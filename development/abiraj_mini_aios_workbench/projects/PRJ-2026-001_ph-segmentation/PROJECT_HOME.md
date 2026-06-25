@@ -55,24 +55,24 @@ onboarding task and recorded here once verified — it has not been invented.
 
 At creation time, no PH Segmentation files exist inside this Mini-AIOS workbench (discovery
 returned zero matches). The completed inputs, final HTML and chat evidence are external and
-will be imported under Task REQ-20260625-001_retroactive-onboarding.
+will be imported under Task REQ-20260625-001_ph-asin-segmentation.
 
 ## Source-of-Truth Locations
 
-- Source documents: `evidence/source_documents/REQ-20260625-001_retroactive-onboarding/`
-- Final output (HTML): `evidence/final_outputs/REQ-20260625-001_retroactive-onboarding/`
-- Process logs / screenshots / chat evidence: `evidence/logs_or_screenshots/REQ-20260625-001_retroactive-onboarding/`
-- Validation: `validation/REQ-20260625-001_retroactive-onboarding/`
-- Closure: `closure/REQ-20260625-001_retroactive-onboarding/`
+- Source documents: `evidence/source_documents/REQ-20260625-001_ph-asin-segmentation/`
+- Final output (HTML): `evidence/final_outputs/REQ-20260625-001_ph-asin-segmentation/`
+- Process logs / screenshots / chat evidence: `evidence/logs_or_screenshots/REQ-20260625-001_ph-asin-segmentation/`
+- Validation: `validation/REQ-20260625-001_ph-asin-segmentation/`
+- Closure: `closure/REQ-20260625-001_ph-asin-segmentation/`
 
 ## Active Tasks
 
-- REQ-20260625-001_retroactive-onboarding — Status: DISCOVERY (see TASK_REGISTER.md)
+- REQ-20260625-001_ph-asin-segmentation — Status: DISCOVERY (see TASK_REGISTER.md)
 
 ## Evidence Locations
 
-- Structure-creation evidence: `evidence/logs_or_screenshots/REQ-20260625-001_retroactive-onboarding/2026-06-25_structure_creation_evidence.md`
-- Duplicate-risk reports: `duplicate_risk_reports/REQ-20260625-001_retroactive-onboarding/`
+- Structure-creation evidence: `evidence/logs_or_screenshots/REQ-20260625-001_ph-asin-segmentation/2026-06-25_structure_creation_evidence.md`
+- Duplicate-risk reports: `duplicate_risk_reports/REQ-20260625-001_ph-asin-segmentation/`
 
 ## Duplicate-Risk Status
 
@@ -121,16 +121,16 @@ work**. It does **not** claim that GPT supervised the original implementation.
 
 ## Imported Assets
 
-Imported 2026-06-25 under Task REQ-20260625-001_retroactive-onboarding (COPY-only; originals
+Imported 2026-06-25 under Task REQ-20260625-001_ph-asin-segmentation (COPY-only; originals
 preserved; checksums matched). See the manifest for full SHA-256 verification:
 
-* Source manifest: `evidence/source_documents/REQ-20260625-001_retroactive-onboarding/SOURCE_MANIFEST.md`
-* Canonical final HTML: `evidence/final_outputs/REQ-20260625-001_retroactive-onboarding/2026-06-24_ph-asin_segmentation_report_2026-07.html`
-* SQL engine (stored, NOT executed): `sql/REQ-20260625-001_retroactive-onboarding/2026-06-25_ph_segment_engine.sql`
-* Monthly run prompt (historical): `prompts/implementation/REQ-20260625-001_retroactive-onboarding/2026-06-25_monthly_run_prompt_historical.md`
-* Day-1 summary: `handover/REQ-20260625-001_retroactive-onboarding/2026-06-23__abiraj__ph-asin__REQ-05-D01.md`
-* Day-2 summary: `handover/REQ-20260625-001_retroactive-onboarding/2026-06-24__abiraj__ph-asin__REQ-05-D02.md`
-* Claude provenance link: `evidence/logs_or_screenshots/REQ-20260625-001_retroactive-onboarding/2026-06-25_claude_chat_share_link.txt`
+* Source manifest: `evidence/source_documents/REQ-20260625-001_ph-asin-segmentation/SOURCE_MANIFEST.md`
+* Canonical final HTML: `evidence/final_outputs/REQ-20260625-001_ph-asin-segmentation/2026-06-24_ph-asin_segmentation_report_2026-07.html`
+* SQL engine (stored, NOT executed): `sql/REQ-20260625-001_ph-asin-segmentation/2026-06-25_ph_segment_engine.sql`
+* Monthly run prompt (historical): `prompts/implementation/REQ-20260625-001_ph-asin-segmentation/2026-06-25_monthly_run_prompt_historical.md`
+* Day-1 summary: `handover/REQ-20260625-001_ph-asin-segmentation/2026-06-23__abiraj__ph-asin__REQ-05-D01.md`
+* Day-2 summary: `handover/REQ-20260625-001_ph-asin-segmentation/2026-06-24__abiraj__ph-asin__REQ-05-D02.md`
+* Claude provenance link: `evidence/logs_or_screenshots/REQ-20260625-001_ph-asin-segmentation/2026-06-25_claude_chat_share_link.txt`
 
 ## Candidate Business Question
 
@@ -167,4 +167,4 @@ Status: CONFIRMED (Business Validator: Bietrick — confirmed by Abiraj on 2026-
 
 ## Project Status
 
-ACTIVE (retrospective onboarding COMPLETED; task REQ-20260625-001_retroactive-onboarding CLOSED).
+ACTIVE (retrospective onboarding COMPLETED; task REQ-20260625-001_ph-asin-segmentation CLOSED).

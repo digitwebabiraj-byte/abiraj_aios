@@ -6,7 +6,7 @@ PRJ-2026-001_ph-segmentation
 
 ## Task ID
 
-REQ-20260625-001_retroactive-onboarding
+REQ-20260625-001_ph-asin-segmentation
 
 ## Objective
 
@@ -30,7 +30,7 @@ SQL engine, historical monthly run prompt (7 assets — checksums matched; origi
 
 ## Source Manifest
 
-`evidence/source_documents/REQ-20260625-001_retroactive-onboarding/SOURCE_MANIFEST.md`
+`evidence/source_documents/REQ-20260625-001_ph-asin-segmentation/SOURCE_MANIFEST.md`
 
 ## Import Validation
 

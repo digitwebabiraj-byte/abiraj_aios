@@ -2,7 +2,7 @@
 
 ## Task ID
 
-REQ-20260625-001_retroactive-onboarding
+REQ-20260625-001_ph-asin-segmentation
 
 ## Project ID
 
@@ -92,7 +92,7 @@ Status: **REQUIRES BUSINESS VALIDATOR** (not CONFIRMED).
 
 ## Validation Path
 
-`validation/REQ-20260625-001_retroactive-onboarding/2026-06-25_retrospective_import_validation.md`
+`validation/REQ-20260625-001_ph-asin-segmentation/2026-06-25_retrospective_import_validation.md`
 
 ## Review Results
 

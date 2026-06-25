@@ -1,6 +1,6 @@
 # PH Segmentation Retrospective Import Validation
 
-- Requirement ID: REQ-20260625-001_retroactive-onboarding
+- Requirement ID: REQ-20260625-001_ph-asin-segmentation
 - Date: 2026-06-25
 - Validated by: Claude Code for Abiraj
 

@@ -1,7 +1,7 @@
 # PH Segmentation — Structure Creation Evidence
 
 - Project ID: PRJ-2026-001_ph-segmentation
-- Task ID: REQ-20260625-001_retroactive-onboarding
+- Task ID: REQ-20260625-001_ph-asin-segmentation
 - Date: 2026-06-25
 - Captured by: Claude Code for Abiraj
 
@@ -33,7 +33,7 @@ PRJ-2026-001_ph-segmentation — UNIQUE (no prior use found).
 
 ## Task ID Check
 
-REQ-20260625-001_retroactive-onboarding — UNIQUE (no prior use found).
+REQ-20260625-001_ph-asin-segmentation — UNIQUE (no prior use found).
 
 ## Folders Created
 
@@ -42,7 +42,7 @@ prompts/{discovery,implementation,validation,closure}, evidence/{source_document
 final_outputs,sql,workflow_exports,logs_or_screenshots}, validation/, workflows/, sql/,
 capability/, handover/, closure/, duplicate_risk_reports/.
 
-Task-specific subfolders (REQ-20260625-001_retroactive-onboarding) created under:
+Task-specific subfolders (REQ-20260625-001_ph-asin-segmentation) created under:
 prompts/discovery, prompts/implementation, prompts/validation, prompts/closure,
 evidence/source_documents, evidence/final_outputs, evidence/logs_or_screenshots,
 validation, handover, closure, duplicate_risk_reports.
@@ -55,7 +55,7 @@ No hypothetical folders for additional tasks were created.
 - CLAUDE.md
 - PROJECT_HOME.md
 - TASK_REGISTER.md
-- evidence/logs_or_screenshots/REQ-20260625-001_retroactive-onboarding/2026-06-25_structure_creation_evidence.md (this file)
+- evidence/logs_or_screenshots/REQ-20260625-001_ph-asin-segmentation/2026-06-25_structure_creation_evidence.md (this file)
 - 16 `.gitkeep` placeholders in empty leaf folders (to preserve the structure for future Git)
 
 ## Files Modified

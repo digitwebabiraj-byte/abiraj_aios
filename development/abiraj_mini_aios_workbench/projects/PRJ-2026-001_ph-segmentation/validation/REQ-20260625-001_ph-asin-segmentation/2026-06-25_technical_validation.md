@@ -6,7 +6,7 @@ PRJ-2026-001_ph-segmentation
 
 ## Task ID
 
-REQ-20260625-001_retroactive-onboarding
+REQ-20260625-001_ph-asin-segmentation
 
 ## Technical Reviewer
 
@@ -24,13 +24,13 @@ No separate signed reviewer artifact was supplied during this update.
 
 ## Reviewed Assets
 
-* Canonical SQL: `sql/REQ-20260625-001_retroactive-onboarding/2026-06-25_ph_segment_engine.sql`
-* SQL warning README: `sql/REQ-20260625-001_retroactive-onboarding/README.md`
-* Source protocol: `evidence/source_documents/REQ-20260625-001_retroactive-onboarding/2026-06_ph-asin_segmentation_protocol_v1.0.docx`
-* Canonical HTML: `evidence/final_outputs/REQ-20260625-001_retroactive-onboarding/2026-06-24_ph-asin_segmentation_report_2026-07.html`
-* Source manifest: `evidence/source_documents/REQ-20260625-001_retroactive-onboarding/SOURCE_MANIFEST.md`
-* Task home: `handover/REQ-20260625-001_retroactive-onboarding/TASK_HOME.md`
-* Retrospective import validation: `validation/REQ-20260625-001_retroactive-onboarding/2026-06-25_retrospective_import_validation.md`
+* Canonical SQL: `sql/REQ-20260625-001_ph-asin-segmentation/2026-06-25_ph_segment_engine.sql`
+* SQL warning README: `sql/REQ-20260625-001_ph-asin-segmentation/README.md`
+* Source protocol: `evidence/source_documents/REQ-20260625-001_ph-asin-segmentation/2026-06_ph-asin_segmentation_protocol_v1.0.docx`
+* Canonical HTML: `evidence/final_outputs/REQ-20260625-001_ph-asin-segmentation/2026-06-24_ph-asin_segmentation_report_2026-07.html`
+* Source manifest: `evidence/source_documents/REQ-20260625-001_ph-asin-segmentation/SOURCE_MANIFEST.md`
+* Task home: `handover/REQ-20260625-001_ph-asin-segmentation/TASK_HOME.md`
+* Retrospective import validation: `validation/REQ-20260625-001_ph-asin-segmentation/2026-06-25_retrospective_import_validation.md`
 
 ## Validated Areas
 

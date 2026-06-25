@@ -20,18 +20,18 @@ business question is to be confirmed from the imported source documents and reco
 
 ## Where Inputs Are Stored
 
-`evidence/source_documents/REQ-20260625-001_retroactive-onboarding/`
+`evidence/source_documents/REQ-20260625-001_ph-asin-segmentation/`
 
 ## Where Final Outputs Are Stored
 
-`evidence/final_outputs/REQ-20260625-001_retroactive-onboarding/` (the original final HTML —
+`evidence/final_outputs/REQ-20260625-001_ph-asin-segmentation/` (the original final HTML —
 preserved, never rewritten).
 
 ## Where Evidence and Validation Are Stored
 
-- Evidence (logs, screenshots, chat evidence): `evidence/logs_or_screenshots/REQ-20260625-001_retroactive-onboarding/`
-- Validation: `validation/REQ-20260625-001_retroactive-onboarding/`
-- Duplicate-risk reports: `duplicate_risk_reports/REQ-20260625-001_retroactive-onboarding/`
+- Evidence (logs, screenshots, chat evidence): `evidence/logs_or_screenshots/REQ-20260625-001_ph-asin-segmentation/`
+- Validation: `validation/REQ-20260625-001_ph-asin-segmentation/`
+- Duplicate-risk reports: `duplicate_risk_reports/REQ-20260625-001_ph-asin-segmentation/`
 
 ## Who Owns and Reviews It
 
