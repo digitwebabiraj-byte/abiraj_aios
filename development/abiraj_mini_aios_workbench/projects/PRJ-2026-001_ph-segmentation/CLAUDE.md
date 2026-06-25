@@ -9,7 +9,7 @@
 
 - Do not modify anything outside this project folder
   (`projects/PRJ-2026-001_ph-segmentation/`) without written approval.
-- Do not rewrite or edit the original PH Segmentation HTML during retrospective onboarding —
+- Do not rewrite or edit the original PH Segmentation HTML during onboarding —
   it is preserved evidence, not a working file.
 
 ## Task Rules

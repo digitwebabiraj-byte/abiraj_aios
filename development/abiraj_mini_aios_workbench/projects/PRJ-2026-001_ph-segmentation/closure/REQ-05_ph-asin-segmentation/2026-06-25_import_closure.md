@@ -1,4 +1,4 @@
-# PH Segmentation Retrospective Import Closure
+# PH Segmentation Import Closure
 
 ## Project ID
 
@@ -34,15 +34,15 @@ ChatGPT_Brain_Setup.md — NOT REQUIRED.
 
 ## Evidence Path
 
-`evidence/logs_or_screenshots/REQ-…001/2026-06-25_retrospective_import_evidence.md`
+`evidence/logs_or_screenshots/REQ-…001/2026-06-25_import_evidence.md`
 
 ## Validation Path
 
-`validation/REQ-…001/2026-06-25_retrospective_import_validation.md`
+`validation/REQ-…001/2026-06-25_import_validation.md`
 
 ## Duplicate-Risk Path
 
-`duplicate_risk_reports/REQ-…001/2026-06-25_retrospective_import_duplicate_risk.md`
+`duplicate_risk_reports/REQ-…001/2026-06-25_import_duplicate_risk.md`
 
 ## Handover Path
 

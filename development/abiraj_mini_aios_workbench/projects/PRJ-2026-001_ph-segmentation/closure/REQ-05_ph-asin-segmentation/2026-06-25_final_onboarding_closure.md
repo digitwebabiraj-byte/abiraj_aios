@@ -11,7 +11,7 @@ REQ-05_ph-asin-segmentation
 ## Objective
 
 Preserve, classify, document and validate the previously completed PH Segmentation work
-inside the approved Mini-AIOS project structure, then close the retrospective onboarding task
+inside the approved Mini-AIOS project structure, then close the onboarding task
 and set the project ACTIVE.
 
 ## Imported Assets
@@ -82,7 +82,7 @@ PASS
 
 PASS
 
-## Retrospective Task Status
+## Task Status
 
 CLOSED
 

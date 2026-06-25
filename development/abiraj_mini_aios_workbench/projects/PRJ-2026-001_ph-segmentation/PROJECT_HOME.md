@@ -38,7 +38,7 @@ onboarding task and recorded here once verified — it has not been invented.
 ## Prohibited Scope
 
 - Do not repeat, re-run or modify the original PH Segmentation implementation.
-- Do not rewrite or edit the original final HTML during retrospective onboarding.
+- Do not rewrite or edit the original final HTML during onboarding.
 - Do not modify anything outside this project folder without written approval.
 - Do not create business, financial or PPC logic.
 - Do not commit or push without explicit approval after GPT review.
@@ -146,7 +146,7 @@ Status: CONFIRMED (Business Validator: Bietrick — confirmed by Abiraj on 2026-
 * Queryability Validation: PASS — Tamil Selvan
 * Business Validation: PASS — Bietrick
 * Coordinator Validation: PASS — Varmen
-* Retrospective Onboarding Status: COMPLETED
+* Onboarding Status: COMPLETED
 
 (All confirmed by Abiraj on 2026-06-25; no separate signed reviewer artifact was supplied.)
 
@@ -167,4 +167,4 @@ Status: CONFIRMED (Business Validator: Bietrick — confirmed by Abiraj on 2026-
 
 ## Project Status
 
-ACTIVE (retrospective onboarding COMPLETED; task REQ-05_ph-asin-segmentation CLOSED).
+ACTIVE (onboarding COMPLETED; task REQ-05_ph-asin-segmentation CLOSED).

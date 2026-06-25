@@ -30,7 +30,7 @@ No separate signed reviewer artifact was supplied during this update.
 * Canonical HTML: `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-06-24_ph-asin_segmentation_report_2026-07.html`
 * Source manifest: `evidence/source_documents/REQ-05_ph-asin-segmentation/SOURCE_MANIFEST.md`
 * Task home: `handover/REQ-05_ph-asin-segmentation/TASK_HOME.md`
-* Retrospective import validation: `validation/REQ-05_ph-asin-segmentation/2026-06-25_retrospective_import_validation.md`
+* Import validation: `validation/REQ-05_ph-asin-segmentation/2026-06-25_import_validation.md`
 
 ## Validated Areas
 

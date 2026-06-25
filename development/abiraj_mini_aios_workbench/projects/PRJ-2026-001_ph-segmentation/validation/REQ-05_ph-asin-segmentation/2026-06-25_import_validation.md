@@ -1,4 +1,4 @@
-# PH Segmentation Retrospective Import Validation
+# PH Segmentation Import Validation
 
 - Requirement ID: REQ-05_ph-asin-segmentation
 - Date: 2026-06-25

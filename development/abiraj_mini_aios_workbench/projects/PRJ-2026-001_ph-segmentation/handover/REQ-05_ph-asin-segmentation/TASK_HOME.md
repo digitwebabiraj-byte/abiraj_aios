@@ -1,4 +1,4 @@
-# PH Segmentation Retrospective Onboarding Task
+# PH Segmentation Onboarding Task
 
 ## Task ID
 
@@ -87,12 +87,12 @@ Status: **REQUIRES BUSINESS VALIDATOR** (not CONFIRMED).
 ## Evidence Paths
 
 * Source manifest: `evidence/source_documents/REQ-…001/SOURCE_MANIFEST.md`
-* Import evidence: `evidence/logs_or_screenshots/REQ-…001/2026-06-25_retrospective_import_evidence.md`
-* Duplicate-risk: `duplicate_risk_reports/REQ-…001/2026-06-25_retrospective_import_duplicate_risk.md`
+* Import evidence: `evidence/logs_or_screenshots/REQ-…001/2026-06-25_import_evidence.md`
+* Duplicate-risk: `duplicate_risk_reports/REQ-…001/2026-06-25_import_duplicate_risk.md`
 
 ## Validation Path
 
-`validation/REQ-05_ph-asin-segmentation/2026-06-25_retrospective_import_validation.md`
+`validation/REQ-05_ph-asin-segmentation/2026-06-25_import_validation.md`
 
 ## Review Results
 

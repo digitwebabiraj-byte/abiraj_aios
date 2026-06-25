@@ -82,4 +82,4 @@ source-document inspection**. They were not invented, inferred or approved in th
 ## One Next Step
 
 Inspect the supplied PH Segmentation source documents, final HTML and work-summary files
-through the approved retrospective discovery task.
+through the approved discovery task.

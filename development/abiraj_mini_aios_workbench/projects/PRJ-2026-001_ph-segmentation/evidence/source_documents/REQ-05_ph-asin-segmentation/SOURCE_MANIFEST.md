@@ -13,7 +13,7 @@
 The original PH Segmentation implementation was completed using **Claude Chat before the
 GPT-controlled workflow was adopted**.
 
-This manifest records a **retrospective preservation and validation import**.
+This manifest records a **preservation and validation import**.
 
 It does **not** claim that GPT supervised the original work.
 
