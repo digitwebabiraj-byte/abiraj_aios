@@ -1,0 +1,61 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Office and temporary files
+~$*
+*.tmp
+*.temp
+*.bak
+*.old
+*.orig
+*.rej
+
+# Editors
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Logs and caches
+*.log
+.cache/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Python environments
+.venv/
+venv/
+env/
+
+# Node
+node_modules/
+dist/
+build/
+coverage/
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets.json
+
+# Claude private configuration
+.claude/
+**/.claude/
+claude_desktop_config.json
+
+# Database dumps
+*.dump
+*.sql.gz
+*.backup
+
+# Temporary local intake (kept outside version control)
+PH_Segmentation_Intake/
