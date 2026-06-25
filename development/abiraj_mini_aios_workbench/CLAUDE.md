@@ -39,6 +39,26 @@ Inspection permission is not modification permission.
 | Daily work logs | /10_daily_work |
 | Unapproved parent-AIOS candidates | /11_parent_aios_candidates |
 
+## Multi-Project Storage Rule
+
+1. **Workbench folders `01–11` are for workbench governance only** — Mini-AIOS setup, reusable
+   standards, governance reports and workbench-level evidence. They are NOT a home for any
+   specific business or development project's working files.
+2. **Real projects belong under `projects/<PROJECT_ID>/`** (e.g.
+   `projects/PRJ-2026-001_ph-segmentation/`). All of a project's requirements, prompts,
+   evidence, validation, handover and closure live inside that project folder, never in `01–11`.
+3. **Tasks belong only to their assigned project.** Every task is stored under its own
+   `<TASK_ID>` inside its project; a task never spans two projects.
+4. **A new day or a new Claude session does NOT create a new Task ID.** Keep using the existing
+   Task ID until that requirement is formally closed; only a new requirement gets a new Task ID.
+5. **Do not mix files from different projects** in the same folder. One project = one
+   `projects/<PROJECT_ID>/` tree.
+6. **Do not duplicate canonical assets.** Each SQL, HTML, evidence or validation asset has
+   exactly one canonical location; reference it by path rather than copying it.
+7. **Identifiers are unique:** one unique Project ID per project, one unique Task ID per task.
+8. **PH Segmentation (`PRJ-2026-001_ph-segmentation`) remains in its current approved
+   structure** as the completed legacy project; do not restructure or move it.
+
 ## Existing-Asset-First Rule
 
 Use this order:

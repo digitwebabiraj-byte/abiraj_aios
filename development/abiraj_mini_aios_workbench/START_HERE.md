@@ -97,6 +97,25 @@ workflows, handover, capability, closure) are created at the workbench root.
 **Launch rule:** Claude Code must be launched from the Mini-AIOS workbench root
 (`development\abiraj_mini_aios_workbench`) so it auto-reads `CLAUDE.md` and this guide.
 
+## Multi-Project Storage Rule
+
+1. **Workbench folders `01–11` are for workbench governance only** — Mini-AIOS setup,
+   reusable standards, governance reports and workbench-level evidence. They do not hold any
+   specific project's working files.
+2. **Real business or development projects belong under `projects/<PROJECT_ID>/`** (e.g.
+   `projects/PRJ-2026-001_ph-segmentation/`). A project's requirements, prompts, evidence,
+   validation, handover and closure all live inside that project folder — never in `01–11`.
+3. **Tasks belong only to their assigned project**, stored under their own `<TASK_ID>` inside
+   that project. A task never spans two projects.
+4. **A new day or a new Claude session does not create a new Task ID.** Keep the existing Task
+   ID until the requirement is closed; only a new requirement gets a new Task ID.
+5. **Do not mix files from different projects.** One project = one `projects/<PROJECT_ID>/` tree.
+6. **Do not duplicate canonical assets.** Each SQL, HTML, evidence or validation asset has one
+   canonical location; reference it by path instead of copying it. Identifiers stay unique —
+   one Project ID per project, one Task ID per task.
+7. **PH Segmentation (`PRJ-2026-001_ph-segmentation`) remains in its current approved
+   structure** as the completed legacy project and must not be restructured or moved.
+
 ## 11. GPT-to-Claude Operating Loop
 
 1. GPT (planning layer) asks the mandatory questions and writes a structured prompt.
