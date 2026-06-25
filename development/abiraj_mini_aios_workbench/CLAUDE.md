@@ -96,6 +96,22 @@ YYYY-MM-DD_[stage]_[task-name].[extension]
 - One project = one Project ID; one requirement = one Task ID. Do not create a second ID for
   the same body of work (no dual IDs). If the source has no requirement ID, ask before minting one.
 
+## Project Root Files (standard for every project)
+
+Each `projects/<PROJECT_ID>/` root carries these standing, project-level documents (NOT under a
+task folder):
+
+| File | Purpose |
+|---|---|
+| `README.md` | One-screen landing page |
+| `PROJECT_HOME.md` | Governance: purpose, scope, reviewers, status |
+| `SYSTEM_REFERENCE.md` | **Complete functional detail** — what the system actually does (protocol, rules, data model, logic, report). Plain-markdown, derived from the canonical sources, for a leader or new engineer |
+| `CLAUDE.md` | Project execution rules |
+| `TASK_REGISTER.md` | Index of the project's tasks |
+
+`SYSTEM_REFERENCE.md` is project-level (it describes the whole system), so it lives at the
+project root — never inside a `REQ-…` task folder.
+
 ## Evidence Rule
 
 No evidence means the task is UNPROVEN.
