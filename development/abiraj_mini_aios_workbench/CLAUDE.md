@@ -84,6 +84,18 @@ Use:
 
 YYYY-MM-DD_[stage]_[task-name].[extension]
 
+## ID Naming Convention
+
+- **Project ID:** `PRJ-<YYYY>-<NNN>_<short-name>` (e.g. `PRJ-2026-001_ph-segmentation`).
+- **Task ID:** use the **real requirement ID from the source files**, named after the
+  deliverable — NOT a process word like `retroactive`, `onboarding` or `import`, and NOT a
+  freshly-invented dated ID. Format: `REQ-<original-number>_<deliverable-name>`.
+  - Example: PH Segmentation's source files reference requirement `REQ-05`, so its task is
+    `REQ-05_ph-asin-segmentation`. EOD-Skills references `REQ-03`, so its task is
+    `REQ-03_eod-skills`.
+- One project = one Project ID; one requirement = one Task ID. Do not create a second ID for
+  the same body of work (no dual IDs). If the source has no requirement ID, ask before minting one.
+
 ## Evidence Rule
 
 No evidence means the task is UNPROVEN.
