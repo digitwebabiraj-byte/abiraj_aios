@@ -22,7 +22,7 @@ delivering high-value verified work, who is wasting hours or logging unverifiabl
 is each person's and department's measurable EOD performance?" The skill answers a bank of ~50
 predefined HR/management questions from live `daily_eod_log` joins.
 
-Status: **REQUIRES BUSINESS VALIDATOR** (reconstructed; not yet confirmed).
+Status: **CONFIRMED** (validated by HR; confirmed by Abiraj on 2026-06-25).
 
 ## Owner and Reviewers
 
@@ -30,7 +30,7 @@ Status: **REQUIRES BUSINESS VALIDATOR** (reconstructed; not yet confirmed).
 - Coordinator: Varmen
 - Technical Reviewer: Sajeesan
 - Queryability Reviewer: Tamil Selvan
-- Business Validator: HR — to be assigned (the deliverables are HR-facing)
+- Business Validator: HR (validated 2026-06-25)
 
 ## Original Requirement
 
@@ -80,9 +80,18 @@ matched). See `evidence/source_documents/REQ-03_eod-skills/SOURCE_MANIFEST.md`.
 - DB corrections claimed in the summaries are unverifiable from this folder.
 - Some referenced artifacts (dashboard zip, FastAPI package, Claude artifact) were not provided.
 
+## Reviews
+
+* Business Validation: PASS — HR
+* Queryability Validation: PASS — Tamil Selvan
+* Technical (Sajeesan) and Coordinator (Varmen): not required by the owner for this onboarding.
+
+(Both required reviews confirmed by Abiraj on 2026-06-25; no separate signed reviewer artifact was supplied.)
+
 ## Current Status
 
-ONBOARDING — imported and registered; pending technical, queryability and business validation.
+ACTIVE — onboarding COMPLETED; task REQ-03_eod-skills CLOSED on the owner-required reviews
+(Business + Queryability). Technical review applies only if the EOD skill/SQL is later executed.
 
 ## One Next Action
 

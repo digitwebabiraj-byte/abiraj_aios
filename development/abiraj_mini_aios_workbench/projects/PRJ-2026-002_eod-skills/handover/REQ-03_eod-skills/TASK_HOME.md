@@ -52,7 +52,7 @@ Mini-AIOS project structure.
 
 ## Current Status
 
-IMPORTED — PENDING TECHNICAL, QUERYABILITY AND BUSINESS VALIDATION
+CLOSED — Business (HR) PASS and Queryability (Tamil Selvan) PASS, confirmed by Abiraj 2026-06-25. Technical (Sajeesan) and Coordinator (Varmen) not required by the owner for this onboarding.
 
 ## One Next Step
 

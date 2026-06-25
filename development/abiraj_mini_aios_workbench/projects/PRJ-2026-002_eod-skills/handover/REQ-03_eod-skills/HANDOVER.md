@@ -20,12 +20,13 @@ originals preserved in `C:\Users\digit\OneDrive\Desktop\Project 2 EOD-Skills`; a
 
 ## Validation Status
 
-Import PASS (14/14 checksums matched, originals preserved). Technical, queryability and business
-validation still pending.
+Import PASS (14/14 checksums matched, originals preserved). Owner-required reviews complete:
+Business (HR) PASS, Queryability (Tamil Selvan) PASS — confirmed by Abiraj 2026-06-25.
+Technical (Sajeesan) and Coordinator (Varmen) not required for this onboarding. **Task CLOSED.**
 
 ## Business Question Status
 
-REQUIRES BUSINESS VALIDATOR (reconstructed; not confirmed).
+CONFIRMED (validated by HR, 2026-06-25).
 
 ## HR / Sensitivity Notice
 
