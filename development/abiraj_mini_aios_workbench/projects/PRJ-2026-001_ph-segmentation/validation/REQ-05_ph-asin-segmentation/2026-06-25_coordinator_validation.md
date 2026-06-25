@@ -6,7 +6,7 @@ PRJ-2026-001_ph-segmentation
 
 ## Task ID
 
-REQ-20260625-001_ph-asin-segmentation
+REQ-05_ph-asin-segmentation
 
 ## Coordinator
 

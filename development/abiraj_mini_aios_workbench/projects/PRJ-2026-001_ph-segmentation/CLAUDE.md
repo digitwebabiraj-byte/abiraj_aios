@@ -15,7 +15,7 @@
 ## Task Rules
 
 - Do not create a new task merely because a new Claude session begins.
-- Use the existing Task ID (`REQ-20260625-001_ph-asin-segmentation`) until the requirement
+- Use the existing Task ID (`REQ-05_ph-asin-segmentation`) until the requirement
   is formally closed.
 
 ## Evidence Rule

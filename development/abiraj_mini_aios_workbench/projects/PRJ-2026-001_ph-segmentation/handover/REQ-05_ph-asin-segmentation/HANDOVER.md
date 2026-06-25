@@ -6,7 +6,7 @@ PRJ-2026-001_ph-segmentation
 
 ## Task ID
 
-REQ-20260625-001_ph-asin-segmentation
+REQ-05_ph-asin-segmentation
 
 ## What Was Imported
 
@@ -31,7 +31,7 @@ queryable and safe for another person to continue.
 
 ## Source Manifest
 
-`evidence/source_documents/REQ-20260625-001_ph-asin-segmentation/SOURCE_MANIFEST.md`
+`evidence/source_documents/REQ-05_ph-asin-segmentation/SOURCE_MANIFEST.md`
 
 ## Final HTML
 
