@@ -15,7 +15,7 @@ original work.
 ## Business Question Supported
 
 Who is delivering high-value verified work, who is wasting hours or logging unverifiable work,
-and what is each person's/department's measurable EOD performance? (Status: REQUIRES BUSINESS VALIDATOR.)
+and what is each person's/department's measurable EOD performance? (Status: CONFIRMED — validated by HR, 2026-06-25.)
 
 ## Where Things Are Stored
 
@@ -27,11 +27,13 @@ and what is each person's/department's measurable EOD performance? (Status: REQU
 
 ## Who Owns and Reviews It
 
-Owner: Abiraj · Coordinator: Varmen · Technical: Sajeesan · Queryability: Tamil Selvan · Business: HR (to be assigned).
+Owner: Abiraj · Coordinator: Varmen · Technical: Sajeesan · Queryability: Tamil Selvan · Business: HR.
 
 ## Current Status
 
-ONBOARDING — imported and registered; pending technical, queryability and business validation.
+ACTIVE — onboarding CLOSED on the owner-required reviews: Business (HR) PASS and Queryability
+(Tamil Selvan) PASS, confirmed by Abiraj 2026-06-25. Technical (Sajeesan) review applies only
+if the EOD skill/SQL is later executed.
 
 ## Known Limitations
 
