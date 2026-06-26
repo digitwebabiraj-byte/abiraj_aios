@@ -167,4 +167,40 @@ Status: CONFIRMED (Business Validator: Bietrick — confirmed by Abiraj on 2026-
 
 ## Project Status
 
-ACTIVE (onboarding COMPLETED; task REQ-05_ph-asin-segmentation CLOSED).
+ACTIVE (onboarding COMPLETED; task REQ-05_ph-asin-segmentation CLOSED). A second task,
+REQ-20260626-002_dashboard-ui-live-report-release, records the 26 June 2026 dashboard UI fix
+and live report release (RECORDED — documentation only; substantive claims REPORTED_BY_ABIRAJ).
+
+## Active Tasks (updated 2026-06-26)
+
+- REQ-05_ph-asin-segmentation — Status: CLOSED (PASS). Onboarding/preservation.
+- REQ-20260626-002_dashboard-ui-live-report-release — Status: RECORDED (AMBER). New execution
+  beyond REQ-05's preservation scope (UI fix + live release + routine build). All claims
+  REPORTED_BY_ABIRAJ; Task ID pending GPT/Abiraj ratification (dated invented ID, no backing
+  written requirement). See `handover/REQ-20260626-002_dashboard-ui-live-report-release/TASK_HOME.md`.
+
+## Current Operational State
+
+As of 2026-06-26 (REPORTED_BY_ABIRAJ unless marked otherwise):
+
+| Aspect | State |
+|---|---|
+| Dashboard release | COMPLETE (reported — DB state; not independently verified, DB not queried) |
+| Downloadable HTML | COMPLETE — **VERIFIED** (imported + checksummed `6F126A4E…`; 24 PHs, 1,765 cards, 7,855 `segTotal`, 686 LLL, July-2026/Jun-FBM window all read from the file) |
+| Monthly PostgreSQL routine | BUILT (reported; not created/enabled; routine file not imported) |
+| Automation creation | PAUSED (blocker: Windows Virtual Machine Platform enablement/restart) |
+| Final post-June refresh | PENDING (July built on partial June data — file `meta.generated` = 26 June, window 1–30 Jun) |
+| Mark done database persistence | PENDING — **CONFIRMED not implemented** (file persists ticks to browser `localStorage` only) |
+
+Records: `handover/REQ-20260626-002_dashboard-ui-live-report-release/TASK_HOME.md`,
+`validation/REQ-20260626-002_dashboard-ui-live-report-release/2026-06-26_release_validation.md`,
+`evidence/final_outputs/REQ-20260626-002_dashboard-ui-live-report-release/` (HTML + `SOURCE_MANIFEST.md`),
+`capability/2026-06-26_server-side-monthly-build-method.md`.
+
+## Future Governed Tasks
+
+Candidates only — **no Task IDs assigned** (no approved written requirement exists yet):
+
+1. Enable and validate monthly PH report automation.
+2. Refresh the July report after June data closes.
+3. Implement database persistence for the "Mark done" action.

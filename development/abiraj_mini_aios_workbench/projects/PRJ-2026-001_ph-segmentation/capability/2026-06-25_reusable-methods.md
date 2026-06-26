@@ -42,3 +42,10 @@ owner+category — never a single global average across unlike things.
 ## 8. Method A vs pooled averages
 "Average of the per-item rates" (Method A) ≠ "pooled rate". Choose deliberately and state which;
 Method A produces an intentionally high, peer-relative bar.
+
+## 9. Server-side build-and-serve from the pre-computed table
+Generate the report **server-side from the pre-computed segmentation table** and write it
+straight into the dashboard record (no large manual HTML paste); pull the file back out of the DB
+so the download and the dashboard record are identical. See
+`capability/2026-06-26_server-side-monthly-build-method.md` (REPORTED_BY_ABIRAJ — no in-repo
+proof yet). Extends §5 (Pre-compute-then-serve) and §6 (parameter-free scheduled engine).
