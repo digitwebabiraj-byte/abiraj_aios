@@ -1,32 +1,33 @@
-# PH Segmentation — Dashboard UI Fix & Live Report Release
+# REQ-05 Delivery Increment — Dashboard UI Fix & Live Report Release (26 June 2026)
 
 ## Task ID
 
-REQ-20260626-002_dashboard-ui-live-report-release
+REQ-05_ph-asin-segmentation
 
-> **ID governance note:** this is a freshly-invented dated ID supplied by Abiraj for this
-> documentation update. It deviates from the project naming convention (workbench `CLAUDE.md`
-> ID rule: "NOT a freshly-invented dated ID"), and no separate written-requirement file backs
-> it yet. Recorded as instructed; flagged AMBER for GPT/Abiraj to ratify or rename to a
-> `REQ-<n>_<deliverable>` form. See `## Open Items`.
+> **Re-homing note (2026-06-26):** this record was originally filed under a separate, non-compliant
+> Task ID `REQ-20260626-002_dashboard-ui-live-report-release` (a freshly-invented dated ID). Per the
+> project ID-naming convention (workbench `CLAUDE.md`: "use the real requirement ID … NOT a freshly-
+> invented dated ID"), it has been folded back into **REQ-05** — the real requirement this report
+> delivers. The dashboard UI fix and live release are the **delivery phase** of REQ-05's segmentation
+> report, not a separate requirement. Ratified by Abiraj on 2026-06-26.
 
 ## Project ID
 
 PRJ-2026-001_ph-segmentation
 
-## Relationship to REQ-05
+## Phase
 
-REQ-05_ph-asin-segmentation (onboarding/preservation) is **CLOSED — PASS**. That task only
-preserved and validated the pre-existing Claude-Chat work. The work recorded here — the card-UI
-fix, the sidebar fix, the indicator strengthening, the full-report dashboard release, the
-server-side build method, and the monthly routine build — is **new execution beyond REQ-05's
-preservation scope** and therefore belongs to a new task, not a reopening of the CLOSED task.
+DELIVERY / RELEASE increment of REQ-05. The earlier REQ-05 closure
+(`closure/REQ-05_ph-asin-segmentation/2026-06-25_final_onboarding_closure.md`) covered the
+**onboarding/preservation** scope only; this increment records the subsequent delivery of the
+same REQ-05 report. REQ-05 is therefore **reopened to a delivery phase**.
 
-## Purpose
+## What This Records
 
-Record the complete end-state of the 26 June 2026 PH Segmentation session: the report was
-rebuilt and fixed, released to the live dashboard, delivered as a downloadable file, and the
-monthly PostgreSQL routine was built (but not created/enabled as automation).
+The 26 June 2026 end-state: the PH segmentation report was rebuilt and fixed, released to the
+live dashboard, delivered as a downloadable HTML file, and the monthly PostgreSQL routine was
+built (engine as Step 0 + insert + data-fill + skip guards, cron `0 9 3 * *`, PostgreSQL-only).
+Automation creation was deliberately **paused**.
 
 ## Evidence Rule Applied
 
@@ -34,11 +35,12 @@ A claim is marked **VERIFIED** only when supported by a saved file, checksum, da
 SQL/routine file, or existing validation evidence inside this project. Otherwise it is
 **REPORTED_BY_ABIRAJ**. No execution logs, screenshots or reviewer approvals were invented.
 
-**Update 2026-06-26:** the delivered HTML has now been imported as canonical evidence —
-`evidence/final_outputs/REQ-20260626-002_dashboard-ui-live-report-release/2026-06-26_release_ph-asin_segmentation_report_2026-07.html`
-(SHA-256 `6F126A4E…76FEEE87`, 457,618 bytes; copy integrity verified). Several counts are now
-**VERIFIED directly from the file**; database-side and visual claims remain REPORTED_BY_ABIRAJ.
-See `evidence/final_outputs/REQ-20260626-002_dashboard-ui-live-report-release/SOURCE_MANIFEST.md`.
+The delivered HTML is imported as canonical evidence:
+`evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-06-26_release_ph-asin_segmentation_report_2026-07.html`
+(SHA-256 `6F126A4E…76FEEE87`, 457,618 bytes; copy integrity verified). Manifest:
+`evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-06-26_release_evidence_manifest.md`.
+Read-only validation:
+`validation/REQ-05_ph-asin-segmentation/2026-06-26_release_validation.md`.
 
 ## Completed Items (status as of 2026-06-26, post-import)
 
@@ -82,34 +84,44 @@ See `evidence/final_outputs/REQ-20260626-002_dashboard-ui-live-report-release/SO
 
 1. **Automation creation is PAUSED.** Not created, not enabled, not executed.
 2. **Blocker:** Windows Virtual Machine Platform must be enabled (requires restart/enablement).
-3. **No automation action** was taken during this documentation update — not enabled, created or executed.
+3. **No automation action** was taken — not enabled, created or executed.
 4. **The current July report was generated on partial June data.**
 5. **The report must be refreshed after June closes** to produce the final July values.
-6. **Per-card "Mark done" database persistence remains incomplete.** CONFIRMED by the imported file: ticks persist to browser `localStorage` with manual JSON export/import only — there is no database write-back.
-7. **Task ID convention conflict (AMBER):** see the governance note at the top — GPT/Abiraj to ratify or rename.
+6. **Per-card "Mark done" database persistence remains incomplete.** CONFIRMED by the imported file:
+   ticks persist to browser `localStorage` with manual JSON export/import only — no database write-back.
+
+## What Must Not Be Done (carried forward)
+
+* do not execute SQL;
+* do not modify the live database;
+* do not initialise, create or enable the automation;
+* do not refresh the July report until June closes (then refresh for final values);
+* do not mark any claim VERIFIED without saving the corresponding evidence.
+
+## Operational State
+
+See `## Current Operational State` in `PROJECT_HOME.md`.
+
+## Future Governed Tasks
+
+See `## Future Governed Tasks` in `PROJECT_HOME.md` — candidates only; no Task IDs assigned.
 
 ## Current Status
 
-RECORDED — documentation update only. No SQL executed, no live database modified, no automation
-created/enabled, no commit/push performed.
+RECORDED — delivery increment of REQ-05. No SQL executed, no live database modified, no
+automation created/enabled.
 
-## Final Task Result
+## Final Result
 
-AMBER (materially strengthened 2026-06-26). The delivered report is now imported and checksummed,
-and its core counts are **VERIFIED from the file** (7,855 rows, 1,765 cards, 24 PHs, 686 LLL;
-July-2026 period on a 1–30 Jun FBM window, generated 26 June). Still AMBER because: the dashboard
-DB release and the byte-for-byte DB identity are unverified (DB not queried — prohibited), the
-57-benchmark count is unproven (file shows 51), the monthly routine file is not imported, the
-UI-fix *visuals* are not headlessly confirmable, and the Task ID still awaits ratification.
+AMBER (materially strengthened 2026-06-26). The delivered report is imported and checksummed, and
+its core counts are **VERIFIED from the file** (7,855 rows, 1,765 cards, 24 PHs, 686 LLL; July-2026
+period on a 1–30 Jun FBM window, generated 26 June). Still AMBER because: the dashboard DB release
+and the byte-for-byte DB identity are unverified (DB not queried — prohibited), the 57-benchmark
+count is unproven (file shows 51), the monthly routine file is not imported, and the UI-fix
+*visuals* are not headlessly confirmable.
 
 ## One Next Step
 
-GPT/Abiraj to (a) ratify or rename this Task ID, and (b) decide whether to save the 26 June work
-products (new HTML + checksum, routine file, DB release proof) into the project so the claims can
-move from REPORTED_BY_ABIRAJ to VERIFIED.
-
-## Pass / Fail Rule
-
-PASS if the recorded end-state matches what was reported, no claim is marked VERIFIED without
-in-repo evidence, and no prohibited action (SQL execution, DB change, automation enablement,
-commit/push) is taken. FAIL otherwise.
+Decide whether to import the remaining 26 June work products (monthly routine file; a DB release
+proof; a pulled DB copy for the byte-for-byte comparison) so the REPORTED_BY_ABIRAJ claims can
+move to VERIFIED.

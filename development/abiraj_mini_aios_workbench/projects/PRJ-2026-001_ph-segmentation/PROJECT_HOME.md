@@ -167,17 +167,18 @@ Status: CONFIRMED (Business Validator: Bietrick — confirmed by Abiraj on 2026-
 
 ## Project Status
 
-ACTIVE (onboarding COMPLETED; task REQ-05_ph-asin-segmentation CLOSED). A second task,
-REQ-20260626-002_dashboard-ui-live-report-release, records the 26 June 2026 dashboard UI fix
-and live report release (RECORDED — documentation only; substantive claims REPORTED_BY_ABIRAJ).
+ACTIVE. Single task **REQ-05_ph-asin-segmentation**: onboarding/preservation scope CLOSED-PASS,
+now in a **delivery phase** recording the 26 June 2026 dashboard UI fix and live report release.
 
 ## Active Tasks (updated 2026-06-26)
 
-- REQ-05_ph-asin-segmentation — Status: CLOSED (PASS). Onboarding/preservation.
-- REQ-20260626-002_dashboard-ui-live-report-release — Status: RECORDED (AMBER). New execution
-  beyond REQ-05's preservation scope (UI fix + live release + routine build). All claims
-  REPORTED_BY_ABIRAJ; Task ID pending GPT/Abiraj ratification (dated invented ID, no backing
-  written requirement). See `handover/REQ-20260626-002_dashboard-ui-live-report-release/TASK_HOME.md`.
+- REQ-05_ph-asin-segmentation — Status: **DELIVERY** (onboarding CLOSED-PASS; delivery increment
+  AMBER). The 26 June dashboard UI fix + live release + routine build are recorded as a delivery
+  increment of REQ-05, not a separate task. See
+  `handover/REQ-05_ph-asin-segmentation/2026-06-26_delivery_dashboard-ui-live-report-release.md`.
+  - *Re-homing note:* this increment was briefly filed under a non-compliant dated ID
+    `REQ-20260626-002_…`; it was folded back into REQ-05 (the real requirement) per the
+    ID-naming convention. The dated ID is retired. Ratified by Abiraj on 2026-06-26.
 
 ## Current Operational State
 
@@ -192,9 +193,9 @@ As of 2026-06-26 (REPORTED_BY_ABIRAJ unless marked otherwise):
 | Final post-June refresh | PENDING (July built on partial June data — file `meta.generated` = 26 June, window 1–30 Jun) |
 | Mark done database persistence | PENDING — **CONFIRMED not implemented** (file persists ticks to browser `localStorage` only) |
 
-Records: `handover/REQ-20260626-002_dashboard-ui-live-report-release/TASK_HOME.md`,
-`validation/REQ-20260626-002_dashboard-ui-live-report-release/2026-06-26_release_validation.md`,
-`evidence/final_outputs/REQ-20260626-002_dashboard-ui-live-report-release/` (HTML + `SOURCE_MANIFEST.md`),
+Records: `handover/REQ-05_ph-asin-segmentation/2026-06-26_delivery_dashboard-ui-live-report-release.md`,
+`validation/REQ-05_ph-asin-segmentation/2026-06-26_release_validation.md`,
+`evidence/final_outputs/REQ-05_ph-asin-segmentation/` (2026-06-26 release HTML + `2026-06-26_release_evidence_manifest.md`),
 `capability/2026-06-26_server-side-monthly-build-method.md`.
 
 ## Future Governed Tasks

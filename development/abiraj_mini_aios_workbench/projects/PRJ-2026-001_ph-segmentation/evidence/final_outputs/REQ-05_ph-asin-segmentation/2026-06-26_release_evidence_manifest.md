@@ -1,15 +1,17 @@
-# Final Output Manifest — REQ-20260626-002 (Released July 2026 Report)
+# Final Output Manifest — REQ-05 Delivery Increment (Released July 2026 Report)
 
 ## Project / Task
 
 * Project: PRJ-2026-001_ph-segmentation
-* Task: REQ-20260626-002_dashboard-ui-live-report-release
+* Task: REQ-05_ph-asin-segmentation (delivery/release increment, 2026-06-26)
+* Re-homed 2026-06-26 from the non-compliant dated ID `REQ-20260626-002_…`; see the delivery
+  record `handover/REQ-05_ph-asin-segmentation/2026-06-26_delivery_dashboard-ui-live-report-release.md`.
 
 ## Imported Asset
 
 | Field | Value |
 |---|---|
-| Canonical path | `evidence/final_outputs/REQ-20260626-002_dashboard-ui-live-report-release/2026-06-26_release_ph-asin_segmentation_report_2026-07.html` |
+| Canonical path | `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-06-26_release_ph-asin_segmentation_report_2026-07.html` |
 | Imported from | `c:\Users\digit\Downloads\PH_ASIN_Segmentation_Report_2026-07 (1).html` (original preserved; COPY-only) |
 | Import date | 2026-06-26 |
 | Size (bytes) | 457,618 (446.9 KB) |

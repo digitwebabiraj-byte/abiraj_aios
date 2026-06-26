@@ -105,15 +105,20 @@ Status: **REQUIRES BUSINESS VALIDATOR** (not CONFIRMED).
 
 ## Current Status
 
-CLOSED
+CLOSED for the onboarding/preservation scope (PASS) — **REOPENED to a DELIVERY phase on
+2026-06-26**. The 26 June dashboard UI fix and live report release are recorded as a delivery
+increment of this same requirement:
+`handover/REQ-05_ph-asin-segmentation/2026-06-26_delivery_dashboard-ui-live-report-release.md`.
+(This increment was re-homed from the non-compliant dated ID `REQ-20260626-002_…`.)
 
 ## Final Task Result
 
-PASS
+PASS (onboarding scope). Delivery increment: AMBER — see the delivery record.
 
 ## One Next Step
 
-Create a new Task ID before future monthly execution.
+Clear the delivery increment's remaining REPORTED_BY_ABIRAJ items (monthly routine file, DB
+release proof, byte-for-byte DB comparison); see the 2026-06-26 delivery record.
 
 ## Pass / Fail Rule
 

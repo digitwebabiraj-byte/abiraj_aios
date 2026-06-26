@@ -6,7 +6,11 @@ PRJ-2026-001_ph-segmentation
 
 ## Task ID
 
-REQ-20260626-002_dashboard-ui-live-report-release
+REQ-05_ph-asin-segmentation (delivery/release increment, 2026-06-26)
+
+> Re-homed 2026-06-26 from the non-compliant dated ID `REQ-20260626-002_…` per the project
+> ID-naming convention. Delivery record:
+> `handover/REQ-05_ph-asin-segmentation/2026-06-26_delivery_dashboard-ui-live-report-release.md`.
 
 ## Validation Date
 
@@ -29,10 +33,11 @@ Cross-checked each reported claim against files actually present in the project 
 ## Evidence Update — 2026-06-26 (delivered HTML imported)
 
 The delivered file was imported and inspected read-only:
-`evidence/final_outputs/REQ-20260626-002_dashboard-ui-live-report-release/2026-06-26_release_ph-asin_segmentation_report_2026-07.html`
+`evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-06-26_release_ph-asin_segmentation_report_2026-07.html`
 (SHA-256 `6F126A4E365934ACD4A0D9AEA539B3FE6620C4EE54C4F9191350B4DE76FEEE87`, 457,618 bytes;
-copy integrity verified). Manifest: same folder `SOURCE_MANIFEST.md`. Verdicts below revised
-accordingly. The live database and dashboard were **not** contacted.
+copy integrity verified). Manifest: same folder
+`2026-06-26_release_evidence_manifest.md`. Verdicts below revised accordingly. The live database
+and dashboard were **not** contacted.
 
 ## Claim-by-Claim Result (revised)
 
@@ -65,15 +70,17 @@ accordingly. The live database and dashboard were **not** contacted.
 
 ## Known Limits
 
-* No in-repo evidence supports any 26 June work product; all claims are REPORTED_BY_ABIRAJ.
-* Task ID `REQ-20260626-002_dashboard-ui-live-report-release` deviates from the project naming
-  convention (dated invented ID) and has no backing written-requirement file — AMBER, pending
-  GPT/Abiraj ratification.
+* The delivered HTML is now imported + checksummed and several counts are VERIFIED from it; the
+  remaining DB-side and routine claims still lack in-repo evidence (REPORTED_BY_ABIRAJ).
+* Task ID: this increment was re-homed 2026-06-26 from the non-compliant dated ID
+  `REQ-20260626-002_…` into **REQ-05** (the real requirement), resolving the earlier naming
+  AMBER. REQ-05 is reopened to a delivery phase.
 
 ## Decision
 
-AMBER — end-state recorded faithfully and read-only; substantive claims unverified for lack of
-in-repo evidence; Task ID pending ratification.
+AMBER — end-state recorded faithfully and read-only; core report counts VERIFIED from the
+imported file; DB-side release, byte-for-byte identity, the 57-benchmark count, and the routine
+file remain unverified.
 
 ## One Next Step
 

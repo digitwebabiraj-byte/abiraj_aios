@@ -59,7 +59,11 @@ Import PASS (checksums matched, originals preserved). All four reviews now PASS:
 * Coordinator Validation: PASS — Varmen
 
 (Confirmed by Abiraj on 2026-06-25; no separate signed reviewer artifact was supplied.)
-**Task status: CLOSED.** Future SQL execution requires a new approved Task ID.
+**Task status: onboarding scope CLOSED; REOPENED to a DELIVERY phase on 2026-06-26** — the
+dashboard UI fix and live report release are a delivery increment of this requirement, recorded
+at `handover/REQ-05_ph-asin-segmentation/2026-06-26_delivery_dashboard-ui-live-report-release.md`
+(re-homed from the non-compliant dated ID `REQ-20260626-002_…`). Future SQL execution still
+requires written write authorisation.
 
 ## Business Question Status
 
@@ -87,4 +91,6 @@ No saved SQL execution output; no independent 7,855-row validation; no immutable
 
 ## One Next Step
 
-Create a new governed Task ID before any future PH Segmentation monthly run / SQL execution.
+Clear the 2026-06-26 delivery increment's remaining REPORTED_BY_ABIRAJ items (monthly routine
+file, DB release proof, byte-for-byte DB comparison). Any future SQL execution still requires
+written write authorisation.
