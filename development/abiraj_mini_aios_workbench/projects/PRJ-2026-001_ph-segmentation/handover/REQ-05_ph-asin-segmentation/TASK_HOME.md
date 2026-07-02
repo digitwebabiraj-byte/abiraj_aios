@@ -103,22 +103,93 @@ Status: **REQUIRES BUSINESS VALIDATOR** (not CONFIRMED).
 
 (All confirmed by Abiraj on 2026-06-25; no separate signed reviewer artifact was supplied.)
 
+## Daily Increment — REQ-05-D06 — 2026-07-01
+
+Third recorded delivery increment of REQ-05 (after 26 Jun and 30 Jun). **Not a new Task ID.**
+Executed by Abiraj in a live Claude Chat session; imported here read-only. Import result **AMBER**
+(4 of the day's artifacts imported + checksummed; 3 named artifacts absent — see the source manifest).
+
+### Work Completed (from the D06 knowledge file)
+
+- **Option A movement correction** — Bietrick approved; previous comparison window recomputed to
+  4 complete weeks (3–30 May) while **current segments were left unchanged** (51/426/139/5/440/7,088).
+  Declines corrected 628 → 574.
+- **Returning-aware NEW correction** — a 46-row false-NEW artifact was caught and fixed with an
+  8-week lookback rule (NEW back to the true 191) before go-live. Escalation moved 21 → 22 PHs,
+  investigated and confirmed as accurate redistribution, not inflation.
+- **Orphan ASIN monitor + assignment output** — term formalised; ownership confirmed absent across
+  4 systems; permanent view `analytics.v_orphan_asins` created; live dashboard warning added;
+  492-row assignment CSV produced (CSV not exported to repo — MISSING_ARTIFACT).
+- **Engine v2** — `2026-07-01_ph_segment_engine_v2.sql`: self-contained on weekly `traffic_data`,
+  equal 4-week windows, returning-aware, orphans excluded. Validated in scratch tables only;
+  **deliberately not run against the live 2026-07 report** (next real run 3 Aug).
+- **Monthly routine update** — `2026-07-01_ph_asin_monthly_routine.txt`: engine v2 embedded, orphan
+  count pulls live from the view. **HTML shell BLOCK 1 still builds the old tabs UI** (open gap).
+- **Protocol clarification** — `2026-07-01_ph_asin_protocol_v1_clarifications.md`: lateral→SAME,
+  zero-click→LOW conversion, conv>clicks→HIGH conversion, HLL→HLH, LHL→HHL (Bietrick sign-off line).
+- **Full verification** — 8,146/8,149 rows reconciled exactly to source (3 differ ±1 conversion);
+  orphan/owned sets 0 overlap; dashboard vs report counts reconciled; **backups deliberately KEPT**.
+- **Dropdown/table UI redesign** — dashboard rebuilt to a PH-dropdown + one-view flat-table layout
+  (Rank, Avg Conv, Δ Conv, Status columns) matching a reference board, with classification logic
+  proven 100% unchanged (Method-A CVR shown, not the reference's weighted CVR). Pushed live twice.
+
+### Canonical Assets (imported this increment)
+
+- Daily knowledge: `handover/REQ-05_ph-asin-segmentation/2026-07-01__abiraj__ph-asin__REQ-05-D06.md`
+- Engine v2: `sql/REQ-05_ph-asin-segmentation/2026-07-01_ph_segment_engine_v2.sql`
+- Monthly routine: `prompts/implementation/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_monthly_routine.txt`
+- Protocol clarifications: `validation/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_protocol_v1_clarifications.md`
+- Live dashboard HTML (id-5 v2): `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_dashboard_id5_live_2026-07.html` *(imported 2 Jul)*
+- UI review template: `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_dashboard_ph_view_template.html` *(imported 2 Jul)*
+- Orphan/unowned assignment CSV (492 rows): `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_unowned_asins_for_assignment_2026-07.csv` *(imported 2 Jul)*
+- Manifest: `evidence/logs_or_screenshots/REQ-05_ph-asin-segmentation/2026-07-01_req-05-d06_source_manifest.md`
+- Update evidence / duplicate-risk / validation: matching `2026-07-01_req-05-d06_*` records.
+
+### Current Live State (DOCUMENTED_IN_D06 — NOT RECHECKED DURING AIOS IMPORT)
+
+- Live dashboard row: `tech_team_outputs.ph_task` id 5 (new dropdown UI, ~879,907 bytes).
+- Live 2026-07 report uses the approved Option-A movement; current segments unchanged.
+- Engine v2 is for the next fresh cycle (3 Aug); orphan monitor view exists.
+- Live dashboard HTML, UI template, and orphan/unowned CSV are **now imported** (2 Jul) as saved,
+  checksummed evidence in `evidence/final_outputs/`. The live DB row itself was not re-queried
+  (LIVE_STATE_NOT_RECHECKED), but every work-product exists as a file.
+
+### Open Gaps
+
+- Cloud Routine creation still pending (Windows feature).
+- Routine HTML BLOCK 1 still builds the **old** UI — must be swapped before the 3 Aug run.
+- Backup tables retained (housekeeping deferred).
+- Engine v2 has not completed its first live monthly run (by design, 3 Aug).
+- Live values may drift after the recorded verification time.
+
+### Status
+
+- Daily Increment REQ-05-D06: **COMPLETE** (import **PASS** as of 2 Jul — all 7 work-products
+  imported + checksummed; was AMBER on 1 Jul when 3 artifacts were absent).
+- Requirement REQ-05: **ACTIVE — FOLLOW-UP WORK REMAINS** (delivery gaps below, not import defects).
+
+### Next Step
+
+Replace the monthly routine's HTML BLOCK 1 with the approved dropdown/table UI before the next
+monthly run. (All 7 D06 work-products are now imported — the artifact-import step is closed.)
+
 ## Current Status
 
-CLOSED for the onboarding/preservation scope (PASS) — **REOPENED to a DELIVERY phase on
-2026-06-26**. The 26 June dashboard UI fix and live report release are recorded as a delivery
-increment of this same requirement:
-`handover/REQ-05_ph-asin-segmentation/2026-06-26_delivery_dashboard-ui-live-report-release.md`.
-(This increment was re-homed from the non-compliant dated ID `REQ-20260626-002_…`.)
+CLOSED for the onboarding/preservation scope (PASS) — **in a DELIVERY phase since 2026-06-26**,
+with three recorded delivery increments of this same requirement: 26 Jun (dashboard UI fix + live
+release), 30 Jun (final-June refresh + validation), and **1 Jul (REQ-05-D06 — Option-A movement
+fix, Orphan ASIN routing, engine v2, protocol clarifications, dropdown UI redesign)**. None are
+new Task IDs.
 
 ## Final Task Result
 
-PASS (onboarding scope). Delivery increment: AMBER — see the delivery record.
+PASS (onboarding scope). Delivery increments: AMBER — see each delivery/increment record.
 
 ## One Next Step
 
-Clear the delivery increment's remaining REPORTED_BY_ABIRAJ items (monthly routine file, DB
-release proof, byte-for-byte DB comparison); see the 2026-06-26 delivery record.
+Swap the monthly routine's HTML BLOCK 1 to the new dropdown UI before the 3 Aug run. (The D06
+artifact import is complete — all 7 work-products are saved and checksummed; live-UI and orphan
+claims are now VERIFIED_FROM_FILE.)
 
 ## Pass / Fail Rule
 

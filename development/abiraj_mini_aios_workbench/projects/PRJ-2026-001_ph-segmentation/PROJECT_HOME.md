@@ -168,8 +168,33 @@ Status: CONFIRMED (Business Validator: Bietrick — confirmed by Abiraj on 2026-
 ## Project Status
 
 ACTIVE. Single task **REQ-05_ph-asin-segmentation**: onboarding/preservation scope CLOSED-PASS,
-now in a **delivery phase**. Two delivery increments recorded: the 26 June 2026 dashboard UI fix &
-live release, and the 30 June 2026 final-June refresh + report validation + data-quality review.
+now in a **delivery phase**. Three delivery increments recorded: the 26 June 2026 dashboard UI fix &
+live release, the 30 June 2026 final-June refresh + report validation + data-quality review, and the
+**1 July 2026 (REQ-05-D06)** Option-A movement fix + Orphan-ASIN routing + engine v2 + protocol
+clarifications + dropdown UI redesign.
+
+## Latest Increment (updated 2026-07-01)
+
+| Field | Value |
+|---|---|
+| Latest Work Date | 2026-07-01 |
+| Latest Deliverable | REQ-05-D06 |
+| Project Status | ACTIVE |
+| Current live UI | PH dropdown + one-view flat table (`ph_task` id 5); saved HTML imported 2 Jul (`evidence/final_outputs/…/2026-07-01_ph_asin_dashboard_id5_live_2026-07.html`) — VERIFIED_FROM_FILE (live DB row not re-queried) |
+| Current live cycle | 2026-07 on the approved Option-A movement state (segments unchanged 8,149) |
+| Future engine | v2 four-week engine (`2026-07-01_ph_segment_engine_v2.sql`) — first live run 3 Aug |
+| Orphan monitor | `analytics.v_orphan_asins` (permanent view) + live dashboard flag |
+| Main open gap | monthly routine HTML BLOCK 1 still builds the **old** UI (swap before 3 Aug) |
+| Automation | PENDING (Cloud Routine — Windows VM Platform feature) |
+| Import result | PASS (updated 2 Jul) — D06 + **all 6** supporting artifacts imported & checksummed (4 on 1 Jul, 3 on 2 Jul); nothing missing. Was AMBER on 1 Jul. Delivery still ACTIVE (routine BLOCK-1 swap + engine-v2 first run open) |
+
+Records: `handover/REQ-05_ph-asin-segmentation/2026-07-01__abiraj__ph-asin__REQ-05-D06.md`,
+`.../TASK_HOME.md`, `.../HANDOVER.md`,
+`evidence/logs_or_screenshots/REQ-05_ph-asin-segmentation/2026-07-01_req-05-d06_source_manifest.md`
+(+ update-evidence), `duplicate_risk_reports/REQ-05_ph-asin-segmentation/2026-07-01_req-05-d06_duplicate_risk.md`,
+`validation/REQ-05_ph-asin-segmentation/2026-07-01_req-05-d06_aios_validation.md`,
+`evidence/final_outputs/REQ-05_ph-asin-segmentation/` (2 Jul: `2026-07-01_ph_asin_dashboard_id5_live_2026-07.html`,
+`2026-07-01_ph_asin_dashboard_ph_view_template.html`, `2026-07-01_unowned_asins_for_assignment_2026-07.csv`).
 
 ## Active Tasks (updated 2026-06-30)
 
@@ -185,10 +210,16 @@ live release, and the 30 June 2026 final-June refresh + report validation + data
 
 ## Current Operational State
 
-As of 2026-06-30 (REPORTED_BY_ABIRAJ unless marked otherwise):
+As of **2026-07-01** (DOCUMENTED_IN_D06 unless marked otherwise; the 30 Jun rows below carry
+forward except where superseded by the 1 Jul increment — dashboard UI, movement window, orphan
+monitor, engine v2):
 
 | Aspect | State |
 |---|---|
+| Dashboard UI (`ph_task` row id 5) | **PH-dropdown + one-view flat table** (Rank/Avg Conv/Δ Conv/Status), classification logic unchanged; pushed live 1 Jul (~879,907 bytes) — supersedes the tabs/sidebar layout |
+| Movement window | **Option A live** — last 4 complete weeks vs previous 4 complete weeks; current segments unchanged; declines 628→574; escalation 24/22 |
+| Orphan ASIN monitor | `analytics.v_orphan_asins` created (permanent) + live dashboard warning (492 converting orphans) |
+| Engine (going forward) | **v2** self-contained on weekly `traffic_data`, returning-aware — validated scratch-only, first live run 3 Aug |
 | Dashboard release (`ph_task` row id 5) | LIVE with **complete-June** numbers (8,149) as of 30 Jun (reported — DB state; DB not queried) |
 | `ph_segment_report` | Rebuilt to complete-June window + fully validated vs source + protocol (reported — 30 Jun session) |
 | Distribution | **8,149** (51/426/139/5/440/7,088), escalation 24/21 (reported). **Supersedes** the 26 Jun **7,855** build (VERIFIED in repo) |
@@ -225,3 +256,11 @@ Candidates only — **no Task IDs assigned** (no approved written requirement ex
 
 > Note: candidate #2 of the prior list — "Refresh the July report after June data closes" — was
 > **completed on 30 Jun** as a delivery increment of REQ-05 and is removed from the candidate list.
+
+> **Update 2026-07-01 (REQ-05-D06):** candidate #4 above is now largely delivered — the
+> **"last 4 complete weeks" window is approved (Option A, live)**, folded into **engine v2**, and the
+> **66 "lateral SAME" / edge-case rules are documented** in the imported protocol clarifications. Two
+> leading next action remains **(a) swap the monthly routine's HTML shell (BLOCK 1) to the new dropdown
+> UI before the 3 Aug run**. Item **(b) import the 3 missing D06 artifacts** (orphan/unowned CSV + both
+> dashboard HTML) is **DONE — imported 2 Jul with matching checksums**. Candidate #1 (automation) is
+> unchanged — still PENDING.

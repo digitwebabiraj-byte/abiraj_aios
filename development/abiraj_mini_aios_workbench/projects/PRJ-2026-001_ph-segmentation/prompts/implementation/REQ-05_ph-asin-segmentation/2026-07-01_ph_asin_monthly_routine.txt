@@ -1,0 +1,555 @@
+PH ASIN SEGMENTATION — MONTHLY CLOUD ROUTINE
+=============================================
+Paste the INSTRUCTIONS block below into the routine's "Instructions" box.
+Trigger: Custom cron  ->  0 9 3 * *  (09:00 on the 3rd of every month)
+        Run on the 3rd, NOT the 1st: the previous month's data is not fully loaded
+        into the database until the 2nd or 3rd of the following month, so the 3rd
+        ensures the most-recent ENDED month is complete before we segment it.
+        (If a month's load is ever later than the 3rd, the engine simply segments
+        whatever the latest complete window is, and the duplicate-guard prevents
+        building the same month twice.)
+Connectors: Postgresql ONLY (remove ledsone-docs and LLM_wiki).
+
+This routine does the WHOLE monthly job, in order:
+  - STEP 0: runs the segmentation ENGINE (rebuilds analytics.ph_segment_report
+    from the last 4 COMPLETE weeks in public.traffic_data (weekly, Saturday-ending)
+    + public.order_transaction). The engine auto-detects the last 8 weeks
+    (current 4 + previous 4). Orphans (traffic with no PH owner) are excluded here
+    and surfaced separately by analytics.v_orphan_asins.
+  - then BUILDS the dashboard report: inserts one new row into tech_team_outputs.ph_task.
+The engine REPLACES analytics.ph_segment_report each run (single-cycle table; report
+history is preserved as separate ph_task rows). The report build never updates/deletes
+existing ph_task rows. It self-skips if this month's report row already exists.
+
+==================== INSTRUCTIONS (paste this whole block) ====================
+
+You are a monthly report generator for the PH ASIN Segmentation project.
+Use ONLY the Postgresql connector. Follow these steps exactly. Do not improvise SQL.
+
+STEP 0 - Rebuild the segmentation data (run the ENGINE).
+  Take SQL BLOCK 0 below and run it. It contains several statements; run the whole
+  block in order (it drops/creates helper tables and finally rebuilds
+  analytics.ph_segment_report for the last 4 complete weeks). Do not edit it.
+  If it raises a message beginning with "PH ENGINE ABORT:", that is the built-in
+  safety guard firing because the source has fewer than 8 weekly snapshots loaded
+  yet. This is a SAFE SKIP, not a failure: the existing report was left untouched.
+  STOP, and report "Engine aborted safely (source not ready) - no changes made."
+  Do NOT continue to the later steps.
+  If it errors for any OTHER reason, STOP and report that error; do not continue.
+  NOTE: the engine uses only complete past weeks (week-ending Saturdays already in
+  traffic_data), so it never segments on a partial/in-progress week, and it stops
+  before touching the report if fewer than 8 weeks are present.
+  That is why this routine is scheduled for the 3rd (after prior-month weeks load).
+
+STEP 1 - Determine the target period (latest available month of data):
+  SELECT max(report_period) AS target FROM analytics.ph_segment_report;
+  Let TARGET = that value (format YYYY-MM, e.g. 2026-07).
+  If TARGET is null, STOP and report "No data in ph_segment_report, skipped."
+
+STEP 2 - Guard A (do not duplicate):
+  SELECT count(*) AS n FROM tech_team_outputs.ph_task WHERE task_id = 'ph-asin-' || '<TARGET>';
+  If n > 0, STOP and report "Report for <TARGET> already exists, skipped." Insert nothing.
+
+STEP 3 - Guard B (data must exist for that period):
+  SELECT count(*) AS rows FROM analytics.ph_segment_report WHERE report_period = '<TARGET>';
+  If rows = 0, STOP and report "No data for <TARGET>, skipped." Insert nothing.
+
+STEP 4 - Insert the report row (HTML shell). Take SQL BLOCK 1 below, replace every
+  occurrence of __PERIOD__ with <TARGET>, and run it as a single statement.
+
+STEP 5 - Fill the data server-side. Take SQL BLOCK 2 below, replace every occurrence
+  of __PERIOD__ with <TARGET>, and run it as a single statement.
+
+STEP 6 - Verify and report:
+  SELECT id, task_id, length(html_content) AS bytes,
+         position('__DATA__' in html_content) AS placeholder_left
+  FROM tech_team_outputs.ph_task WHERE task_id = 'ph-asin-' || '<TARGET>';
+  Success requires placeholder_left = 0 AND bytes > 50000.
+  Then run, and include in your report, the segment counts:
+  SELECT segment, count(*) FROM analytics.ph_segment_report
+  WHERE report_period='<TARGET>' GROUP BY segment ORDER BY segment;
+  If placeholder_left <> 0, report FAILURE (do not claim success).
+
+RULES: Never DELETE or UPDATE any existing ph_task row. Only read
+analytics.ph_segment_report and INSERT/fill the one new ph_task row for <TARGET>.
+
+==================== SQL BLOCK 0 (segmentation engine — run first) ====================
+-- ============================================================================
+-- PH ASIN SEGMENTATION — MONTHLY ENGINE  (v2: last 4 COMPLETE weeks)
+-- ----------------------------------------------------------------------------
+-- WINDOW (changed in v2): traffic_data is WEEKLY (each row = one week, dated on
+-- the week-ending Saturday). A calendar month catches a VARIABLE number of weeks
+-- (e.g. May=5, June=4), which made month-over-month movement unfair. v2 fixes
+-- this: CURRENT = the last 4 complete weeks, PREVIOUS = the 4 weeks before that,
+-- so both sides are always equal length. Self-contained on public.traffic_data
+-- (+ public.order_transaction for units); does NOT depend on the monthly window
+-- table. Category per ASIN = its max-impression category in the window (verified
+-- 8,149/8,149 identical to the old window-table assignment).
+--
+-- LOCKED DECISIONS (unchanged): Method A CVR (avg of per-ASIN CVR over top-N sold);
+-- zero-click -> LOW conversion ; conversions>clicks -> HIGH conversion ;
+-- undefined combos mapped HLL->HLH , LHL->HHL ; scope = which_channel=1, UK,
+-- FBM only (fba_sales=false) ; benchmark = avg Imp/Clk/CVR over top-30 sold
+-- (top-10 if <30 ; needs_manual if <10) ; movement by h-count
+-- (HHH=3, HHL/HLH/LHH=2, LLH=1, LLL=0) ; account from sub_source_name ;
+-- ownership read from user_name (orphans, user_name NULL, are excluded here and
+-- surfaced separately by analytics.v_orphan_asins).
+--
+-- MOVEMENT / NEW RULE (returning-aware, equal 4-week windows):
+--   IMPROVED = current h-count > previous h-count ; DECLINED = < ; SAME = equal.
+--   NEW      = ASIN present in the current 4 weeks but absent from the previous
+--              8 weeks (both the previous 4 weeks AND the 4 weeks before that).
+--   RETURNING (absent from the previous 4 weeks but active in the 4 before that)
+--              is labelled SAME, NOT NEW -- a product that reappears after a gap
+--              is not a new product. This generalises the one-time transition
+--              patch applied to the 2026-07 live report into a permanent rule.
+--
+-- Re-run as-is every month (schedule: 3rd, after prior-month weeks have loaded).
+-- No dates to edit. SAFE: ABORT-IF-EMPTY guards stop the script BEFORE dropping
+-- ph_segment_report, so an empty/under-loaded source can never wipe it.
+-- ============================================================================
+
+-- ---- resolve the last 8 complete weeks (Saturdays) from the weekly source ----
+DROP TABLE IF EXISTS analytics._ph_sats;
+CREATE TABLE analytics._ph_sats AS
+SELECT date, ROW_NUMBER() OVER (ORDER BY date DESC) AS rn
+FROM (SELECT DISTINCT date FROM public.traffic_data
+      WHERE which_channel=1 AND market_place='UK') d;
+
+-- ---- ABORT-IF-EMPTY GUARD (1/2): need at least 8 complete weeks --------------
+DO $ph_guard1$
+BEGIN
+  IF (SELECT count(*) FROM analytics._ph_sats WHERE rn<=8) < 8 THEN
+    RAISE EXCEPTION 'PH ENGINE ABORT: fewer than 8 weekly snapshots in public.traffic_data (need last-4 + previous-4). Existing analytics.ph_segment_report left untouched.';
+  END IF;
+END
+$ph_guard1$;
+
+-- ============================================================================
+-- CURRENT window  = weeks rn 1..4
+-- ============================================================================
+DROP TABLE IF EXISTS analytics._ph_cur;
+CREATE TABLE analytics._ph_cur AS
+WITH weeks AS (SELECT date FROM analytics._ph_sats WHERE rn BETWEEN 1 AND 4),
+span AS (SELECT min(date)-6 AS d0, max(date) AS d1 FROM weeks),
+sig AS (  -- summed weekly signals per owned ASIN (across categories)
+  SELECT user_name, ref_id, sub_source_name,
+         SUM(impression) imp, SUM(click) clk, SUM(conversion) conv,
+         CASE WHEN SUM(click)>0 THEN SUM(conversion)::numeric/SUM(click) ELSE 0 END cvr
+  FROM public.traffic_data
+  WHERE which_channel=1 AND market_place='UK' AND user_name IS NOT NULL
+    AND date IN (SELECT date FROM weeks)
+  GROUP BY 1,2,3),
+cat AS (  -- one category per ASIN = the max-impression category in this window
+  SELECT user_name, ref_id, sub_source_name, category_name,
+         ROW_NUMBER() OVER (PARTITION BY user_name,ref_id,sub_source_name
+                            ORDER BY SUM(impression) DESC, category_name) rn
+  FROM public.traffic_data
+  WHERE which_channel=1 AND market_place='UK' AND user_name IS NOT NULL
+    AND date IN (SELECT date FROM weeks)
+  GROUP BY 1,2,3,4),
+ph_asins AS (
+  SELECT sig.user_name, sig.ref_id, c.category_name, sig.sub_source_name,
+         sig.imp, sig.clk, sig.conv, sig.cvr
+  FROM sig JOIN cat c
+    ON c.user_name=sig.user_name AND c.ref_id=sig.ref_id
+   AND c.sub_source_name=sig.sub_source_name AND c.rn=1),
+units AS (  -- FBM units over the window-aligned sales span
+  SELECT o."asin", SUM(COALESCE(o."quantity",0)) AS u
+  FROM public.order_transaction o, span
+  WHERE o."source_name"='AMAZON' AND o."market_place"='UK' AND o."order_status"='Completed' AND o."fba_sales"=false
+    AND o."order_date"::date >= span.d0 AND o."order_date"::date <= span.d1
+  GROUP BY o."asin"),
+sellers AS (
+  SELECT a.user_name,a.category_name,a.ref_id,a.imp,a.clk,a.cvr,
+         ROW_NUMBER() OVER (PARTITION BY a.user_name,a.category_name ORDER BY u.u DESC,a.imp DESC) rnk,
+         COUNT(*) OVER (PARTITION BY a.user_name,a.category_name) scnt
+  FROM ph_asins a JOIN units u ON a.ref_id=u.asin AND u.u>0),
+bm AS (
+  SELECT user_name,category_name,MAX(scnt) sellers,
+    AVG(imp) FILTER (WHERE rnk<=CASE WHEN scnt>=30 THEN 30 ELSE 10 END) bi,
+    AVG(clk) FILTER (WHERE rnk<=CASE WHEN scnt>=30 THEN 30 ELSE 10 END) bc,
+    AVG(cvr) FILTER (WHERE rnk<=CASE WHEN scnt>=30 THEN 30 ELSE 10 END) bv
+  FROM sellers GROUP BY user_name,category_name),
+raw AS (
+  SELECT a.user_name,a.ref_id,a.category_name,a.sub_source_name,a.imp,a.clk,a.conv,a.cvr,
+    b.bi,b.bc,b.bv,b.sellers,(b.bi IS NULL OR b.sellers<10) needs_manual,
+    (CASE WHEN a.imp>=b.bi THEN 'H' ELSE 'L' END)
+    ||(CASE WHEN a.clk>=b.bc THEN 'H' ELSE 'L' END)
+    ||(CASE WHEN a.clk=0 THEN 'L' WHEN a.conv>a.clk THEN 'H' WHEN a.cvr>=b.bv THEN 'H' ELSE 'L' END) rawc
+  FROM ph_asins a LEFT JOIN bm b ON a.user_name=b.user_name AND a.category_name=b.category_name)
+SELECT user_name,ref_id,category_name,
+  CASE sub_source_name WHEN 'amazon Ledsone' THEN 'LEDSone UK' WHEN 'amazon Dcvoltage' THEN 'DCVoltage UK' ELSE sub_source_name END account,
+  sub_source_name,imp,clk,conv,cvr,bi,bc,bv,sellers,needs_manual,rawc,
+  CASE rawc WHEN 'HLL' THEN 'HLH' WHEN 'LHL' THEN 'HHL' ELSE rawc END segment,
+  CASE CASE rawc WHEN 'HLL' THEN 'HLH' WHEN 'LHL' THEN 'HHL' ELSE rawc END
+    WHEN 'HHH' THEN 3 WHEN 'HHL' THEN 2 WHEN 'HLH' THEN 2 WHEN 'LHH' THEN 2 WHEN 'LLH' THEN 1 ELSE 0 END hcount,
+  (SELECT max(date) FROM weeks) AS window_end,
+  (SELECT min(date)-6 FROM weeks) AS window_start
+FROM raw;
+
+-- ============================================================================
+-- PREVIOUS window = weeks rn 5..8  (same logic; only ref_id/segment/hcount kept)
+-- ============================================================================
+DROP TABLE IF EXISTS analytics._ph_prev;
+CREATE TABLE analytics._ph_prev AS
+WITH weeks AS (SELECT date FROM analytics._ph_sats WHERE rn BETWEEN 5 AND 8),
+span AS (SELECT min(date)-6 AS d0, max(date) AS d1 FROM weeks),
+sig AS (
+  SELECT user_name, ref_id, sub_source_name,
+         SUM(impression) imp, SUM(click) clk, SUM(conversion) conv,
+         CASE WHEN SUM(click)>0 THEN SUM(conversion)::numeric/SUM(click) ELSE 0 END cvr
+  FROM public.traffic_data
+  WHERE which_channel=1 AND market_place='UK' AND user_name IS NOT NULL
+    AND date IN (SELECT date FROM weeks)
+  GROUP BY 1,2,3),
+cat AS (
+  SELECT user_name, ref_id, sub_source_name, category_name,
+         ROW_NUMBER() OVER (PARTITION BY user_name,ref_id,sub_source_name
+                            ORDER BY SUM(impression) DESC, category_name) rn
+  FROM public.traffic_data
+  WHERE which_channel=1 AND market_place='UK' AND user_name IS NOT NULL
+    AND date IN (SELECT date FROM weeks)
+  GROUP BY 1,2,3,4),
+ph_asins AS (
+  SELECT sig.user_name, sig.ref_id, c.category_name, sig.sub_source_name,
+         sig.imp, sig.clk, sig.conv, sig.cvr
+  FROM sig JOIN cat c
+    ON c.user_name=sig.user_name AND c.ref_id=sig.ref_id
+   AND c.sub_source_name=sig.sub_source_name AND c.rn=1),
+units AS (
+  SELECT o."asin", SUM(COALESCE(o."quantity",0)) AS u
+  FROM public.order_transaction o, span
+  WHERE o."source_name"='AMAZON' AND o."market_place"='UK' AND o."order_status"='Completed' AND o."fba_sales"=false
+    AND o."order_date"::date >= span.d0 AND o."order_date"::date <= span.d1
+  GROUP BY o."asin"),
+sellers AS (
+  SELECT a.user_name,a.category_name,a.ref_id,a.imp,a.clk,a.cvr,
+    ROW_NUMBER() OVER (PARTITION BY a.user_name,a.category_name ORDER BY u.u DESC,a.imp DESC) rnk,
+    COUNT(*) OVER (PARTITION BY a.user_name,a.category_name) scnt
+  FROM ph_asins a JOIN units u ON a.ref_id=u.asin AND u.u>0),
+bm AS (
+  SELECT user_name,category_name,
+    AVG(imp) FILTER (WHERE rnk<=CASE WHEN scnt>=30 THEN 30 ELSE 10 END) bi,
+    AVG(clk) FILTER (WHERE rnk<=CASE WHEN scnt>=30 THEN 30 ELSE 10 END) bc,
+    AVG(cvr) FILTER (WHERE rnk<=CASE WHEN scnt>=30 THEN 30 ELSE 10 END) bv
+  FROM sellers GROUP BY user_name,category_name),
+raw AS (
+  SELECT a.user_name,a.ref_id,a.category_name,a.sub_source_name,a.imp,a.clk,a.conv,a.cvr,
+    (CASE WHEN a.imp>=b.bi THEN 'H' ELSE 'L' END)
+    ||(CASE WHEN a.clk>=b.bc THEN 'H' ELSE 'L' END)
+    ||(CASE WHEN a.clk=0 THEN 'L' WHEN a.conv>a.clk THEN 'H' WHEN a.cvr>=b.bv THEN 'H' ELSE 'L' END) rawc
+  FROM ph_asins a LEFT JOIN bm b ON a.user_name=b.user_name AND a.category_name=b.category_name)
+SELECT ref_id,sub_source_name,
+  CASE rawc WHEN 'HLL' THEN 'HLH' WHEN 'LHL' THEN 'HHL' ELSE rawc END prev_segment,
+  CASE CASE rawc WHEN 'HLL' THEN 'HLH' WHEN 'LHL' THEN 'HHL' ELSE rawc END
+    WHEN 'HHH' THEN 3 WHEN 'HHL' THEN 2 WHEN 'HLH' THEN 2 WHEN 'LHH' THEN 2 WHEN 'LLH' THEN 1 ELSE 0 END prev_hcount
+FROM raw;
+
+-- ---- prior presence (weeks 9-12) for the returning-aware NEW rule -----------
+-- An ASIN absent from the previous 4 weeks (5-8) but active in the 4 weeks
+-- before that (9-12) is RETURNING, not NEW. We only need its presence here
+-- (not a full re-classification), so this stays cheap.
+DROP TABLE IF EXISTS analytics._ph_prior;
+CREATE TABLE analytics._ph_prior AS
+SELECT DISTINCT ref_id, sub_source_name
+FROM public.traffic_data
+WHERE which_channel=1 AND market_place='UK' AND user_name IS NOT NULL
+  AND date IN (SELECT date FROM analytics._ph_sats WHERE rn BETWEEN 9 AND 12);
+
+-- ---- ABORT-IF-EMPTY GUARD (2/2) ------------------------------------------
+DO $ph_guard2$
+BEGIN
+  IF (SELECT count(*) FROM analytics._ph_cur) = 0 THEN
+    RAISE EXCEPTION 'PH ENGINE ABORT: current window produced 0 classified rows. Existing analytics.ph_segment_report left untouched.';
+  END IF;
+END
+$ph_guard2$;
+
+-- ---- final report table (movement + SKU + report_period label + window cols) --
+DROP TABLE IF EXISTS analytics.ph_segment_report;
+CREATE TABLE analytics.ph_segment_report AS
+WITH cur_end AS (SELECT max(window_end) pe FROM analytics._ph_cur),
+sku_pick AS (
+  SELECT asin,sku,ROW_NUMBER() OVER (PARTITION BY asin ORDER BY SUM(COALESCE(quantity,0)) DESC) rn
+  FROM public.order_transaction
+  WHERE "source_name"='AMAZON' AND "market_place"='UK' AND "fba_sales"=false AND sku IS NOT NULL
+  GROUP BY asin,sku)
+SELECT TO_CHAR(date_trunc('month',(SELECT pe FROM cur_end)) + INTERVAL '1 month','YYYY-MM') AS report_period,
+  c.user_name,c.ref_id AS asin,s.sku,c.account,c.category_name,
+  c.imp AS impression,c.clk AS click,c.conv AS conversion,(c.cvr*100)::numeric(10,2) cvr_pct,
+  c.bi::numeric(10,0) bm_impression,c.bc::numeric(10,1) bm_click,(c.bv*100)::numeric(10,2) bm_cvr_pct,
+  c.sellers benchmark_sellers,c.needs_manual,c.segment,p.prev_segment,
+  CASE
+    WHEN p.prev_segment IS NOT NULL THEN
+      CASE WHEN c.hcount>p.prev_hcount THEN 'IMPROVED'
+           WHEN c.hcount<p.prev_hcount THEN 'DECLINED' ELSE 'SAME' END
+    WHEN pr.ref_id IS NOT NULL THEN 'SAME'   -- returning (active in weeks 9-12), not NEW
+    ELSE 'NEW' END movement,
+  c.window_start, c.window_end
+FROM analytics._ph_cur c
+LEFT JOIN analytics._ph_prev p ON c.ref_id=p.ref_id AND c.sub_source_name=p.sub_source_name
+LEFT JOIN analytics._ph_prior pr ON c.ref_id=pr.ref_id AND c.sub_source_name=pr.sub_source_name
+LEFT JOIN sku_pick s ON c.ref_id=s.asin AND s.rn=1;
+
+DROP TABLE IF EXISTS analytics._ph_cur;
+DROP TABLE IF EXISTS analytics._ph_prev;
+DROP TABLE IF EXISTS analytics._ph_prior;
+DROP TABLE IF EXISTS analytics._ph_sats;
+
+==================== SQL BLOCK 1 (insert shell) ====================
+INSERT INTO tech_team_outputs.ph_task
+(project_name, project_code, task_name, task_id, team, developer, assigned_user, html_content, description, phase_level, version_level, version_status)
+VALUES
+('PH ASIN Segmentation — GPE','ph-asin','PH ASIN Segmentation — ' || upper(to_char(to_date('__PERIOD__','YYYY-MM'),'FMMonth YYYY')),
+ 'ph-asin-__PERIOD__','tech','abiraj',NULL,
+ '<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PH ASIN Segmentation Report — July 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:''Poppins'',sans-serif;background:#f4f5f7;color:#1f2733;font-size:13px}
+.topbar{background:#161d29;color:#fff;padding:18px 26px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px}
+.topbar h1{font-size:19px;font-weight:700;letter-spacing:.3px}
+.topbar .sub{font-size:11px;color:#9fb0c4;margin-top:5px;letter-spacing:.4px}
+.topbar .meta{text-align:right;font-size:11px;color:#c7d4e2;line-height:1.7}
+.topbar .meta b{color:#fff}
+.esc{background:#fdeceb;border-bottom:2px solid #e6a59e;padding:11px 26px;font-size:12px;color:#9a2a1f;display:flex;gap:22px;flex-wrap:wrap;font-weight:500}
+.esc b{color:#c0392b}
+.tabs{display:flex;background:#fff;border-bottom:1px solid #e3e8ef;padding:0 16px;overflow-x:auto}
+.tab{padding:13px 16px;cursor:pointer;font-weight:600;font-size:12.5px;color:#5b6675;border-bottom:3px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:7px}
+.tab .cnt{background:#eef1f5;color:#46505f;border-radius:11px;padding:1px 8px;font-size:11px;font-weight:600}
+.tab.active{color:var(--c)}
+.tab.active{border-bottom-color:var(--c)}
+.tab.active .cnt{background:var(--c);color:#fff}
+.layout{display:flex;align-items:stretch}
+.sidebar{width:206px;background:#fff;border-right:1px solid #e3e8ef;flex-shrink:0;align-self:stretch}
+.sidebar h3{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#8a95a3;padding:14px 16px 8px}
+.ph-item{padding:8px 16px;cursor:pointer;font-size:12px;display:flex;justify-content:space-between;align-items:center;border-left:3px solid transparent;color:#3b4654}
+.ph-item:hover{background:#f6f8fa}
+.ph-item.active{background:#eef4fb;border-left-color:#1A6E99;font-weight:600;color:#15212e}
+.ph-item .pct{font-size:10px;color:#fff;background:#b9c2cd;border-radius:9px;padding:1px 6px}
+.ph-item .pct.hot{background:#c0392b}
+.content{flex:1;padding:18px 22px;min-width:0}
+.plan{border-radius:10px;padding:15px 18px;margin-bottom:16px;font-size:12.5px;line-height:1.65}
+.plan .ptitle{font-weight:700;font-size:15px;margin-bottom:7px;display:flex;align-items:center;gap:9px}
+.plan .pp{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;padding:4px 11px;border-radius:6px;color:#fff}
+.plan .kill{display:block;margin-top:9px;background:#fff;border-left:4px solid #c0392b;padding:7px 11px;border-radius:0 6px 6px 0;color:#9a2a1f;font-size:12px}
+.plan .kill b{color:#c0392b}
+.phblock{background:#fff;border:1px solid #e6eaf0;border-radius:11px;margin-bottom:18px;overflow:hidden}
+.phhead{padding:13px 16px;border-bottom:1px solid #eef1f5;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.phhead .nm{font-weight:700;font-size:14px}
+.phhead .prog{font-size:11px;color:#5b6675;min-width:230px}
+.bar{height:8px;background:#eef1f5;border-radius:5px;overflow:hidden;margin-top:4px}
+.bar>span{display:block;height:100%;background:#1A8A4A;transition:width .25s}
+.cfg{padding:11px 16px;background:#fbfcfd;border-bottom:1px solid #eef1f5;font-size:11px;display:flex;flex-wrap:wrap;gap:9px}
+.cfg .ct{border:1px solid #e3e8ef;border-radius:7px;padding:7px 10px;background:#fff;line-height:1.6}
+.cfg .ct b{color:#15212e}
+.cfg .man{color:#b87800;font-weight:600}
+.cards{padding:12px 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:11px}
+.card{border:1px solid #e6eaf0;border-radius:9px;padding:11px 12px;position:relative;border-left:4px solid var(--c)}
+.card .r1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.card .asin{font-weight:700;font-size:13px}
+.card .acct{font-size:9.5px;font-weight:600;padding:1px 6px;border-radius:4px;color:#fff;vertical-align:middle;margin-left:6px}
+.acct.led{background:#2c6e9b}.acct.dcv{background:#6b3fa0}
+.card .sku{font-size:10.5px;color:#76808d;margin:3px 0;word-break:break-all}
+.card .cat{font-size:10px;color:#8a95a3}
+.card .segb{font-size:10px;font-weight:700;color:#fff;padding:2px 7px;border-radius:5px;background:var(--c)}
+.card .mv{font-size:10.5px;font-weight:700;margin-top:7px;display:inline-block;padding:2px 8px;border-radius:5px}
+.mv.up{color:#147a3e;background:#e3f5ea}.mv.same{color:#5f6b78;background:#eef1f5}.mv.down{color:#b3271c;background:#fdeceb}.mv.new{color:#1f54b0;background:#e7eefb}
+.card .met{font-size:11px;margin-top:7px;color:#3b4654;line-height:1.7;border-top:1px dashed #eaeef3;padding-top:6px}
+.card .met .lbl{color:#909aa7}
+.card .bm{font-size:10px;color:#909aa7;margin-top:2px}
+.card .man{display:inline-block;font-size:9px;color:#b87800;font-weight:600;margin-top:4px}
+.cardfoot{display:flex;justify-content:flex-end;margin-top:10px;padding-top:8px;border-top:1px dashed #eaeef3}
+.donebtn{font-family:inherit;font-size:11px;font-weight:600;color:var(--c);background:#fff;border:1px solid var(--c);border-radius:6px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.donebtn:hover{background:var(--c);color:#fff}
+.donebtn.on{background:var(--c);color:#fff}
+.card.done{opacity:.72}
+.card.done .asin{text-decoration:line-through;text-decoration-color:#9bbfaa}
+.note{background:#fff8ec;border:1px solid #f0dcb4;border-radius:8px;padding:10px 13px;font-size:11.5px;color:#7a5b16;margin-bottom:14px;line-height:1.6}
+.toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.toolbar button{font-family:inherit;font-size:11px;font-weight:600;border:1px solid #cdd5de;background:#fff;color:#3b4654;border-radius:7px;padding:6px 12px;cursor:pointer}
+.toolbar button:hover{background:#f2f5f8}
+.empty{padding:40px;text-align:center;color:#909aa7;font-size:13px}
+@media(max-width:720px){.sidebar{display:none}.topbar .meta{text-align:left}}
+</style></head>
+<body>
+<div class="topbar">
+  <div><h1>PH ASIN SEGMENTATION REPORT — <span id="mPeriod"></span></h1>
+  <div class="sub">UK AMAZON FBM · ALL PH OWNERS · 6 SEGMENTS · LEDSone + DCVoltage · CATEGORY-WISE BENCHMARKS</div></div>
+  <div class="meta">Generated: <b id="mGen"></b><br>Data window: <b id="mWin"></b><br>Movement vs <span id="mPrev"></span></div>
+</div>
+<div class="esc" id="escBar"></div>
+<div class="tabs" id="tabs"></div>
+<div class="layout">
+  <aside class="sidebar"><h3>Employees</h3><div id="phlist"></div></aside>
+  <main class="content">
+    <div class="toolbar">
+      <button onclick="exportTicks()">Export progress</button>
+      <button onclick="document.getElementById(''imp'').click()">Import progress</button>
+      <input type="file" id="imp" hidden accept="application/json" onchange="importTicks(event)">
+      <button onclick="resetTicks()">Reset ticks</button>
+    </div>
+    <div id="plan"></div>
+    <div id="main"></div>
+  </main>
+</div>
+<script>
+const D=__DATA__;
+let curSeg="HHH", curPH="ALL", ticks={};
+const TKEY="ph_seg_ticks_"+D.meta.period.replace(/\s/g,"_");
+try{ticks=JSON.parse(localStorage.getItem(TKEY))||{}}catch(e){ticks={}}
+function save(){try{localStorage.setItem(TKEY,JSON.stringify(ticks))}catch(e){}}
+const k=a=>a.asin+"|"+a.acct;
+
+document.getElementById("mPeriod").textContent=D.meta.period;
+document.getElementById("mGen").textContent=D.meta.generated;
+document.getElementById("mWin").textContent=D.meta.window;
+document.getElementById("mPrev").textContent=D.meta.prev;
+
+// escalation banner
+const eb=document.getElementById("escBar"); let ehtml="";
+if(D.escLLL.length) ehtml+=`<div>\u26A0 <b>${D.escLLL.length} PH(s)</b> with &gt;30% ASINs in LLL \u2014 portfolio restructure review (\u00a78)</div>`;
+if(D.escDecl.length) ehtml+=`<div>\u26A0 <b>${D.escDecl.length} PH(s)</b> with &gt;5 ASINs declined this month \u2014 Bietrick + sub-leader review (\u00a78)</div>`;
+if(D.orphan) ehtml+=`<div>\u26A0 <b>${D.orphan} Orphan ASIN(s)</b> selling with no PH owner \u2014 assign owners so they enter segmentation (not in any PH yet)</div>`;
+eb.innerHTML=ehtml||"No \u00a78 escalation thresholds breached.";
+
+// tabs
+const tabs=document.getElementById("tabs");
+D.tabOrder.forEach(s=>{const m=D.seg[s];const t=document.createElement("div");
+  t.className="tab";t.style.setProperty("--c",m.tab);t.dataset.seg=s;
+  t.innerHTML=`${s} <span class="cnt">${D.segTotal[s]}</span>`;
+  t.onclick=()=>{curSeg=s;render()};tabs.appendChild(t)});
+
+// sidebar
+const pl=document.getElementById("phlist");
+const allItem=document.createElement("div");allItem.className="ph-item";allItem.dataset.ph="ALL";
+allItem.innerHTML=`<span>\u25CF All PHs</span>`;allItem.onclick=()=>{curPH="ALL";render()};pl.appendChild(allItem);
+D.summary.forEach(s=>{const it=document.createElement("div");it.className="ph-item";it.dataset.ph=s.user_name;
+  it.innerHTML=`<span>${s.user_name}</span><span class="pct ${s.lll_pct>30?''hot'':''''}">${s.lll_pct}%</span>`;
+  it.onclick=()=>{curPH=s.user_name;render()};pl.appendChild(it)});
+
+function segCount(seg){
+  if(curPH==="ALL") return D.segTotal[seg];
+  const s=D.summary.find(x=>x.user_name===curPH);
+  if(!s) return 0;
+  return ({HHH:s.hhh,HHL:s.hhl,HLH:s.hlh,LHH:s.lhh,LLH:s.llh,LLL:s.lll})[seg];
+}
+const mvMeta=m=>({IMPROVED:["up","\u2191","Improved"],SAME:["same","\u2192","Same segment"],DECLINED:["down","\u2193","Declined"],NEW:["new","\u2605","New ASIN"]}[m]);
+const cfgFor=ph=>D.config.filter(c=>c.user_name===ph);
+
+function card(a){const m=D.seg[a.seg];const[mc,ar,mt]=mvMeta(a.mv);
+  const ck=k(a);const done=!!ticks[ck];
+  const acls=a.acct.indexOf("LED")===0?"led":"dcv";
+  const mvtxt=a.mv==="SAME"?`${ar} Same segment as last month`:(a.mv==="NEW"?`${ar} New ASIN this month`:`${ar} ${mt} from ${a.prev}`);
+  return `<div class="card${done?'' done'':''''}" style="--c:${m.tab};background:${m.card}">
+    <div class="r1"><div><span class="asin">${a.asin}</span><span class="acct ${acls}">${a.acct}</span>
+      <div class="cat">${a.cat}</div></div><span class="segb">${a.seg}</span></div>
+    <div class="sku">SKU: ${a.sku}</div>
+    <div class="mv ${mc}">${mvtxt}</div>
+    <div class="met"><span class="lbl">Impr</span> ${a.imp.toLocaleString()} &nbsp;\u00b7&nbsp; <span class="lbl">Clicks</span> ${a.clk.toLocaleString()} &nbsp;\u00b7&nbsp; <span class="lbl">CVR</span> ${a.cvr}%</div>
+    <div class="bm">Benchmark: Imp ${a.bi?Number(a.bi).toLocaleString():''\u2014''} \u00b7 Clk ${a.bc??''\u2014''} \u00b7 CVR ${a.bv??''\u2014''}%</div>
+    ${a.mn?''<span class="man">\u26A0 manual benchmark (&lt;10 sellers in category)</span>'':''''}
+    <div class="cardfoot"><button class="donebtn${done?'' on'':''''}" onclick="toggleDone(''${ck.replace(/''/g,"")}'')">${done?''\u2713 Done'':''Mark done''}</button></div>
+  </div>`;}
+
+function phBlock(ph,rows){
+  const total=rows.length, done=rows.filter(r=>ticks[k(r)]).length;
+  const pctw=total?Math.round(done/total*100):0;
+  let cfg="";const cf=cfgFor(ph);
+  if(cf.length) cfg=`<div class="cfg">`+cf.map(c=>`<div class="ct"><b>${c.category_name}</b><br>`+
+     (c.needs_manual&&c.bm_impression===null?`<span class="man">manual \u2014 &lt;10 sellers</span>`:
+      `Imp \u2265 <b>${Number(c.bm_impression).toLocaleString()}</b> \u00b7 Clk \u2265 <b>${c.bm_click}</b> \u00b7 CVR \u2265 <b>${c.bm_cvr_pct}%</b><br><span style="color:#8a95a3">Top ${c.topn} sold${c.needs_manual?'' \u00b7 \u26A0 manual'':''''}</span>`)+
+     `</div>`).join("")+`</div>`;
+  return `<div class="phblock"><div class="phhead"><div class="nm">${ph}</div>
+    <div class="prog">${done} / ${total} actioned in ${curSeg}<div class="bar"><span style="width:${pctw}%;background:${D.seg[curSeg].tab}"></span></div></div></div>
+    ${cfg}<div class="cards">${rows.map(card).join("")}</div></div>`;
+}
+
+function render(){
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.classList.toggle("active",t.dataset.seg===curSeg);
+    const c=t.querySelector(".cnt"); if(c) c.textContent=segCount(t.dataset.seg);
+  });
+  document.querySelectorAll(".ph-item").forEach(t=>t.classList.toggle("active",t.dataset.ph===curPH));
+  const m=D.seg[curSeg];
+  const ki=m.plan.indexOf("Kill:");
+  const planHtml = ki>=0
+    ? m.plan.slice(0,ki).trim()+`<span class="kill"><b>\u26A0 Kill criteria \u2014 </b>${m.plan.slice(ki+5).trim()}</span>`
+    : m.plan;
+  document.getElementById("plan").innerHTML=`<div class="plan" style="background:${m.card};border:1px solid ${m.tab}33">
+     <div class="ptitle"><span class="pp" style="background:${m.tab}">${curSeg} \u00b7 ${m.prio}</span> ${m.name}</div>${planHtml}</div>`;
+  let rows=D.asins.filter(a=>a.seg===curSeg && (curPH==="ALL"||a.ph===curPH));
+  const main=document.getElementById("main");
+  let banner="";
+  if(curSeg==="LLL") banner=`<div class="note">LLL has <b>${D.segTotal.LLL.toLocaleString()}</b> ASINs total. This view shows the <b>${D.lllShown}</b> that <b>declined</b> or are <b>new</b> this month (the \u00a78 priority set). The complete LLL list per PH lives in <b>analytics.ph_segment_report</b> for the dashboard phase.</div>`;
+  if(!rows.length){main.innerHTML=banner+`<div class="empty">No ASINs in ${curSeg}${curPH!=="ALL"?" for "+curPH:""}.</div>`;return;}
+  const phs=[...new Set(rows.map(r=>r.ph))].sort();
+  main.innerHTML=banner+phs.map(ph=>phBlock(ph,rows.filter(r=>r.ph===ph))).join("");
+}
+function tick(key,val){ticks[key]=val;if(!val)delete ticks[key];save();
+  // update only progress bars without full rerender
+  render();}
+function toggleDone(key){tick(key,!ticks[key]);}
+function exportTicks(){const b=new Blob([JSON.stringify(ticks,null,2)],{type:"application/json"});
+  const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download="ph_segmentation_progress_"+D.meta.period.replace(/\s/g,"_")+".json";a.click();URL.revokeObjectURL(u);}
+function importTicks(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{ticks=JSON.parse(r.result)||{};save();render();}catch(x){alert("Invalid progress file")}};r.readAsText(f);}
+function resetTicks(){if(confirm("Clear all ticks?")){ticks={};save();render();}}
+render();
+</script></body></html>
+',
+ 'Monthly PH ASIN segmentation report (UK Amazon FBM). All PHs, 6 segments, category-wise benchmarks, movement vs prior month, escalation flags. Auto-generated.',
+ 4,1,'released');
+
+==================== SQL BLOCK 2 (fill data) ====================
+UPDATE tech_team_outputs.ph_task t
+SET html_content = replace(t.html_content, '__DATA__', (
+  SELECT jsonb_build_object(
+    'asins', (SELECT jsonb_agg(jsonb_build_object(
+        'ph',user_name,'asin',asin,'sku',sku,'acct',account,'cat',category_name,
+        'imp',impression,'clk',click,'cvr',cvr_pct,'bi',bm_impression,'bc',bm_click,'bv',bm_cvr_pct,
+        'seg',segment,'prev',prev_segment,'mv',movement,'mn',needs_manual) ORDER BY impression DESC, asin)
+      FROM analytics.ph_segment_report
+      WHERE report_period='__PERIOD__' AND (segment<>'LLL' OR movement IN ('DECLINED','NEW'))),
+    'config', (SELECT jsonb_agg(jsonb_build_object(
+        'user_name',user_name,'category_name',category_name,'bm_impression',bm_imp,'bm_click',bm_clk,
+        'bm_cvr_pct',bm_cvr,'benchmark_sellers',sellers,'topn',topn,'needs_manual',nm)
+        ORDER BY lower(user_name), category_name)
+      FROM (SELECT user_name, category_name,
+              max(bm_impression) bm_imp, max(bm_click) bm_clk, max(bm_cvr_pct) bm_cvr,
+              max(benchmark_sellers) sellers, bool_or(needs_manual) nm,
+              CASE WHEN max(benchmark_sellers)>=30 THEN 30 WHEN max(benchmark_sellers)>=10 THEN 10 ELSE max(benchmark_sellers) END topn
+            FROM analytics.ph_segment_report WHERE report_period='__PERIOD__'
+            GROUP BY user_name, category_name) c),
+    'summary', (SELECT jsonb_agg(jsonb_build_object(
+        'user_name',user_name,'total',total,'hhh',hhh,'hhl',hhl,'hlh',hlh,'lhh',lhh,'llh',llh,'lll',lll,
+        'lll_pct',lll_pct,'declined',declined) ORDER BY lower(user_name))
+      FROM (SELECT user_name, count(*) total,
+              count(*) FILTER(WHERE segment='HHH') hhh, count(*) FILTER(WHERE segment='HHL') hhl,
+              count(*) FILTER(WHERE segment='HLH') hlh, count(*) FILTER(WHERE segment='LHH') lhh,
+              count(*) FILTER(WHERE segment='LLH') llh, count(*) FILTER(WHERE segment='LLL') lll,
+              round(100.0*count(*) FILTER(WHERE segment='LLL')/count(*),1) lll_pct,
+              count(*) FILTER(WHERE movement='DECLINED') declined
+            FROM analytics.ph_segment_report WHERE report_period='__PERIOD__' GROUP BY user_name) s),
+    'seg', '{"HHH":{"name":"Champions","prio":"Scale","tab":"#1A8A4A","card":"#E8F7EE","plan":"Proven ROI — scale it. Expand long-tail keywords & backend terms, add rich media (video/lifestyle), raise ad spend carefully, push B2B/global, add bundles or Subscribe&Save. Kill: margin <15% for 30 days → mandatory pricing review."},"HHL":{"name":"Leaky Buckets","prio":"Fix Now","tab":"#B87800","card":"#FFFBF0","plan":"Traffic is here, conversion isn''t. Revamp the detail page & images, A/B test price/title, build reviews (Vine), answer negatives in 48h, and cut PPC until CR is fixed. Kill: CR not +20% in 60 days → cut PPC 50% & escalate to Bietrick."},"HLH":{"name":"Wallflowers","prio":"Quick Win","tab":"#1A6E99","card":"#EAF4FB","plan":"Conversion is proven, clicks aren''t. Replace the main image, rewrite the title (lead keyword + benefit), A/B test, add negative keywords to kill irrelevant impressions, surface coupons. Kill: CTR <1% after 2 image/title rounds → treat as LHH (volume problem)."},"LHH":{"name":"Hidden Gems","prio":"Growth Play","tab":"#6B3FA0","card":"#F3EEF9","plan":"Listing works, visibility is the only gap — highest-ROI scale. Expand keywords (Helium 10), fill backend terms, raise Sponsored Products budget, verify category/browse node, add SB/SD ads & external traffic. Kill: impressions not +50% in 60 days → pause & investigate targeting."},"LLL":{"name":"Dead Horses","prio":"Kill / Review","tab":"#C0392B","card":"#FDF0EF","plan":"Weak on all three signals. Full listing audit, rebuild keywords from scratch, professional photography, competitor reverse-engineering, pricing review, PPC only after fixes. Kill: units <20/month after full overhaul + 30 days targeted PPC → delist / liquidation review."},"LLH":{"name":"Niche Winners","prio":"Maintain Selectively","tab":"#0D7377","card":"#E6F7F7","plan":"Niche product, converts well — scale reach carefully without breaking margin. Broaden keywords, start selective PPC, product-targeting ads on competitor pages, light external marketing. Don''t aggressively scale until ACoS <40%. Kill: ACoS >40% for 30 days → stop scaling, keep organic-only."}}'::jsonb,
+    'tabOrder', '["HHH","HHL","HLH","LHH","LLL","LLH"]'::jsonb,
+    'segTotal', (SELECT jsonb_object_agg(segment, c) FROM (SELECT segment, count(*) c FROM analytics.ph_segment_report WHERE report_period='__PERIOD__' GROUP BY segment) x),
+    'escLLL', (SELECT coalesce(jsonb_agg(user_name ORDER BY lower(user_name)),'[]'::jsonb) FROM (SELECT user_name, round(100.0*count(*) FILTER(WHERE segment='LLL')/count(*),1) p FROM analytics.ph_segment_report WHERE report_period='__PERIOD__' GROUP BY user_name) y WHERE p>30),
+    'escDecl', (SELECT coalesce(jsonb_agg(user_name ORDER BY lower(user_name)),'[]'::jsonb) FROM (SELECT user_name, count(*) FILTER(WHERE movement='DECLINED') d FROM analytics.ph_segment_report WHERE report_period='__PERIOD__' GROUP BY user_name) z WHERE d>5),
+    'orphan', (SELECT count(*) FROM analytics.v_orphan_asins WHERE is_converting),
+    'lllShown', (SELECT count(*) FROM analytics.ph_segment_report WHERE report_period='__PERIOD__' AND segment='LLL' AND movement IN ('DECLINED','NEW')),
+    'meta', jsonb_build_object('period', upper(to_char(to_date('__PERIOD__','YYYY-MM'),'FMMonth YYYY')),
+        'window', (SELECT 'last 4 complete weeks: '||to_char(min(window_start),'FMDD Mon')||' → '||to_char(max(window_end),'FMDD Mon YYYY')||' (FBM only)' FROM analytics.ph_segment_report WHERE report_period='__PERIOD__'),
+        'prev', (SELECT 'previous 4 weeks: '||to_char(min(window_start)-28,'FMDD Mon')||' → '||to_char(min(window_start)-1,'FMDD Mon YYYY') FROM analytics.ph_segment_report WHERE report_period='__PERIOD__'),
+        'generated', to_char(CURRENT_DATE,'FMDD FMMonth YYYY'))
+  )::text
+))
+WHERE t.id = (SELECT id FROM tech_team_outputs.ph_task WHERE task_id='ph-asin-__PERIOD__' ORDER BY id DESC LIMIT 1);
+
+==================== END ====================
