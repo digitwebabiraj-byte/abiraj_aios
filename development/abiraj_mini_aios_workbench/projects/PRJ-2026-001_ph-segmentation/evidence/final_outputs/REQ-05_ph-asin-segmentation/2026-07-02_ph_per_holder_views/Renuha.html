@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PH ASIN Segmentation — Portfolio Holder View</title>
+<style>
+  :root{
+    --navy:#232a33; --navy2:#2f3a46; --ink:#1f2733; --muted:#6b7688; --line:#e3e8ef;
+    --bg:#eef1f4; --card:#ffffff; --green:#1b6e46; --greenhead:#14683f;
+    --teal:#0f9b8e; --teal2:#0c7d78; --slate:#2b333d; --slate2:#39434f;
+    --hHHH:#1A8A4A; --hHHL:#B87800; --hHLH:#1A6E99; --hLHH:#6B3FA0; --hLLH:#0D7377; --hLLL:#C0392B;
+    --mUP:#1A8A4A; --mDN:#C0392B; --mSAME:#8792a3; --mNEW:#2f6fb0;
+    --warn-bg:#fdeceb; --warn-line:#e6a59e; --warn-ink:#9a2a1f;
+    --shadow-sm:0 1px 2px rgba(16,33,56,.06),0 1px 3px rgba(16,33,56,.05);
+    --shadow-md:0 2px 6px rgba(16,33,56,.08),0 4px 14px rgba(16,33,56,.06);
+    --shadow-lg:0 6px 20px rgba(16,33,56,.12);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:
+         radial-gradient(1200px 400px at 100% -100px,rgba(15,155,142,.07),transparent 60%),
+         var(--bg);
+       color:var(--ink);font-size:13px;line-height:1.4}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  @keyframes escPulse{0%,100%{box-shadow:inset 4px 0 0 #c0392b}50%{box-shadow:inset 4px 0 0 #e0544a,0 2px 10px rgba(192,57,43,.14)}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* header */
+  .top{background:linear-gradient(120deg,#0a0b0e 0%,#111318 55%,#16191f 100%);
+       color:#fff;padding:15px 26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+       box-shadow:var(--shadow-md);position:relative;z-index:5;border-bottom:1px solid #23262d}
+  .top::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;
+       background:linear-gradient(90deg,transparent,#8a6d1f,#d4af37,#f0d878,#d4af37,#8a6d1f,transparent);
+       background-size:200% 100%;animation:goldSheen 8s linear infinite}
+  @keyframes goldSheen{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  .top .brand{font-weight:700;font-size:15.5px;letter-spacing:.4px;
+       background:linear-gradient(90deg,#f0d878,#d4af37);-webkit-background-clip:text;background-clip:text;
+       -webkit-text-fill-color:transparent;color:#d4af37}
+  .top .sub{color:#8f96a1;font-size:11.5px}
+  .top .spacer{flex:1}
+  .top label{color:#aeb4bf;font-size:12px;margin-right:8px;letter-spacing:.3px}
+  .top select{font-size:13px;padding:8px 12px;border-radius:8px;border:1px solid #b89540;
+       background:#ffffff;color:#1a1d22;font-weight:600;min-width:200px;box-shadow:var(--shadow-sm);
+       transition:box-shadow .18s ease}
+  .top select option{background:#ffffff;color:#1a1d22}
+  .top select:hover{box-shadow:0 0 0 3px rgba(212,175,55,.22)}
+  .top select:focus{outline:none;box-shadow:0 0 0 3px rgba(212,175,55,.4)}
+
+  .greet{background:linear-gradient(120deg,#111318,#1a1e25);color:#fff;padding:14px 26px;
+       border-bottom:1px solid #23262d;animation:fadeUp .4s ease both}
+  .greet h1{margin:0;font-size:17.5px;font-weight:700;color:#f3ead2;letter-spacing:.3px}
+  .greet .scope{color:#b7bdc7;font-size:12px;margin-top:3px}
+
+  /* escalation banner */
+  .esc{background:linear-gradient(90deg,#fbdedb,var(--warn-bg));border-bottom:1px solid var(--warn-line);
+       padding:12px 26px 12px 24px;font-size:12.5px;color:var(--warn-ink);display:flex;gap:22px;flex-wrap:wrap;
+       font-weight:600;box-shadow:inset 4px 0 0 #c0392b;animation:escPulse 3.4s ease-in-out infinite}
+  .esc div{display:flex;align-items:center;gap:6px}
+  .esc b{color:#a5241a;font-weight:800;font-size:14px}
+  .esc.ok{background:linear-gradient(90deg,#eaf6ef,#eef7f0);border-color:#bfe0cb;color:#2b6b43;
+       box-shadow:inset 4px 0 0 #3f9e63;animation:none;font-weight:600}
+
+  /* body */
+  .wrap{padding:20px 26px 60px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px 14px;
+       box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+       transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;animation:fadeUp .45s ease both}
+  .card::before{content:"";position:absolute;top:0;left:0;width:100%;height:4px;
+       background:var(--cAccent,linear-gradient(90deg,var(--teal),var(--hHHH)))}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+  .card:nth-child(1){animation-delay:.02s} .card:nth-child(2){animation-delay:.06s}
+  .card:nth-child(3){animation-delay:.10s} .card:nth-child(4){animation-delay:.14s}
+  .card:nth-child(5){animation-delay:.18s} .card:nth-child(6){animation-delay:.22s}
+  .card .k{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:600;padding-right:34px}
+  .card .v{font-size:26px;font-weight:800;margin-top:5px;color:var(--slate);line-height:1}
+  .card .s{color:var(--muted);font-size:11.5px;margin-top:4px}
+  /* per-card icon badge (top-right) */
+  .card .cardIcon{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:9px;
+       display:flex;align-items:center;justify-content:center;background:var(--cSoft,#eef4f6);
+       background-repeat:no-repeat;background-position:center;background-size:17px 17px}
+  /* c1 Assigned listings — teal (list) */
+  .card.c1{--cAccent:linear-gradient(90deg,#0f9b8e,#37c8bb);--cSoft:#e3f5f2}
+  .card.c1 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f9b8e' stroke-width='2.2' stroke-linecap='round'><line x1='8' y1='6' x2='21' y2='6'/><line x1='8' y1='12' x2='21' y2='12'/><line x1='8' y1='18' x2='21' y2='18'/><line x1='3' y1='6' x2='3.01' y2='6'/><line x1='3' y1='12' x2='3.01' y2='12'/><line x1='3' y1='18' x2='3.01' y2='18'/></svg>")}
+  /* c2 Distinct ASINs — blue (tag) */
+  .card.c2{--cAccent:linear-gradient(90deg,#2f6fb0,#5b9bd8);--cSoft:#e7f0fa}
+  .card.c2 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f6fb0' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z'/><line x1='7' y1='7' x2='7.01' y2='7'/></svg>")}
+  /* c3 Distinct SKUs — purple (box) */
+  .card.c3{--cAccent:linear-gradient(90deg,#6b3fa0,#9165c9);--cSoft:#f0e9f8}
+  .card.c3 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b3fa0' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'/><polyline points='3.27 6.96 12 12.01 20.73 6.96'/><line x1='12' y1='22.08' x2='12' y2='12'/></svg>")}
+  /* c4 Categories — slate (grid) */
+  .card.c4{--cAccent:linear-gradient(90deg,#39434f,#5b6675);--cSoft:#eceef1}
+  .card.c4 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2339434f' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='7' height='7'/><rect x='14' y='3' width='7' height='7'/><rect x='14' y='14' width='7' height='7'/><rect x='3' y='14' width='7' height='7'/></svg>")}
+  /* c5 Champions — GREEN, emphasized (trophy) */
+  .card.c5{--cAccent:linear-gradient(90deg,#1A8A4A,#37c26b);--cSoft:#dff3e6;
+       border-color:#a7dcbb;background:linear-gradient(180deg,#f2fbf5,#ffffff)}
+  .card.c5 .v{color:#1A8A4A}
+  .card.c5 .k{color:#1A8A4A}
+  .card.c5 .cardIcon{background:#1A8A4A;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M10.1 13.2L7.7 21.5l2.7-1.4 1.3 2.3.7-6.6z'/><path d='M13.9 13.2l2.4 8.3-2.7-1.4-1.3 2.3-.7-6.6z' opacity='0.9'/><circle cx='12' cy='8.5' r='6.3'/><circle cx='12' cy='8.5' r='3.1' fill='%231A8A4A'/></svg>")}
+  /* c6 Dead Horses — RED, emphasized (alert) */
+  .card.c6{--cAccent:linear-gradient(90deg,#C0392B,#e0685a);--cSoft:#fce4e1;
+       border-color:#eab5ae;background:linear-gradient(180deg,#fdf2f0,#ffffff)}
+  .card.c6 .v{color:#C0392B}
+  .card.c6 .k{color:#C0392B}
+  .card.c6 .cardIcon{background:#C0392B;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M12 3.2c.5 0 .95.26 1.2.7l8.3 14.4c.55.95-.14 2.15-1.24 2.15H3.74c-1.1 0-1.79-1.2-1.24-2.15L10.8 3.9c.25-.44.7-.7 1.2-.7z'/><rect x='11' y='9' width='2' height='5.4' rx='1' fill='%23C0392B'/><circle cx='12' cy='17' r='1.25' fill='%23C0392B'/></svg>")}
+  /* c7 Allocated — slate-blue (clipboard) */
+  .card.c7{--cAccent:linear-gradient(90deg,#4a6b8a,#7a97b5);--cSoft:#e9eff5}
+  .card.c7 .v{color:#3a5570}
+  .card.c7 .cardIcon{background:#4a6b8a;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='4' width='16' height='16' rx='2'/><path d='M9 9h6M9 13h6M9 17h3'/></svg>")}
+
+  .meta{display:flex;gap:26px;flex-wrap:wrap;background:linear-gradient(180deg,#ffffff,#fbfcfe);
+        border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:18px;
+        box-shadow:var(--shadow-sm);animation:fadeUp .5s ease both}
+  .meta div{font-size:12px}
+  .meta .k{color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+  .meta .v{font-weight:600;margin-top:3px;color:var(--ink)}
+
+  /* segment / movement chips */
+  .mix{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 18px}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:5px 12px;font-size:12px;
+        cursor:pointer;font-weight:600;color:#3a4658;user-select:none;box-shadow:var(--shadow-sm);
+        transition:transform .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease,border-color .15s ease;
+        animation:popIn .3s ease both}
+  .chip:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:#c3ceda}
+  .chip.on{background:linear-gradient(120deg,var(--slate),var(--teal2));color:#fff;border-color:var(--slate);
+        box-shadow:0 3px 10px rgba(43,51,61,.3)}
+  .chip .n{opacity:.7;font-weight:700;margin-left:5px}
+  .chip.on .n{opacity:.9}
+  /* colored dot before each segment chip label uses inline text; add left tint bar */
+  #segMix .chip{border-left:3px solid transparent}
+
+  h2.sec{font-size:13px;font-weight:700;margin:24px 0 9px;color:#26313f;text-transform:uppercase;
+       letter-spacing:.5px;position:relative;padding-left:12px}
+  h2.sec::before{content:"";position:absolute;left:0;top:1px;bottom:1px;width:4px;border-radius:3px;
+       background:linear-gradient(180deg,var(--teal),var(--hHHH))}
+  h2.sec .hint{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:12px}
+
+  /* tables */
+  .tblwrap{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:70vh;
+       box-shadow:var(--shadow-sm);animation:fadeUp .5s ease both}
+  table{border-collapse:collapse;width:100%;font-size:12px}
+  thead th{position:sticky;top:0;background:linear-gradient(180deg,#1a7a4c,var(--greenhead));color:#fff;
+       text-align:left;padding:10px 10px;font-weight:600;white-space:nowrap;cursor:pointer;font-size:11.5px;
+       z-index:2}
+  thead th.num{text-align:right}
+  thead th .ar{opacity:.5;font-size:10px;margin-left:3px}
+  tbody td{padding:8px 10px;border-bottom:1px solid #eef1f5;white-space:nowrap}
+  tbody td.num{text-align:right;font-variant-numeric:tabular-nums}
+  tbody tr{transition:background .12s ease}
+  tbody tr:nth-child(even){background:#fbfcfe}
+  tbody tr:hover{background:#eef6f1}
+  #catTbl tbody tr.catrow:hover{background:#eaf3fb}
+  #catTbl tbody tr.catrow:hover .catcue{color:var(--teal2)}
+  #catTbl tbody tr.catrow.on{background:linear-gradient(90deg,rgba(15,155,142,.16),rgba(15,155,142,.05));box-shadow:inset 3px 0 0 var(--teal)}
+  #catTbl tbody tr.catrow.on td{font-weight:600}
+  .catcue{display:inline-block;width:12px;color:#9aa7b5;font-size:11px;transition:color .15s ease}
+  #catTbl tbody tr.catrow.on .catcue{color:var(--teal2)}
+  .catactive{display:inline-block;margin-left:8px;font-size:10.5px;font-weight:700;color:var(--teal2);
+       background:rgba(15,155,142,.12);border:1px solid rgba(15,155,142,.35);border-radius:10px;padding:1px 7px;vertical-align:middle}
+  tbody tr.row-review{background:linear-gradient(90deg,rgba(224,169,46,.18),rgba(224,169,46,.06))}
+  tbody tr.row-review:hover{background:linear-gradient(90deg,rgba(224,169,46,.26),rgba(224,169,46,.10))}
+  tbody tr.row-review td:first-child{box-shadow:inset 3px 0 0 #d99b1c}
+  .seg{display:inline-block;padding:3px 8px;border-radius:6px;color:#fff;font-weight:700;font-size:11px;
+       box-shadow:0 1px 2px rgba(0,0,0,.12)}
+  .badge{display:inline-block;padding:3px 8px;border-radius:6px;font-weight:600;font-size:11px}
+  .dpos{color:var(--mUP);font-weight:600}.dneg{color:var(--mDN);font-weight:600}
+  .man{color:#9a6a00;font-weight:600}
+  .empty{padding:26px;text-align:center;color:var(--muted)}
+  .foot{color:var(--muted);font-size:11px;margin-top:14px}
+  .top label,.top select{display:none!important}
+</style>
+</head>
+<body>
+  <div class="top">
+    <div>
+      <div class="brand">PH ASIN Segmentation</div>
+      <div class="sub">Growth Protection Engine · UK Amazon FBM · category-wise benchmarks</div>
+    </div>
+    <div class="spacer"></div>
+    <div><label for="phsel">Portfolio Holder</label>
+      <select id="phsel"></select></div>
+  </div>
+
+  <div class="greet">
+    <h1 id="gTitle">Select a Portfolio Holder</h1>
+    <div class="scope" id="gScope">Pick a name to see that portfolio only — segments, movement and benchmarks in one view.</div>
+  </div>
+
+  <div class="esc" id="escBar" style="display:none"></div>
+
+  <div class="wrap">
+    <div class="cards" id="cards"></div>
+    <div class="meta" id="meta"></div>
+
+    <h2 class="sec">Segment mix <span class="hint">— where each ASIN stands now · click to filter the table</span></h2>
+    <div class="mix" id="segMix"></div>
+    <h2 class="sec" style="margin-top:16px">Movement <span class="hint">— how each ASIN changed vs last window · NEW = first time seen (nothing to compare yet)</span></h2>
+    <div class="mix" id="movMix"></div>
+
+    <h2 class="sec">Category benchmark <span class="hint">— click a category row to see only its ranking · top-30 best-sellers per category (units-sold ranked); CVR = average of each product's conversion rate</span></h2>
+    <div class="tblwrap"><table id="catTbl"><thead></thead><tbody></tbody></table></div>
+
+    <h2 class="sec">ASIN-level view <span class="hint" id="asinHint"></span></h2>
+    <div class="foot" style="margin:0 0 8px">Status vs the category's top-N average conversions: <b>ABOVE</b> ≥ avg×1.10 · <b>NEAR</b> ±10% · <b>BELOW</b> ≤ avg×0.90 · <b>NEEDS REVIEW</b> = data-quality flag (conversions &gt; clicks, CVR &gt; 100%, or conversions with zero clicks). Segment &amp; Movement remain our engine's classification.</div>
+    <div class="tblwrap"><table id="asinTbl"><thead></thead><tbody></tbody></table></div>
+
+    <div class="foot" id="foot"></div>
+  </div>
+
+<script>
+const D={"period":"2026-07", "generated":"01 Jul 2026", "phs":["Renuha"], "alloc":{"Renuha":190}, "rows":[[0, "Chandelier", "LLL", "SAME", "B0BQMVV41T", "LSCA500BF", 1, 29, 0, 0, 0, 0, 0, 0, 1], [0, "Chandelier", "LLL", "SAME", "B0BQMVZB2T", "LSCA400BF", 1, 117, 0, 0, 0, 0, 0, 0, 2], [0, "Chandelier", "LLL", "SAME", "B0BQMXH1NT", "LS2CA800BF", 1, 99, 3, 0, 0, 0, 0, 0, 3], [0, "Chandelier", "LLL", "SAME", "B0BW115TNK", "LSCA1000FG", 1, 9, 0, 0, 0, 0, 0, 0, 4], [0, "Chandelier", "LLL", "SAME", "B0CGD1XB3P", "LSCA600SG", 1, 8, 0, 0, 0, 0, 0, 0, 5], [0, "Chandelier", "LLL", "SAME", "B0CGD1ZJYN", "LSCA280SG", 1, 1, 0, 0, 0, 0, 0, 0, 6], [0, "Chandelier", "LLL", "SAME", "B0CGD2BLY1", "LSCA500SG", 1, 3, 0, 0, 0, 0, 0, 0, 7], [0, "Chandelier", "LLL", "SAME", "B0CGD2NLHF", "LSCA400SG", 1, 1, 0, 0, 0, 0, 0, 0, 8], [0, "Chandelier", "LLL", "SAME", "B0CH88Q7GL", "LSCA800BF", 1, 16, 0, 0, 0, 0, 0, 0, 9], [0, "Chandelier", "LLL", "SAME", "B0CH8BNK4D", "WSCWBF+LDMC35E1443PK", 1, 43, 0, 0, 0, 0, 0, 0, 10], [0, "Chandelier", "LLL", "SAME", "B0CJ2HN6JP", "LSCASNAMW3", 1, 34, 0, 0, 0, 0, 0, 0, 11], [0, "Chandelier", "LLL", "SAME", "B0CLLHFVHJ", "LSCA2L300SG+LDC35E144", 1, 10, 0, 0, 0, 0, 0, 0, 12], [0, "Chandelier", "LLL", "SAME", "B0CPPQCFSZ", "LSCA500BF+LDC35E1445PK", 0, 336, 0, 0, 0, 0, 0, 0, 13], [0, "Chandelier", "LLL", "SAME", "B0CZ6YCB27", "LSCASN3EG5", 0, 37, 0, 0, 0, 0, 0, 0, 14], [0, "Chandelier", "LLL", "SAME", "B0CZDZNKD6", "LSCASN1WG5", 0, 47, 0, 0, 0, 0, 0, 0, 15], [0, "Chandelier", "LLL", "SAME", "B0D2LDGX7K", "LSCASN3EG3", 0, 196, 1, 0, 0, 0, 0, 0, 16], [0, "Chandelier", "LLL", "SAME", "B0D2LH7V3H", "LSCASN1WG5", 0, 43, 0, 0, 0, 0, 0, 0, 17], [0, "Chandelier", "LLL", "SAME", "B0D456G1WW", "LSCACO500CL+LDC35E144", 1, 28, 0, 0, 0, 0, 0, 0, 18], [0, "Chandelier", "LLL", "SAME", "B0FCYM7LVM", "LSCA400GD", 1, 45, 0, 0, 0, 0, 0, 0, 19], [0, "Hemp Lighting", "HHL", "SAME", "B0FZCW7KC7", "LSHM300HE+RPR44WH", 0, 29208, 157, 23, 14.7, 2207, 14.4, 36, 1], [0, "Hemp Lighting", "HHL", "SAME", "B0FY2HP9LJ", "PHUH0.5HETBM", 1, 6525, 85, 15, 17.7, 2207, 14.4, 36, 2], [0, "Hemp Lighting", "LLL", "SAME", "B09L8H35VL", "PHSH1HETYB+LSCY290BC", 1, 41, 0, 1, 0, 2207, 14.4, 36, 3], [0, "Hemp Lighting", "LLL", "SAME", "B08W8RBGCQ", "PHUH1HETBM+LSHB310HE", 0, 179, 0, 1, 0, 2207, 14.4, 36, 4], [0, "Hemp Lighting", "LLH", "IMPROVED", "B0F6SLG78J", "PHUH1HETBM", 1, 1257, 11, 5, 45.5, 2207, 14.4, 36, 5], [0, "Hemp Lighting", "LLH", "DECLINED", "B0FZCQMY9B", "LSHM400HE2PK+RPR44WH2PK", 0, 1520, 2, 2, 100, 2207, 14.4, 36, 6], [0, "Hemp Lighting", "LLH", "IMPROVED", "B08X4TF49Y", "WCFRBM", 0, 1089, 4, 2, 50, 2207, 14.4, 36, 7], [0, "Hemp Lighting", "HHL", "IMPROVED", "B0CBRL28PQ", "PHDH1HETHE", 0, 3444, 28, 3, 10.7, 2207, 14.4, 36, 8], [0, "Hemp Lighting", "LLH", "SAME", "B0FY5PN96J", "PHUH2HETBM", 1, 1000, 5, 2, 40, 2207, 14.4, 36, 9], [0, "Hemp Lighting", "HHH", "IMPROVED", "B0FZCRB2RS", "LSHM400HE+RPR44WH", 0, 6708, 40, 15, 37.5, 2207, 14.4, 36, 10], [0, "Hemp Lighting", "LLH", "IMPROVED", "B0D8HZLL1S", "ENC3538", 0, 567, 5, 2, 40, 2207, 14.4, 36, 11], [0, "Hemp Lighting", "LLH", "IMPROVED", "B0DBZHMXVT", "ENC7848", 1, 193, 1, 2, 200, 2207, 14.4, 36, 12], [0, "Hemp Lighting", "LLL", "SAME", "B0FB428PD7", "ENC3489", 1, 755, 8, 2, 25, 2207, 14.4, 36, 13], [0, "Hemp Lighting", "LLH", "DECLINED", "B0FR8C1X83", "PHUH1HETBM2PK+LSHM400HE2PK", 0, 1811, 7, 3, 42.9, 2207, 14.4, 36, 14], [0, "Hemp Lighting", "LLL", "SAME", "B0CTFCSYLV", "CRSF100BM+PHHT2PBRBM+LSHM300HE", 0, 116, 0, 1, 0, 2207, 14.4, 36, 15], [0, "Hemp Lighting", "LLL", "SAME", "B0DSBXGG1H", "PHUH1HETBM+LSHM400HE", 1, 205, 0, 0, 0, 2207, 14.4, 36, 16], [0, "Hemp Lighting", "LLH", "SAME", "B0F6T8TMYL", "PHUH2HETBM+LSHM400HE", 1, 848, 3, 2, 66.7, 2207, 14.4, 36, 17], [0, "Hemp Lighting", "LLH", "SAME", "B0FZCY5184", "LSHM300HE2PK+RPR44WH2PK", 0, 811, 3, 2, 66.7, 2207, 14.4, 36, 18], [0, "Hemp Lighting", "LLL", "SAME", "B083TZC6WR", "CRFF500BM+PHHR1HETHE3PK", 1, 577, 9, 1, 11.1, 2207, 14.4, 36, 19], [0, "Hemp Lighting", "LLH", "IMPROVED", "B08W9QJ9PV", "CRSF100BM+PHUH1HETBM+LSHM300HE", 0, 375, 1, 1, 100, 2207, 14.4, 36, 20], [0, "Hemp Lighting", "LLL", "DECLINED", "B08X4TCVN8", "CRFF4503BM+WCRNBM3PK", 0, 1252, 11, 1, 9.1, 2207, 14.4, 36, 21], [0, "Hemp Lighting", "LLH", "IMPROVED", "B08Z7T5CB8", "PHUH2HETBM+LSHM400HE", 0, 375, 1, 1, 100, 2207, 14.4, 36, 22], [0, "Hemp Lighting", "LLL", "SAME", "B091N5YNF6", "PHDH1HETHE", 1, 385, 3, 0, 0, 2207, 14.4, 36, 23], [0, "Hemp Lighting", "LLL", "SAME", "B0964613ZN", "CRSF2003BM+WCRNBM3PK", 1, 571, 4, 0, 0, 2207, 14.4, 36, 24], [0, "Hemp Lighting", "LLL", "SAME", "B096Y9F455", "PHDH1HETHE", 1, 667, 3, 1, 33.3, 2207, 14.4, 36, 25], [0, "Hemp Lighting", "LLL", "SAME", "B0C4DRYJ5T", "CRSF2003BM+WCRNBM3PK", 0, 819, 7, 1, 14.3, 2207, 14.4, 36, 26], [0, "Hemp Lighting", "LLL", "DECLINED", "B0C6R1T87Q", "PHDH1HETHE+ICST64E272PK", 1, 1082, 9, 0, 0, 2207, 14.4, 36, 27], [0, "Hemp Lighting", "LLL", "SAME", "B0CBRLYR8K", "ENC3538", 0, 606, 6, 1, 16.7, 2207, 14.4, 36, 28], [0, "Hemp Lighting", "LLL", "SAME", "B0CG9BRWL7", "WCWODVBM2PK+RPR44WH2PK", 0, 31, 0, 1, 0, 2207, 14.4, 36, 29], [0, "Hemp Lighting", "LLH", "IMPROVED", "B0CGV3FQ7C", "PHHR1DSTHE+LDSG125LOE2742PK", 1, 56, 1, 1, 100, 2207, 14.4, 36, 30], [0, "Hemp Lighting", "LLL", "SAME", "B0CTZRW2J9", "ENC6202", 0, 406, 0, 1, 0, 2207, 14.4, 36, 31], [0, "Hemp Lighting", "LLL", "SAME", "B0DC44PDT5", "WLFSWDBM2PK", 0, 213, 0, 2, 0, 2207, 14.4, 36, 32], [0, "Hemp Lighting", "HHL", "IMPROVED", "B0DC471B8B", "WLFSWDBM", 0, 2909, 18, 1, 5.6, 2207, 14.4, 36, 33], [0, "Hemp Lighting", "LLL", "SAME", "B0DP2CQ86C", "PHUH1HETBM2PK+LSHM400HE2PK", 1, 288, 3, 1, 33.3, 2207, 14.4, 36, 34], [0, "Hemp Lighting", "LLL", "SAME", "B0DP2QXXVC", "PHUH1HETBM2PK+LSHM300HE2PK", 1, 141, 0, 1, 0, 2207, 14.4, 36, 35], [0, "Hemp Lighting", "LLL", "SAME", "B0GC5MC7HV", "LSH3325HE+RPR44WH", 0, 97, 0, 1, 0, 2207, 14.4, 36, 36], [0, "Hemp Lighting", "LLL", "SAME", "B07KQ342K9", "PHHR1BMTBM", 0, 856, 6, 0, 0, 2207, 14.4, 36, 37], [0, "Hemp Lighting", "LLL", "SAME", "B08M9YHDCC", "ENC79", 1, 49, 0, 0, 0, 2207, 14.4, 36, 38], [0, "Hemp Lighting", "LLL", "SAME", "B08QRSTB44", "PHDH1HETHE+LDMG80E2742PK", 0, 22, 0, 0, 0, 2207, 14.4, 36, 39], [0, "Hemp Lighting", "LLL", "DECLINED", "B08W9BGDYY", "CRSF100BM+PHUH1HETBM+LSHM400HE", 0, 412, 1, 0, 0, 2207, 14.4, 36, 40], [0, "Hemp Lighting", "LLL", "SAME", "B08W9S5QR5", "PHUH1HETBM+LSH3325HE", 0, 10, 0, 0, 0, 2207, 14.4, 36, 41], [0, "Hemp Lighting", "LLL", "SAME", "B08W9WF8V3", "PHUH1HETBM+LSHI410HE", 0, 361, 0, 0, 0, 2207, 14.4, 36, 42], [0, "Hemp Lighting", "LLL", "DECLINED", "B08X4V1M19", "CRSF2003BM+WCRNBM3PK", 0, 244, 0, 0, 0, 2207, 14.4, 36, 43], [0, "Hemp Lighting", "LLL", "SAME", "B08X4W7CX3", "CRFF5005BM+WCRNBM5PK", 0, 111, 0, 0, 0, 2207, 14.4, 36, 44], [0, "Hemp Lighting", "LLL", "SAME", "B08Z795F3H", "PHUH1HETBM+LSHM300HE", 0, 60, 0, 0, 0, 2207, 14.4, 36, 45], [0, "Hemp Lighting", "HHL", "SAME", "B08Z7RZC6W", "PHUH1HETBM+LSHM400HE", 0, 3910, 21, 4, 19.1, 2207, 14.4, 36, 46], [0, "Hemp Lighting", "LLL", "DECLINED", "B08Z7W3SYL", "PHUH1HETBM+LSHM300HE", 0, 1866, 10, 2, 20, 2207, 14.4, 36, 47], [0, "Hemp Lighting", "HHL", "IMPROVED", "B093Y224LS", "CRSF100BM+PHHT1PBRBM+LSHM400HE", 1, 2484, 19, 5, 26.3, 2207, 14.4, 36, 48], [0, "Hemp Lighting", "LLL", "SAME", "B093Y44Y4N", "CRSF100BM+PHHT1PBRBM+LSHM300HE", 1, 227, 2, 0, 0, 2207, 14.4, 36, 49], [0, "Hemp Lighting", "LLL", "SAME", "B09472PVQF", "CRSF100BM+PHUH1HETBM+LSHM400HE", 0, 495, 1, 0, 0, 2207, 14.4, 36, 50], [0, "Hemp Lighting", "LLL", "SAME", "B094JZRQGR", "PHSH1HETYB+SCRN70BC+LSWD360BC", 0, 10, 0, 0, 0, 2207, 14.4, 36, 51], [0, "Hemp Lighting", "LLL", "SAME", "B0974S2KD9", "PHUH1HETBM+LSWD360BC", 1, 13, 0, 0, 0, 2207, 14.4, 36, 52], [0, "Hemp Lighting", "LLL", "DECLINED", "B09FB4PR94", "CRFF5005BM+WCRNBM5PK", 1, 478, 3, 0, 0, 2207, 14.4, 36, 53], [0, "Hemp Lighting", "LLL", "SAME", "B09L84CR6S", "PHSH1HETYB+LSCY290BI", 1, 29, 0, 0, 0, 2207, 14.4, 36, 54], [0, "Hemp Lighting", "LLL", "SAME", "B09L84F6FZ", "PHSH1HETYB+LSSS300BI", 1, 57, 0, 0, 0, 2207, 14.4, 36, 55], [0, "Hemp Lighting", "LLL", "DECLINED", "B09L8G677K", "PHSH1HETYB+LSCY290BS", 1, 22, 0, 0, 0, 2207, 14.4, 36, 56], [0, "Hemp Lighting", "LLL", "SAME", "B09L8G8CZ9", "PHSH1HETYB+LSCY290WH", 1, 24, 0, 0, 0, 2207, 14.4, 36, 57], [0, "Hemp Lighting", "LLL", "SAME", "B09L8GQVFY", "PHSH1HETYB+LSCY290GY", 1, 3, 0, 0, 0, 2207, 14.4, 36, 58], [0, "Hemp Lighting", "LLL", "SAME", "B09L8GSM5V", "CRSF100BM+PHSH1HETYB+LSCY290BL", 1, 20, 0, 0, 0, 2207, 14.4, 36, 59], [0, "Hemp Lighting", "LLL", "SAME", "B09L8GXDLD", "PHSH1HETYB+LSCY290BM", 1, 21, 0, 0, 0, 2207, 14.4, 36, 60], [0, "Hemp Lighting", "LLL", "SAME", "B09L8H1XLB", "PHSH1HETYB+LSCY290YE", 1, 1, 0, 0, 0, 2207, 14.4, 36, 61], [0, "Hemp Lighting", "LLL", "SAME", "B09L8H5RQN", "PHSH1HETYB+LSCY290RE", 1, 28, 0, 0, 0, 2207, 14.4, 36, 62], [0, "Hemp Lighting", "LLL", "SAME", "B09L8H671X", "PHSH1HETYB+LSCY290RR", 1, 9, 0, 0, 0, 2207, 14.4, 36, 63], [0, "Hemp Lighting", "LLL", "SAME", "B09L8H6F15", "PHSH1HETYB+LSCY290CO", 1, 38, 0, 0, 0, 2207, 14.4, 36, 64], [0, "Hemp Lighting", "LLL", "SAME", "B09L8H89KT", "PHSH1HETYB+LSCY290YB", 1, 5, 0, 0, 0, 2207, 14.4, 36, 65], [0, "Hemp Lighting", "LLL", "DECLINED", "B09L8HFKRW", "PHSH1HETYB+LSCY290GR", 1, 52, 0, 0, 0, 2207, 14.4, 36, 66], [0, "Hemp Lighting", "LLL", "SAME", "B0BTP13VX7", "PHSH1HETYB+LSCY290GR", 1, 37, 0, 0, 0, 2207, 14.4, 36, 67], [0, "Hemp Lighting", "LLL", "SAME", "B0BTP1MVCF", "PHSH1HETYB+LSCY290GY", 0, 50, 0, 0, 0, 2207, 14.4, 36, 68], [0, "Hemp Lighting", "LLL", "SAME", "B0BTP1NWCV", "PHSH1HETYB+LSCY290RE", 0, 14, 0, 0, 0, 2207, 14.4, 36, 69], [0, "Hemp Lighting", "LLL", "SAME", "B0BTP2GMY9", "PHSH1HETYB+LSCY290BS", 0, 22, 0, 0, 0, 2207, 14.4, 36, 70], [0, "Hemp Lighting", "LLL", "SAME", "B0BTP3C8M1", "PHSH1HETYB+LSCY290BM", 0, 485, 2, 0, 0, 2207, 14.4, 36, 71], [0, "Hemp Lighting", "LLL", "SAME", "B0BTP3G72C", "PHSH1HETYB+LSCY290YB", 0, 103, 0, 0, 0, 2207, 14.4, 36, 72], [0, "Hemp Lighting", "LLL", "SAME", "B0BVMN1JXB", "WCFRBM", 1, 255, 1, 0, 0, 2207, 14.4, 36, 73], [0, "Hemp Lighting", "LLL", "SAME", "B0BYZ6B6CS", "ENC5700", 1, 618, 5, 0, 0, 2207, 14.4, 36, 74], [0, "Hemp Lighting", "LLL", "SAME", "B0C2Z62V55", "PHUH2HETBM+LSHM400HE", 1, 416, 0, 0, 0, 2207, 14.4, 36, 75], [0, "Hemp Lighting", "LLL", "SAME", "B0C2Z67QN4", "PHUH1HETBM+LSHM300HE", 1, 65, 0, 0, 0, 2207, 14.4, 36, 76], [0, "Hemp Lighting", "LLL", "SAME", "B0C2Z7LKJN", "PHUH2HETBM+LSHM300HE", 1, 198, 0, 0, 0, 2207, 14.4, 36, 77], [0, "Hemp Lighting", "LLL", "SAME", "B0C2ZBKY8S", "PHUH1HETBM+LSHM400HE", 1, 198, 2, 0, 0, 2207, 14.4, 36, 78], [0, "Hemp Lighting", "LLL", "SAME", "B0C4DQQSFX", "CRSF2003BM+WCRNBM3PK+ICST64E273PK", 0, 161, 0, 0, 0, 2207, 14.4, 36, 79], [0, "Hemp Lighting", "LLL", "SAME", "B0C6KPDR1H", "ENC5699", 1, 26, 0, 0, 0, 2207, 14.4, 36, 80], [0, "Hemp Lighting", "LLL", "SAME", "B0C6KZDFBD", "ENC3538", 1, 101, 0, 0, 0, 2207, 14.4, 36, 81], [0, "Hemp Lighting", "LLL", "SAME", "B0C6MZVSLF", "PHHR2HETHE+ICST64E27", 1, 67, 0, 0, 0, 2207, 14.4, 36, 82], [0, "Hemp Lighting", "LLL", "DECLINED", "B0C7Q6ZQ8T", "CRSF100BM+PHHT1PBRBM+LSHM400HE", 0, 107, 0, 0, 0, 2207, 14.4, 36, 83], [0, "Hemp Lighting", "LLL", "SAME", "B0C7Q8FXCD", "CRSF100BM+PHHT1PBRBM+LSHM300HE", 0, 497, 3, 0, 0, 2207, 14.4, 36, 84], [0, "Hemp Lighting", "LLL", "SAME", "B0C7QYCFJR", "WCFRBM+ICST64E2740", 0, 248, 0, 0, 0, 2207, 14.4, 36, 85], [0, "Hemp Lighting", "LLL", "SAME", "B0C7QYT4H2", "CRFF4503BM+WCRNBM3PK+ICST64E273PK", 0, 126, 0, 0, 0, 2207, 14.4, 36, 86], [0, "Hemp Lighting", "LLL", "SAME", "B0C7R259DR", "CRFF5004BM+WCRNBM4PK+ICST64E274PK", 0, 141, 1, 0, 0, 2207, 14.4, 36, 87], [0, "Hemp Lighting", "LLL", "SAME", "B0C7VDPPZ9", "CRSF100BM+PHUP1PBRBM+LSHB310HE", 0, 62, 0, 0, 0, 2207, 14.4, 36, 88], [0, "Hemp Lighting", "LLL", "SAME", "B0C9JFJGGH", "PHUH1HETBM+LSHM400HE", 1, 975, 4, 1, 25, 2207, 14.4, 36, 89], [0, "Hemp Lighting", "LLL", "SAME", "B0CBMH92KR", "PHUH2HETBM+LSHM400HE", 1, 507, 2, 0, 0, 2207, 14.4, 36, 90], [0, "Hemp Lighting", "LLL", "SAME", "B0CBMHYBWD", "PHUH2HETBM+LSHM300HE", 1, 411, 2, 0, 0, 2207, 14.4, 36, 91], [0, "Hemp Lighting", "LLL", "DECLINED", "B0CBMK1KDW", "PHUH1HETBM+LSHM300HE", 1, 932, 3, 0, 0, 2207, 14.4, 36, 92], [0, "Hemp Lighting", "LLL", "SAME", "B0CBRJM5X9", "PHHR1BRTBR+ICST64E27", 0, 38, 0, 0, 0, 2207, 14.4, 36, 93], [0, "Hemp Lighting", "LLL", "SAME", "B0CBRKFVB6", "PHHR1HETHE", 0, 53, 1, 0, 0, 2207, 14.4, 36, 94], [0, "Hemp Lighting", "LLH", "IMPROVED", "B0CBRKPMQ3", "ENC3535", 0, 272, 2, 1, 50, 2207, 14.4, 36, 95], [0, "Hemp Lighting", "LLL", "SAME", "B0CBRKZY5C", "PHHR1BRTBR", 0, 8, 0, 0, 0, 2207, 14.4, 36, 96], [0, "Hemp Lighting", "LLL", "SAME", "B0CBRLFF3L", "PHDH1HETHE+ICG80E27602PK", 0, 1316, 13, 0, 0, 2207, 14.4, 36, 97], [0, "Hemp Lighting", "LLL", "SAME", "B0CBRMTDB5", "PHHR2HETHE", 0, 1, 0, 0, 0, 2207, 14.4, 36, 98], [0, "Hemp Lighting", "LLL", "SAME", "B0CBRPWDBJ", "PHHR1HETHE+ICST64E27", 0, 42, 0, 0, 0, 2207, 14.4, 36, 99], [0, "Hemp Lighting", "LLL", "SAME", "B0CBV5PRK4", "PHHR1HETHE", 1, 474, 4, 0, 0, 2207, 14.4, 36, 100], [0, "Hemp Lighting", "LLL", "SAME", "B0CBV7VNDZ", "PHHR1BRTBR+ICST64E27", 1, 112, 1, 0, 0, 2207, 14.4, 36, 101], [0, "Hemp Lighting", "LLL", "DECLINED", "B0CDPX4PJM", "PHHR1DSTHE", 1, 103, 0, 0, 0, 2207, 14.4, 36, 102], [0, "Hemp Lighting", "LLL", "SAME", "B0CFLJDTLD", "WCWODV1BM2PK+ICST64E272PK", 1, 62, 0, 0, 0, 2207, 14.4, 36, 103], [0, "Hemp Lighting", "LLL", "SAME", "B0CFQQ7QTC", "WLFSWRHE", 1, 88, 0, 0, 0, 2207, 14.4, 36, 104], [0, "Hemp Lighting", "LLL", "NEW", "B0CFQR57S2", "", 1, 3, 0, 0, 0, 2207, 14.4, 36, 105], [0, "Hemp Lighting", "LLL", "SAME", "B0CFQR6JWT", "WLFSWRHE+ICST64E27", 1, 5, 0, 0, 0, 2207, 14.4, 36, 106], [0, "Hemp Lighting", "LLL", "SAME", "B0CFQTFXVJ", "WLFSWRHE2PK+ICST64E272PK", 1, 10, 0, 0, 0, 2207, 14.4, 36, 107], [0, "Hemp Lighting", "LLL", "SAME", "B0CFQYTDGF", "WLFSWWHE+ICST64E27", 1, 324, 1, 0, 0, 2207, 14.4, 36, 108], [0, "Hemp Lighting", "HHL", "IMPROVED", "B0CFVBZ2GH", "PSOS2BMTHE+ICST64E27", 1, 943, 15, 1, 6.7, 2207, 14.4, 36, 109], [0, "Hemp Lighting", "LLH", "SAME", "B0CG9G8PBV", "WCWODSBM+RPR44WH", 0, 1132, 7, 4, 57.1, 2207, 14.4, 36, 110], [0, "Hemp Lighting", "LLL", "SAME", "B0CG9GNX5L", "WCWODSBM2PK+RPR44WH2PK", 0, 452, 1, 0, 0, 2207, 14.4, 36, 111], [0, "Hemp Lighting", "LLL", "SAME", "B0CG9GQZ99", "WCWODVBM+RPR44WH", 0, 128, 0, 0, 0, 2207, 14.4, 36, 112], [0, "Hemp Lighting", "LLL", "SAME", "B0CG9HYBJS", "WSLH200BM+ICST64E27", 1, 37, 0, 0, 0, 2207, 14.4, 36, 113], [0, "Hemp Lighting", "LLL", "SAME", "B0CGRM9ZTF", "WSLH200BM+ICST64E27", 1, 382, 0, 0, 0, 2207, 14.4, 36, 114], [0, "Hemp Lighting", "LLH", "IMPROVED", "B0CHF49HKL", "PHUH1HETBM+LSHM400HE", 1, 1138, 2, 2, 100, 2207, 14.4, 36, 115], [0, "Hemp Lighting", "LLL", "SAME", "B0CHP8ZB2M", "", 1, 408, 4, 0, 0, 2207, 14.4, 36, 116], [0, "Hemp Lighting", "LLL", "SAME", "B0CHP9RWN2", "WCWODV1BM2PK+ICST64E272PK", 1, 31, 0, 0, 0, 2207, 14.4, 36, 117], [0, "Hemp Lighting", "LLL", "SAME", "B0CHP9SG28", "WCWODV1BM+ICST64E27", 1, 587, 3, 0, 0, 2207, 14.4, 36, 118], [0, "Hemp Lighting", "LLL", "SAME", "B0CKSSP3SH", "PHUH2HETBM+WCSPROBM+SPHEBM", 1, 113, 1, 0, 0, 2207, 14.4, 36, 119], [0, "Hemp Lighting", "LLL", "SAME", "B0CKSSS8BQ", "PHUH0.5HETBM+WCSPROBM+ICST64E27", 1, 177, 0, 0, 0, 2207, 14.4, 36, 120], [0, "Hemp Lighting", "LLL", "SAME", "B0CKST6V7Q", "PHUH0.5HETBM+WCSPROBM", 1, 21, 0, 0, 0, 2207, 14.4, 36, 121], [0, "Hemp Lighting", "LLL", "SAME", "B0CNRLTT9J", "PHSH1HETYB+LSCY290BM", 0, 2, 0, 0, 0, 2207, 14.4, 36, 122], [0, "Hemp Lighting", "LLL", "DECLINED", "B0CP9CV6W1", "WCFRBM+ICST64E2740", 0, 2077, 12, 0, 0, 2207, 14.4, 36, 123], [0, "Hemp Lighting", "LLL", "SAME", "B0CR8WHMLC", "PHHR3DSTHE+LDSG125LOE2742PK", 1, 148, 1, 0, 0, 2207, 14.4, 36, 124], [0, "Hemp Lighting", "LLL", "SAME", "B0CTFKSJCZ", "CRSF100BM+PHHT2PBRBM+LSHM400HE", 0, 95, 0, 0, 0, 2207, 14.4, 36, 125], [0, "Hemp Lighting", "LLL", "SAME", "B0CWNZRDZN", "WCWODVBM2PK+RPR44WH2PK", 1, 32, 0, 0, 0, 2207, 14.4, 36, 126], [0, "Hemp Lighting", "LLL", "SAME", "B0CWPCJV6S", "WCWODSBM2PK+RPR44WH2PK", 1, 356, 1, 0, 0, 2207, 14.4, 36, 127], [0, "Hemp Lighting", "LLL", "SAME", "B0CWPCM44P", "WCWODVBM+RPR44WH", 1, 127, 0, 0, 0, 2207, 14.4, 36, 128], [0, "Hemp Lighting", "LLL", "SAME", "B0CWPCS4Y1", "WCWODSBM+RPR44WH", 1, 1466, 6, 0, 0, 2207, 14.4, 36, 129], [0, "Hemp Lighting", "LLL", "SAME", "B0D8HY3HZ5", "PHDH1HETHE", 0, 83, 0, 0, 0, 2207, 14.4, 36, 130], [0, "Hemp Lighting", "LLL", "SAME", "B0D8HYXLNQ", "ENC3535", 0, 202, 0, 0, 0, 2207, 14.4, 36, 131], [0, "Hemp Lighting", "LLL", "SAME", "B0D8J28F5D", "PHHR2HETHE", 0, 129, 0, 0, 0, 2207, 14.4, 36, 132], [0, "Hemp Lighting", "LLL", "SAME", "B0D9KD6SVF", "PHHR1YETYE2PK+ICST64E272PK", 1, 55, 0, 0, 0, 2207, 14.4, 36, 133], [0, "Hemp Lighting", "LLL", "SAME", "B0DBPWGS2Y", "PHHR3DSTHE+ICST64E272PK", 1, 1284, 9, 0, 0, 2207, 14.4, 36, 134], [0, "Hemp Lighting", "HLH", "IMPROVED", "B0DBVBSG26", "CRSF100BM2PK+PHHT1PBRBM2PK+LSHM300HE2PK", 1, 3055, 13, 0, 0, 2207, 14.4, 36, 135], [0, "Hemp Lighting", "LLL", "SAME", "B0DC42TYHC", "WLFSWDBM+ICST64E27", 1, 178, 2, 0, 0, 2207, 14.4, 36, 136], [0, "Hemp Lighting", "LLL", "SAME", "B0DC43H1CL", "WLFSWDBM2PK", 1, 23, 0, 0, 0, 2207, 14.4, 36, 137], [0, "Hemp Lighting", "LLL", "SAME", "B0DC43SN5M", "WLFSWDBM2PK+ICST64E272PK", 1, 32, 0, 0, 0, 2207, 14.4, 36, 138], [0, "Hemp Lighting", "LLL", "SAME", "B0DC44ZC8T", "WLFSWDBM", 1, 144, 0, 0, 0, 2207, 14.4, 36, 139], [0, "Hemp Lighting", "LLL", "SAME", "B0DCFGJXHM", "PHHR1BRTRE2PK", 1, 22, 0, 0, 0, 2207, 14.4, 36, 140], [0, "Hemp Lighting", "LLL", "SAME", "B0DCS86RKH", "WLFSWWHE+ICST64E27", 1, 7, 0, 0, 0, 2207, 14.4, 36, 141], [0, "Hemp Lighting", "LLL", "SAME", "B0DCS8DHMF", "WLFSWRHE+ICST64E27", 1, 163, 0, 0, 0, 2207, 14.4, 36, 142], [0, "Hemp Lighting", "LLL", "SAME", "B0DCSFN85H", "WLFSWWHE", 1, 105, 0, 0, 0, 2207, 14.4, 36, 143], [0, "Hemp Lighting", "LLL", "SAME", "B0DFCP3VGD", "CRSF2003BM2PK+WCRNBM6PK+ICST64E276PK", 1, 179, 0, 0, 0, 2207, 14.4, 36, 144], [0, "Hemp Lighting", "LLL", "SAME", "B0DJD14XFG", "WSLR200BM", 1, 1, 0, 0, 0, 2207, 14.4, 36, 145], [0, "Hemp Lighting", "LLL", "SAME", "B0DKFNXM3T", "PHHR1HETHE2PK", 0, 20, 0, 0, 0, 2207, 14.4, 36, 146], [0, "Hemp Lighting", "LLL", "SAME", "B0DR92Q39T", "PSOS2BMTHE+CBMP140BM+ICST64E27", 1, 168, 1, 0, 0, 2207, 14.4, 36, 147], [0, "Hemp Lighting", "LLL", "SAME", "B0DSBVNW6D", "PHUH1HETBM+LSHM300HE", 1, 73, 0, 0, 0, 2207, 14.4, 36, 148], [0, "Hemp Lighting", "LLL", "SAME", "B0F6THWDY6", "CRSF100BM+PHHT2PBRBM+LSHM400HE", 1, 336, 0, 0, 0, 2207, 14.4, 36, 149], [0, "Hemp Lighting", "LLL", "SAME", "B0F6TY4TKT", "PHUH1HETBM+LSHM300HE", 1, 5, 0, 0, 0, 2207, 14.4, 36, 150], [0, "Hemp Lighting", "LLH", "SAME", "B0F6V3GXXV", "PHUH1HETBM+LSHM400HE", 1, 790, 2, 4, 200, 2207, 14.4, 36, 151], [0, "Hemp Lighting", "LLL", "SAME", "B0FB43F88T", "ENC5296", 1, 34, 0, 0, 0, 2207, 14.4, 36, 152], [0, "Hemp Lighting", "LLL", "SAME", "B0FB43FVYC", "CRFF2005BM+PHUH2HETBM5PK+SPSDCSBM5PK", 1, 31, 0, 0, 0, 2207, 14.4, 36, 153], [0, "Hemp Lighting", "LLL", "SAME", "B0FBRJF2FH", "CRSF1202BM+PHHRE2HETHE2PK+SPHEBM2PK", 1, 31, 0, 0, 0, 2207, 14.4, 36, 154], [0, "Hemp Lighting", "LLL", "SAME", "B0FGJGK9G3", "PHUH2HETBM+LSHM300HE", 1, 107, 0, 0, 0, 2207, 14.4, 36, 155], [0, "Hemp Lighting", "LLL", "SAME", "B0FGJGPNRL", "PHUH1HETBM+LSHM300HE", 1, 110, 0, 0, 0, 2207, 14.4, 36, 156], [0, "Hemp Lighting", "LLL", "SAME", "B0FGJLM2GH", "PHHT1FBRBM+LSHM400HE", 1, 824, 5, 0, 0, 2207, 14.4, 36, 157], [0, "Hemp Lighting", "LLL", "SAME", "B0FMDTYNNF", "WCWODSBM2PK+RPR44WH2PK", 1, 68, 0, 0, 0, 2207, 14.4, 36, 158], [0, "Hemp Lighting", "LLL", "SAME", "B0FR8C2VP7", "ENC7848", 0, 47, 0, 0, 0, 2207, 14.4, 36, 159], [0, "Hemp Lighting", "LLL", "SAME", "B0FR8R5JRG", "PHUH1HETBM2PK+LSHM300HE2PK", 0, 55, 2, 0, 0, 2207, 14.4, 36, 160], [0, "Hemp Lighting", "LLL", "SAME", "B0FV8QM8P5", "WLYIHEBM", 1, 64, 0, 0, 0, 2207, 14.4, 36, 161], [0, "Hemp Lighting", "LLL", "SAME", "B0FWBWKCNX", "PHHR3DSTHE+ICST64E272PK", 0, 164, 0, 0, 0, 2207, 14.4, 36, 162], [0, "Hemp Lighting", "LLL", "SAME", "B0FXFMNL6B", "WCFRBM2PK", 0, 1852, 14, 0, 0, 2207, 14.4, 36, 163], [0, "Hemp Lighting", "LLL", "SAME", "B0FY217G8Q", "PHUH1HETBM+LDMST64E274", 1, 36, 0, 0, 0, 2207, 14.4, 36, 164], [0, "Hemp Lighting", "LLL", "SAME", "B0FY5LSJVZ", "PHUH2HETBM+LDEDG125E273", 1, 136, 0, 0, 0, 2207, 14.4, 36, 165]], "cats":[[0, "Hemp Lighting", 165, 30, 2207, 14.4, 36, "FULL_TOP_30", 3.07], [0, "Chandelier", 19, null, null, null, null, "NEEDS_MANUAL", null]]};;
+const ACC=["DCVoltage UK","LEDSone UK"];
+const SEGCOL={HHH:"--hHHH",HHL:"--hHHL",HLH:"--hHLH",LHH:"--hLHH",LLH:"--hLLH",LLL:"--hLLL"};
+const SEGNAME={HHH:"Champions",HHL:"Leaky Buckets",HLH:"Wallflowers",LHH:"Hidden Gems",LLH:"Niche Winners",LLL:"Dead Horses"};
+const SEGORDER=["HHH","HHL","HLH","LHH","LLH","LLL"];
+const MOVCOL={IMPROVED:"--mUP",DECLINED:"--mDN",SAME:"--mSAME",NEW:"--mNEW"};
+const MOVORDER=["IMPROVED","DECLINED","SAME","NEW"];
+const STATCOL={ABOVE_TOP30_AVG:"--mUP",BELOW_TOP30_AVG:"--mDN",NEAR_TOP30_AVG:"--mSAME",NEEDS_REVIEW:"--hHHL"};
+// row columns: [phIdx,cat,seg,mov,asin,sku,acc,i,k,v,cvr,bi,bk,bcvr,rank]
+const C={ph:0,cat:1,seg:2,mov:3,asin:4,sku:5,acc:6,i:7,k:8,v:9,cvr:10,bi:11,bk:12,bcvr:13,rank:14};
+// category avg-conversion benchmark lookup (cats: [phIdx,cat,listings,topn,b_imp,b_clk,b_cvr,status,b_conv])
+const CATCONV={}; (D.cats||[]).forEach(c=>{CATCONV[c[0]+"|"+c[1]]=c[8];});
+function avgConvOf(r){const x=CATCONV[r[C.ph]+"|"+r[C.cat]];return x==null?0:x;}
+function statusOf(r){const v=r[C.v],k=r[C.k],cvr=r[C.cvr],avg=avgConvOf(r);
+  if(v>k || cvr>100 || (v>0&&k===0)) return "NEEDS_REVIEW";
+  if(avg>0){ if(v>=avg*1.10) return "ABOVE_TOP30_AVG"; if(v<=avg*0.90) return "BELOW_TOP30_AVG"; }
+  return "NEAR_TOP30_AVG";}
+function statBadge(s){const col=getComputedStyle(document.documentElement).getPropertyValue(STATCOL[s]||"--mSAME");
+  return `<span class="badge" style="background:${col}22;color:${col}">${s.replace(/_/g," ")}</span>`;}
+
+let cur=null, segFilter=null, movFilter=null, catFilter=null, sortKey=null, sortDir=1;
+
+const sel=document.getElementById("phsel");
+sel.innerHTML='<option value="">— choose —</option>'+D.phs.map((n,i)=>`<option value="${i}">${n}</option>`).join("");
+sel.addEventListener("change",()=>{const v=sel.value; cur=v===""?null:+v; segFilter=null; movFilter=null; catFilter=null; sortKey=null; render();});
+
+function fmt(n){return (n==null?0:n).toLocaleString()}
+function f1(n){return (n==null?0:n).toFixed(1)}
+function segBadge(s){return `<span class="seg" style="background:var(${SEGCOL[s]})">${s}</span>`}
+function movBadge(m){const c=MOVCOL[m];const col=getComputedStyle(document.documentElement).getPropertyValue(c);
+  return `<span class="badge" style="background:${col}22;color:${col}">${m}</span>`}
+function delta(x){const cls=x>0?"dpos":x<0?"dneg":"";const s=x>0?"+"+fmt(x):fmt(x);return `<span class="${cls}">${s}</span>`}
+
+function render(){
+  const esc=document.getElementById("escBar");
+  if(cur===null){
+    document.getElementById("gTitle").textContent="Select a Portfolio Holder";
+    document.getElementById("gScope").textContent="Pick a name to see that portfolio only — segments, movement and benchmarks in one view.";
+    document.getElementById("cards").innerHTML="";
+    document.getElementById("meta").innerHTML="";
+    document.getElementById("segMix").innerHTML="";
+    document.getElementById("movMix").innerHTML="";
+    esc.style.display="none";
+    catBody([]); asinBody([]); document.getElementById("foot").textContent="";
+    document.getElementById("asinHint").textContent="";
+    return;
+  }
+  const name=D.phs[cur];
+  const rows=D.rows.filter(r=>r[C.ph]===cur);
+  const cats=D.cats.filter(c=>c[0]===cur);
+  const listings=rows.length;
+  const asins=new Set(rows.map(r=>r[C.asin])).size;
+  const skus=new Set(rows.filter(r=>r[C.sku]).map(r=>r[C.sku])).size;
+  const ncat=new Set(rows.map(r=>r[C.cat])).size;
+  const segCount={},movCount={};
+  SEGORDER.forEach(s=>segCount[s]=0); MOVORDER.forEach(m=>movCount[m]=0);
+  rows.forEach(r=>{segCount[r[C.seg]]++;movCount[r[C.mov]]++});
+  const lllPct=listings?Math.round(1000*segCount.LLL/listings)/10:0;
+
+  document.getElementById("gTitle").textContent=name;
+  const _alloc=(D.alloc&&D.alloc[name])||0;
+  const _notActive=_alloc>asins?_alloc-asins:0;
+  document.getElementById("gScope").textContent=`${fmt(listings)} listings · ${fmt(asins)} ASINs active this window · ${fmt(_alloc)} allocated${_notActive>0?` (${fmt(_notActive)} not active)`:""} · ${fmt(skus)} SKUs · ${ncat} categor${ncat===1?"y":"ies"} — this portfolio only.`;
+
+  // cards
+  document.getElementById("cards").innerHTML=[
+    ["Assigned listings",fmt(listings),"rows in scope"],
+    ["Distinct ASINs",fmt(asins),""],
+    ["Distinct SKUs",fmt(skus),""],
+    ["Categories",fmt(ncat),""],
+    ["Champions (HHH)",fmt(segCount.HHH),"scale these"],
+    ["Dead Horses (LLL)",fmt(segCount.LLL),lllPct+"% of portfolio"],
+    ["Allocated",fmt(_alloc),_notActive>0?`${fmt(_notActive)} not active this window`:"all active"]
+  ].map((c,ci)=>`<div class="card c${ci+1}"><div class="cardIcon"></div><div class="k">${c[0]}</div><div class="v">${c[1]}</div><div class="s">${c[2]}</div></div>`).join("");
+
+  // meta strip
+  document.getElementById("meta").innerHTML=[
+    ["Current window (this report)","31 May – 27 Jun 2026 · last 4 complete weeks (UK Amazon FBM)"],
+    ["Benchmark","Top-30 best-sellers / category · average conversion rate"],
+    ["Movement compares","current vs previous 4 weeks: 3 May – 30 May 2026 → 31 May – 27 Jun 2026"],
+    ["Report period",D.period],
+    ["Generated",D.generated]
+  ].map(m=>`<div><div class="k">${m[0]}</div><div class="v">${m[1]}</div></div>`).join("");
+
+  // escalation banner (our §8 rules, this PH)
+  let e="";
+  if(lllPct>30) e+=`<div>\u26A0 <b>${lllPct}%</b> of this portfolio is in LLL (Dead Horses) \u2014 portfolio restructure review (\u00a78)</div>`;
+  if(movCount.DECLINED>5) e+=`<div>\u26A0 <b>${movCount.DECLINED}</b> ASINs declined this cycle \u2014 Bietrick + sub-leader review (\u00a78)</div>`;
+  if(e){esc.className="esc";esc.innerHTML=e;esc.style.display="flex";}
+  else {esc.className="esc ok";esc.innerHTML="\u2713 No \u00a78 escalation thresholds breached for this portfolio.";esc.style.display="flex";}
+
+  // mixes (filter chips)
+  document.getElementById("segMix").innerHTML=SEGORDER.map(s=>
+    `<span class="chip ${segFilter===s?'on':''}" data-seg="${s}"><span style="color:var(${SEGCOL[s]})">\u25CF</span> ${s} <span class="n">${segCount[s]}</span></span>`).join("");
+  document.getElementById("movMix").innerHTML=MOVORDER.map(m=>
+    `<span class="chip ${movFilter===m?'on':''}" data-mov="${m}">${m} <span class="n">${movCount[m]}</span></span>`).join("");
+  document.querySelectorAll("[data-seg]").forEach(el=>el.onclick=()=>{segFilter=segFilter===el.dataset.seg?null:el.dataset.seg;render();});
+  document.querySelectorAll("[data-mov]").forEach(el=>el.onclick=()=>{movFilter=movFilter===el.dataset.mov?null:el.dataset.mov;render();});
+
+  // category table
+  catHead();
+  catBody(cats);
+  document.querySelectorAll("[data-cat]").forEach(el=>el.onclick=()=>{const c=el.getAttribute("data-cat");catFilter=catFilter===c?null:c;render();});
+
+  // asin table
+  let ar=rows.slice();
+  if(catFilter) ar=ar.filter(r=>r[C.cat]===catFilter);
+  if(segFilter) ar=ar.filter(r=>r[C.seg]===segFilter);
+  if(movFilter) ar=ar.filter(r=>r[C.mov]===movFilter);
+  if(sortKey!=null){ar.sort((a,b)=>{
+    let x,y;
+    if(sortKey==="dImp"){x=a[C.i]-a[C.bi];y=b[C.i]-b[C.bi];}
+    else if(sortKey==="dClk"){x=a[C.k]-a[C.bk];y=b[C.k]-b[C.bk];}
+    else if(sortKey==="avgc"){x=avgConvOf(a);y=avgConvOf(b);}
+    else if(sortKey==="dConv"){x=a[C.v]-avgConvOf(a);y=b[C.v]-avgConvOf(b);}
+    else if(sortKey==="status"){x=statusOf(a);y=statusOf(b);}
+    else {x=a[sortKey];y=b[sortKey];}
+    if(typeof x==="string"){return sortDir*x.localeCompare(y)} return sortDir*((x||0)-(y||0))});}
+  asinHead();
+  asinBody(ar);
+  document.getElementById("asinHint").textContent=`— ${fmt(ar.length)} shown${catFilter?` · category: ${catFilter} (click it again to clear)`:""}${segFilter?` · segment ${segFilter}`:""}${movFilter?` · ${movFilter}`:""}`;
+  document.getElementById("foot").textContent=`Source: analytics.ph_segment_report (read-only). Segments, movement and benchmarks are the production engine's output — this view only reorganises them per portfolio holder.`;
+}
+
+/* ---- category table ---- */
+function catHead(){
+  document.querySelector("#catTbl thead").innerHTML=
+   `<tr><th>Category</th><th class="num">Listings</th><th class="num">Top-N used</th>
+    <th class="num">Avg impressions</th><th class="num">Avg clicks</th><th class="num">Avg conversions</th><th class="num">Benchmark CVR%</th><th>Status</th></tr>`;
+}
+function catBody(cats){
+  const tb=document.querySelector("#catTbl tbody");
+  if(!cats.length){tb.innerHTML='<tr><td class="empty" colspan="8">No categories.</td></tr>';return;}
+  tb.innerHTML=cats.map(c=>`<tr class="catrow ${catFilter===c[1]?'on':''}" data-cat="${String(c[1]).replace(/"/g,'&quot;')}" style="cursor:pointer">
+     <td><span class="catcue">${catFilter===c[1]?'▾':'▸'}</span> ${c[1]}${catFilter===c[1]?' <span class="catactive">filtering ✓</span>':''}</td><td class="num">${fmt(c[2])}</td><td class="num">${c[3]}</td>
+     <td class="num">${fmt(c[4])}</td><td class="num">${f1(c[5])}</td><td class="num">${f1(c[8])}</td><td class="num">${f1(c[6])}%</td>
+     <td>${c[7]==='NEEDS_MANUAL'?'<span class="man">NEEDS MANUAL</span>':c[7].replace('_',' ')}</td></tr>`).join("");
+}
+
+/* ---- asin table ---- */
+const ACOLS=[
+  ["Rank",C.rank,1],["Category",C.cat,0],["Segment",C.seg,0],["Movement",C.mov,0],["ASIN",C.asin,0],["SKU",C.sku,0],["Account",C.acc,0],
+  ["Impr",C.i,1],["Clicks",C.k,1],["Conv",C.v,1],["Row CVR%",C.cvr,1],
+  ["Avg impr",C.bi,1],["Avg clk",C.bk,1],["Avg conv","avgc",1],["Bench CVR%",C.bcvr,1],
+  ["\u0394 Impr","dImp",1],["\u0394 Clk","dClk",1],["\u0394 Conv","dConv",1],["Status","status",0]
+];
+function asinHead(){
+  document.querySelector("#asinTbl thead").innerHTML="<tr>"+ACOLS.map((c,idx)=>{
+    const num=c[2]?"num":"";const ar=(String(sortKey)===String(c[1]))?(sortDir>0?"\u25B2":"\u25BC"):"\u21C5";
+    return `<th class="${num}" data-k="${c[1]}">${c[0]}<span class="ar">${ar}</span></th>`;}).join("")+"</tr>";
+  document.querySelectorAll("#asinTbl thead th").forEach(th=>th.onclick=()=>{
+    const k=th.dataset.k; if(k==="dImp"||k==="dClk"){/*sort by computed*/}
+    if(sortKey===k){sortDir*=-1}else{sortKey=k;sortDir=1} render();});
+}
+function asinBody(rows){
+  const tb=document.querySelector("#asinTbl tbody");
+  if(!rows.length){tb.innerHTML='<tr><td class="empty" colspan="19">No ASINs match this filter.</td></tr>';return;}
+  const frag=rows.map(r=>{
+    const avgc=avgConvOf(r);
+    const dImp=r[C.i]-r[C.bi], dClk=r[C.k]-r[C.bk], dConv=r[C.v]-avgc;
+    const _st=statusOf(r);
+    const _rowcls=_st==="NEEDS_REVIEW"?" row-review":"";
+    return `<tr class="${_rowcls.trim()}">
+      <td class="num">${r[C.rank]}</td>
+      <td>${r[C.cat]}</td><td>${segBadge(r[C.seg])}</td><td>${movBadge(r[C.mov])}</td>
+      <td>${r[C.asin]}</td><td>${r[C.sku]||'<span class="man">—</span>'}</td><td>${ACC[r[C.acc]]}</td>
+      <td class="num">${fmt(r[C.i])}</td><td class="num">${fmt(r[C.k])}</td><td class="num">${fmt(r[C.v])}</td>
+      <td class="num">${f1(r[C.cvr])}%</td>
+      <td class="num">${fmt(r[C.bi])}</td><td class="num">${f1(r[C.bk])}</td><td class="num">${f1(avgc)}</td><td class="num">${f1(r[C.bcvr])}%</td>
+      <td class="num">${delta(dImp)}</td><td class="num">${delta(Math.round(dClk))}</td><td class="num">${delta(Math.round(dConv*10)/10)}</td>
+      <td>${statBadge(statusOf(r))}</td></tr>`;
+  }).join("");
+  tb.innerHTML=frag;
+}
+// sort support for computed delta columns
+const _origSort=render;
+render();
+
+(function(){ var s=document.getElementById("phsel"); if(s){ s.value="0"; s.dispatchEvent(new Event("change")); } })();
+</script>
+</body>
+</html>

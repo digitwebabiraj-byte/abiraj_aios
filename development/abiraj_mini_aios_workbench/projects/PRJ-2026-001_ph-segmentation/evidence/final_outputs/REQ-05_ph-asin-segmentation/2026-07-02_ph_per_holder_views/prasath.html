@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PH ASIN Segmentation — Portfolio Holder View</title>
+<style>
+  :root{
+    --navy:#232a33; --navy2:#2f3a46; --ink:#1f2733; --muted:#6b7688; --line:#e3e8ef;
+    --bg:#eef1f4; --card:#ffffff; --green:#1b6e46; --greenhead:#14683f;
+    --teal:#0f9b8e; --teal2:#0c7d78; --slate:#2b333d; --slate2:#39434f;
+    --hHHH:#1A8A4A; --hHHL:#B87800; --hHLH:#1A6E99; --hLHH:#6B3FA0; --hLLH:#0D7377; --hLLL:#C0392B;
+    --mUP:#1A8A4A; --mDN:#C0392B; --mSAME:#8792a3; --mNEW:#2f6fb0;
+    --warn-bg:#fdeceb; --warn-line:#e6a59e; --warn-ink:#9a2a1f;
+    --shadow-sm:0 1px 2px rgba(16,33,56,.06),0 1px 3px rgba(16,33,56,.05);
+    --shadow-md:0 2px 6px rgba(16,33,56,.08),0 4px 14px rgba(16,33,56,.06);
+    --shadow-lg:0 6px 20px rgba(16,33,56,.12);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:
+         radial-gradient(1200px 400px at 100% -100px,rgba(15,155,142,.07),transparent 60%),
+         var(--bg);
+       color:var(--ink);font-size:13px;line-height:1.4}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  @keyframes escPulse{0%,100%{box-shadow:inset 4px 0 0 #c0392b}50%{box-shadow:inset 4px 0 0 #e0544a,0 2px 10px rgba(192,57,43,.14)}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* header */
+  .top{background:linear-gradient(120deg,#0a0b0e 0%,#111318 55%,#16191f 100%);
+       color:#fff;padding:15px 26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+       box-shadow:var(--shadow-md);position:relative;z-index:5;border-bottom:1px solid #23262d}
+  .top::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;
+       background:linear-gradient(90deg,transparent,#8a6d1f,#d4af37,#f0d878,#d4af37,#8a6d1f,transparent);
+       background-size:200% 100%;animation:goldSheen 8s linear infinite}
+  @keyframes goldSheen{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  .top .brand{font-weight:700;font-size:15.5px;letter-spacing:.4px;
+       background:linear-gradient(90deg,#f0d878,#d4af37);-webkit-background-clip:text;background-clip:text;
+       -webkit-text-fill-color:transparent;color:#d4af37}
+  .top .sub{color:#8f96a1;font-size:11.5px}
+  .top .spacer{flex:1}
+  .top label{color:#aeb4bf;font-size:12px;margin-right:8px;letter-spacing:.3px}
+  .top select{font-size:13px;padding:8px 12px;border-radius:8px;border:1px solid #b89540;
+       background:#ffffff;color:#1a1d22;font-weight:600;min-width:200px;box-shadow:var(--shadow-sm);
+       transition:box-shadow .18s ease}
+  .top select option{background:#ffffff;color:#1a1d22}
+  .top select:hover{box-shadow:0 0 0 3px rgba(212,175,55,.22)}
+  .top select:focus{outline:none;box-shadow:0 0 0 3px rgba(212,175,55,.4)}
+
+  .greet{background:linear-gradient(120deg,#111318,#1a1e25);color:#fff;padding:14px 26px;
+       border-bottom:1px solid #23262d;animation:fadeUp .4s ease both}
+  .greet h1{margin:0;font-size:17.5px;font-weight:700;color:#f3ead2;letter-spacing:.3px}
+  .greet .scope{color:#b7bdc7;font-size:12px;margin-top:3px}
+
+  /* escalation banner */
+  .esc{background:linear-gradient(90deg,#fbdedb,var(--warn-bg));border-bottom:1px solid var(--warn-line);
+       padding:12px 26px 12px 24px;font-size:12.5px;color:var(--warn-ink);display:flex;gap:22px;flex-wrap:wrap;
+       font-weight:600;box-shadow:inset 4px 0 0 #c0392b;animation:escPulse 3.4s ease-in-out infinite}
+  .esc div{display:flex;align-items:center;gap:6px}
+  .esc b{color:#a5241a;font-weight:800;font-size:14px}
+  .esc.ok{background:linear-gradient(90deg,#eaf6ef,#eef7f0);border-color:#bfe0cb;color:#2b6b43;
+       box-shadow:inset 4px 0 0 #3f9e63;animation:none;font-weight:600}
+
+  /* body */
+  .wrap{padding:20px 26px 60px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px 14px;
+       box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+       transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;animation:fadeUp .45s ease both}
+  .card::before{content:"";position:absolute;top:0;left:0;width:100%;height:4px;
+       background:var(--cAccent,linear-gradient(90deg,var(--teal),var(--hHHH)))}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+  .card:nth-child(1){animation-delay:.02s} .card:nth-child(2){animation-delay:.06s}
+  .card:nth-child(3){animation-delay:.10s} .card:nth-child(4){animation-delay:.14s}
+  .card:nth-child(5){animation-delay:.18s} .card:nth-child(6){animation-delay:.22s}
+  .card .k{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:600;padding-right:34px}
+  .card .v{font-size:26px;font-weight:800;margin-top:5px;color:var(--slate);line-height:1}
+  .card .s{color:var(--muted);font-size:11.5px;margin-top:4px}
+  /* per-card icon badge (top-right) */
+  .card .cardIcon{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:9px;
+       display:flex;align-items:center;justify-content:center;background:var(--cSoft,#eef4f6);
+       background-repeat:no-repeat;background-position:center;background-size:17px 17px}
+  /* c1 Assigned listings — teal (list) */
+  .card.c1{--cAccent:linear-gradient(90deg,#0f9b8e,#37c8bb);--cSoft:#e3f5f2}
+  .card.c1 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f9b8e' stroke-width='2.2' stroke-linecap='round'><line x1='8' y1='6' x2='21' y2='6'/><line x1='8' y1='12' x2='21' y2='12'/><line x1='8' y1='18' x2='21' y2='18'/><line x1='3' y1='6' x2='3.01' y2='6'/><line x1='3' y1='12' x2='3.01' y2='12'/><line x1='3' y1='18' x2='3.01' y2='18'/></svg>")}
+  /* c2 Distinct ASINs — blue (tag) */
+  .card.c2{--cAccent:linear-gradient(90deg,#2f6fb0,#5b9bd8);--cSoft:#e7f0fa}
+  .card.c2 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f6fb0' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z'/><line x1='7' y1='7' x2='7.01' y2='7'/></svg>")}
+  /* c3 Distinct SKUs — purple (box) */
+  .card.c3{--cAccent:linear-gradient(90deg,#6b3fa0,#9165c9);--cSoft:#f0e9f8}
+  .card.c3 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b3fa0' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'/><polyline points='3.27 6.96 12 12.01 20.73 6.96'/><line x1='12' y1='22.08' x2='12' y2='12'/></svg>")}
+  /* c4 Categories — slate (grid) */
+  .card.c4{--cAccent:linear-gradient(90deg,#39434f,#5b6675);--cSoft:#eceef1}
+  .card.c4 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2339434f' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='7' height='7'/><rect x='14' y='3' width='7' height='7'/><rect x='14' y='14' width='7' height='7'/><rect x='3' y='14' width='7' height='7'/></svg>")}
+  /* c5 Champions — GREEN, emphasized (trophy) */
+  .card.c5{--cAccent:linear-gradient(90deg,#1A8A4A,#37c26b);--cSoft:#dff3e6;
+       border-color:#a7dcbb;background:linear-gradient(180deg,#f2fbf5,#ffffff)}
+  .card.c5 .v{color:#1A8A4A}
+  .card.c5 .k{color:#1A8A4A}
+  .card.c5 .cardIcon{background:#1A8A4A;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M10.1 13.2L7.7 21.5l2.7-1.4 1.3 2.3.7-6.6z'/><path d='M13.9 13.2l2.4 8.3-2.7-1.4-1.3 2.3-.7-6.6z' opacity='0.9'/><circle cx='12' cy='8.5' r='6.3'/><circle cx='12' cy='8.5' r='3.1' fill='%231A8A4A'/></svg>")}
+  /* c6 Dead Horses — RED, emphasized (alert) */
+  .card.c6{--cAccent:linear-gradient(90deg,#C0392B,#e0685a);--cSoft:#fce4e1;
+       border-color:#eab5ae;background:linear-gradient(180deg,#fdf2f0,#ffffff)}
+  .card.c6 .v{color:#C0392B}
+  .card.c6 .k{color:#C0392B}
+  .card.c6 .cardIcon{background:#C0392B;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M12 3.2c.5 0 .95.26 1.2.7l8.3 14.4c.55.95-.14 2.15-1.24 2.15H3.74c-1.1 0-1.79-1.2-1.24-2.15L10.8 3.9c.25-.44.7-.7 1.2-.7z'/><rect x='11' y='9' width='2' height='5.4' rx='1' fill='%23C0392B'/><circle cx='12' cy='17' r='1.25' fill='%23C0392B'/></svg>")}
+  /* c7 Allocated — slate-blue (clipboard) */
+  .card.c7{--cAccent:linear-gradient(90deg,#4a6b8a,#7a97b5);--cSoft:#e9eff5}
+  .card.c7 .v{color:#3a5570}
+  .card.c7 .cardIcon{background:#4a6b8a;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='4' width='16' height='16' rx='2'/><path d='M9 9h6M9 13h6M9 17h3'/></svg>")}
+
+  .meta{display:flex;gap:26px;flex-wrap:wrap;background:linear-gradient(180deg,#ffffff,#fbfcfe);
+        border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:18px;
+        box-shadow:var(--shadow-sm);animation:fadeUp .5s ease both}
+  .meta div{font-size:12px}
+  .meta .k{color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+  .meta .v{font-weight:600;margin-top:3px;color:var(--ink)}
+
+  /* segment / movement chips */
+  .mix{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 18px}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:5px 12px;font-size:12px;
+        cursor:pointer;font-weight:600;color:#3a4658;user-select:none;box-shadow:var(--shadow-sm);
+        transition:transform .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease,border-color .15s ease;
+        animation:popIn .3s ease both}
+  .chip:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:#c3ceda}
+  .chip.on{background:linear-gradient(120deg,var(--slate),var(--teal2));color:#fff;border-color:var(--slate);
+        box-shadow:0 3px 10px rgba(43,51,61,.3)}
+  .chip .n{opacity:.7;font-weight:700;margin-left:5px}
+  .chip.on .n{opacity:.9}
+  /* colored dot before each segment chip label uses inline text; add left tint bar */
+  #segMix .chip{border-left:3px solid transparent}
+
+  h2.sec{font-size:13px;font-weight:700;margin:24px 0 9px;color:#26313f;text-transform:uppercase;
+       letter-spacing:.5px;position:relative;padding-left:12px}
+  h2.sec::before{content:"";position:absolute;left:0;top:1px;bottom:1px;width:4px;border-radius:3px;
+       background:linear-gradient(180deg,var(--teal),var(--hHHH))}
+  h2.sec .hint{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:12px}
+
+  /* tables */
+  .tblwrap{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:70vh;
+       box-shadow:var(--shadow-sm);animation:fadeUp .5s ease both}
+  table{border-collapse:collapse;width:100%;font-size:12px}
+  thead th{position:sticky;top:0;background:linear-gradient(180deg,#1a7a4c,var(--greenhead));color:#fff;
+       text-align:left;padding:10px 10px;font-weight:600;white-space:nowrap;cursor:pointer;font-size:11.5px;
+       z-index:2}
+  thead th.num{text-align:right}
+  thead th .ar{opacity:.5;font-size:10px;margin-left:3px}
+  tbody td{padding:8px 10px;border-bottom:1px solid #eef1f5;white-space:nowrap}
+  tbody td.num{text-align:right;font-variant-numeric:tabular-nums}
+  tbody tr{transition:background .12s ease}
+  tbody tr:nth-child(even){background:#fbfcfe}
+  tbody tr:hover{background:#eef6f1}
+  #catTbl tbody tr.catrow:hover{background:#eaf3fb}
+  #catTbl tbody tr.catrow:hover .catcue{color:var(--teal2)}
+  #catTbl tbody tr.catrow.on{background:linear-gradient(90deg,rgba(15,155,142,.16),rgba(15,155,142,.05));box-shadow:inset 3px 0 0 var(--teal)}
+  #catTbl tbody tr.catrow.on td{font-weight:600}
+  .catcue{display:inline-block;width:12px;color:#9aa7b5;font-size:11px;transition:color .15s ease}
+  #catTbl tbody tr.catrow.on .catcue{color:var(--teal2)}
+  .catactive{display:inline-block;margin-left:8px;font-size:10.5px;font-weight:700;color:var(--teal2);
+       background:rgba(15,155,142,.12);border:1px solid rgba(15,155,142,.35);border-radius:10px;padding:1px 7px;vertical-align:middle}
+  tbody tr.row-review{background:linear-gradient(90deg,rgba(224,169,46,.18),rgba(224,169,46,.06))}
+  tbody tr.row-review:hover{background:linear-gradient(90deg,rgba(224,169,46,.26),rgba(224,169,46,.10))}
+  tbody tr.row-review td:first-child{box-shadow:inset 3px 0 0 #d99b1c}
+  .seg{display:inline-block;padding:3px 8px;border-radius:6px;color:#fff;font-weight:700;font-size:11px;
+       box-shadow:0 1px 2px rgba(0,0,0,.12)}
+  .badge{display:inline-block;padding:3px 8px;border-radius:6px;font-weight:600;font-size:11px}
+  .dpos{color:var(--mUP);font-weight:600}.dneg{color:var(--mDN);font-weight:600}
+  .man{color:#9a6a00;font-weight:600}
+  .empty{padding:26px;text-align:center;color:var(--muted)}
+  .foot{color:var(--muted);font-size:11px;margin-top:14px}
+  .top label,.top select{display:none!important}
+</style>
+</head>
+<body>
+  <div class="top">
+    <div>
+      <div class="brand">PH ASIN Segmentation</div>
+      <div class="sub">Growth Protection Engine · UK Amazon FBM · category-wise benchmarks</div>
+    </div>
+    <div class="spacer"></div>
+    <div><label for="phsel">Portfolio Holder</label>
+      <select id="phsel"></select></div>
+  </div>
+
+  <div class="greet">
+    <h1 id="gTitle">Select a Portfolio Holder</h1>
+    <div class="scope" id="gScope">Pick a name to see that portfolio only — segments, movement and benchmarks in one view.</div>
+  </div>
+
+  <div class="esc" id="escBar" style="display:none"></div>
+
+  <div class="wrap">
+    <div class="cards" id="cards"></div>
+    <div class="meta" id="meta"></div>
+
+    <h2 class="sec">Segment mix <span class="hint">— where each ASIN stands now · click to filter the table</span></h2>
+    <div class="mix" id="segMix"></div>
+    <h2 class="sec" style="margin-top:16px">Movement <span class="hint">— how each ASIN changed vs last window · NEW = first time seen (nothing to compare yet)</span></h2>
+    <div class="mix" id="movMix"></div>
+
+    <h2 class="sec">Category benchmark <span class="hint">— click a category row to see only its ranking · top-30 best-sellers per category (units-sold ranked); CVR = average of each product's conversion rate</span></h2>
+    <div class="tblwrap"><table id="catTbl"><thead></thead><tbody></tbody></table></div>
+
+    <h2 class="sec">ASIN-level view <span class="hint" id="asinHint"></span></h2>
+    <div class="foot" style="margin:0 0 8px">Status vs the category's top-N average conversions: <b>ABOVE</b> ≥ avg×1.10 · <b>NEAR</b> ±10% · <b>BELOW</b> ≤ avg×0.90 · <b>NEEDS REVIEW</b> = data-quality flag (conversions &gt; clicks, CVR &gt; 100%, or conversions with zero clicks). Segment &amp; Movement remain our engine's classification.</div>
+    <div class="tblwrap"><table id="asinTbl"><thead></thead><tbody></tbody></table></div>
+
+    <div class="foot" id="foot"></div>
+  </div>
+
+<script>
+const D={"period":"2026-07", "generated":"01 Jul 2026", "phs":["prasath"], "alloc":{"prasath":407}, "rows":[[0, "Ceiling Rose", "HHL", "SAME", "B0GCZG4XFD", "CRSF120WH", 1, 4325, 52, 11, 21.2, 1113, 9.8, 62.4, 1], [0, "Ceiling Rose", "HHL", "DECLINED", "B0B7KCXV72", "CRFF105GB", 1, 879, 24, 11, 45.8, 1113, 9.8, 62.4, 2], [0, "Ceiling Rose", "HHL", "IMPROVED", "B0B7799FKL", "CRFF108GB+HK10GB", 1, 2760, 38, 8, 21.1, 1113, 9.8, 62.4, 3], [0, "Ceiling Rose", "LLH", "SAME", "B0DB2B9NYZ", "CRFF75GB2PK", 1, 407, 4, 5, 125, 1113, 9.8, 62.4, 4], [0, "Ceiling Rose", "LLL", "SAME", "B083H3BRWZ", "CRSF100CO", 1, 957, 5, 3, 60, 1113, 9.8, 62.4, 5], [0, "Ceiling Rose", "HLH", "IMPROVED", "B0DB29LMHK", "CRFF75BA2PK", 1, 1674, 9, 4, 44.4, 1113, 9.8, 62.4, 6], [0, "Ceiling Rose", "LLL", "SAME", "B084VP9518", "CRSF2003GB", 1, 445, 2, 1, 50, 1113, 9.8, 62.4, 7], [0, "Ceiling Rose", "LLH", "IMPROVED", "B0C37PWHDM", "CRFF105WH", 1, 487, 3, 4, 133.3, 1113, 9.8, 62.4, 8], [0, "Ceiling Rose", "LLH", "IMPROVED", "B0CKSRCVKQ", "CRFF75CH+HK10CH", 1, 195, 2, 4, 200, 1113, 9.8, 62.4, 9], [0, "Ceiling Rose", "LLH", "IMPROVED", "B0CSMJHGLG", "CRSF100BM2PK", 0, 416, 1, 1, 100, 1113, 9.8, 62.4, 10], [0, "Ceiling Rose", "LLH", "SAME", "B0D7MMR2GN", "CRFF105SN2PK", 1, 727, 4, 3, 75, 1113, 9.8, 62.4, 11], [0, "Ceiling Rose", "HLH", "DECLINED", "B0DB2B8XXL", "CRFF75GB3PK", 1, 1318, 8, 4, 50, 1113, 9.8, 62.4, 12], [0, "Ceiling Rose", "HHL", "IMPROVED", "B07L6T9P7B", "CRSF100GB", 1, 4351, 27, 0, 0, 1113, 9.8, 62.4, 13], [0, "Ceiling Rose", "HLH", "IMPROVED", "B07S8CCS1Q", "CRSF100YB", 1, 1422, 6, 3, 50, 1113, 9.8, 62.4, 14], [0, "Ceiling Rose", "HHL", "IMPROVED", "B07S9S34B2", "CRSF2003YB", 0, 1319, 15, 2, 13.3, 1113, 9.8, 62.4, 15], [0, "Ceiling Rose", "HLH", "IMPROVED", "B08F74TBB7", "CRFF75SN", 0, 1223, 7, 3, 42.9, 1113, 9.8, 62.4, 16], [0, "Ceiling Rose", "LLL", "SAME", "B09LM5Q942", "CRFF140GB", 1, 302, 0, 2, 0, 1113, 9.8, 62.4, 17], [0, "Ceiling Rose", "HHL", "SAME", "B0B71MJFDZ", "CRSF100BM", 1, 1097, 10, 2, 20, 1113, 9.8, 62.4, 18], [0, "Ceiling Rose", "LLL", "SAME", "B0B7F21ZXS", "CRSF108SN", 1, 218, 0, 1, 0, 1113, 9.8, 62.4, 19], [0, "Ceiling Rose", "HHL", "IMPROVED", "B0CKQSMQVC", "CRSF2003BB", 1, 1493, 15, 3, 20, 1113, 9.8, 62.4, 20], [0, "Ceiling Rose", "LLH", "IMPROVED", "B0CSMK1P5N", "CRFF100SN2PK", 0, 192, 1, 2, 200, 1113, 9.8, 62.4, 21], [0, "Ceiling Rose", "HHL", "IMPROVED", "B0D2N2MJRP", "CRFF500BM", 1, 978, 13, 3, 23.1, 1113, 9.8, 62.4, 22], [0, "Ceiling Rose", "HLH", "SAME", "B0DB29BF1T", "CRFF75YB2PK", 1, 1320, 5, 4, 80, 1113, 9.8, 62.4, 23], [0, "Ceiling Rose", "LLH", "SAME", "B07CQL5WJR", "CRSF100BM", 1, 378, 1, 1, 100, 1113, 9.8, 62.4, 24], [0, "Ceiling Rose", "LLL", "SAME", "B07SBVXTP1", "CRSF2003GB", 0, 667, 5, 1, 20, 1113, 9.8, 62.4, 25], [0, "Ceiling Rose", "LLH", "IMPROVED", "B082DDY7BX", "CRSF2003WH", 0, 78, 2, 2, 100, 1113, 9.8, 62.4, 26], [0, "Ceiling Rose", "HHL", "SAME", "B084VPJ2M2", "CRSF2003WH", 1, 1042, 12, 2, 16.7, 1113, 9.8, 62.4, 27], [0, "Ceiling Rose", "LLL", "DECLINED", "B0CKSSBF61", "CRFF75CO+HK10CO", 1, 546, 2, 1, 50, 1113, 9.8, 62.4, 28], [0, "Ceiling Rose", "LLH", "SAME", "B0D7MQC47C", "CRFF105BA2PK", 1, 46, 1, 2, 200, 1113, 9.8, 62.4, 29], [0, "Ceiling Rose", "LLH", "IMPROVED", "B0D7MSLPL3", "CRFF105CH2PK", 1, 152, 1, 1, 100, 1113, 9.8, 62.4, 30], [0, "Ceiling Rose", "LLH", "IMPROVED", "B0D9RX7Q8J", "CRSF100CH3PK", 1, 84, 1, 2, 200, 1113, 9.8, 62.4, 31], [0, "Ceiling Rose", "LLH", "IMPROVED", "B0DF79WFPK", "CRSF120BM2PK", 1, 207, 1, 1, 100, 1113, 9.8, 62.4, 32], [0, "Ceiling Rose", "LLH", "IMPROVED", "B0DKDWL636", "CRFF100BM", 0, 383, 1, 2, 200, 1113, 9.8, 62.4, 33], [0, "Ceiling Rose", "HHL", "SAME", "B0GCZ9ZLXK", "CRSF1203WH", 1, 1669, 22, 2, 9.1, 1113, 9.8, 62.4, 34], [0, "Ceiling Rose", "LLL", "SAME", "B07BB324Q1", "CRFF108GB+HK10GB", 1, 354, 3, 1, 33.3, 1113, 9.8, 62.4, 35], [0, "Ceiling Rose", "LLL", "SAME", "B07S8BBQ3X", "CRSF100SN", 0, 350, 0, 1, 0, 1113, 9.8, 62.4, 36], [0, "Ceiling Rose", "LLL", "SAME", "B07SHRTVJQ", "CRSF1204BM", 1, 552, 6, 1, 16.7, 1113, 9.8, 62.4, 37], [0, "Ceiling Rose", "LLL", "SAME", "B07WH1745B", "CRSF1202BM", 0, 372, 4, 1, 25, 1113, 9.8, 62.4, 38], [0, "Ceiling Rose", "LLL", "DECLINED", "B07WH2551R", "CRSF1205BM", 0, 424, 2, 1, 50, 1113, 9.8, 62.4, 39], [0, "Ceiling Rose", "LLL", "SAME", "B07WK7B3L2", "CRSF1202YB", 0, 620, 9, 1, 11.1, 1113, 9.8, 62.4, 40], [0, "Ceiling Rose", "LLL", "SAME", "B07X62T49N", "CRSF100GN", 0, 535, 7, 1, 14.3, 1113, 9.8, 62.4, 41], [0, "Ceiling Rose", "LLL", "SAME", "B084VPLPS5", "CRSF2003YB", 1, 307, 4, 1, 25, 1113, 9.8, 62.4, 42], [0, "Ceiling Rose", "HHL", "SAME", "B0B7196F29", "CRSF100CH", 1, 2034, 16, 1, 6.3, 1113, 9.8, 62.4, 43], [0, "Ceiling Rose", "HHL", "IMPROVED", "B0B77GWCPC", "CRFF108GB2PK+HK10GB2PK", 1, 1328, 14, 7, 50, 1113, 9.8, 62.4, 44], [0, "Ceiling Rose", "LLL", "SAME", "B0B77JMW7G", "CRFF108GB4PK+HK10GB4PK", 1, 156, 0, 1, 0, 1113, 9.8, 62.4, 45], [0, "Ceiling Rose", "HLH", "DECLINED", "B0B77KX4P8", "CRFF108BM2PK+HK10BM2PK", 1, 1833, 8, 6, 75, 1113, 9.8, 62.4, 46], [0, "Ceiling Rose", "LLL", "SAME", "B0B7F22LSC", "CRSF108FG", 1, 320, 2, 1, 50, 1113, 9.8, 62.4, 47], [0, "Ceiling Rose", "LLL", "SAME", "B0B7KG1L76", "CRFF105RO", 1, 68, 0, 1, 0, 1113, 9.8, 62.4, 48], [0, "Ceiling Rose", "HHL", "SAME", "B0B8DWXLQ2", "CRSF1202BM", 1, 1667, 22, 1, 4.6, 1113, 9.8, 62.4, 49], [0, "Ceiling Rose", "LLL", "SAME", "B0B8DZFLX9", "CRSF120BM", 1, 589, 4, 1, 25, 1113, 9.8, 62.4, 50], [0, "Ceiling Rose", "HHL", "SAME", "B0BPMQXMQR", "CRSF100WH", 1, 1606, 24, 0, 0, 1113, 9.8, 62.4, 51], [0, "Ceiling Rose", "LLL", "SAME", "B0BPMT5TVR", "CRSF100OR", 1, 97, 3, 0, 0, 1113, 9.8, 62.4, 52], [0, "Ceiling Rose", "LLL", "SAME", "B0C37QJWFF", "CRFF105BY", 1, 232, 4, 1, 25, 1113, 9.8, 62.4, 53], [0, "Ceiling Rose", "LLH", "IMPROVED", "B0CKQS1ZV3", "CRSF2003BC", 1, 106, 1, 1, 100, 1113, 9.8, 62.4, 54], [0, "Ceiling Rose", "LLL", "SAME", "B0CKSNWTYT", "CRFF75YB", 1, 405, 3, 1, 33.3, 1113, 9.8, 62.4, 55], [0, "Ceiling Rose", "LLH", "IMPROVED", "B0CKSSCVJY", "CRFF75RO+HK10RO", 1, 90, 1, 1, 100, 1113, 9.8, 62.4, 56], [0, "Ceiling Rose", "LLL", "DECLINED", "B0CKSTLS8P", "CRFF75SN", 1, 240, 3, 1, 33.3, 1113, 9.8, 62.4, 57], [0, "Ceiling Rose", "HHL", "IMPROVED", "B0CSML6JMZ", "CRFF100CH2PK", 0, 1098, 12, 1, 8.3, 1113, 9.8, 62.4, 58], [0, "Ceiling Rose", "LLH", "SAME", "B0D2N41QCP", "CRFF500WH", 1, 92, 1, 1, 100, 1113, 9.8, 62.4, 59], [0, "Ceiling Rose", "LLL", "SAME", "B0D2N4WCFZ", "CRFF500YB", 1, 43, 0, 1, 0, 1113, 9.8, 62.4, 60], [0, "Ceiling Rose", "LLH", "IMPROVED", "B0D7MRFW2L", "CRFF105YB2PK", 1, 402, 1, 1, 100, 1113, 9.8, 62.4, 61], [0, "Ceiling Rose", "LLH", "IMPROVED", "B0D9RXDDRM", "CRSF100CH2PK", 1, 58, 1, 1, 100, 1113, 9.8, 62.4, 62], [0, "Ceiling Rose", "LLL", "DECLINED", "B0DK98XPXQ", "CRFF100FG", 0, 864, 9, 1, 11.1, 1113, 9.8, 62.4, 63], [0, "Ceiling Rose", "LLL", "SAME", "B0DZ5SWLZN", "CRSF120CH3PK", 1, 83, 0, 1, 0, 1113, 9.8, 62.4, 64], [0, "Ceiling Rose", "LLL", "SAME", "B0DZ5SZ3B1", "CRSF120CH2PK", 1, 564, 6, 1, 16.7, 1113, 9.8, 62.4, 65], [0, "Ceiling Rose", "HLH", "IMPROVED", "B0FJ5J4WMV", "CRSF100WH2PK", 0, 2000, 9, 1, 11.1, 1113, 9.8, 62.4, 66], [0, "Ceiling Rose", "HLH", "SAME", "B0FJ5J5T51", "CRSF100WH", 0, 1568, 9, 1, 11.1, 1113, 9.8, 62.4, 67], [0, "Ceiling Rose", "HHL", "SAME", "B07BB27CJ4", "CRFF108CH+HK10CH", 1, 2550, 23, 0, 0, 1113, 9.8, 62.4, 68], [0, "Ceiling Rose", "LLL", "SAME", "B07BBLYSD6", "CRSF100CO", 1, 21, 0, 0, 0, 1113, 9.8, 62.4, 69], [0, "Ceiling Rose", "LLL", "SAME", "B07BBLYW9Q", "CRSF100BM", 1, 294, 3, 0, 0, 1113, 9.8, 62.4, 70], [0, "Ceiling Rose", "LLL", "SAME", "B07CMD2ZFJ", "CRSF100CH", 1, 2, 0, 0, 0, 1113, 9.8, 62.4, 71], [0, "Ceiling Rose", "LLL", "SAME", "B07CRJYPYC", "CRFF100CH", 1, 35, 0, 0, 0, 1113, 9.8, 62.4, 72], [0, "Ceiling Rose", "LLL", "SAME", "B07CRQ8629", "CRFF100BM", 1, 89, 0, 0, 0, 1113, 9.8, 62.4, 73], [0, "Ceiling Rose", "LLL", "SAME", "B07CXSVBMJ", "CRSF100CH", 0, 83, 1, 0, 0, 1113, 9.8, 62.4, 74], [0, "Ceiling Rose", "LLL", "SAME", "B07CXYBCVJ", "CRFF100GB", 0, 8, 0, 0, 0, 1113, 9.8, 62.4, 75], [0, "Ceiling Rose", "LLL", "SAME", "B07CXZSHM8", "CRFF100BM", 0, 27, 0, 0, 0, 1113, 9.8, 62.4, 76], [0, "Ceiling Rose", "LLL", "SAME", "B07CY1RWSV", "CRSF100GB", 0, 31, 0, 0, 0, 1113, 9.8, 62.4, 77], [0, "Ceiling Rose", "LLL", "SAME", "B07CZDPC8C", "CRFF108CH+HK10CH", 0, 89, 0, 0, 0, 1113, 9.8, 62.4, 78], [0, "Ceiling Rose", "LLL", "SAME", "B07D1KHHT8", "CRFF108GB+HK10GB", 0, 384, 1, 0, 0, 1113, 9.8, 62.4, 79], [0, "Ceiling Rose", "LLL", "SAME", "B07D1MYNGW", "CRSF100WH", 0, 365, 1, 0, 0, 1113, 9.8, 62.4, 80], [0, "Ceiling Rose", "LLL", "SAME", "B07D1PPT7T", "CRFF100GB", 0, 76, 0, 0, 0, 1113, 9.8, 62.4, 81], [0, "Ceiling Rose", "LLL", "SAME", "B07D1PZPK1", "CRSF100GB", 0, 13, 0, 0, 0, 1113, 9.8, 62.4, 82], [0, "Ceiling Rose", "LLL", "SAME", "B07D1Q4XY1", "CRFF100FG", 0, 22, 0, 0, 0, 1113, 9.8, 62.4, 83], [0, "Ceiling Rose", "LLL", "SAME", "B07L6B6PFC", "CRSF100WH", 1, 79, 0, 0, 0, 1113, 9.8, 62.4, 84], [0, "Ceiling Rose", "HLH", "IMPROVED", "B07L6JNC62", "CRSF100GB", 1, 1545, 2, 0, 0, 1113, 9.8, 62.4, 85], [0, "Ceiling Rose", "LLL", "SAME", "B07L6K5CZ7", "CRSF100CO", 1, 20, 0, 0, 0, 1113, 9.8, 62.4, 86], [0, "Ceiling Rose", "LLL", "SAME", "B07L6KRWK9", "CRSF100CH", 1, 218, 2, 0, 0, 1113, 9.8, 62.4, 87], [0, "Ceiling Rose", "LLL", "SAME", "B07RTXZD5N", "CRFF140BC", 1, 65, 0, 0, 0, 1113, 9.8, 62.4, 88], [0, "Ceiling Rose", "LLL", "SAME", "B07S69PHCK", "CRSF100YE", 0, 129, 0, 0, 0, 1113, 9.8, 62.4, 89], [0, "Ceiling Rose", "LLL", "SAME", "B07S6BH8JJ", "CRFF140GB", 0, 63, 0, 0, 0, 1113, 9.8, 62.4, 90], [0, "Ceiling Rose", "LLL", "SAME", "B07S6MXTK4", "CRSF1209BM", 0, 2, 0, 0, 0, 1113, 9.8, 62.4, 91], [0, "Ceiling Rose", "LLL", "SAME", "B07S6PBTYH", "CRFF108CO", 0, 39, 0, 0, 0, 1113, 9.8, 62.4, 92], [0, "Ceiling Rose", "LLL", "SAME", "B07S7B34QW", "CRSF100YB", 0, 39, 0, 0, 0, 1113, 9.8, 62.4, 93], [0, "Ceiling Rose", "LLL", "SAME", "B07S7BN1CS", "CRSF100CO", 0, 394, 0, 0, 0, 1113, 9.8, 62.4, 94], [0, "Ceiling Rose", "LLL", "SAME", "B07S7CPN2Z", "CRSF10025WH", 0, 14, 0, 0, 0, 1113, 9.8, 62.4, 95], [0, "Ceiling Rose", "LLL", "SAME", "B07S7DF4G4", "CRFF140GB", 1, 16, 0, 0, 0, 1113, 9.8, 62.4, 96], [0, "Ceiling Rose", "LLL", "DECLINED", "B07S7Q2D76", "CRSF1205YB", 0, 160, 2, 0, 0, 1113, 9.8, 62.4, 97], [0, "Ceiling Rose", "HLH", "IMPROVED", "B07S7RFB51", "CRFF108GB", 0, 1161, 5, 0, 0, 1113, 9.8, 62.4, 98], [0, "Ceiling Rose", "LLL", "SAME", "B07S88YDVX", "CRSF108WH", 0, 18, 0, 0, 0, 1113, 9.8, 62.4, 99], [0, "Ceiling Rose", "HHL", "SAME", "B07S8BKN2C", "CRSF100GB", 1, 5647, 53, 0, 0, 1113, 9.8, 62.4, 100], [0, "Ceiling Rose", "LLL", "SAME", "B07S8CKHDJ", "CRFF140YB", 0, 34, 0, 0, 0, 1113, 9.8, 62.4, 101], [0, "Ceiling Rose", "LLL", "SAME", "B07S9BTTFN", "CRSF100BM", 0, 41, 0, 0, 0, 1113, 9.8, 62.4, 102], [0, "Ceiling Rose", "LLL", "SAME", "B07S9CL2DN", "CRFF140YB", 1, 26, 0, 0, 0, 1113, 9.8, 62.4, 103], [0, "Ceiling Rose", "LLL", "SAME", "B07S9SNT9H", "CRFF108BY", 0, 24, 0, 0, 0, 1113, 9.8, 62.4, 104], [0, "Ceiling Rose", "LLL", "SAME", "B07SBV33QQ", "CRSF1206BM", 0, 8, 0, 0, 0, 1113, 9.8, 62.4, 105], [0, "Ceiling Rose", "LLL", "SAME", "B07SBV6SPY", "CRSF1204BM", 0, 105, 0, 0, 0, 1113, 9.8, 62.4, 106], [0, "Ceiling Rose", "LLL", "SAME", "B07SBVWV77", "CRSF2003CO", 0, 254, 4, 0, 0, 1113, 9.8, 62.4, 107], [0, "Ceiling Rose", "LLL", "SAME", "B07SBVWV79", "CRSF2003CH", 0, 637, 4, 0, 0, 1113, 9.8, 62.4, 108], [0, "Ceiling Rose", "LLL", "SAME", "B07SDTLD5S", "CRSF1205BM", 0, 16, 0, 0, 0, 1113, 9.8, 62.4, 109], [0, "Ceiling Rose", "LLL", "SAME", "B07SGPNHGY", "CRSF1208BM", 1, 94, 0, 0, 0, 1113, 9.8, 62.4, 110], [0, "Ceiling Rose", "LLL", "SAME", "B07SHRTLP7", "CRSF100BM", 1, 378, 2, 0, 0, 1113, 9.8, 62.4, 111], [0, "Ceiling Rose", "LLL", "SAME", "B07SJRD26P", "CRSF1209BM", 1, 143, 0, 0, 0, 1113, 9.8, 62.4, 112], [0, "Ceiling Rose", "LLL", "SAME", "B07SN2KQGF", "CRSF1205BM", 1, 85, 0, 0, 0, 1113, 9.8, 62.4, 113], [0, "Ceiling Rose", "LLL", "SAME", "B07SN2YWLP", "CRSF1206BM", 1, 375, 2, 0, 0, 1113, 9.8, 62.4, 114], [0, "Ceiling Rose", "LLL", "SAME", "B07WDWW6BV", "CRSF100BM", 0, 59, 1, 0, 0, 1113, 9.8, 62.4, 115], [0, "Ceiling Rose", "LLL", "SAME", "B07WDXY71X", "CRSF1205YB", 0, 212, 4, 0, 0, 1113, 9.8, 62.4, 116], [0, "Ceiling Rose", "LLL", "SAME", "B07WDXYWL2", "CRSF1209YB", 0, 325, 0, 0, 0, 1113, 9.8, 62.4, 117], [0, "Ceiling Rose", "LLL", "SAME", "B07WDY11V6", "CRSF1203YB", 0, 79, 0, 0, 0, 1113, 9.8, 62.4, 118], [0, "Ceiling Rose", "HHL", "IMPROVED", "B07WG26Z76", "CRSF1203BM", 0, 849, 10, 0, 0, 1113, 9.8, 62.4, 119], [0, "Ceiling Rose", "LLL", "SAME", "B07WG38HB6", "CRSF1206YB", 0, 411, 3, 0, 0, 1113, 9.8, 62.4, 120], [0, "Ceiling Rose", "LLL", "SAME", "B07WG38V3D", "CRSF1207YB", 0, 374, 4, 0, 0, 1113, 9.8, 62.4, 121], [0, "Ceiling Rose", "LLL", "SAME", "B07WH1MR1D", "CRSF1209BM", 0, 103, 0, 0, 0, 1113, 9.8, 62.4, 122], [0, "Ceiling Rose", "LLL", "SAME", "B07WH25HKQ", "CRSF1206BM", 0, 259, 1, 0, 0, 1113, 9.8, 62.4, 123], [0, "Ceiling Rose", "LLL", "SAME", "B07WJ3S5FD", "CRSF1207BM", 0, 212, 5, 0, 0, 1113, 9.8, 62.4, 124], [0, "Ceiling Rose", "LLL", "SAME", "B07WK7ZJ12", "CRSF120YB", 0, 114, 0, 0, 0, 1113, 9.8, 62.4, 125], [0, "Ceiling Rose", "LLL", "SAME", "B07WZTVFRW", "CRSF100CO", 0, 34, 0, 0, 0, 1113, 9.8, 62.4, 126], [0, "Ceiling Rose", "LLL", "SAME", "B07X1YMLZK", "CRSF100CH", 0, 57, 0, 0, 0, 1113, 9.8, 62.4, 127], [0, "Ceiling Rose", "LLL", "SAME", "B07X1YN5MT", "CRSF100BM", 0, 135, 1, 0, 0, 1113, 9.8, 62.4, 128], [0, "Ceiling Rose", "LLL", "SAME", "B07X2YFRHJ", "CRSF100RO", 0, 14, 0, 0, 0, 1113, 9.8, 62.4, 129], [0, "Ceiling Rose", "LLL", "SAME", "B07X42SQXW", "CRSF100BL", 0, 12, 0, 0, 0, 1113, 9.8, 62.4, 130], [0, "Ceiling Rose", "LLL", "SAME", "B07X42TM3K", "CRSF100YE", 0, 17, 0, 0, 0, 1113, 9.8, 62.4, 131], [0, "Ceiling Rose", "LLL", "SAME", "B07X5Z7YLB", "CRSF100GB", 0, 4, 0, 0, 0, 1113, 9.8, 62.4, 132], [0, "Ceiling Rose", "LLL", "SAME", "B082DD4LBH", "CRFF500WH", 0, 441, 0, 0, 0, 1113, 9.8, 62.4, 133], [0, "Ceiling Rose", "LLL", "SAME", "B082DDYL6R", "CRFF500BM", 0, 29, 0, 0, 0, 1113, 9.8, 62.4, 134], [0, "Ceiling Rose", "LLL", "SAME", "B082DFMGT5", "CRSF2003BM", 0, 626, 2, 0, 0, 1113, 9.8, 62.4, 135], [0, "Ceiling Rose", "HHL", "SAME", "B084VPGJRD", "CRSF2003BM", 1, 6319, 57, 0, 0, 1113, 9.8, 62.4, 136], [0, "Ceiling Rose", "HHL", "SAME", "B084VPHL47", "CRSF2003CO", 1, 1374, 10, 0, 0, 1113, 9.8, 62.4, 137], [0, "Ceiling Rose", "LLL", "SAME", "B084VPKMLH", "CRSF2003RO", 1, 141, 1, 0, 0, 1113, 9.8, 62.4, 138], [0, "Ceiling Rose", "LLL", "SAME", "B0851CC3LS", "CRSF1207BM", 1, 3, 0, 0, 0, 1113, 9.8, 62.4, 139], [0, "Ceiling Rose", "LLL", "SAME", "B0851CVK37", "CRSF1207CO", 1, 16, 0, 0, 0, 1113, 9.8, 62.4, 140], [0, "Ceiling Rose", "LLL", "SAME", "B0851CVQR3", "CRSF1206CO", 1, 57, 0, 0, 0, 1113, 9.8, 62.4, 141], [0, "Ceiling Rose", "LLL", "SAME", "B0851CVZ81", "CRSF1209CO", 1, 232, 1, 0, 0, 1113, 9.8, 62.4, 142], [0, "Ceiling Rose", "LLL", "SAME", "B085DQ3PXQ", "CRSF100GB", 1, 1, 0, 0, 0, 1113, 9.8, 62.4, 143], [0, "Ceiling Rose", "LLL", "SAME", "B085DSQ31P", "CRSF100FG", 1, 116, 0, 0, 0, 1113, 9.8, 62.4, 144], [0, "Ceiling Rose", "LLL", "SAME", "B085TJD29Q", "CRFF100BM", 1, 18, 0, 0, 0, 1113, 9.8, 62.4, 145], [0, "Ceiling Rose", "LLL", "SAME", "B087NNRH1G", "CRSF100GY", 1, 366, 3, 0, 0, 1113, 9.8, 62.4, 146], [0, "Ceiling Rose", "LLL", "DECLINED", "B087NPHQFZ", "CRSF100BL", 1, 583, 1, 0, 0, 1113, 9.8, 62.4, 147], [0, "Ceiling Rose", "LLL", "SAME", "B08F74MMM8", "CRFF75RO", 0, 467, 0, 0, 0, 1113, 9.8, 62.4, 148], [0, "Ceiling Rose", "HLH", "DECLINED", "B098P8343B", "CRSF120BC", 1, 1157, 4, 0, 0, 1113, 9.8, 62.4, 149], [0, "Ceiling Rose", "HHL", "SAME", "B098P9KFYR", "CRSF100BM", 1, 6748, 112, 0, 0, 1113, 9.8, 62.4, 150], [0, "Ceiling Rose", "HHL", "SAME", "B098PDCS7H", "CRSF100BM", 1, 3491, 30, 0, 0, 1113, 9.8, 62.4, 151], [0, "Ceiling Rose", "LLL", "SAME", "B098PF834Q", "CRSF100CO", 1, 333, 1, 0, 0, 1113, 9.8, 62.4, 152], [0, "Ceiling Rose", "LLL", "SAME", "B09LLL62VV", "CRFF108CO", 1, 34, 1, 0, 0, 1113, 9.8, 62.4, 153], [0, "Ceiling Rose", "LLL", "SAME", "B09LLXF42D", "CRFF108GB", 1, 34, 0, 0, 0, 1113, 9.8, 62.4, 154], [0, "Ceiling Rose", "LLL", "SAME", "B09LLYZVWG", "CRFF108YB", 1, 65, 0, 0, 0, 1113, 9.8, 62.4, 155], [0, "Ceiling Rose", "HHL", "SAME", "B09LLZL5CD", "CRFF140BM", 1, 4446, 35, 0, 0, 1113, 9.8, 62.4, 156], [0, "Ceiling Rose", "LLL", "SAME", "B09LM4VP15", "CRFF140BC", 1, 402, 0, 0, 0, 1113, 9.8, 62.4, 157], [0, "Ceiling Rose", "LLL", "DECLINED", "B09LM5YGPY", "CRFF140YB", 1, 174, 1, 0, 0, 1113, 9.8, 62.4, 158], [0, "Ceiling Rose", "LLL", "SAME", "B09LM63CRF", "CRFF140CH", 1, 105, 1, 0, 0, 1113, 9.8, 62.4, 159], [0, "Ceiling Rose", "LLL", "DECLINED", "B09LM6WCFN", "CRFF140FG", 1, 493, 3, 0, 0, 1113, 9.8, 62.4, 160], [0, "Ceiling Rose", "LLL", "SAME", "B0B1F9V3H7", "CRSF100NB", 1, 131, 0, 0, 0, 1113, 9.8, 62.4, 161], [0, "Ceiling Rose", "LLL", "SAME", "B0B71CHFDH", "CRSF100SN", 1, 111, 1, 0, 0, 1113, 9.8, 62.4, 162], [0, "Ceiling Rose", "LLL", "SAME", "B0B71H28P7", "CRSF100RO", 1, 146, 1, 0, 0, 1113, 9.8, 62.4, 163], [0, "Ceiling Rose", "LLL", "DECLINED", "B0B71HGVPG", "CRSF100CO", 1, 120, 0, 0, 0, 1113, 9.8, 62.4, 164], [0, "Ceiling Rose", "LLL", "SAME", "B0B71KMCX4", "CRSF100GB", 1, 63, 0, 0, 0, 1113, 9.8, 62.4, 165], [0, "Ceiling Rose", "HHL", "IMPROVED", "B0B71KX4H3", "CRSF100WH", 1, 1016, 13, 0, 0, 1113, 9.8, 62.4, 166], [0, "Ceiling Rose", "LLL", "SAME", "B0B71KXCZS", "CRSF100YB", 1, 336, 0, 0, 0, 1113, 9.8, 62.4, 167], [0, "Ceiling Rose", "LLL", "SAME", "B0B77G7BXG", "CRFF108CH+HK10CH", 1, 73, 0, 0, 0, 1113, 9.8, 62.4, 168], [0, "Ceiling Rose", "LLL", "DECLINED", "B0B77GF35H", "CRFF108CH2PK+HK10CH2PK", 1, 562, 1, 0, 0, 1113, 9.8, 62.4, 169], [0, "Ceiling Rose", "LLL", "DECLINED", "B0B77GPTQ7", "CRFF108WH2PK+HK10WH2PK", 1, 599, 1, 0, 0, 1113, 9.8, 62.4, 170], [0, "Ceiling Rose", "LLL", "SAME", "B0B77H4HFS", "CRFF108CO2PK+HK10CO2PK", 1, 132, 0, 0, 0, 1113, 9.8, 62.4, 171], [0, "Ceiling Rose", "LLL", "SAME", "B0B77JF877", "CRFF108CO+HK10CO", 1, 229, 3, 0, 0, 1113, 9.8, 62.4, 172], [0, "Ceiling Rose", "LLL", "SAME", "B0B77JNHR5", "CRFF108BM+HK10BM", 1, 1048, 9, 0, 0, 1113, 9.8, 62.4, 173], [0, "Ceiling Rose", "HHL", "SAME", "B0B77MBN44", "CRFF108WH+HK10WH", 1, 2406, 27, 0, 0, 1113, 9.8, 62.4, 174], [0, "Ceiling Rose", "LLL", "SAME", "B0B7DYW44K", "CRSF108RO", 1, 20, 0, 0, 0, 1113, 9.8, 62.4, 175], [0, "Ceiling Rose", "LLL", "DECLINED", "B0B7F18VZT", "CRSF108YB", 1, 429, 1, 0, 0, 1113, 9.8, 62.4, 176], [0, "Ceiling Rose", "HHL", "IMPROVED", "B0B7F1HWWK", "CRSF108BM", 1, 1387, 14, 0, 0, 1113, 9.8, 62.4, 177], [0, "Ceiling Rose", "HHL", "SAME", "B0B7F221KH", "CRSF108WH", 1, 4564, 53, 0, 0, 1113, 9.8, 62.4, 178], [0, "Ceiling Rose", "LLL", "SAME", "B0B7F22HWQ", "CRSF108CO", 1, 190, 1, 0, 0, 1113, 9.8, 62.4, 179], [0, "Ceiling Rose", "LLL", "SAME", "B0B7F2VMRF", "CRSF108CH", 1, 85, 1, 0, 0, 1113, 9.8, 62.4, 180], [0, "Ceiling Rose", "LLL", "SAME", "B0B7F41D79", "CRSF108GB", 1, 39, 0, 0, 0, 1113, 9.8, 62.4, 181], [0, "Ceiling Rose", "LLL", "SAME", "B0B7KBMXND", "CRFF105CO", 1, 653, 5, 0, 0, 1113, 9.8, 62.4, 182], [0, "Ceiling Rose", "HHL", "SAME", "B0B7KCP524", "CRFF105YB+HK10YB", 1, 12463, 253, 0, 0, 1113, 9.8, 62.4, 183], [0, "Ceiling Rose", "LLL", "SAME", "B0B8DS35K7", "CRSF1204BM", 1, 222, 0, 0, 0, 1113, 9.8, 62.4, 184], [0, "Ceiling Rose", "LLL", "SAME", "B0B8DV248K", "CRSF1203BM", 1, 467, 2, 0, 0, 1113, 9.8, 62.4, 185], [0, "Ceiling Rose", "HHL", "IMPROVED", "B0B8DWL177", "CRSF1205BM", 1, 674, 10, 0, 0, 1113, 9.8, 62.4, 186], [0, "Ceiling Rose", "LLL", "SAME", "B0B8DWNFLN", "CRSF1206BM", 1, 52, 0, 0, 0, 1113, 9.8, 62.4, 187], [0, "Ceiling Rose", "LLL", "SAME", "B0B8DX5FDW", "CRSF1207BM", 1, 37, 0, 0, 0, 1113, 9.8, 62.4, 188], [0, "Ceiling Rose", "LLL", "SAME", "B0B8DY4DTF", "CRSF1208BM", 1, 16, 0, 0, 0, 1113, 9.8, 62.4, 189], [0, "Ceiling Rose", "LLL", "DECLINED", "B0B8J3N76X", "CRSF1203CO", 1, 206, 1, 0, 0, 1113, 9.8, 62.4, 190], [0, "Ceiling Rose", "HHL", "SAME", "B0B8J5GX2V", "CRSF120CO", 1, 1539, 14, 0, 0, 1113, 9.8, 62.4, 191], [0, "Ceiling Rose", "LLL", "SAME", "B0B8J8FJFN", "CRSF1202CO", 1, 247, 5, 0, 0, 1113, 9.8, 62.4, 192], [0, "Ceiling Rose", "LLL", "SAME", "B0BPMNPQM4", "CRSF100BL", 1, 50, 1, 0, 0, 1113, 9.8, 62.4, 193], [0, "Ceiling Rose", "LLL", "SAME", "B0BPMPJNXW", "CRSF100BU", 1, 15, 0, 0, 0, 1113, 9.8, 62.4, 194], [0, "Ceiling Rose", "LLL", "SAME", "B0BPMQNQ37", "CRSF100RO", 1, 36, 0, 0, 0, 1113, 9.8, 62.4, 195], [0, "Ceiling Rose", "LLL", "SAME", "B0BPMR6L8S", "CRSF100BM", 1, 161, 0, 0, 0, 1113, 9.8, 62.4, 196], [0, "Ceiling Rose", "LLL", "SAME", "B0BSNLCJTH", "CRSF100WH", 0, 117, 0, 0, 0, 1113, 9.8, 62.4, 197], [0, "Ceiling Rose", "LLL", "DECLINED", "B0BZDSH4D9", "CRFF105CH", 1, 722, 6, 0, 0, 1113, 9.8, 62.4, 198], [0, "Ceiling Rose", "HHL", "IMPROVED", "B0C37SPD6H", "CRFF105BA", 1, 1061, 15, 0, 0, 1113, 9.8, 62.4, 199], [0, "Ceiling Rose", "LLL", "SAME", "B0CBSNKKTM", "CRFF108CO2PK+HK10CO2PK", 1, 71, 0, 0, 0, 1113, 9.8, 62.4, 200], [0, "Ceiling Rose", "LLL", "SAME", "B0CKQT5DD8", "CRSF2003BS", 1, 236, 0, 0, 0, 1113, 9.8, 62.4, 201], [0, "Ceiling Rose", "LLL", "SAME", "B0CKQTS769", "CRSF2003RR", 1, 19, 0, 0, 0, 1113, 9.8, 62.4, 202], [0, "Ceiling Rose", "HHL", "SAME", "B0CKSSBSMN", "CRFF75WH+HK10WH", 1, 1537, 11, 0, 0, 1113, 9.8, 62.4, 203], [0, "Ceiling Rose", "HHL", "SAME", "B0CKSSF9F2", "CRFF75BA", 1, 1302, 15, 0, 0, 1113, 9.8, 62.4, 204], [0, "Ceiling Rose", "HHL", "SAME", "B0CKSV67CC", "CRFF75GB", 1, 2365, 34, 0, 0, 1113, 9.8, 62.4, 205], [0, "Ceiling Rose", "LLL", "SAME", "B0CSG1BYYT", "CRSF100GY", 0, 11, 0, 0, 0, 1113, 9.8, 62.4, 206], [0, "Ceiling Rose", "LLL", "SAME", "B0CSMK9LJ2", "CRFF100BM2PK", 0, 1040, 5, 0, 0, 1113, 9.8, 62.4, 207], [0, "Ceiling Rose", "LLL", "SAME", "B0CSMMG9C2", "CRFF100FG2PK", 0, 53, 0, 0, 0, 1113, 9.8, 62.4, 208], [0, "Ceiling Rose", "LLL", "SAME", "B0CV5FWP8Z", "CRSF100BM2PK", 1, 496, 4, 0, 0, 1113, 9.8, 62.4, 209], [0, "Ceiling Rose", "LLL", "SAME", "B0CV5HMZM3", "CRFF108CH2PK+HK10CH2PK", 1, 320, 0, 0, 0, 1113, 9.8, 62.4, 210], [0, "Ceiling Rose", "LLL", "SAME", "B0CV7VRJ2Z", "CRFF105BA2PK", 1, 10, 0, 0, 0, 1113, 9.8, 62.4, 211], [0, "Ceiling Rose", "LLL", "DECLINED", "B0CVXG576R", "CRSF2003BM2PK", 1, 608, 6, 1, 16.7, 1113, 9.8, 62.4, 212], [0, "Ceiling Rose", "HHL", "SAME", "B0CW5RLSQL", "CRFF105GB2PK", 1, 4336, 53, 12, 22.6, 1113, 9.8, 62.4, 213], [0, "Ceiling Rose", "HHL", "IMPROVED", "B0CW9DVLQ1", "CRSF108BM2PK", 1, 2220, 16, 0, 0, 1113, 9.8, 62.4, 214], [0, "Ceiling Rose", "LLL", "SAME", "B0CW9HNB4G", "CRSF108YB2PK", 1, 1082, 9, 1, 11.1, 1113, 9.8, 62.4, 215], [0, "Ceiling Rose", "LLL", "SAME", "B0CXPS8JXW", "CRSF108GB", 0, 25, 0, 0, 0, 1113, 9.8, 62.4, 216], [0, "Ceiling Rose", "LLL", "SAME", "B0CXPSLKZ6", "CRSF108GB2PK", 0, 84, 0, 0, 0, 1113, 9.8, 62.4, 217], [0, "Ceiling Rose", "LLL", "SAME", "B0D2N3YH2G", "CRFF500GB", 1, 38, 0, 0, 0, 1113, 9.8, 62.4, 218], [0, "Ceiling Rose", "LLL", "SAME", "B0D2N472B2", "CRFF500SN", 1, 52, 0, 0, 0, 1113, 9.8, 62.4, 219], [0, "Ceiling Rose", "LLL", "SAME", "B0D2N4PFZJ", "CRFF500FG", 1, 27, 0, 0, 0, 1113, 9.8, 62.4, 220], [0, "Ceiling Rose", "LLL", "SAME", "B0D2N5BVKY", "CRFF500RO", 1, 99, 1, 0, 0, 1113, 9.8, 62.4, 221], [0, "Ceiling Rose", "LLL", "SAME", "B0D2N6QX4F", "CRFF500CH", 1, 29, 1, 0, 0, 1113, 9.8, 62.4, 222], [0, "Ceiling Rose", "LLL", "SAME", "B0D7MP6T33", "CRFF105CO2PK", 1, 10, 0, 0, 0, 1113, 9.8, 62.4, 223], [0, "Ceiling Rose", "LLL", "SAME", "B0D7MRR59N", "CRFF105BY2PK", 1, 13, 0, 0, 0, 1113, 9.8, 62.4, 224], [0, "Ceiling Rose", "LLL", "DECLINED", "B0D7MS1G25", "CRFF105WH2PK", 1, 130, 0, 0, 0, 1113, 9.8, 62.4, 225], [0, "Ceiling Rose", "LLL", "SAME", "B0D9RWMTGM", "CRSF100CO2PK", 1, 7, 0, 0, 0, 1113, 9.8, 62.4, 226], [0, "Ceiling Rose", "LLL", "SAME", "B0D9RWZ7H8", "CRSF100SN3PK", 1, 220, 1, 0, 0, 1113, 9.8, 62.4, 227], [0, "Ceiling Rose", "LLL", "DECLINED", "B0D9RX6QMT", "CRSF100WH2PK", 1, 318, 0, 0, 0, 1113, 9.8, 62.4, 228], [0, "Ceiling Rose", "LLL", "SAME", "B0D9RX7K72", "CRSF100GB3PK", 1, 52, 0, 0, 0, 1113, 9.8, 62.4, 229], [0, "Ceiling Rose", "LLL", "SAME", "B0D9RXXDBJ", "CRSF100CO3PK", 1, 6, 0, 0, 0, 1113, 9.8, 62.4, 230], [0, "Ceiling Rose", "LLL", "SAME", "B0D9RY2YKZ", "CRSF100GB2PK", 1, 111, 0, 0, 0, 1113, 9.8, 62.4, 231], [0, "Ceiling Rose", "LLL", "SAME", "B0D9SC16ZN", "CRSF2003WH", 1, 102, 1, 0, 0, 1113, 9.8, 62.4, 232], [0, "Ceiling Rose", "LLL", "SAME", "B0D9SC9PMX", "CRSF2003BB2PK", 1, 40, 0, 0, 0, 1113, 9.8, 62.4, 233], [0, "Ceiling Rose", "LLL", "SAME", "B0D9SCH1HX", "CRSF2003RR", 1, 18, 0, 0, 0, 1113, 9.8, 62.4, 234], [0, "Ceiling Rose", "LLL", "SAME", "B0DB27TD8R", "CRFF75YB3PK", 1, 63, 0, 0, 0, 1113, 9.8, 62.4, 235], [0, "Ceiling Rose", "LLL", "SAME", "B0DB28JXL6", "CRFF75SN2PK", 1, 140, 1, 0, 0, 1113, 9.8, 62.4, 236], [0, "Ceiling Rose", "LLL", "SAME", "B0DB294CYD", "CRFF75RO2PK+HK10RO2PK", 1, 59, 0, 0, 0, 1113, 9.8, 62.4, 237], [0, "Ceiling Rose", "LLL", "SAME", "B0DB29785K", "CRFF75CH3PK", 1, 34, 0, 0, 0, 1113, 9.8, 62.4, 238], [0, "Ceiling Rose", "LLL", "DECLINED", "B0DB299X7R", "CRFF75SN", 1, 714, 2, 0, 0, 1113, 9.8, 62.4, 239], [0, "Ceiling Rose", "LLL", "SAME", "B0DB2BBS59", "CRFF75CO2PK", 1, 35, 0, 0, 0, 1113, 9.8, 62.4, 240], [0, "Ceiling Rose", "LLL", "SAME", "B0DB6387KR", "CRSF2003BM3PK", 1, 48, 1, 0, 0, 1113, 9.8, 62.4, 241], [0, "Ceiling Rose", "LLL", "SAME", "B0DF79G76G", "CRSF120BC3PK", 1, 28, 0, 0, 0, 1113, 9.8, 62.4, 242], [0, "Ceiling Rose", "LLL", "SAME", "B0DGQ9N6R9", "CRSF100NB2PK", 1, 264, 1, 0, 0, 1113, 9.8, 62.4, 243], [0, "Ceiling Rose", "LLL", "SAME", "B0DHX2B9L8", "CRFF110HCO", 1, 11, 0, 0, 0, 1113, 9.8, 62.4, 244], [0, "Ceiling Rose", "LLL", "SAME", "B0DHX3RMZF", "CRFF110HFG", 1, 102, 1, 0, 0, 1113, 9.8, 62.4, 245], [0, "Ceiling Rose", "LLL", "SAME", "B0DHX4BNBS", "CRFF110HYB", 1, 221, 0, 0, 0, 1113, 9.8, 62.4, 246], [0, "Ceiling Rose", "LLL", "SAME", "B0DJCTBCNS", "CRFF110HBM", 1, 102, 0, 0, 0, 1113, 9.8, 62.4, 247], [0, "Ceiling Rose", "LLL", "SAME", "B0DJCV33SP", "CRFF110HSN", 1, 126, 0, 0, 0, 1113, 9.8, 62.4, 248], [0, "Ceiling Rose", "LLL", "DECLINED", "B0DK96Q9J9", "CRFF100GB", 0, 435, 3, 0, 0, 1113, 9.8, 62.4, 249], [0, "Ceiling Rose", "LLL", "SAME", "B0DK97ZCW1", "CRSF100GB", 0, 48, 0, 0, 0, 1113, 9.8, 62.4, 250], [0, "Ceiling Rose", "LLL", "SAME", "B0DKDWV5QV", "CRFF100CH", 0, 222, 1, 0, 0, 1113, 9.8, 62.4, 251], [0, "Ceiling Rose", "LLL", "SAME", "B0DKDY66WX", "CRFF100RO", 0, 110, 2, 0, 0, 1113, 9.8, 62.4, 252], [0, "Ceiling Rose", "LLL", "SAME", "B0DN5SD786", "CRSF100WH", 0, 68, 0, 0, 0, 1113, 9.8, 62.4, 253], [0, "Ceiling Rose", "LLL", "SAME", "B0DN5WGMSZ", "CRSF100CH", 0, 22, 0, 0, 0, 1113, 9.8, 62.4, 254], [0, "Ceiling Rose", "LLL", "SAME", "B0DN5WN9LB", "CRSF100GB", 0, 78, 1, 0, 0, 1113, 9.8, 62.4, 255], [0, "Ceiling Rose", "LLL", "SAME", "B0DQ5DR5G6", "CRSF1204BM2PK", 1, 156, 0, 0, 0, 1113, 9.8, 62.4, 256], [0, "Ceiling Rose", "LLL", "SAME", "B0DZ5Y29HS", "CRSF120CH", 1, 363, 3, 0, 0, 1113, 9.8, 62.4, 257], [0, "Ceiling Rose", "LLL", "SAME", "B0DZHLXZ3C", "CRSF108GB2PK", 1, 46, 0, 0, 0, 1113, 9.8, 62.4, 258], [0, "Ceiling Rose", "LLL", "SAME", "B0DZHMDN7C", "CRSF108CH2PK", 1, 167, 0, 0, 0, 1113, 9.8, 62.4, 259], [0, "Ceiling Rose", "LLL", "SAME", "B0DZHMRCSM", "CRFF2005WH5PK", 1, 12, 0, 0, 0, 1113, 9.8, 62.4, 260], [0, "Ceiling Rose", "LLL", "SAME", "B0DZHP23L2", "CRSF108SN2PK", 1, 155, 0, 0, 0, 1113, 9.8, 62.4, 261], [0, "Ceiling Rose", "LLL", "SAME", "B0DZHQ5RQ2", "CRFF2005WH", 1, 106, 1, 0, 0, 1113, 9.8, 62.4, 262], [0, "Ceiling Rose", "LLL", "SAME", "B0DZHR2PPF", "CRFF2006WH", 1, 9, 0, 0, 0, 1113, 9.8, 62.4, 263], [0, "Ceiling Rose", "LLL", "SAME", "B0DZNPHV6S", "CRSF1204CH", 1, 10, 0, 0, 0, 1113, 9.8, 62.4, 264], [0, "Ceiling Rose", "LLL", "SAME", "B0F135ZRMK", "CRSF1203CO", 1, 2, 0, 0, 0, 1113, 9.8, 62.4, 265], [0, "Ceiling Rose", "LLL", "SAME", "B0F1CL86YS", "CRFF4002BM", 1, 257, 0, 0, 0, 1113, 9.8, 62.4, 266], [0, "Ceiling Rose", "LLL", "SAME", "B0F1CL9GQP", "CRSF1209BM5PK", 1, 2, 0, 0, 0, 1113, 9.8, 62.4, 267], [0, "Ceiling Rose", "LLL", "SAME", "B0F1CTFQ7M", "CRSF1204WH", 1, 20, 0, 0, 0, 1113, 9.8, 62.4, 268], [0, "Ceiling Rose", "LLL", "SAME", "B0F1D4718F", "CRSF1205SN", 1, 612, 5, 0, 0, 1113, 9.8, 62.4, 269], [0, "Ceiling Rose", "LLL", "SAME", "B0FJ5HRRKF", "", 0, 6, 0, 0, 0, 1113, 9.8, 62.4, 270], [0, "Ceiling Rose", "LLL", "SAME", "B0FJ5L1H8C", "CRSF100BM2PK", 0, 30, 0, 0, 0, 1113, 9.8, 62.4, 271], [0, "Ceiling Rose", "LLL", "SAME", "B0FVYFT9XL", "CRFF110HSN", 0, 167, 0, 0, 0, 1113, 9.8, 62.4, 272], [0, "Ceiling Rose", "LLL", "SAME", "B0FVYFXV32", "CRFF110HYB", 0, 33, 0, 0, 0, 1113, 9.8, 62.4, 273], [0, "Ceiling Rose", "LLL", "SAME", "B0FVYGB7VD", "CRFF110HFG", 0, 19, 0, 0, 0, 1113, 9.8, 62.4, 274], [0, "Ceiling Rose", "LLL", "SAME", "B0GS5FF2JM", "", 0, 50, 0, 0, 0, 1113, 9.8, 62.4, 275], [0, "Ceiling Rose", "LLL", "SAME", "B0GS5H35LF", "", 0, 31, 0, 0, 0, 1113, 9.8, 62.4, 276], [0, "Ceiling Rose", "LLL", "SAME", "B0GS5K6CZV", "", 0, 17, 0, 0, 0, 1113, 9.8, 62.4, 277], [0, "Ceiling Rose", "LLL", "SAME", "B0GS5KC66G", "", 0, 3, 0, 0, 0, 1113, 9.8, 62.4, 278], [0, "Ceiling Rose", "LLL", "SAME", "B0GS5LBF2L", "", 0, 59, 0, 0, 0, 1113, 9.8, 62.4, 279], [0, "Ceiling Rose", "LLL", "DECLINED", "B0GS5W6KSJ", "CRFF75BA", 0, 549, 2, 0, 0, 1113, 9.8, 62.4, 280], [0, "Ceiling Rose", "LLL", "SAME", "B0GSQLNVBZ", "", 0, 4, 0, 0, 0, 1113, 9.8, 62.4, 281], [0, "Ceiling Rose", "LLL", "SAME", "B0GSQLNYBN", "", 0, 172, 2, 0, 0, 1113, 9.8, 62.4, 282], [0, "Ceiling Rose", "LLL", "SAME", "B0GSQMT5QC", "", 0, 35, 0, 0, 0, 1113, 9.8, 62.4, 283], [0, "Ceiling Rose", "LLL", "SAME", "B0GTL64KKD", "", 0, 19, 0, 0, 0, 1113, 9.8, 62.4, 284], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0FHQ4BY48", "CRSF100BM+LHHTE27BM+WCCYSP180GD", 1, 7, 0, 0, 0, 0, 0, 0, 1], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0FHQ4KZ59", "", 1, 13, 0, 0, 0, 0, 0, 0, 2], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0FHQ4N44Z", "ENC8937", 1, 10, 0, 0, 0, 0, 0, 0, 3], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0FHQ596S7", "", 1, 3, 0, 0, 0, 0, 0, 0, 4], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0FHQ5MX37", "CRSF100BM+LHHTE27BM+WCCYSP160WH", 1, 24, 0, 0, 0, 0, 0, 0, 5], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0FHQ5QSF8", "", 1, 2, 0, 0, 0, 0, 0, 0, 6], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0FHQ5VRR7", "CRSF100BM+LHHTE27BM+WCCYSP180BM", 1, 53, 0, 0, 0, 0, 0, 0, 7], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0FHQ5VY6T", "CRSF100BM+LHHTE27BM+WCCYSP160GD", 1, 46, 0, 0, 0, 0, 0, 0, 8], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0FHQ6GGXQ", "", 1, 1, 0, 0, 0, 0, 0, 0, 9], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0FHQ6NMQZ", "ENC9367", 1, 37, 0, 0, 0, 0, 0, 0, 10], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0FHQ7CNVJ", "ENC8938", 1, 6, 0, 0, 0, 0, 0, 0, 11], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0FX3X2Z6F", "CRFF100BM+LHHTE27BM+WCCYLC290BM", 1, 34, 0, 0, 0, 0, 0, 0, 12], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0FX3Y432N", "CRFF100BM+LHHTE27BM+WCCYLC230BM", 1, 247, 0, 0, 0, 0, 0, 0, 13], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0GJYYPMV4", "", 0, 29, 0, 0, 0, 0, 0, 0, 14], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0GJZ6P41Q", "", 0, 23, 0, 0, 0, 0, 0, 0, 15], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0GJZ8J7VH", "", 0, 1, 0, 0, 0, 0, 0, 0, 16], [0, "Cristal Ceiling Light", "LLL", "NEW", "B0GJZBQVPT", "", 0, 1, 0, 0, 0, 0, 0, 0, 17], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0GJZGBHT8", "", 0, 22, 0, 0, 0, 0, 0, 0, 18], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0GJZJNHVD", "", 0, 3, 0, 0, 0, 0, 0, 0, 19], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0GJZKRH37", "", 0, 3, 0, 0, 0, 0, 0, 0, 20], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0GJZMP2WM", "", 0, 10, 0, 0, 0, 0, 0, 0, 21], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0GJZQPCW5", "", 0, 2, 0, 0, 0, 0, 0, 0, 22], [0, "Cristal Ceiling Light", "LLL", "SAME", "B0GJZVPGY7", "", 0, 9, 0, 0, 0, 0, 0, 0, 23], [0, "Tapes", "HHL", "SAME", "B0DCK527TN", "STBFT50M48EWH", 0, 3076, 17, 4, 23.5, 886, 4.8, 59.7, 1], [0, "Tapes", "LLL", "SAME", "B0CSFS5V1P", "STND242RE2PK", 1, 126, 0, 1, 0, 886, 4.8, 59.7, 2], [0, "Tapes", "HHL", "DECLINED", "B0DCKWL469", "STFG4845WH", 1, 3494, 17, 4, 23.5, 886, 4.8, 59.7, 3], [0, "Tapes", "LLH", "IMPROVED", "B0FJ2JF399", "STPVC17ABLAPK", 0, 173, 1, 2, 200, 886, 4.8, 59.7, 4], [0, "Tapes", "LLH", "IMPROVED", "B0DCK6VM9H", "STBFT50M48EWH2PK", 0, 98, 3, 2, 66.7, 886, 4.8, 59.7, 5], [0, "Tapes", "LLL", "SAME", "B0CSK4C4MT", "STBFT50M48EWH", 0, 556, 2, 1, 50, 886, 4.8, 59.7, 6], [0, "Tapes", "LLH", "IMPROVED", "B0CT5PY35Z", "STFG4845WH", 0, 281, 1, 1, 100, 886, 4.8, 59.7, 7], [0, "Tapes", "LLL", "DECLINED", "B0DCD25XPJ", "STPVC17ABL3PK", 0, 378, 3, 1, 33.3, 886, 4.8, 59.7, 8], [0, "Tapes", "LLH", "IMPROVED", "B0DCDB1TLJ", "STPVC17ARE3PK", 1, 74, 1, 1, 100, 886, 4.8, 59.7, 9], [0, "Tapes", "LLL", "SAME", "B0DCDLW2M2", "STPVC17ABL", 1, 317, 2, 1, 50, 886, 4.8, 59.7, 10], [0, "Tapes", "LLL", "SAME", "B0DCKGXY3N", "STFG4845WH2PK", 1, 203, 0, 1, 0, 886, 4.8, 59.7, 11], [0, "Tapes", "LLL", "DECLINED", "B0DCLQH97K", "STMT18FWH", 1, 356, 2, 1, 50, 886, 4.8, 59.7, 12], [0, "Tapes", "LLL", "SAME", "B0FH22BX82", "STIX245GR", 1, 158, 3, 1, 33.3, 886, 4.8, 59.7, 13], [0, "Tapes", "LLL", "SAME", "B0FJ26WKLN", "STPVC17AWHAPK", 0, 32, 0, 1, 0, 886, 4.8, 59.7, 14], [0, "Tapes", "LLL", "SAME", "B0FJ296YPH", "STPVC17AWH5PK", 0, 57, 0, 1, 0, 886, 4.8, 59.7, 15], [0, "Tapes", "LLH", "SAME", "B0FJ2L7LQF", "STPVC17ABL", 0, 118, 1, 1, 100, 886, 4.8, 59.7, 16], [0, "Tapes", "LLL", "SAME", "B0CS65JKLX", "STMT18FWH6PK", 1, 28, 0, 0, 0, 886, 4.8, 59.7, 17], [0, "Tapes", "LLL", "SAME", "B0CS6L2GL9", "STRF50ISR", 1, 42, 0, 0, 0, 886, 4.8, 59.7, 18], [0, "Tapes", "LLL", "SAME", "B0CSFGJTYF", "STMT4845WH6PK", 1, 26, 0, 0, 0, 886, 4.8, 59.7, 19], [0, "Tapes", "LLL", "SAME", "B0CSFHQ8Y7", "STMT4845WH", 1, 195, 1, 0, 0, 886, 4.8, 59.7, 20], [0, "Tapes", "LLL", "SAME", "B0CSFYGTXF", "STFT23M50NTR", 0, 9, 0, 0, 0, 886, 4.8, 59.7, 21], [0, "Tapes", "LLL", "SAME", "B0CSFZ77SJ", "STFT23M50NBM", 0, 16, 0, 0, 0, 886, 4.8, 59.7, 22], [0, "Tapes", "LLL", "SAME", "B0CSG1QG8P", "STFT20M40OBM", 0, 81, 0, 0, 0, 886, 4.8, 59.7, 23], [0, "Tapes", "LLL", "SAME", "B0CSG34NXB", "STFG4845WH6PK", 1, 23, 0, 0, 0, 886, 4.8, 59.7, 24], [0, "Tapes", "LLL", "DECLINED", "B0CSK6CPQR", "STFG4845WH", 1, 230, 1, 0, 0, 886, 4.8, 59.7, 25], [0, "Tapes", "LLL", "NEW", "B0CSKMGKDB", "STRF50IYE", 0, 7, 0, 0, 0, 886, 4.8, 59.7, 26], [0, "Tapes", "LLL", "SAME", "B0CSMKGWVV", "STND242RE2PK", 0, 35, 0, 0, 0, 886, 4.8, 59.7, 27], [0, "Tapes", "LLL", "SAME", "B0CSMTR4W7", "STND182WH2PK", 0, 167, 1, 0, 0, 886, 4.8, 59.7, 28], [0, "Tapes", "LLL", "SAME", "B0CSWHJ5HK", "STFT20M40OBM", 1, 11, 0, 0, 0, 886, 4.8, 59.7, 29], [0, "Tapes", "LLL", "SAME", "B0CT5PNMZ1", "STFG4845WH6PK", 0, 105, 0, 0, 0, 886, 4.8, 59.7, 30], [0, "Tapes", "LLL", "SAME", "B0CT5RWDTM", "STMT4845WH", 0, 185, 0, 0, 0, 886, 4.8, 59.7, 31], [0, "Tapes", "LLL", "SAME", "B0CT5T2YCB", "STMT4845WH6PK", 0, 22, 0, 0, 0, 886, 4.8, 59.7, 32], [0, "Tapes", "LLL", "SAME", "B0CV9B7PXX", "STPVC17ABLAPK", 0, 25, 0, 0, 0, 886, 4.8, 59.7, 33], [0, "Tapes", "LLL", "SAME", "B0CV9FZB89", "STPVC17AREAPK", 0, 74, 0, 0, 0, 886, 4.8, 59.7, 34], [0, "Tapes", "LLL", "SAME", "B0CV9MVJ6H", "STPVC17AWHAPK", 0, 85, 0, 0, 0, 886, 4.8, 59.7, 35], [0, "Tapes", "LLL", "DECLINED", "B0DC1HX37B", "STMT4845WH", 0, 255, 1, 0, 0, 886, 4.8, 59.7, 36], [0, "Tapes", "LLL", "SAME", "B0DC1KN2BR", "STMT4845WH3PK", 0, 10, 0, 0, 0, 886, 4.8, 59.7, 37], [0, "Tapes", "LLL", "SAME", "B0DC1P23SN", "STMT4845WH", 0, 338, 0, 0, 0, 886, 4.8, 59.7, 38], [0, "Tapes", "LLL", "SAME", "B0DC1QXTWT", "STMT4845WH6PK", 0, 66, 0, 0, 0, 886, 4.8, 59.7, 39], [0, "Tapes", "LLL", "SAME", "B0DC1T21TK", "STMT4845WH2PK", 0, 4, 1, 0, 0, 886, 4.8, 59.7, 40], [0, "Tapes", "LLL", "SAME", "B0DC1T5YLF", "STMT4845WHAPK", 0, 9, 0, 0, 0, 886, 4.8, 59.7, 41], [0, "Tapes", "LLL", "NEW", "B0DC27MKPV", "STMT4845WH5PK", 0, 5, 0, 0, 0, 886, 4.8, 59.7, 42], [0, "Tapes", "LLL", "SAME", "B0DC5MTM8N", "STMT18FWH", 0, 3, 0, 0, 0, 886, 4.8, 59.7, 43], [0, "Tapes", "LLL", "SAME", "B0DCCGTMMR", "STPVC17AREAPK", 1, 33, 0, 0, 0, 886, 4.8, 59.7, 44], [0, "Tapes", "LLL", "NEW", "B0DCCXR484", "STPVC17ARE5PK", 1, 2, 0, 0, 0, 886, 4.8, 59.7, 45], [0, "Tapes", "LLL", "SAME", "B0DCD54D33", "STPVC17ABLAPK", 1, 2, 0, 0, 0, 886, 4.8, 59.7, 46], [0, "Tapes", "LLL", "SAME", "B0DCD5V3R5", "STPVC17ABL5PK", 0, 5, 0, 0, 0, 886, 4.8, 59.7, 47], [0, "Tapes", "LLL", "SAME", "B0DCD9QX59", "STPVC17AWH", 1, 2, 0, 0, 0, 886, 4.8, 59.7, 48], [0, "Tapes", "LLL", "SAME", "B0DCDJ5TNY", "STPVC17ARE3PK", 0, 10, 0, 0, 0, 886, 4.8, 59.7, 49], [0, "Tapes", "LLL", "SAME", "B0DCHCW5XF", "STND242RE", 0, 248, 1, 0, 0, 886, 4.8, 59.7, 50], [0, "Tapes", "LLL", "SAME", "B0DCHLY759", "STND242RE2PK", 0, 33, 0, 0, 0, 886, 4.8, 59.7, 51], [0, "Tapes", "HHL", "IMPROVED", "B0DCHNMY65", "STND242RE", 1, 221, 5, 0, 0, 886, 4.8, 59.7, 52], [0, "Tapes", "LLL", "SAME", "B0DCJRPR27", "STFT23M50NTR", 0, 9, 0, 0, 0, 886, 4.8, 59.7, 53], [0, "Tapes", "LLL", "SAME", "B0DCJZYHYQ", "STFT23M50NTR2PK", 0, 7, 0, 0, 0, 886, 4.8, 59.7, 54], [0, "Tapes", "LLL", "SAME", "B0DCK4KX2R", "STBFT50M48EWH2PK", 1, 84, 0, 0, 0, 886, 4.8, 59.7, 55], [0, "Tapes", "LLL", "SAME", "B0DCK4QXLN", "STBFT50M48EWH3PK", 0, 28, 0, 0, 0, 886, 4.8, 59.7, 56], [0, "Tapes", "LLL", "SAME", "B0DCK4R85J", "STBFT50M48EWH5PK", 0, 9, 0, 0, 0, 886, 4.8, 59.7, 57], [0, "Tapes", "LLL", "SAME", "B0DCK6K14N", "STBFT50M48EWH", 1, 387, 0, 0, 0, 886, 4.8, 59.7, 58], [0, "Tapes", "LLL", "NEW", "B0DCKJFT48", "STFG4845WHAPK", 1, 6, 0, 0, 0, 886, 4.8, 59.7, 59], [0, "Tapes", "LLL", "DECLINED", "B0DCKQW2PW", "STFG4845WH3PK", 1, 289, 3, 0, 0, 886, 4.8, 59.7, 60], [0, "Tapes", "LLL", "SAME", "B0DCKW59D3", "STFG4845WH6PK", 1, 51, 0, 0, 0, 886, 4.8, 59.7, 61], [0, "Tapes", "LLL", "SAME", "B0DCLHV92C", "STMT18FWHAPK", 1, 35, 1, 0, 0, 886, 4.8, 59.7, 62], [0, "Tapes", "LLL", "SAME", "B0DCLRDBR7", "STMT18FWH2PK", 1, 29, 0, 0, 0, 886, 4.8, 59.7, 63], [0, "Tapes", "LLL", "SAME", "B0DCLRJX5M", "STMT4845WH2PK", 1, 48, 0, 0, 0, 886, 4.8, 59.7, 64], [0, "Tapes", "LLL", "SAME", "B0DCLRSF8R", "STMT4845WH6PK", 1, 39, 0, 0, 0, 886, 4.8, 59.7, 65], [0, "Tapes", "LLL", "SAME", "B0DCLXSHSN", "STMT4845WH", 1, 194, 1, 0, 0, 886, 4.8, 59.7, 66], [0, "Tapes", "LLL", "NEW", "B0DCLXSHSY", "STMT4845WHAPK", 1, 6, 0, 0, 0, 886, 4.8, 59.7, 67], [0, "Tapes", "LLL", "SAME", "B0DCLY36S7", "STMT18FWH5PK", 1, 1, 0, 0, 0, 886, 4.8, 59.7, 68], [0, "Tapes", "LLL", "SAME", "B0DCM47227", "STMT18FWH3PK", 1, 35, 0, 0, 0, 886, 4.8, 59.7, 69], [0, "Tapes", "LLL", "SAME", "B0FFSJ6B59", "STIX245GR6PK", 1, 5, 0, 0, 0, 886, 4.8, 59.7, 70], [0, "Tapes", "LLL", "SAME", "B0FGXXG8NZ", "STBFT50M48EWH2PK", 0, 71, 0, 0, 0, 886, 4.8, 59.7, 71], [0, "Tapes", "LLL", "SAME", "B0FH1X4BTJ", "STIX245GR", 0, 107, 1, 0, 0, 886, 4.8, 59.7, 72], [0, "Tapes", "LLL", "SAME", "B0FH1ZRY56", "STIX245GR2PK", 1, 12, 0, 0, 0, 886, 4.8, 59.7, 73], [0, "Tapes", "LLL", "NEW", "B0FH22X7W8", "STIX245GR5PK", 1, 1, 0, 0, 0, 886, 4.8, 59.7, 74], [0, "Tapes", "LLL", "SAME", "B0FHPN73X7", "STPVC17ABL", 1, 82, 0, 0, 0, 886, 4.8, 59.7, 75], [0, "Tapes", "LLL", "SAME", "B0FJ1T42V9", "STPVC17ARE", 0, 86, 0, 0, 0, 886, 4.8, 59.7, 76], [0, "Tapes", "LLL", "SAME", "B0FJ27683H", "STPVC17AWH", 0, 278, 0, 0, 0, 886, 4.8, 59.7, 77], [0, "Tapes", "LLL", "SAME", "B0FJ28QDM2", "STPVC17AWH3PK", 0, 23, 0, 0, 0, 886, 4.8, 59.7, 78], [0, "Tapes", "LLL", "DECLINED", "B0FJ28QLQZ", "STPVC17AWH2PK", 0, 40, 1, 0, 0, 886, 4.8, 59.7, 79], [0, "Tapes", "LLL", "SAME", "B0FJ2DGLKG", "STPVC17AWH6PK", 0, 13, 0, 0, 0, 886, 4.8, 59.7, 80], [0, "Tapes", "LLL", "SAME", "B0FNRC7YBT", "STND302WH", 0, 90, 0, 0, 0, 886, 4.8, 59.7, 81], [0, "Tapes", "LLL", "SAME", "B0FP1Z2V5T", "STND182RE", 0, 147, 0, 0, 0, 886, 4.8, 59.7, 82], [0, "Tapes", "LLL", "SAME", "B0FP227D9N", "STND182REAPK", 0, 4, 0, 0, 0, 886, 4.8, 59.7, 83]], "cats":[[0, "Tapes", 83, 10, 886, 4.8, 59.7, "TOP_10", 1.8], [0, "Cristal Ceiling Light", 23, null, null, null, null, "NEEDS_MANUAL", null], [0, "Ceiling Rose", 284, 30, 1113, 9.8, 62.4, "FULL_TOP_30", 3.13]]};;
+const ACC=["DCVoltage UK","LEDSone UK"];
+const SEGCOL={HHH:"--hHHH",HHL:"--hHHL",HLH:"--hHLH",LHH:"--hLHH",LLH:"--hLLH",LLL:"--hLLL"};
+const SEGNAME={HHH:"Champions",HHL:"Leaky Buckets",HLH:"Wallflowers",LHH:"Hidden Gems",LLH:"Niche Winners",LLL:"Dead Horses"};
+const SEGORDER=["HHH","HHL","HLH","LHH","LLH","LLL"];
+const MOVCOL={IMPROVED:"--mUP",DECLINED:"--mDN",SAME:"--mSAME",NEW:"--mNEW"};
+const MOVORDER=["IMPROVED","DECLINED","SAME","NEW"];
+const STATCOL={ABOVE_TOP30_AVG:"--mUP",BELOW_TOP30_AVG:"--mDN",NEAR_TOP30_AVG:"--mSAME",NEEDS_REVIEW:"--hHHL"};
+// row columns: [phIdx,cat,seg,mov,asin,sku,acc,i,k,v,cvr,bi,bk,bcvr,rank]
+const C={ph:0,cat:1,seg:2,mov:3,asin:4,sku:5,acc:6,i:7,k:8,v:9,cvr:10,bi:11,bk:12,bcvr:13,rank:14};
+// category avg-conversion benchmark lookup (cats: [phIdx,cat,listings,topn,b_imp,b_clk,b_cvr,status,b_conv])
+const CATCONV={}; (D.cats||[]).forEach(c=>{CATCONV[c[0]+"|"+c[1]]=c[8];});
+function avgConvOf(r){const x=CATCONV[r[C.ph]+"|"+r[C.cat]];return x==null?0:x;}
+function statusOf(r){const v=r[C.v],k=r[C.k],cvr=r[C.cvr],avg=avgConvOf(r);
+  if(v>k || cvr>100 || (v>0&&k===0)) return "NEEDS_REVIEW";
+  if(avg>0){ if(v>=avg*1.10) return "ABOVE_TOP30_AVG"; if(v<=avg*0.90) return "BELOW_TOP30_AVG"; }
+  return "NEAR_TOP30_AVG";}
+function statBadge(s){const col=getComputedStyle(document.documentElement).getPropertyValue(STATCOL[s]||"--mSAME");
+  return `<span class="badge" style="background:${col}22;color:${col}">${s.replace(/_/g," ")}</span>`;}
+
+let cur=null, segFilter=null, movFilter=null, catFilter=null, sortKey=null, sortDir=1;
+
+const sel=document.getElementById("phsel");
+sel.innerHTML='<option value="">— choose —</option>'+D.phs.map((n,i)=>`<option value="${i}">${n}</option>`).join("");
+sel.addEventListener("change",()=>{const v=sel.value; cur=v===""?null:+v; segFilter=null; movFilter=null; catFilter=null; sortKey=null; render();});
+
+function fmt(n){return (n==null?0:n).toLocaleString()}
+function f1(n){return (n==null?0:n).toFixed(1)}
+function segBadge(s){return `<span class="seg" style="background:var(${SEGCOL[s]})">${s}</span>`}
+function movBadge(m){const c=MOVCOL[m];const col=getComputedStyle(document.documentElement).getPropertyValue(c);
+  return `<span class="badge" style="background:${col}22;color:${col}">${m}</span>`}
+function delta(x){const cls=x>0?"dpos":x<0?"dneg":"";const s=x>0?"+"+fmt(x):fmt(x);return `<span class="${cls}">${s}</span>`}
+
+function render(){
+  const esc=document.getElementById("escBar");
+  if(cur===null){
+    document.getElementById("gTitle").textContent="Select a Portfolio Holder";
+    document.getElementById("gScope").textContent="Pick a name to see that portfolio only — segments, movement and benchmarks in one view.";
+    document.getElementById("cards").innerHTML="";
+    document.getElementById("meta").innerHTML="";
+    document.getElementById("segMix").innerHTML="";
+    document.getElementById("movMix").innerHTML="";
+    esc.style.display="none";
+    catBody([]); asinBody([]); document.getElementById("foot").textContent="";
+    document.getElementById("asinHint").textContent="";
+    return;
+  }
+  const name=D.phs[cur];
+  const rows=D.rows.filter(r=>r[C.ph]===cur);
+  const cats=D.cats.filter(c=>c[0]===cur);
+  const listings=rows.length;
+  const asins=new Set(rows.map(r=>r[C.asin])).size;
+  const skus=new Set(rows.filter(r=>r[C.sku]).map(r=>r[C.sku])).size;
+  const ncat=new Set(rows.map(r=>r[C.cat])).size;
+  const segCount={},movCount={};
+  SEGORDER.forEach(s=>segCount[s]=0); MOVORDER.forEach(m=>movCount[m]=0);
+  rows.forEach(r=>{segCount[r[C.seg]]++;movCount[r[C.mov]]++});
+  const lllPct=listings?Math.round(1000*segCount.LLL/listings)/10:0;
+
+  document.getElementById("gTitle").textContent=name;
+  const _alloc=(D.alloc&&D.alloc[name])||0;
+  const _notActive=_alloc>asins?_alloc-asins:0;
+  document.getElementById("gScope").textContent=`${fmt(listings)} listings · ${fmt(asins)} ASINs active this window · ${fmt(_alloc)} allocated${_notActive>0?` (${fmt(_notActive)} not active)`:""} · ${fmt(skus)} SKUs · ${ncat} categor${ncat===1?"y":"ies"} — this portfolio only.`;
+
+  // cards
+  document.getElementById("cards").innerHTML=[
+    ["Assigned listings",fmt(listings),"rows in scope"],
+    ["Distinct ASINs",fmt(asins),""],
+    ["Distinct SKUs",fmt(skus),""],
+    ["Categories",fmt(ncat),""],
+    ["Champions (HHH)",fmt(segCount.HHH),"scale these"],
+    ["Dead Horses (LLL)",fmt(segCount.LLL),lllPct+"% of portfolio"],
+    ["Allocated",fmt(_alloc),_notActive>0?`${fmt(_notActive)} not active this window`:"all active"]
+  ].map((c,ci)=>`<div class="card c${ci+1}"><div class="cardIcon"></div><div class="k">${c[0]}</div><div class="v">${c[1]}</div><div class="s">${c[2]}</div></div>`).join("");
+
+  // meta strip
+  document.getElementById("meta").innerHTML=[
+    ["Current window (this report)","31 May – 27 Jun 2026 · last 4 complete weeks (UK Amazon FBM)"],
+    ["Benchmark","Top-30 best-sellers / category · average conversion rate"],
+    ["Movement compares","current vs previous 4 weeks: 3 May – 30 May 2026 → 31 May – 27 Jun 2026"],
+    ["Report period",D.period],
+    ["Generated",D.generated]
+  ].map(m=>`<div><div class="k">${m[0]}</div><div class="v">${m[1]}</div></div>`).join("");
+
+  // escalation banner (our §8 rules, this PH)
+  let e="";
+  if(lllPct>30) e+=`<div>\u26A0 <b>${lllPct}%</b> of this portfolio is in LLL (Dead Horses) \u2014 portfolio restructure review (\u00a78)</div>`;
+  if(movCount.DECLINED>5) e+=`<div>\u26A0 <b>${movCount.DECLINED}</b> ASINs declined this cycle \u2014 Bietrick + sub-leader review (\u00a78)</div>`;
+  if(e){esc.className="esc";esc.innerHTML=e;esc.style.display="flex";}
+  else {esc.className="esc ok";esc.innerHTML="\u2713 No \u00a78 escalation thresholds breached for this portfolio.";esc.style.display="flex";}
+
+  // mixes (filter chips)
+  document.getElementById("segMix").innerHTML=SEGORDER.map(s=>
+    `<span class="chip ${segFilter===s?'on':''}" data-seg="${s}"><span style="color:var(${SEGCOL[s]})">\u25CF</span> ${s} <span class="n">${segCount[s]}</span></span>`).join("");
+  document.getElementById("movMix").innerHTML=MOVORDER.map(m=>
+    `<span class="chip ${movFilter===m?'on':''}" data-mov="${m}">${m} <span class="n">${movCount[m]}</span></span>`).join("");
+  document.querySelectorAll("[data-seg]").forEach(el=>el.onclick=()=>{segFilter=segFilter===el.dataset.seg?null:el.dataset.seg;render();});
+  document.querySelectorAll("[data-mov]").forEach(el=>el.onclick=()=>{movFilter=movFilter===el.dataset.mov?null:el.dataset.mov;render();});
+
+  // category table
+  catHead();
+  catBody(cats);
+  document.querySelectorAll("[data-cat]").forEach(el=>el.onclick=()=>{const c=el.getAttribute("data-cat");catFilter=catFilter===c?null:c;render();});
+
+  // asin table
+  let ar=rows.slice();
+  if(catFilter) ar=ar.filter(r=>r[C.cat]===catFilter);
+  if(segFilter) ar=ar.filter(r=>r[C.seg]===segFilter);
+  if(movFilter) ar=ar.filter(r=>r[C.mov]===movFilter);
+  if(sortKey!=null){ar.sort((a,b)=>{
+    let x,y;
+    if(sortKey==="dImp"){x=a[C.i]-a[C.bi];y=b[C.i]-b[C.bi];}
+    else if(sortKey==="dClk"){x=a[C.k]-a[C.bk];y=b[C.k]-b[C.bk];}
+    else if(sortKey==="avgc"){x=avgConvOf(a);y=avgConvOf(b);}
+    else if(sortKey==="dConv"){x=a[C.v]-avgConvOf(a);y=b[C.v]-avgConvOf(b);}
+    else if(sortKey==="status"){x=statusOf(a);y=statusOf(b);}
+    else {x=a[sortKey];y=b[sortKey];}
+    if(typeof x==="string"){return sortDir*x.localeCompare(y)} return sortDir*((x||0)-(y||0))});}
+  asinHead();
+  asinBody(ar);
+  document.getElementById("asinHint").textContent=`— ${fmt(ar.length)} shown${catFilter?` · category: ${catFilter} (click it again to clear)`:""}${segFilter?` · segment ${segFilter}`:""}${movFilter?` · ${movFilter}`:""}`;
+  document.getElementById("foot").textContent=`Source: analytics.ph_segment_report (read-only). Segments, movement and benchmarks are the production engine's output — this view only reorganises them per portfolio holder.`;
+}
+
+/* ---- category table ---- */
+function catHead(){
+  document.querySelector("#catTbl thead").innerHTML=
+   `<tr><th>Category</th><th class="num">Listings</th><th class="num">Top-N used</th>
+    <th class="num">Avg impressions</th><th class="num">Avg clicks</th><th class="num">Avg conversions</th><th class="num">Benchmark CVR%</th><th>Status</th></tr>`;
+}
+function catBody(cats){
+  const tb=document.querySelector("#catTbl tbody");
+  if(!cats.length){tb.innerHTML='<tr><td class="empty" colspan="8">No categories.</td></tr>';return;}
+  tb.innerHTML=cats.map(c=>`<tr class="catrow ${catFilter===c[1]?'on':''}" data-cat="${String(c[1]).replace(/"/g,'&quot;')}" style="cursor:pointer">
+     <td><span class="catcue">${catFilter===c[1]?'▾':'▸'}</span> ${c[1]}${catFilter===c[1]?' <span class="catactive">filtering ✓</span>':''}</td><td class="num">${fmt(c[2])}</td><td class="num">${c[3]}</td>
+     <td class="num">${fmt(c[4])}</td><td class="num">${f1(c[5])}</td><td class="num">${f1(c[8])}</td><td class="num">${f1(c[6])}%</td>
+     <td>${c[7]==='NEEDS_MANUAL'?'<span class="man">NEEDS MANUAL</span>':c[7].replace('_',' ')}</td></tr>`).join("");
+}
+
+/* ---- asin table ---- */
+const ACOLS=[
+  ["Rank",C.rank,1],["Category",C.cat,0],["Segment",C.seg,0],["Movement",C.mov,0],["ASIN",C.asin,0],["SKU",C.sku,0],["Account",C.acc,0],
+  ["Impr",C.i,1],["Clicks",C.k,1],["Conv",C.v,1],["Row CVR%",C.cvr,1],
+  ["Avg impr",C.bi,1],["Avg clk",C.bk,1],["Avg conv","avgc",1],["Bench CVR%",C.bcvr,1],
+  ["\u0394 Impr","dImp",1],["\u0394 Clk","dClk",1],["\u0394 Conv","dConv",1],["Status","status",0]
+];
+function asinHead(){
+  document.querySelector("#asinTbl thead").innerHTML="<tr>"+ACOLS.map((c,idx)=>{
+    const num=c[2]?"num":"";const ar=(String(sortKey)===String(c[1]))?(sortDir>0?"\u25B2":"\u25BC"):"\u21C5";
+    return `<th class="${num}" data-k="${c[1]}">${c[0]}<span class="ar">${ar}</span></th>`;}).join("")+"</tr>";
+  document.querySelectorAll("#asinTbl thead th").forEach(th=>th.onclick=()=>{
+    const k=th.dataset.k; if(k==="dImp"||k==="dClk"){/*sort by computed*/}
+    if(sortKey===k){sortDir*=-1}else{sortKey=k;sortDir=1} render();});
+}
+function asinBody(rows){
+  const tb=document.querySelector("#asinTbl tbody");
+  if(!rows.length){tb.innerHTML='<tr><td class="empty" colspan="19">No ASINs match this filter.</td></tr>';return;}
+  const frag=rows.map(r=>{
+    const avgc=avgConvOf(r);
+    const dImp=r[C.i]-r[C.bi], dClk=r[C.k]-r[C.bk], dConv=r[C.v]-avgc;
+    const _st=statusOf(r);
+    const _rowcls=_st==="NEEDS_REVIEW"?" row-review":"";
+    return `<tr class="${_rowcls.trim()}">
+      <td class="num">${r[C.rank]}</td>
+      <td>${r[C.cat]}</td><td>${segBadge(r[C.seg])}</td><td>${movBadge(r[C.mov])}</td>
+      <td>${r[C.asin]}</td><td>${r[C.sku]||'<span class="man">—</span>'}</td><td>${ACC[r[C.acc]]}</td>
+      <td class="num">${fmt(r[C.i])}</td><td class="num">${fmt(r[C.k])}</td><td class="num">${fmt(r[C.v])}</td>
+      <td class="num">${f1(r[C.cvr])}%</td>
+      <td class="num">${fmt(r[C.bi])}</td><td class="num">${f1(r[C.bk])}</td><td class="num">${f1(avgc)}</td><td class="num">${f1(r[C.bcvr])}%</td>
+      <td class="num">${delta(dImp)}</td><td class="num">${delta(Math.round(dClk))}</td><td class="num">${delta(Math.round(dConv*10)/10)}</td>
+      <td>${statBadge(statusOf(r))}</td></tr>`;
+  }).join("");
+  tb.innerHTML=frag;
+}
+// sort support for computed delta columns
+const _origSort=render;
+render();
+
+(function(){ var s=document.getElementById("phsel"); if(s){ s.value="0"; s.dispatchEvent(new Event("change")); } })();
+</script>
+</body>
+</html>

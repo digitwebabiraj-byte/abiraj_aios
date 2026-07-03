@@ -139,7 +139,7 @@ Executed by Abiraj in a live Claude Chat session; imported here read-only. Impor
 - Engine v2: `sql/REQ-05_ph-asin-segmentation/2026-07-01_ph_segment_engine_v2.sql`
 - Monthly routine: `prompts/implementation/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_monthly_routine.txt`
 - Protocol clarifications: `validation/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_protocol_v1_clarifications.md`
-- Live dashboard HTML (id-5 v2): `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_dashboard_id5_live_2026-07.html` *(imported 2 Jul)*
+- ~~Live dashboard HTML (id-5)~~ **corrected 3 Jul**: that file was the 2 Jul restyle, re-homed to the D07 record (`2026-07-02_ph_asin_dashboard_v2_restyle_preview.html`); the true 1 Jul navy live HTML was never exported → MISSING_ARTIFACT
 - UI review template: `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_dashboard_ph_view_template.html` *(imported 2 Jul)*
 - Orphan/unowned assignment CSV (492 rows): `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_unowned_asins_for_assignment_2026-07.csv` *(imported 2 Jul)*
 - Manifest: `evidence/logs_or_screenshots/REQ-05_ph-asin-segmentation/2026-07-01_req-05-d06_source_manifest.md`
@@ -173,12 +173,70 @@ Executed by Abiraj in a live Claude Chat session; imported here read-only. Impor
 Replace the monthly routine's HTML BLOCK 1 with the approved dropdown/table UI before the next
 monthly run. (All 7 D06 work-products are now imported — the artifact-import step is closed.)
 
+## Daily Increment — REQ-05-D07 — 2026-07-02
+
+Fourth recorded delivery increment of REQ-05 (Phase-07). **Not a new Task ID.** Executed live by
+Abiraj; imported read-only. Import result **AMBER** (knowledge file + 3 dashboard previews + 24 per-PH
+views + chat transcript imported & checksummed; exact final live HTML + engine v3 MISSING_ARTIFACT).
+
+### Work Completed (from the D07 knowledge file)
+
+- **Read-only verification** of the live 2026-07 report — 0 mismatches, 8,146/8,149 source reconcile.
+- **Live dashboard restyle** — gold header + greeting over slate/teal body, bolder escalation banner,
+  amber NEEDS_REVIEW rows. Pushed live (`preview_v2`, 884,616 B live).
+- **Card redesign** — per-card icons + colour-coding (Champions=green, Dead Horses=red). Pushed live (`preview_v3`).
+- **Strict segment-rank movement rule** — HHH=1…LLL=6 (replaces equal-weight h-count where HHL/HLH/LHH
+  were tied). 65 rows moved SAME→IMPROVED/DECLINED; applied to the report table AND the baked dashboard
+  data; folded into the engine. **User-decided rule change (2 Jul), not a Bietrick protocol sign-off.**
+- **Engine v3 (strict-rank)** — sandbox-validated (8,149 rows, 0 movement mismatches); **not run live**.
+- **Per-PH deliverables** — window-date meta strip, category-click filtering, dynamic allocated card,
+  jargon removal, and **24 per-PH locked views** (each shows only its own PH, dropdown hidden).
+
+### Canonical Assets (imported this increment)
+
+- Daily knowledge: `handover/REQ-05_ph-asin-segmentation/2026-07-02__abiraj__ph-asin__REQ-05-D07.md`
+- Dashboard previews: `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-02_ph_asin_dashboard_{v2_restyle,v3_cards,catfilter}_preview.html`
+- 24 per-PH views: `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-02_ph_per_holder_views/` (+ `.sha256` index)
+- Chat transcript: `evidence/logs_or_screenshots/REQ-05_ph-asin-segmentation/2026-07-02_claude_chat_transcript_d07.txt`
+- Manifest / update-evidence / duplicate-risk / validation: matching `2026-07-02_req-05-d07_*` records.
+
+### Current Live State (DOCUMENTED_IN_D07 — NOT RECHECKED)
+
+- Live dashboard row `ph_task` id 5 = 888,511 B (restyle + cards + strict-rank movement).
+- The exact final live file (`live_v4_movrule.html`) is **MISSING_ARTIFACT**; `preview_v3` (888,305 B)
+  is the closest saved copy. Engine v3 SQL is also MISSING_ARTIFACT.
+
+### D06 correction folded in
+
+The file imported for D06 as the "1 Jul navy live dashboard" was actually the **2 Jul restyle** (preview_v2);
+it has been re-homed to `2026-07-02_ph_asin_dashboard_v2_restyle_preview.html` and the D06 records annotated.
+The true 1 Jul navy build was never exported (only in DB backup `ph_task_id5_backup_20260702_css`).
+
+### Open Gaps
+
+- Monthly routine HTML BLOCK 1 still builds the **old** UI — swap before the 3 Aug run.
+- Cloud Routine automation still pending (Windows feature).
+- Engine v3 first live run pending (3 Aug); engine v3 SQL not in repo.
+- Three Bietrick sign-offs pending: NEW definition, edge-case protocol, 492 orphan assignments.
+- Backups (`_css`, `_cards`, `_movdata`, `_movrule`, + carried) retained — drop only after Bietrick accepts.
+
+### Status
+
+- Daily Increment REQ-05-D07: **COMPLETE** (import **AMBER** — 2 artifacts missing).
+- Requirement REQ-05: **ACTIVE — FOLLOW-UP WORK REMAINS**.
+
+### Next Step
+
+Swap the monthly routine's HTML BLOCK 1 to the new UI before the 3 Aug run; export + import
+`live_v4_movrule.html` and engine v3.
+
 ## Current Status
 
 CLOSED for the onboarding/preservation scope (PASS) — **in a DELIVERY phase since 2026-06-26**,
-with three recorded delivery increments of this same requirement: 26 Jun (dashboard UI fix + live
-release), 30 Jun (final-June refresh + validation), and **1 Jul (REQ-05-D06 — Option-A movement
-fix, Orphan ASIN routing, engine v2, protocol clarifications, dropdown UI redesign)**. None are
+with four recorded delivery increments of this same requirement: 26 Jun (dashboard UI fix + live
+release), 30 Jun (final-June refresh + validation), **1 Jul (REQ-05-D06 — Option-A movement
+fix, Orphan ASIN routing, engine v2, protocol clarifications, dropdown UI redesign)**, and **2 Jul
+(REQ-05-D07 — restyle + card redesign + strict-rank movement + engine v3 + 24 per-PH views)**. None are
 new Task IDs.
 
 ## Final Task Result
@@ -187,9 +245,9 @@ PASS (onboarding scope). Delivery increments: AMBER — see each delivery/increm
 
 ## One Next Step
 
-Swap the monthly routine's HTML BLOCK 1 to the new dropdown UI before the 3 Aug run. (The D06
-artifact import is complete — all 7 work-products are saved and checksummed; live-UI and orphan
-claims are now VERIFIED_FROM_FILE.)
+Swap the monthly routine's HTML BLOCK 1 to the new dropdown UI before the 3 Aug run. (D06 artifacts
+fully imported; for D07, export + import `live_v4_movrule.html` and engine v3 to close the two
+MISSING_ARTIFACT items.)
 
 ## Pass / Fail Rule
 

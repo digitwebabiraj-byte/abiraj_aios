@@ -34,7 +34,8 @@ only when backed by a saved, checksummed file inside this project; live-only out
 | PH_ASIN_Monthly_Routine.txt | C:\Users\digit\OneDrive\Desktop\Postgress_backup\files.zip → PH_ASIN_Monthly_Routine.txt | prompts/implementation/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_monthly_routine.txt | 38322 | 947879174d87d7f4632e1150a62b05784882e909e8224e85e8706d568c95d1ed | MONTHLY_ROUTINE | IMPORTED (checksum matched) |
 | PH_ASIN_Protocol_v1.0_Clarifications.md | C:\Users\digit\OneDrive\Desktop\Postgress_backup\PH_ASIN_Protocol_v1.0_Clarifications.md | validation/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_protocol_v1_clarifications.md | 4963 | 1de131c25557462929f351dc37b4d4a94eb24fcd519e7772dfe5e4b0cc99f359 | PROTOCOL_CLARIFICATION | IMPORTED (checksum matched) |
 | unowned_asins_for_assignment_2026-07.csv (Orphan-ASIN assignment output; file keeps older "unowned" term) | C:\Users\digit\Downloads\unowned_asins_for_assignment_2026-07.csv | evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_unowned_asins_for_assignment_2026-07.csv | 27447 | d4f288d0a47c729275a73f84ea1c4130ad0e4c1a5ca9a41a20e56214267af02c | ORPHAN_ASSIGNMENT_OUTPUT | IMPORTED 2026-07-02 (checksum matched; 492 data rows) |
-| preview_v2.html (confirmed by Abiraj as the latest/live id-5 v2 dashboard) | C:\Users\digit\Downloads\preview_v2.html | evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_dashboard_id5_live_2026-07.html | 884658 | 951354efd8969d7d97762f9fc6a8d6e5172687524a418fe98f75179f321711b6 | LIVE_HTML_SNAPSHOT | IMPORTED 2026-07-02 (checksum matched) |
+| preview_v2.html | C:\Users\digit\Downloads\preview_v2.html | ~~2026-07-01_ph_asin_dashboard_id5_live_2026-07.html~~ **re-homed 2026-07-03** → evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-02_ph_asin_dashboard_v2_restyle_preview.html | 884658 | 951354efd8969d7d97762f9fc6a8d6e5172687524a418fe98f75179f321711b6 | ~~LIVE_HTML_SNAPSHOT~~ → **DASHBOARD_PREVIEW (belongs to D07)** | **CORRECTED**: this file is the **2 Jul restyle**, not the 1 Jul navy dashboard. Re-homed to the D07 record. |
+| PH_ASIN_Dashboard_id5_LIVE_2026-07.html (the true 1 Jul navy dropdown build, 879,907 B) | — (never exported; survives only in DB backup `ph_task_id5_backup_20260702_css`) | evidence/final_outputs/REQ-05_ph-asin-segmentation/ (reserved) | — | — | LIVE_HTML_SNAPSHOT | **MISSING_ARTIFACT** (correction 2026-07-03) |
 | PH_ASIN_Dashboard_PH_view_TEMPLATE.html | C:\Users\digit\Downloads\PH_ASIN_Dashboard_PH_view_TEMPLATE.html | evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_dashboard_ph_view_template.html | 752008 | 1bb90b8cca63a2457a27c76bdbf5879e3f0aa61fd62c2cf402c23ff4025319c0 | UI_TEMPLATE | IMPORTED 2026-07-02 (checksum matched) |
 
 ### Note on the historical engine
@@ -61,17 +62,22 @@ A separate undated `ph_segment_engine.sql` copy exists in `DigitWeb_Works_Abiraj
 | Monthly routine updated to v2 engine + live orphan wiring; HTML shell BLOCK 1 still old UI | Imported `2026-07-01_ph_asin_monthly_routine.txt` | VERIFIED_FROM_FILE (file present) | BLOCK 1 old-UI gap confirmed in file (see Gap B) |
 | Protocol v1.0 clarifications (lateral-SAME, zero-click→LOW, conv>clicks→HIGH, HLL→HLH, LHL→HHL) | Imported `2026-07-01_ph_asin_protocol_v1_clarifications.md` | VERIFIED_FROM_FILE | Sign-off line present for Bietrick |
 | Full pre-drop verification: 8,146/8,149 rows reconcile exactly (3 differ ±1 conv) | D06 §2 Change 16, §3 Finding G | DOCUMENTED_IN_D06 | Live reconciliation; no saved output; backups deliberately KEPT |
-| UI redesigned to dropdown/one-view table, classification logic unchanged, pushed live twice | D06 §2 Change 17-19, §3 Finding H/I + imported `2026-07-01_ph_asin_dashboard_id5_live_2026-07.html` (884,658 B) + `..._ph_view_template.html` | VERIFIED_FROM_FILE (saved dashboard HTML proves the dropdown/status-column UI) | Saved copy = 884,658 B vs D06-cited ~879,907 B (minor); live DB row not queried, so byte-identity to id 5 is LIVE_STATE_NOT_RECHECKED |
+| UI redesigned to dropdown/one-view table, classification logic unchanged, pushed live twice | D06 §2 Change 17-19, §3 Finding H/I + `..._ph_view_template.html` | DOCUMENTED_IN_D06 (**corrected 2026-07-03**) | The saved dashboard HTML previously cited here was the **2 Jul restyle** (re-homed to D07), **not** the 1 Jul navy build — which was never exported. The UI template supports the layout; the exact 1 Jul live HTML is MISSING_ARTIFACT |
 | Live output row `tech_team_outputs.ph_task` id 5 is the current dashboard | D06 §2 Change 19 metadata | LIVE_STATE_NOT_RECHECKED | DB not queried during this import; the imported HTML is the confirmed latest v2 build (Abiraj) |
 
 ## Missing Artifacts
 
-**NONE — resolved 2026-07-02.** The three artifacts initially absent were supplied by Abiraj from
-`C:\Users\digit\Downloads\` and imported with matching checksums:
+**Correction 2026-07-03.** On 2 Jul this section read "NONE — resolved," treating `preview_v2.html`
+as the 1 Jul live dashboard. That was wrong: `preview_v2.html` is the **2 Jul restyle** (D07), now
+re-homed. So the D06 status is:
 
-1. `unowned_asins_for_assignment_2026-07.csv` (492 rows) → `evidence/final_outputs/…/2026-07-01_unowned_asins_for_assignment_2026-07.csv`.
-2. `preview_v2.html` (latest/live id-5 v2 dashboard) → `…/2026-07-01_ph_asin_dashboard_id5_live_2026-07.html`.
-3. `PH_ASIN_Dashboard_PH_view_TEMPLATE.html` → `…/2026-07-01_ph_asin_dashboard_ph_view_template.html`.
+- ✅ `unowned_asins_for_assignment_2026-07.csv` (492 rows) — imported (D06).
+- ✅ `PH_ASIN_Dashboard_PH_view_TEMPLATE.html` — imported (D06).
+- ✅ Engine v2, monthly routine, protocol clarifications, D06 knowledge file — imported (D06).
+- ❌ **`PH_ASIN_Dashboard_id5_LIVE_2026-07.html`** (the true 1 Jul navy dropdown build, 879,907 B) —
+  **MISSING_ARTIFACT**; never exported to a file (only in DB backup `ph_task_id5_backup_20260702_css`).
+  The file previously placed here was the 2 Jul restyle, re-homed to
+  `evidence/final_outputs/…/2026-07-02_ph_asin_dashboard_v2_restyle_preview.html` (D07 record).
 
 Original discovery (1 Jul) searched the entire `DigitWeb_Works_Abiraj` tree, `Desktop/Postgress_backup/`
 (incl. `files.zip`), and a depth-4 `Desktop` sweep. No replacements were ever invented.
@@ -91,10 +97,12 @@ Original discovery (1 Jul) searched the entire `DigitWeb_Works_Abiraj` tree, `De
 
 ## Result
 
-**PASS (updated 2026-07-02)** — the D06 daily knowledge file and **all 6 named supporting
-artifacts** are now imported with matching checksums (4 on 1 Jul, 3 on 2 Jul). No artifact is
-missing. REQ-05 mapping is confirmed and unambiguous. Live-DB and live-dashboard *state* claims
-remain honestly labelled LIVE_STATE_NOT_RECHECKED (the DB was not queried), but every named
-work-product now exists as a checksummed file in the repo.
+**AMBER (corrected 2026-07-03)** — the D06 daily knowledge file and 5 of the 6 named supporting
+artifacts are imported with matching checksums (orphan/unowned CSV, UI template, engine v2, monthly
+routine, protocol clarifications). The 6th — the **1 Jul navy live dashboard HTML** — is
+**MISSING_ARTIFACT**: it was never exported (only in DB backup), and the file briefly counted as it
+was actually the 2 Jul restyle, now re-homed to the D07 record. REQ-05 mapping is confirmed; no
+DB/commit action.
 
-_(Superseded status: this manifest was AMBER at first creation on 1 Jul, when 3 artifacts were absent.)_
+_History: AMBER at creation (1 Jul, 3 artifacts absent) → wrongly marked PASS (2 Jul) → corrected back
+to AMBER (3 Jul) once `preview_v2` was identified as the D07 restyle via the D07 chat + knowledge file._

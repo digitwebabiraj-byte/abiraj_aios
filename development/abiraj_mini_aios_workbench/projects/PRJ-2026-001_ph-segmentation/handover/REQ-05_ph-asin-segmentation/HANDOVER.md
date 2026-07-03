@@ -100,10 +100,11 @@ Recorded read-only from the D06 knowledge file; live session run by Abiraj. Impo
   monitor view created.
 - **Files delivered & imported** (all checksum-matched): engine v2 (`2026-07-01_ph_segment_engine_v2.sql`),
   updated monthly routine (`2026-07-01_ph_asin_monthly_routine.txt`), protocol clarifications
-  (`2026-07-01_ph_asin_protocol_v1_clarifications.md`), the D06 knowledge file, and — imported 2 Jul —
-  the live dashboard HTML (`evidence/final_outputs/…/2026-07-01_ph_asin_dashboard_id5_live_2026-07.html`),
-  the UI review template (`…_ph_view_template.html`), and the orphan/unowned assignment CSV
+  (`2026-07-01_ph_asin_protocol_v1_clarifications.md`), the D06 knowledge file, the UI review template
+  (`…_ph_view_template.html`), and the orphan/unowned assignment CSV
   (`…/2026-07-01_unowned_asins_for_assignment_2026-07.csv`, 492 rows).
+  **Correction 2026-07-03:** the "live dashboard HTML" briefly listed here was the 2 Jul restyle
+  (`preview_v2`), re-homed to the D07 record; the true 1 Jul navy live HTML was never exported → MISSING_ARTIFACT.
 - **Logic changed**: movement window = last 4 complete weeks vs the previous 4 complete weeks
   (Option A live; Option B baked into engine v2 for future cycles); returning-aware NEW rule (8-week
   lookback); Orphan ASIN formally defined (user_name NULL across 4 sources).
@@ -135,9 +136,44 @@ Recorded read-only from the D06 knowledge file; live session run by Abiraj. Impo
 - Do not drop backup tables without a separately approved housekeeping task.
 - Do not execute the monthly routine merely to validate its documentation.
 
+## 2 July 2026 Increment (REQ-05-D07)
+
+Recorded read-only from the D07 knowledge file; live session run by Abiraj. Import result **AMBER**.
+
+- **What is now live** (DOCUMENTED_IN_D07, DB not queried): dashboard row `ph_task` id 5 = 888,511 B with
+  a **gold-header / slate-teal restyle**, **redesigned colour-coded cards** (Champions green, Dead Horses
+  red), and the **strict segment-rank movement rule** (HHH=1…LLL=6) — 65 rows moved SAME→IMPROVED/DECLINED.
+- **Files delivered & imported** (checksummed): the D07 knowledge file; three dashboard previews
+  (`v2_restyle`, `v3_cards`, `catfilter`); **24 per-PH locked views** (each PH sees only their own data,
+  dropdown hidden); the chat transcript.
+- **Logic changed**: movement now uses strict segment rank (distinct HHL/HLH/LHH) instead of the tied
+  equal-weight h-count. **User-decided (2 Jul), not a Bietrick protocol sign-off** — so the live movement
+  and engine v3 use strict rank, but this is not yet ratified as protocol.
+- **Logic NOT changed**: 6-segment classification, Method-A CVR benchmark, scope, conversion edges,
+  Option-B letter map. Restyle/cards are presentation only.
+- **Database objects involved**: read-only verification SELECTs; backups `ph_task_id5_backup_20260702_css`,
+  `_cards`, `_movdata`, `ph_segment_report_backup_20260702_movrule`; three live pushes (byte/md5-verified);
+  strict-rank UPDATE on `ph_segment_report` (65 rows) + 65-row baked-data fix in id 5; sandbox engine
+  validation (schema `sandbox.*`, dropped after).
+- **Scratch-only**: engine v3 (strict-rank) validated in sandbox, **not** run against the live report.
+- **Backups remaining**: `_css`, `_cards`, `_movdata`, `_movrule`, plus the carried D06/30-Jun set — all KEPT.
+- **Routine UI-shell risk**: the monthly routine's BLOCK 1 still builds the **old** layout; a 3 Aug run
+  before it is swapped would overwrite the new UI.
+- **Missing artifacts (AMBER driver)**: `live_v4_movrule.html` (exact final live, 888,511 B) and
+  `ph_segment_engine.sql` v3 — not on disk. `preview_v3` (888,305 B) is the closest saved proxy.
+- **D06 correction**: the "1 Jul live dashboard" file was actually the 2 Jul restyle (preview_v2), now
+  re-homed to D07; the true 1 Jul navy build was never exported (only in DB backup `_css`).
+
+### Do Not Repeat
+
+- Do not treat the strict-rank movement rule as Bietrick-ratified protocol — it is a user-directed change awaiting sign-off.
+- Do not run engine v3 against the frozen 2026-07 report.
+- Do not adopt the reference dashboard's weighted-CVR method.
+- Do not drop any backup (`_css`/`_cards`/`_movdata`/`_movrule`/carried) without a separately approved housekeeping task.
+- Do not run the monthly routine merely to validate its documentation; and swap BLOCK 1 before the 3 Aug run.
+
 ## One Next Step
 
-Swap the monthly routine's HTML shell (BLOCK 1) to the new dropdown UI before the 3 Aug run. All D06
-artifacts (incl. the live dashboard HTML, UI template and orphan/unowned CSV) are now imported and
-checksummed, so the D06 artifact-import step is closed. Any future SQL execution still requires
-written write authorisation.
+Swap the monthly routine's HTML shell (BLOCK 1) to the new dropdown/restyled UI before the 3 Aug run,
+and export + import the two D07 MISSING artifacts (`live_v4_movrule.html`, engine v3). Any future SQL
+execution still requires written write authorisation.

@@ -168,33 +168,44 @@ Status: CONFIRMED (Business Validator: Bietrick — confirmed by Abiraj on 2026-
 ## Project Status
 
 ACTIVE. Single task **REQ-05_ph-asin-segmentation**: onboarding/preservation scope CLOSED-PASS,
-now in a **delivery phase**. Three delivery increments recorded: the 26 June 2026 dashboard UI fix &
-live release, the 30 June 2026 final-June refresh + report validation + data-quality review, and the
+now in a **delivery phase**. Four delivery increments recorded: the 26 June 2026 dashboard UI fix &
+live release, the 30 June 2026 final-June refresh + report validation + data-quality review, the
 **1 July 2026 (REQ-05-D06)** Option-A movement fix + Orphan-ASIN routing + engine v2 + protocol
-clarifications + dropdown UI redesign.
+clarifications + dropdown UI redesign, and the **2 July 2026 (REQ-05-D07)** live restyle + card
+redesign + strict-rank movement rule + engine v3 + 24 per-PH views.
 
-## Latest Increment (updated 2026-07-01)
+## Latest Increment (updated 2026-07-02)
 
 | Field | Value |
 |---|---|
-| Latest Work Date | 2026-07-01 |
-| Latest Deliverable | REQ-05-D06 |
+| Latest Work Date | 2026-07-02 |
+| Latest Deliverable | REQ-05-D07 |
 | Project Status | ACTIVE |
-| Current live UI | PH dropdown + one-view flat table (`ph_task` id 5); saved HTML imported 2 Jul (`evidence/final_outputs/…/2026-07-01_ph_asin_dashboard_id5_live_2026-07.html`) — VERIFIED_FROM_FILE (live DB row not re-queried) |
-| Current live cycle | 2026-07 on the approved Option-A movement state (segments unchanged 8,149) |
-| Future engine | v2 four-week engine (`2026-07-01_ph_segment_engine_v2.sql`) — first live run 3 Aug |
+| Current live UI | **Restyled** dashboard (`ph_task` id 5 = 888,511 B): gold header + slate/teal body, redesigned colour-coded cards, strict-rank movement. Closest saved copy = `evidence/final_outputs/…/2026-07-02_ph_asin_dashboard_v3_cards_preview.html` (888,305 B); exact `live_v4_movrule.html` is MISSING_ARTIFACT (live DB row not re-queried) |
+| Current live movement rule | **Strict segment rank** (HHH=1…LLL=6) — user-decided 2 Jul, **not yet Bietrick-ratified**; 65 rows moved SAME→IMPROVED/DECLINED |
+| Future engine | **v3** strict-rank (sandbox-validated, first live run 3 Aug) — **engine v3 SQL is MISSING_ARTIFACT**; v2 (`2026-07-01_ph_segment_engine_v2.sql`) is in repo |
+| Per-PH deliverable | 24 per-PH locked views in `evidence/final_outputs/…/2026-07-02_ph_per_holder_views/` (+ `.sha256`) |
 | Orphan monitor | `analytics.v_orphan_asins` (permanent view) + live dashboard flag |
 | Main open gap | monthly routine HTML BLOCK 1 still builds the **old** UI (swap before 3 Aug) |
 | Automation | PENDING (Cloud Routine — Windows VM Platform feature) |
-| Import result | PASS (updated 2 Jul) — D06 + **all 6** supporting artifacts imported & checksummed (4 on 1 Jul, 3 on 2 Jul); nothing missing. Was AMBER on 1 Jul. Delivery still ACTIVE (routine BLOCK-1 swap + engine-v2 first run open) |
+| Import result | **AMBER (2 Jul, D07)** — knowledge file + 3 previews + 24 per-PH views + transcript imported & checksummed; `live_v4_movrule.html` + engine v3 MISSING_ARTIFACT. (D06 import remains PASS.) |
+
+Records (D07): `handover/REQ-05_ph-asin-segmentation/2026-07-02__abiraj__ph-asin__REQ-05-D07.md`,
+`.../TASK_HOME.md`, `.../HANDOVER.md`,
+`evidence/logs_or_screenshots/REQ-05_ph-asin-segmentation/2026-07-02_req-05-d07_source_manifest.md` (+ update-evidence),
+`duplicate_risk_reports/REQ-05_ph-asin-segmentation/2026-07-02_req-05-d07_duplicate_risk.md`,
+`validation/REQ-05_ph-asin-segmentation/2026-07-02_req-05-d07_aios_validation.md`,
+`evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-02_ph_asin_dashboard_{v2_restyle,v3_cards,catfilter}_preview.html`,
+`.../2026-07-02_ph_per_holder_views/`.
 
 Records: `handover/REQ-05_ph-asin-segmentation/2026-07-01__abiraj__ph-asin__REQ-05-D06.md`,
 `.../TASK_HOME.md`, `.../HANDOVER.md`,
 `evidence/logs_or_screenshots/REQ-05_ph-asin-segmentation/2026-07-01_req-05-d06_source_manifest.md`
 (+ update-evidence), `duplicate_risk_reports/REQ-05_ph-asin-segmentation/2026-07-01_req-05-d06_duplicate_risk.md`,
 `validation/REQ-05_ph-asin-segmentation/2026-07-01_req-05-d06_aios_validation.md`,
-`evidence/final_outputs/REQ-05_ph-asin-segmentation/` (2 Jul: `2026-07-01_ph_asin_dashboard_id5_live_2026-07.html`,
-`2026-07-01_ph_asin_dashboard_ph_view_template.html`, `2026-07-01_unowned_asins_for_assignment_2026-07.csv`).
+`evidence/final_outputs/REQ-05_ph-asin-segmentation/` (2 Jul: `2026-07-01_ph_asin_dashboard_ph_view_template.html`,
+`2026-07-01_unowned_asins_for_assignment_2026-07.csv`; the dashboard HTML once listed here was the 2 Jul
+restyle, re-homed to the D07 record — see the D06 manifest correction of 2026-07-03).
 
 ## Active Tasks (updated 2026-06-30)
 
