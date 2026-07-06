@@ -258,7 +258,7 @@ and `.../2026-07-02_ph_asin_dashboard_catfilter_preview.html`. Both source docs 
 
 - Daily knowledge: `handover/REQ-05_ph-asin-segmentation/2026-07-03__abiraj__ph-asin__REQ-05-D08.md`
 - Manifest / update-evidence / duplicate-risk / validation: matching `2026-07-03_req-05-d08_*` records.
-- (Cross-refs: the D07 per-PH views + clarity preview above.)
+- (Cross-refs: the D07 per-PH views + the clarity build `…_catfilter_preview.html` — now the live dashboard, md5 `1f657a1b`.)
 
 ### Current Live State (DOCUMENTED_IN_D08 — NOT RECHECKED)
 
