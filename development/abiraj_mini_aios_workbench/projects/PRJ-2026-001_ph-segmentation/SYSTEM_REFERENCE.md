@@ -284,14 +284,17 @@ PASS) and **ACTIVE**.
 
 **Delivery increments recorded (all imported PASS/GREEN as of 2026-07-06):** D06 (1 Jul) Option-A movement
 fix + Orphan-ASIN + engine v2 + protocol clarifications + dropdown UI · D07 (2 Jul) restyle + card redesign
-+ strict-rank movement + strict-rank engine · D08 (3 Jul) Assigned-Listings confirmation + clarity pass +
-24 per-PH locked views. Live output: `tech_team_outputs.ph_task` id 5.
++ strict-rank movement + strict-rank engine · D08 (3 Jul) Assigned-Listings confirmation + clarity pass
+(**pushed LIVE 3 Jul 14:19, md5 `1f657a1b`**) + 24 per-PH locked views · D09 (6 Jul) backup housekeeping —
+9 `ph_task_id5_backup_*` archived + dropped (≈1.8 MB), live id-5 md5 unchanged, 3 report backups kept.
+Live output: `tech_team_outputs.ph_task` id 5 (current build = the 3 Jul clarity/catfilter, md5 `1f657a1b`).
 
 **Open items (delivery, not this document):**
 - Monthly routine (`PH_ASIN_Monthly_Routine.txt`) still builds the **old** UI shell — must be swapped to the
   new dropdown UI before the next auto-run (3 Aug) or that run would revert the live dashboard.
+- `analytics.v_orphan_asins` view not backed up as a file — export `v_orphan_asins.sql`.
 - Bietrick sign-offs pending: the **NEW definition** (live 191 vs engine 121), the **edge-case protocol**,
-  and the **492 Orphan-ASIN assignments**.
+  and the **492 Orphan-ASIN assignments**; the 3 report backups stay until acceptance.
 - The strict-rank movement rule is live but **not yet formally ratified** as protocol.
 
 The workbench holds the engines **stored, not executed**; any live monthly run requires a new task,

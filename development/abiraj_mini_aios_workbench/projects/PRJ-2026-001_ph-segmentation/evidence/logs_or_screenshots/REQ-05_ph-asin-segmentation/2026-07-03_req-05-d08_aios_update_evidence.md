@@ -7,7 +7,7 @@ PRJ-2026-001_ph-segmentation · REQ-05 · REQ-05-D08 (fifth-day increment; **not
 ## What This Records
 
 Controlled documentation import of the 3 July 2026 (Phase-08) work — a **read-only** increment
-(count confirmation + preview-only clarity pass + 24 per-PH hand-over files). Import + register
+(count confirmation + clarity pass [pushed LIVE 3 Jul] + 24 per-PH hand-over files). Import + register
 updates only; the D08 session itself did no live writes, and this run does no DB/SQL/commit.
 
 ## Files Copied (checksum-recorded)
@@ -48,7 +48,7 @@ TASK_REGISTER.md (REQ-05 row — no new row), root PROJECT_REGISTER.md.
 | Action | Status |
 |---|---|
 | Database execution / SQL | NONE |
-| Live dashboard modification | NONE (clarity pass stays a preview) |
+| Live dashboard modification | NONE by the workbench (the clarity pass itself was pushed live 3 Jul in Abiraj's DB session) |
 | Automation execution / creation | NONE |
 | Backup tables dropped | NONE |
 | Existing canonical file overwritten / moved | NONE (D07 deliverables referenced in place) |

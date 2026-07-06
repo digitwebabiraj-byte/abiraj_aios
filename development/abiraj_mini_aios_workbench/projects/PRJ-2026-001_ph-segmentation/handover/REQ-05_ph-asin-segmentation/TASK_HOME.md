@@ -242,8 +242,8 @@ present (imported here or cross-referenced from D07).
 
 - **Assigned Listings confirmed correct** — read-only re-derivation per PH reconciled to `traffic_data`,
   **diff 0 for all 24 PHs** (paulr = 466 listings / 464 distinct ASINs).
-- **Preview-only clarity pass** — jargon removed ("Method-A"/"returning-aware" → 0), category-click filter,
-  explicit window dates, per-PH allocated card, plainer labels. **Preview only — NOT pushed live.**
+- **Clarity pass** — jargon removed ("Method-A"/"returning-aware" → 0), category-click filter,
+  explicit window dates, per-PH allocated card, plainer labels. **Pushed LIVE 3 Jul 14:19** (md5 `1f657a1b`). *(Corrected 6 Jul from "preview only".)*
 - **24 single-PH-locked standalone dashboards** — one per PH, other PHs' data physically removed, dropdown
   hidden, filenames per Bietrick's authoritative list.
 
@@ -262,8 +262,9 @@ and `.../2026-07-02_ph_asin_dashboard_catfilter_preview.html`. Both source docs 
 
 ### Current Live State (DOCUMENTED_IN_D08 — NOT RECHECKED)
 
-- Live dashboard `ph_task` id 5 **unchanged from D07** (restyle + cards + strict-rank movement); the
-  clarity pass is a preview pending Bietrick approval.
+- Live dashboard `ph_task` id 5 = the restyle + cards + strict-rank movement, **plus the clarity pass
+  which was pushed LIVE on 3 Jul 14:19** (md5 `1f657a1b`). *(Corrected 6 Jul — D08 originally recorded the
+  clarity pass as "preview only"; it went live the same day.)*
 
 ### Open Gaps (carried)
 
@@ -282,14 +283,58 @@ and `.../2026-07-02_ph_asin_dashboard_catfilter_preview.html`. Both source docs 
 
 Get Bietrick approval to push the clarity pass live; keep the monthly-routine UI swap on track before 3 Aug.
 
+## Daily Increment — REQ-05-D09 — 2026-07-06
+
+Sixth recorded delivery increment of REQ-05 (Phase-09). **Not a new Task ID.** Executed live by Abiraj —
+the project's **first `DROP TABLE`** — imported read-only. Import result **GREEN/PASS**.
+
+### Work Completed (from the D09 knowledge file)
+
+- **Backup housekeeping.** Archived the **9 `tech_team_outputs.ph_task_id5_backup_*`** dashboard backups to
+  local byte-verified files (+ manifest), then **dropped them in a single transaction** (≈1.8 MB reclaimed).
+- **Pre-check:** live `ph_task` id 5 present · 9 targets · 3 report backups. **Post-check:** 0 id-5 backups
+  remain · **live id-5 `md5` = `1f657a1b` unchanged** · 3 report backups intact.
+- **Kept:** live `ph_task` (all rows) + 3 `analytics.ph_segment_report_backup_{20260630, 20260702_movrule, opta}`
+  (rollback net) + 492 orphan assignments — held for Bietrick sign-off.
+- Established the reusable **archive-first + fingerprint-guarded drop** method.
+
+### Canonical Assets (this increment)
+
+- Daily knowledge: `handover/REQ-05_ph-asin-segmentation/2026-07-06__abiraj__ph-asin__REQ-05-D09.md`
+- Manifest / update-evidence / duplicate-risk / validation: matching `2026-07-06_req-05-d09_*` records.
+- The 9 archive files + local manifest + drop script live on Abiraj's PC (LOCAL_NOT_IMPORTED; per-table sizes in the D09 knowledge file §2).
+
+### D08 correction (folded in 6 Jul)
+
+The D08 clarity pass, recorded as "preview only, not pushed live," was in fact **pushed LIVE on 3 Jul 14:19**
+(dashboard `md5 1f657a1b` = the imported catfilter build). The current live dashboard is that catfilter
+build, confirmed unchanged by D09's post-check. The D08 EOD source file is preserved unchanged.
+
+### Open Gaps (carried)
+
+- `analytics.v_orphan_asins` view not backed up as a file — export `v_orphan_asins.sql`.
+- Monthly routine HTML BLOCK 1 still old UI — swap before the 3 Aug run.
+- 3 report backups + 492 orphan assignments retained pending Bietrick acceptance.
+- Bietrick sign-offs: NEW definition (191 vs 121), edge-case protocol, 492 orphan assignments.
+
+### Status
+
+- Daily Increment REQ-05-D09: **COMPLETE** (import **GREEN/PASS**).
+- Requirement REQ-05: **ACTIVE — FOLLOW-UP WORK REMAINS**.
+
+### Next Step
+
+Export `v_orphan_asins.sql`; swap the monthly routine's BLOCK-1 UI before the 3 Aug run.
+
 ## Current Status
 
 CLOSED for the onboarding/preservation scope (PASS) — **in a DELIVERY phase since 2026-06-26**,
-with five recorded delivery increments of this same requirement: 26 Jun (dashboard UI fix + live
+with six recorded delivery increments of this same requirement: 26 Jun (dashboard UI fix + live
 release), 30 Jun (final-June refresh + validation), **1 Jul (REQ-05-D06 — Option-A movement
 fix, Orphan ASIN routing, engine v2, protocol clarifications, dropdown UI redesign)**, **2 Jul
-(REQ-05-D07 — restyle + card redesign + strict-rank movement + engine v3 + 24 per-PH views)**, and
-**3 Jul (REQ-05-D08 — read-only Assigned-Listings confirmation + clarity preview + 24 per-PH hand-over)**. None are
+(REQ-05-D07 — restyle + card redesign + strict-rank movement + engine v3 + 24 per-PH views)**,
+**3 Jul (REQ-05-D08 — Assigned-Listings confirmation + clarity pass [pushed LIVE 3 Jul] + 24 per-PH hand-over)**,
+and **6 Jul (REQ-05-D09 — backup housekeeping: 9 id-5 backups archived + dropped)**. None are
 new Task IDs.
 
 ## Final Task Result

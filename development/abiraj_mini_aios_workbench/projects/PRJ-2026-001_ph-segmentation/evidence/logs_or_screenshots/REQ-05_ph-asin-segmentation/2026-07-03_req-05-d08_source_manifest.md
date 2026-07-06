@@ -28,9 +28,9 @@ the D08 knowledge file (live read-only, not re-derived here); **LIVE_STATE_NOT_R
 
 1. **Assigned Listings confirmation** — read-only re-derivation per PH reconciled to `public.traffic_data`,
    **diff 0 for all 24 PHs** (paulr = 466 listings / 464 distinct ASINs). The count each PH's card shows.
-2. **Preview-only clarity pass** — jargon removed ("Method-A", "returning-aware" → 0 remaining), category-click
+2. **Clarity pass** — jargon removed ("Method-A", "returning-aware" → 0 remaining), category-click
    filtering, explicit window date ranges (31 May–27 Jun vs 3 May–30 May), a per-PH allocated card, plainer
-   Segment-mix / Movement labels. **Preview only — not pushed live** (live `ph_task` id 5 unchanged from D07).
+   Segment-mix / Movement labels. **Pushed LIVE 3 Jul 14:19** (md5 `1f657a1b`). *(Corrected 6 Jul — the D08 EOD recorded it as "preview only"; it went live the same day.)*
 3. **24 single-PH-locked standalone dashboards** — one per PH, other PHs' data physically removed, dropdown
    hidden, filenames per Bietrick's authoritative spelling list.
 
@@ -81,5 +81,5 @@ labelled DOCUMENTED_IN_D08 (no query output was exported — not a missing file,
 
 **GREEN / PASS** — D08 is a read-only increment; its knowledge file is imported and checksummed, and every
 deliverable is present in the repo (imported here or cross-referenced from D07). No live write, no push, no
-duplication, no new missing artifact. The clarity pass remains a **preview pending Bietrick approval** — a
-project state, not an import gap.
+duplication, no new missing artifact. *(Update 6 Jul: the clarity pass was **pushed LIVE 3 Jul 14:19**,
+md5 `1f657a1b` — the D08 EOD's "preview only" reflected the state at time of writing.)*

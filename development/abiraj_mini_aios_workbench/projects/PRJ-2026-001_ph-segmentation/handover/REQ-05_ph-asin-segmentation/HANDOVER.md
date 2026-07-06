@@ -181,7 +181,7 @@ Recorded from the D08 knowledge file. A **read-only** day — no live DB writes,
 - **What was confirmed** (DOCUMENTED_IN_D08): the dashboard **Assigned Listings** count is correct for
   **all 24 PHs** — re-derived read-only and reconciled to `traffic_data`, **diff 0** (paulr 466/464).
 - **What is now live**: **unchanged from D07** — the clarity pass (jargon removal, category filter, window
-  dates, allocated card) is a **preview only**, not pushed to `ph_task` id 5.
+  dates, allocated card) was **pushed LIVE on 3 Jul 14:19** (md5 `1f657a1b`). *(Corrected 6 Jul — the D08 EOD recorded it as "preview only"; it went live the same day.)*
 - **Files**: the D08 knowledge file imported; the **24 per-PH locked views** and the **clarity preview** are
   the D08 deliverables but were physically imported under **D07** (dated 2 Jul in the D07 chat) — referenced
   by path, not duplicated. The `…D08(old).md` draft was **not** imported (superseded, vague name).
@@ -190,9 +190,27 @@ Recorded from the D08 knowledge file. A **read-only** day — no live DB writes,
 
 ### Do Not Repeat
 
-- Do not treat the clarity pass as live — it is a preview pending Bietrick approval; push only via the D07 backup-first, byte-verified method.
+- The clarity pass **is live** (pushed 3 Jul, md5 `1f657a1b`); any further live change still uses the D07 backup-first, byte-verified method.
 - Do not hand out per-PH files as live/auto-updating — they are a 2026-07 snapshot; regenerate each cycle.
 - Do not re-import or move the 24 per-PH views / clarity preview — they have one canonical home under the D07 date.
+
+## 6 July 2026 Increment (REQ-05-D09)
+
+Recorded from the D09 knowledge file — the project's **first `DROP TABLE`**. Import **GREEN/PASS**.
+
+- **What was done** (DOCUMENTED_IN_D09): the **9 disposable `ph_task_id5_backup_*`** dashboard backups were
+  **archived to byte-verified local files first, then dropped in a single transaction** (≈1.8 MB reclaimed).
+- **Safety proof:** pre-check (9 targets · live id-5 · 3 report backups) → drop → post-check (**0 remain ·
+  live id-5 md5 `1f657a1b` unchanged · 3 report backups intact**). Archive-first + fingerprint-guarded.
+- **Kept (not touched):** live `ph_task` (all rows), the 3 `analytics.ph_segment_report_backup_*` (rollback
+  net), and the 492 orphan assignments — all held for Bietrick sign-off.
+- **Local (not in repo):** the 9 archive files + manifest + drop script are on Abiraj's PC (per-table sizes in the D09 knowledge file §2).
+
+### Do Not Repeat
+
+- Do not drop the 3 report backups or act on the 492 orphan assignments without Bietrick's formal acceptance.
+- Do not run any DROP without archive-first + a before/after live-md5 fingerprint check.
+- The dropped id-5 backups are gone from the DB but restorable from the local archives only.
 
 ## One Next Step
 

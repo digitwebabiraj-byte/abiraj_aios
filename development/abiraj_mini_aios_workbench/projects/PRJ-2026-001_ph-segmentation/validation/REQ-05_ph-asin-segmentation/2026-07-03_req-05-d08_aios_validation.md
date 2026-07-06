@@ -29,7 +29,7 @@ PRJ-2026-001_ph-segmentation · REQ-05 · REQ-05-D08
 
 From the repo alone a clean LLM can explain: that D08 confirmed Assigned Listings for all 24 PHs (diff 0,
 paulr 466/464); that the clarity pass and 24 per-PH views are D08 deliverables physically stored under the
-D07 date (attribution overlap noted); that the clarity pass is a preview not yet pushed live; and that the
+D07 date (attribution overlap noted); that the clarity pass was pushed live 3 Jul (md5 `1f657a1b`; the D08 EOD said "preview" but it went live the same day); and that the
 day was read-only. PASS.
 
 ## Result Rules Applied
