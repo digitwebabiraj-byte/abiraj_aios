@@ -15,7 +15,7 @@ PRJ-2026-001_ph-segmentation · REQ-05 · REQ-05-D07
 | 5 | No REQ-06 / new task row | register row updated in place | PASS | — |
 | 6 | Artifacts inventoried | manifest tables all items (present + missing) | PASS | — |
 | 7 | Available artifacts copied once | 3 previews + 24 views + knowledge + transcript | PASS | — |
-| 8 | Missing artifacts identified | live_v4_movrule + engine v3 flagged MISSING_ARTIFACT | PASS | drives AMBER |
+| 8 | Missing artifacts resolved | strict-rank engine imported 6 Jul (`3164f427`); only the superseded 2 Jul intermediate live remains absent (current catfilter live is imported) | PASS | none needed |
 | 9 | 24 per-PH views verified | folder + 24-entry checksum index; names match authoritative list | PASS | — |
 | 10 | D06 mislabel corrected | preview_v2 re-homed; D06 records annotated | PASS | — |
 | 11 | TASK_HOME / HANDOVER / PROJECT_HOME updated | D07 sections added | PASS | — |
@@ -33,28 +33,29 @@ PRJ-2026-001_ph-segmentation · REQ-05 · REQ-05-D07
 
 From the repo alone a clean LLM can explain: the restyle, card redesign, and strict-rank movement
 rule; why strict-rank changed 65 lateral moves; that engine v3 was sandbox-only; where the previews
-and 24 per-PH views are; which artifacts (final live HTML, engine v3) are missing and why; and the
+and 24 per-PH views are; that the strict-rank engine is imported (6 Jul) and only the superseded 2 Jul intermediate live is absent; and the
 D06 mislabel correction. PASS.
 
 ## Result Rules Applied
 
-- **PASS** would require all named artifacts present. Two (final live HTML, engine v3) are absent.
-- **AMBER** applies: knowledge file + previews + 24 views + transcript imported and checksummed;
-  final live build and engine v3 are MISSING_ARTIFACT.
+- **PASS** requires all named artifacts present — **now met (6 Jul):** the strict-rank engine is imported;
+  the only absent item is the 2 Jul *intermediate* live build, which is superseded by the imported current
+  catfilter live, so nothing needed is missing.
+- **AMBER** (2 Jul) no longer applies now that the engine is imported.
 - **RED** does not apply: no checksum change, no second REQ-05/REQ-06, no overwrite (preview_v2 re-homed,
   content identical), no DB access.
 
 ## Validation Decision
 
-**AMBER** — faithful, read-only, checksum-verified import; two artifacts absent and honestly recorded;
-D06 mislabel corrected. IDs consistent; another developer can continue.
+**PASS (updated 2026-07-06)** — faithful, read-only, checksum-verified import; the strict-rank engine is
+now imported and the only absent item (2 Jul intermediate live) is superseded by the imported current
+live. IDs consistent; another developer can continue. _(Was AMBER on 2 Jul while the engine was off-disk.)_
 
-> The AIOS import is AMBER only for the two missing files. The **REQ-05 delivery** remains ACTIVE:
-> routine BLOCK-1 UI swap before 3 Aug, engine-v3 first live run, and three Bietrick sign-offs
-> (NEW definition, edge-case protocol, 492 orphan assignments) are open — delivery items, not import defects.
+> The AIOS import is PASS. The **REQ-05 delivery** remains ACTIVE: routine BLOCK-1 UI swap before 3 Aug,
+> engine first live run, and three Bietrick sign-offs (NEW definition, edge-case protocol, 492 orphan
+> assignments) are open — delivery items, not import defects.
 
 ## One Next Step
 
-Export + import `live_v4_movrule.html` (exact final live dashboard) and `ph_segment_engine.sql` v3 so
-those claims move from DOCUMENTED_IN_D07 to VERIFIED_FROM_FILE; then swap the monthly routine's HTML
-BLOCK 1 to the new UI before the 3 Aug run.
+Swap the monthly routine's HTML BLOCK 1 to the new UI before the 3 Aug run (the engine and current live
+dashboard are now both captured in the repo).

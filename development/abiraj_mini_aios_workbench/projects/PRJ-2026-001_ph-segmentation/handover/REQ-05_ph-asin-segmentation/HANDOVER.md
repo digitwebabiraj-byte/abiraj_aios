@@ -104,7 +104,7 @@ Recorded read-only from the D06 knowledge file; live session run by Abiraj. Impo
   (`…_ph_view_template.html`), and the orphan/unowned assignment CSV
   (`…/2026-07-01_unowned_asins_for_assignment_2026-07.csv`, 492 rows).
   **Correction 2026-07-03:** the "live dashboard HTML" briefly listed here was the 2 Jul restyle
-  (`preview_v2`), re-homed to the D07 record; the true 1 Jul navy live HTML was never exported → MISSING_ARTIFACT.
+  (`preview_v2`), re-homed to the D07 record; the real 1 Jul navy live HTML was found 6 Jul and imported (md5 `9b65e429`).
 - **Logic changed**: movement window = last 4 complete weeks vs the previous 4 complete weeks
   (Option A live; Option B baked into engine v2 for future cycles); returning-aware NEW rule (8-week
   lookback); Orphan ASIN formally defined (user_name NULL across 4 sources).
@@ -159,10 +159,12 @@ Recorded read-only from the D07 knowledge file; live session run by Abiraj. Impo
 - **Backups remaining**: `_css`, `_cards`, `_movdata`, `_movrule`, plus the carried D06/30-Jun set — all KEPT.
 - **Routine UI-shell risk**: the monthly routine's BLOCK 1 still builds the **old** layout; a 3 Aug run
   before it is swapped would overwrite the new UI.
-- **Missing artifacts (AMBER driver)**: `live_v4_movrule.html` (exact final live, 888,511 B) and
-  `ph_segment_engine.sql` v3 — not on disk. `preview_v3` (888,305 B) is the closest saved proxy.
-- **D06 correction**: the "1 Jul live dashboard" file was actually the 2 Jul restyle (preview_v2), now
-  re-homed to D07; the true 1 Jul navy build was never exported (only in DB backup `_css`).
+- **Artifacts (resolved 6 Jul)**: the strict-rank engine is now imported (found in `Downloads\files (2)\`,
+  `sql/…/2026-07-02_ph_segment_engine_strict_rank.sql`). The only absent item is the 2 Jul *intermediate*
+  live build (`live_v4_movrule.html`), **superseded** by the imported 3 Jul catfilter live — not needed.
+- **D06 correction (closed 6 Jul)**: the "1 Jul live dashboard" file first placed under D06 was the 2 Jul
+  restyle (preview_v2), re-homed to D07. The real 1 Jul navy build was **found 6 Jul** in `Downloads\files (2)\`
+  and imported (md5 `9b65e429`) — the earlier "never exported" note is superseded.
 
 ### Do Not Repeat
 
@@ -196,5 +198,5 @@ Recorded from the D08 knowledge file. A **read-only** day — no live DB writes,
 
 Get Bietrick approval to push the clarity pass live (D07 backup-first, byte-verified method); swap the
 monthly routine's HTML shell (BLOCK 1) to the new UI before the 3 Aug run; and export + import the two D07
-MISSING artifacts (`live_v4_movrule.html`, engine v3). Any future SQL execution still requires written
+superseded 2 Jul intermediate live build (not needed — the current live is captured). Any future SQL execution still requires written
 write authorisation.

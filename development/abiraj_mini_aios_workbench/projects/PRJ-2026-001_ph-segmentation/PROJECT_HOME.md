@@ -183,14 +183,14 @@ read-only Assigned-Listings confirmation (diff 0, all 24 PHs) + clarity preview 
 | Latest Deliverable | REQ-05-D08 |
 | D08 (3 Jul, read-only) | Assigned Listings confirmed diff 0 for **all 24 PHs** (paulr 466/464); clarity pass + 24 per-PH locked views (preview, **not pushed live**; imported under D07, cross-referenced). Import **GREEN/PASS**. Live `ph_task` id 5 unchanged from D07 |
 | Project Status | ACTIVE |
-| Current live UI | **Restyled** dashboard (`ph_task` id 5 = 888,511 B): gold header + slate/teal body, redesigned colour-coded cards, strict-rank movement. Closest saved copy = `evidence/final_outputs/…/2026-07-02_ph_asin_dashboard_v3_cards_preview.html` (888,305 B); exact `live_v4_movrule.html` is MISSING_ARTIFACT (live DB row not re-queried) |
+| Current live UI | **Restyled** dashboard (gold header + slate/teal body, colour-coded cards, strict-rank movement). Saved builds in repo: 1 Jul navy (`…_id5_navy_live_2026-07.html`, md5 `9b65e429`, imported 6 Jul), 2 Jul restyle/cards previews, and the 3 Jul catfilter build (`…_catfilter_preview.html`, md5 `1f657a1b`). The 2 Jul *intermediate* strict-rank live (`live_v4_movrule`) is absent but superseded |
 | Current live movement rule | **Strict segment rank** (HHH=1…LLL=6) — user-decided 2 Jul, **not yet Bietrick-ratified**; 65 rows moved SAME→IMPROVED/DECLINED |
-| Future engine | **v3** strict-rank (sandbox-validated, first live run 3 Aug) — **engine v3 SQL is MISSING_ARTIFACT**; v2 (`2026-07-01_ph_segment_engine_v2.sql`) is in repo |
+| Engine | **strict-rank engine imported 6 Jul** (`sql/…/2026-07-02_ph_segment_engine_strict_rank.sql`, sha `3164f427`; header labels it "v2", adds strict-rank) — sandbox-validated, first live run 3 Aug. D06 returning-aware v2 (`2026-07-01_ph_segment_engine_v2.sql`) also in repo |
 | Per-PH deliverable | 24 per-PH locked views in `evidence/final_outputs/…/2026-07-02_ph_per_holder_views/` (+ `.sha256`) |
 | Orphan monitor | `analytics.v_orphan_asins` (permanent view) + live dashboard flag |
 | Main open gap | monthly routine HTML BLOCK 1 still builds the **old** UI (swap before 3 Aug) |
 | Automation | PENDING (Cloud Routine — Windows VM Platform feature) |
-| Import result | **AMBER (2 Jul, D07)** — knowledge file + 3 previews + 24 per-PH views + transcript imported & checksummed; `live_v4_movrule.html` + engine v3 MISSING_ARTIFACT. (D06 import is **AMBER** too, corrected 3 Jul — its 1 Jul navy live HTML was never exported; D08 import is GREEN.) |
+| Import result | **All PASS as of 6 Jul** — D06 PASS (all 6 artifacts incl. the 1 Jul navy build, found 6 Jul), D07 PASS (strict-rank engine imported 6 Jul; only the superseded 2 Jul intermediate live is absent), D08 GREEN (read-only). Nothing needed is missing. |
 
 Records (D07): `handover/REQ-05_ph-asin-segmentation/2026-07-02__abiraj__ph-asin__REQ-05-D07.md`,
 `.../TASK_HOME.md`, `.../HANDOVER.md`,

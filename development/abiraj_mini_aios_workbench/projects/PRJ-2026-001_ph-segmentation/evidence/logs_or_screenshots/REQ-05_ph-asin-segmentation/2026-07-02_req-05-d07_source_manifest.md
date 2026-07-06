@@ -50,17 +50,17 @@ allocated card, jargon removal ("returning-aware"/"Method-A" gone), and **24 per
 | preview_catfilter.html (window dates + category filter + allocated card + jargon removed) | Downloads | evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-02_ph_asin_dashboard_catfilter_preview.html | 891397 | a72dc10e6d66b738a482d2a5db49b54b60feeefd0710285c93a7157a934fd332 | DASHBOARD_PREVIEW | IMPORTED |
 | 24 per-PH locked views (Abinayaa…utharsika, exact spellings) | Desktop\files\ | evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-02_ph_per_holder_views/ | — | see `2026-07-02_per_holder_views.sha256` | PER_HOLDER_VIEWS | IMPORTED (24 files + checksum index) |
 | claude_chat_link.txt (D07 chat transcript excerpt) | Downloads | evidence/logs_or_screenshots/REQ-05_ph-asin-segmentation/2026-07-02_claude_chat_transcript_d07.txt | 35862 | 400ac14be1c496bc7dab759012eed9125117e9bf1004a6f368ae0882e3f5d64a | PROVENANCE | IMPORTED |
-| live_v4_movrule.html (final live id-5 dashboard, 888,511 B) | — (not on disk; Abiraj has only preview_v3) | evidence/final_outputs/REQ-05_ph-asin-segmentation/ (reserved) | — | — | LIVE_HTML_SNAPSHOT | MISSING_ARTIFACT |
-| ph_segment_engine.sql v3 (strict-rank) + ph_segment_engine_prev-equalweight.sql.bak | — (not on disk) | sql/REQ-05_ph-asin-segmentation/ (reserved) | — | — | CANONICAL_ENGINE | MISSING_ARTIFACT |
+| live_v4_movrule.html (the 2 Jul intermediate strict-rank live build, 888,511 B) | — (no file matches its md5 `b7ae5e46` in any supplied folder) | evidence/final_outputs/REQ-05_ph-asin-segmentation/ (reserved) | — | — | LIVE_HTML_SNAPSHOT | MISSING_ARTIFACT — **but superseded** (the current live is the 3 Jul catfilter build, md5 `1f657a1b`, which IS imported). Not needed. |
+| ph_segment_engine.sql (strict-rank; file header labels it "v2", adds the strict-rank movement rule — this is what D07 called "v3") + `..._prev-equalweight.sql.bak` | C:\Users\digit\Downloads\files (2)\ph_segment_engine.sql | sql/REQ-05_ph-asin-segmentation/2026-07-02_ph_segment_engine_strict_rank.sql | 13158 | 3164f4274b8e7855e882a20cfd0166b0a29063873fea70903e98ac9fa026536c | CANONICAL_ENGINE | **IMPORTED 2026-07-06** — distinct from the D06 returning-aware v2 (`14a63bc4`); adds strict-rank movement |
 
 ### D06 correction (recorded here for provenance)
 
 On 1 Jul, `preview_v2.html` (md5 `c1a3555c…`, sha `951354ef…`) was imported into the **D06** record and
 mislabeled as the "1 July navy live dashboard." It is in fact the **2 July restyle** (this D07 increment).
-The true 1 July dashboard was the navy dropdown build (879,907 B), which was **never exported to a file**
-(it survives only in the DB backup `ph_task_id5_backup_20260702_css`). The file has been **re-homed** to
-`2026-07-02_ph_asin_dashboard_v2_restyle_preview.html` and the D06 records annotated. See
-`2026-07-01_req-05-d06_source_manifest.md` (D06-correction note).
+The true 1 July dashboard was the navy dropdown build (~879,907 B). It was **found 6 Jul** in
+`Downloads\files (2)\` and imported into the D06 record (md5 `9b65e429`). The mislabeled restyle file has
+been **re-homed** to `2026-07-02_ph_asin_dashboard_v2_restyle_preview.html`. See
+`2026-07-01_req-05-d06_source_manifest.md` (D06-correction note, resolved 6 Jul).
 
 ## Claims Evidence Classification
 
@@ -69,17 +69,23 @@ The true 1 July dashboard was the navy dropdown build (879,907 B), which was **n
 | Read-only verification of live report: 0 mismatches, 8,146/8,149 source reconcile | DOCUMENTED_IN_D07 | Live session; not re-derived here |
 | Restyle (gold/slate-teal) pushed live | VERIFIED_FROM_FILE (preview_v2) + DOCUMENTED_IN_D07 | Live DB row not queried |
 | Card redesign pushed live | VERIFIED_FROM_FILE (preview_v3) + DOCUMENTED_IN_D07 | preview_v3 = 888,305 B vs live 888,511 B; live row not queried |
-| Strict-rank movement rule: 65 rows SAME→IMPROVED/DECLINED, report + dashboard + engine | DOCUMENTED_IN_D07 | Final `live_v4_movrule.html` is MISSING_ARTIFACT; the imported preview_v3 predates the last 206-byte movement tweak |
-| Engine v3 (strict-rank) sandbox-validated, not run live | DOCUMENTED_IN_D07 | Engine v3 SQL is MISSING_ARTIFACT — cannot verify from file |
+| Strict-rank movement rule: 65 rows SAME→IMPROVED/DECLINED, report + dashboard + engine | DOCUMENTED_IN_D07 + strict-rank engine imported 6 Jul | The rule is now VERIFIED_FROM_FILE in the imported engine; the exact 2 Jul intermediate live (`live_v4_movrule`) is absent but superseded by the current catfilter live |
+| Engine (strict-rank) sandbox-validated, not run live | VERIFIED_FROM_FILE (imported 6 Jul, `3164f427…`) | Contains strict-rank + returning-aware; not run against live by design (first live run 3 Aug) |
 | 24 per-PH locked views (only own data, dropdown hidden) | VERIFIED_FROM_FILE | 24 files + checksum index imported |
 | Backups taken (`_css`, `_cards`, `_movdata`, `_movrule`), none dropped | DOCUMENTED_IN_D07 | Live DB state; not queried |
 | Live output `ph_task` id 5 = 888,511 B | LIVE_STATE_NOT_RECHECKED | DB not queried; no exact-copy file imported |
 
 ## Missing Artifacts
 
-1. `live_v4_movrule.html` (888,511 B) — the actual final live dashboard (restyle + cards + strict-rank movement).
-   Abiraj has only `preview_v3.html` (888,305 B), imported as the closest proxy.
-2. `ph_segment_engine.sql` v3 (strict-rank) + `ph_segment_engine_prev-equalweight.sql.bak` — not on disk.
+**Update 2026-07-06:** the strict-rank **engine is now imported** (found in `Downloads\files (2)\`,
+sha `3164f427`). One item remains absent but is **not needed**:
+
+1. ~~`ph_segment_engine.sql` (strict-rank)~~ — **RESOLVED 6 Jul**, imported as
+   `sql/…/2026-07-02_ph_segment_engine_strict_rank.sql`.
+2. `live_v4_movrule.html` (888,511 B, md5 `b7ae5e46`) — the **2 Jul intermediate** strict-rank live build.
+   No supplied file matches its md5. **Superseded** — the current live dashboard is the 3 Jul catfilter build
+   (md5 `1f657a1b`), which IS imported. `preview_v3.html` (888,305 B) remains as the nearest 2 Jul proxy.
+   Not needed for a complete record.
 
 ## Duplicate Check
 
@@ -91,12 +97,18 @@ The true 1 July dashboard was the navy dropdown build (879,907 B), which was **n
 
 ## Known Limits
 
-- The repo does **not** hold the exact final live dashboard (`live_v4_movrule.html`) or engine v3; both
-  are honestly flagged MISSING_ARTIFACT. `preview_v3` is the nearest saved representation.
+- The strict-rank **engine is now imported** (6 Jul). The only absent item is the 2 Jul *intermediate*
+  live build (`live_v4_movrule.html`), which is **superseded** by the imported 3 Jul catfilter live —
+  so it is not needed. `preview_v3` remains the nearest 2 Jul proxy.
 - All live-DB / dashboard state remains LIVE_STATE_NOT_RECHECKED (DB not queried here).
 
 ## Result
 
-**AMBER** — the D07 knowledge file, all three dashboard previews, the 24 per-PH views, and the chat
-transcript are imported and checksummed; the exact final live dashboard and engine v3 are absent and
-recorded as MISSING_ARTIFACT. REQ-05 mapping is confirmed; no new Task ID; no DB/automation/commit action.
+**PASS (updated 2026-07-06)** — the D07 knowledge file, all three dashboard previews, the 24 per-PH
+views, the chat transcript, **and the strict-rank engine** (imported 6 Jul, `3164f427`) are imported and
+checksummed. The only absent item is the superseded 2 Jul intermediate live build, which the current
+imported catfilter live replaces — nothing needed is missing. REQ-05 mapping confirmed; no new Task ID;
+no DB/automation/commit action.
+
+_Was AMBER (2 Jul) while the engine + live build were off-disk; upgraded to PASS on 6 Jul once the engine
+was found in `Downloads\files (2)\`._

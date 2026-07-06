@@ -28,8 +28,10 @@ Reason: the file is the **2 Jul restyle** (preview_v2), not the 1 Jul navy dashb
 
 ## Files NOT Found (recorded, not fabricated)
 
-- `live_v4_movrule.html` (888,511 B — exact final live dashboard) — MISSING_ARTIFACT (Abiraj has only preview_v3).
-- `ph_segment_engine.sql` v3 (strict-rank) + `…_prev-equalweight.sql.bak` — MISSING_ARTIFACT.
+- `ph_segment_engine.sql` (strict-rank) — **RESOLVED 6 Jul**: imported from `Downloads\files (2)\` as
+  `sql/…/2026-07-02_ph_segment_engine_strict_rank.sql` (sha `3164f427`).
+- `live_v4_movrule.html` (888,511 B, md5 `b7ae5e46` — the 2 Jul *intermediate* live) — still absent, but
+  **superseded** by the imported 3 Jul catfilter live (`1f657a1b`); not needed.
 
 ## Records Created (this run)
 
@@ -58,5 +60,7 @@ in 2026-07-01_req-05-d06_source_manifest.md / TASK_HOME / HANDOVER / PROJECT_HOM
 
 ## Result
 
-AMBER — knowledge file + 3 previews + 24 per-PH views + transcript imported & checksummed; final live
-HTML and engine v3 absent (MISSING_ARTIFACT); D06 mislabel corrected.
+**PASS (updated 2026-07-06)** — knowledge file + 3 previews + 24 per-PH views + transcript + the
+**strict-rank engine** (imported 6 Jul) all checksummed. The only absent item is the superseded 2 Jul
+intermediate live build, replaced by the imported current catfilter live — nothing needed is missing.
+D06 mislabel corrected. _(Was AMBER on 2 Jul while the engine was off-disk.)_

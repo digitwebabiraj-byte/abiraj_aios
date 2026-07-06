@@ -47,8 +47,8 @@ record via cross-reference; IDs consistent; another developer can continue.
 
 > The AIOS import is GREEN. The **REQ-05 delivery** remains ACTIVE: the clarity pass awaits Bietrick
 > approval to push live, the monthly-routine BLOCK-1 UI swap is due before 3 Aug, and three Bietrick
-> sign-offs are open — delivery items, not import defects. The D07 items `live_v4_movrule.html` and
-> engine v3 also remain MISSING.
+> sign-offs are open — delivery items, not import defects. (Update 6 Jul: the D07 strict-rank engine is
+> now imported; only the superseded 2 Jul intermediate live `live_v4_movrule.html` is absent — not needed.)
 
 ## One Next Step
 

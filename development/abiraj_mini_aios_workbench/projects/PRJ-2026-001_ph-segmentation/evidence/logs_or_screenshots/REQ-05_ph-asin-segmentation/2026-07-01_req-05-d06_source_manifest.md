@@ -35,7 +35,8 @@ only when backed by a saved, checksummed file inside this project; live-only out
 | PH_ASIN_Protocol_v1.0_Clarifications.md | C:\Users\digit\OneDrive\Desktop\Postgress_backup\PH_ASIN_Protocol_v1.0_Clarifications.md | validation/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_protocol_v1_clarifications.md | 4963 | 1de131c25557462929f351dc37b4d4a94eb24fcd519e7772dfe5e4b0cc99f359 | PROTOCOL_CLARIFICATION | IMPORTED (checksum matched) |
 | unowned_asins_for_assignment_2026-07.csv (Orphan-ASIN assignment output; file keeps older "unowned" term) | C:\Users\digit\Downloads\unowned_asins_for_assignment_2026-07.csv | evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_unowned_asins_for_assignment_2026-07.csv | 27447 | d4f288d0a47c729275a73f84ea1c4130ad0e4c1a5ca9a41a20e56214267af02c | ORPHAN_ASSIGNMENT_OUTPUT | IMPORTED 2026-07-02 (checksum matched; 492 data rows) |
 | preview_v2.html | C:\Users\digit\Downloads\preview_v2.html | ~~2026-07-01_ph_asin_dashboard_id5_live_2026-07.html~~ **re-homed 2026-07-03** → evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-02_ph_asin_dashboard_v2_restyle_preview.html | 884658 | 951354efd8969d7d97762f9fc6a8d6e5172687524a418fe98f75179f321711b6 | ~~LIVE_HTML_SNAPSHOT~~ → **DASHBOARD_PREVIEW (belongs to D07)** | **CORRECTED**: this file is the **2 Jul restyle**, not the 1 Jul navy dashboard. Re-homed to the D07 record. |
-| PH_ASIN_Dashboard_id5_LIVE_2026-07.html (the true 1 Jul navy dropdown build, 879,907 B) | — (never exported; survives only in DB backup `ph_task_id5_backup_20260702_css`) | evidence/final_outputs/REQ-05_ph-asin-segmentation/ (reserved) | — | — | LIVE_HTML_SNAPSHOT | **MISSING_ARTIFACT** (correction 2026-07-03) |
+| PH_ASIN_Dashboard_id5_LIVE_2026-07.html (the 1 Jul navy dropdown build) | C:\Users\digit\Downloads\files (2)\PH_ASIN_Dashboard_id5_LIVE_2026-07.html | evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_dashboard_id5_navy_live_2026-07.html | 879949 | fb7d98e835b86b951d7c1ef82116748dfc2b54000b77d03300111cfd2636e288 | LIVE_HTML_SNAPSHOT | **IMPORTED 2026-07-06** — md5 `9b65e429…` matches the known navy fingerprint. Supersedes the 3 Jul "never exported" note: the file WAS exported and is now recorded. |
+| ph_movement_fix_optionA.sql (the D06 Option-A live movement fix) | C:\Users\digit\Downloads\files (2)\ph_movement_fix_optionA.sql | sql/REQ-05_ph-asin-segmentation/2026-07-01_ph_movement_fix_optionA.sql | 8100 | fc684a1d01090b1124dea2f2ec94786769d4fe43030798d3aace96d948762ed5 | LIVE_SQL_FIX | IMPORTED 2026-07-06 (provenance for the Option-A movement recompute) |
 | PH_ASIN_Dashboard_PH_view_TEMPLATE.html | C:\Users\digit\Downloads\PH_ASIN_Dashboard_PH_view_TEMPLATE.html | evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_dashboard_ph_view_template.html | 752008 | 1bb90b8cca63a2457a27c76bdbf5879e3f0aa61fd62c2cf402c23ff4025319c0 | UI_TEMPLATE | IMPORTED 2026-07-02 (checksum matched) |
 
 ### Note on the historical engine
@@ -62,25 +63,26 @@ A separate undated `ph_segment_engine.sql` copy exists in `DigitWeb_Works_Abiraj
 | Monthly routine updated to v2 engine + live orphan wiring; HTML shell BLOCK 1 still old UI | Imported `2026-07-01_ph_asin_monthly_routine.txt` | VERIFIED_FROM_FILE (file present) | BLOCK 1 old-UI gap confirmed in file (see Gap B) |
 | Protocol v1.0 clarifications (lateral-SAME, zero-click→LOW, conv>clicks→HIGH, HLL→HLH, LHL→HHL) | Imported `2026-07-01_ph_asin_protocol_v1_clarifications.md` | VERIFIED_FROM_FILE | Sign-off line present for Bietrick |
 | Full pre-drop verification: 8,146/8,149 rows reconcile exactly (3 differ ±1 conv) | D06 §2 Change 16, §3 Finding G | DOCUMENTED_IN_D06 | Live reconciliation; no saved output; backups deliberately KEPT |
-| UI redesigned to dropdown/one-view table, classification logic unchanged, pushed live twice | D06 §2 Change 17-19, §3 Finding H/I + `..._ph_view_template.html` | DOCUMENTED_IN_D06 (**corrected 2026-07-03**) | The saved dashboard HTML previously cited here was the **2 Jul restyle** (re-homed to D07), **not** the 1 Jul navy build — which was never exported. The UI template supports the layout; the exact 1 Jul live HTML is MISSING_ARTIFACT |
+| UI redesigned to dropdown/one-view table, classification logic unchanged, pushed live twice | D06 §2 Change 17-19, §3 Finding H/I + imported `2026-07-01_ph_asin_dashboard_id5_navy_live_2026-07.html` (md5 `9b65e429`) + `..._ph_view_template.html` | VERIFIED_FROM_FILE (**updated 2026-07-06**) | The 1 Jul navy live dashboard is now imported (md5 matches the known fingerprint). The 2 Jul restyle that was briefly mislabeled here lives in the D07 record. |
 | Live output row `tech_team_outputs.ph_task` id 5 is the current dashboard | D06 §2 Change 19 metadata | LIVE_STATE_NOT_RECHECKED | DB not queried during this import; the imported HTML is the confirmed latest v2 build (Abiraj) |
 
 ## Missing Artifacts
 
-**Correction 2026-07-03.** On 2 Jul this section read "NONE — resolved," treating `preview_v2.html`
-as the 1 Jul live dashboard. That was wrong: `preview_v2.html` is the **2 Jul restyle** (D07), now
-re-homed. So the D06 status is:
+**NONE — resolved 2026-07-06.** History: on 2 Jul this read "NONE" but wrongly counted `preview_v2.html`
+(the 2 Jul restyle) as the 1 Jul dashboard; on 3 Jul it was corrected to flag the 1 Jul navy build as
+MISSING ("never exported"). On **2026-07-06** the navy build was found in `Downloads\files (2)\` and
+imported — md5 `9b65e429…` matches the known navy fingerprint. Final D06 status: **all 6 supporting
+artifacts imported**:
 
-- ✅ `unowned_asins_for_assignment_2026-07.csv` (492 rows) — imported (D06).
-- ✅ `PH_ASIN_Dashboard_PH_view_TEMPLATE.html` — imported (D06).
-- ✅ Engine v2, monthly routine, protocol clarifications, D06 knowledge file — imported (D06).
-- ❌ **`PH_ASIN_Dashboard_id5_LIVE_2026-07.html`** (the true 1 Jul navy dropdown build, 879,907 B) —
-  **MISSING_ARTIFACT**; never exported to a file (only in DB backup `ph_task_id5_backup_20260702_css`).
-  The file previously placed here was the 2 Jul restyle, re-homed to
-  `evidence/final_outputs/…/2026-07-02_ph_asin_dashboard_v2_restyle_preview.html` (D07 record).
+- ✅ `unowned_asins_for_assignment_2026-07.csv` (492 rows)
+- ✅ `PH_ASIN_Dashboard_PH_view_TEMPLATE.html`
+- ✅ Engine v2, monthly routine, protocol clarifications, D06 knowledge file
+- ✅ **`PH_ASIN_Dashboard_id5_LIVE_2026-07.html`** (1 Jul navy build) → `evidence/final_outputs/…/2026-07-01_ph_asin_dashboard_id5_navy_live_2026-07.html` (md5 `9b65e429`). The 3 Jul "never exported" note is **superseded** — the file existed and is now imported.
+- ➕ Bonus: `ph_movement_fix_optionA.sql` (the D06 Option-A live movement fix) imported for provenance.
 
-Original discovery (1 Jul) searched the entire `DigitWeb_Works_Abiraj` tree, `Desktop/Postgress_backup/`
-(incl. `files.zip`), and a depth-4 `Desktop` sweep. No replacements were ever invented.
+Original discovery (1 Jul) searched the `DigitWeb_Works_Abiraj` tree, `Desktop/Postgress_backup/` and a
+depth-4 `Desktop` sweep — the navy file was not in those locations; it surfaced later in `Downloads\files (2)\`.
+No replacements were ever invented.
 
 ## Duplicate Check
 
@@ -88,6 +90,8 @@ Original discovery (1 Jul) searched the entire `DigitWeb_Works_Abiraj` tree, `De
 - Engine v2 imported once; distinct from the existing v1 (`2026-06-25_ph_segment_engine.sql`) by content and window logic. GREEN.
 - Monthly routine imported once; supersedes nothing already in the repo (the 2026-06-25 file is the *historical run prompt*, a different artifact). GREEN.
 - Protocol clarifications imported once. GREEN.
+- Navy live dashboard imported once (6 Jul); distinct build from the 2 Jul restyle/catfilter by md5. GREEN.
+- Option-A fix SQL imported once. GREEN.
 - No missing artifact was fabricated. GREEN.
 
 ## Known Limits
@@ -97,12 +101,13 @@ Original discovery (1 Jul) searched the entire `DigitWeb_Works_Abiraj` tree, `De
 
 ## Result
 
-**AMBER (corrected 2026-07-03)** — the D06 daily knowledge file and 5 of the 6 named supporting
-artifacts are imported with matching checksums (orphan/unowned CSV, UI template, engine v2, monthly
-routine, protocol clarifications). The 6th — the **1 Jul navy live dashboard HTML** — is
-**MISSING_ARTIFACT**: it was never exported (only in DB backup), and the file briefly counted as it
-was actually the 2 Jul restyle, now re-homed to the D07 record. REQ-05 mapping is confirmed; no
-DB/commit action.
+**PASS (updated 2026-07-06)** — the D06 daily knowledge file and **all 6 supporting artifacts** are now
+imported with matching checksums, including the **1 Jul navy live dashboard HTML** (md5 `9b65e429`,
+imported 6 Jul from `Downloads\files (2)\`) plus the Option-A movement-fix SQL as bonus provenance.
+Nothing is missing. REQ-05 mapping confirmed; no DB/commit action.
+
+_History: AMBER (1 Jul, 3 absent) → wrongly PASS (2 Jul) → AMBER (3 Jul, navy build flagged missing) →
+**PASS (6 Jul, navy build found + imported)**. The status trail is kept intact for honesty._
 
 _History: AMBER at creation (1 Jul, 3 artifacts absent) → wrongly marked PASS (2 Jul) → corrected back
 to AMBER (3 Jul) once `preview_v2` was identified as the D07 restyle via the D07 chat + knowledge file._

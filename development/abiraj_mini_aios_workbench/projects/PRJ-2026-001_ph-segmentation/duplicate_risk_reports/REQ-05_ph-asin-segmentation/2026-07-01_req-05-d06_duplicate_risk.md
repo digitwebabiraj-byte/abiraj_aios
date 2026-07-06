@@ -8,7 +8,7 @@ PRJ-2026-001_ph-segmentation · REQ-05 · REQ-05-D06
 |---|---|---|---|
 | 1 | D06 daily file exists once | One copy at handover/REQ-05_ph-asin-segmentation/2026-07-01__abiraj__ph-asin__REQ-05-D06.md | GREEN |
 | 2 | Engine v2 exists once | One copy at sql/REQ-05_.../2026-07-01_ph_segment_engine_v2.sql; distinct from v1 (2026-06-25, window-table) | GREEN |
-| 3 | Live HTML snapshot exists once | **Corrected 2026-07-03**: the file imported here was the 2 Jul restyle (`preview_v2`), re-homed to the D07 record as `2026-07-02_ph_asin_dashboard_v2_restyle_preview.html`. The true 1 Jul navy live HTML (879,907 B) was never exported → MISSING_ARTIFACT | GREEN (no duplicate; one canonical copy) |
+| 3 | Live HTML snapshot exists once | **Updated 2026-07-06**: the 1 Jul navy live HTML is now imported once as `2026-07-01_ph_asin_dashboard_id5_navy_live_2026-07.html` (md5 `9b65e429`, from `Downloads\files (2)\`). It is a distinct build from the 2 Jul restyle (`preview_v2`, re-homed to D07) and the current catfilter live — three different md5s, one canonical copy each | GREEN |
 | 4 | UI template vs live HTML differentiated | Both imported and distinct: template `..._ph_view_template.html` (752,008 B, 0 dropdown/status markers = review mockup) vs live `..._id5_live_2026-07.html` (884,658 B, 20 markers = shipped UI). Different sizes + checksums | GREEN |
 | 5 | Old and new engines not both labelled current | v1 = HISTORICAL provenance; v2 = going-forward (next live run 3 Aug). Labelled explicitly in the manifest and TASK_HOME | GREEN |
 | 6 | Orphan CSV exists once | Imported once (2 Jul) as `2026-07-01_unowned_asins_for_assignment_2026-07.csv` (492 rows). File keeps older "unowned" name; concept = Orphan ASIN (noted in manifest) | GREEN |

@@ -29,7 +29,7 @@ The three artifacts absent on 1 Jul were supplied by Abiraj from `C:\Users\digit
 | # | Destination (project-relative) | Size | SHA-256 |
 |---|---|---:|---|
 | 5 | evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_unowned_asins_for_assignment_2026-07.csv | 27447 | d4f288d0a47c729275a73f84ea1c4130ad0e4c1a5ca9a41a20e56214267af02c |
-| 6 | ~~2026-07-01_ph_asin_dashboard_id5_live_2026-07.html~~ (this file was the 2 Jul restyle `preview_v2`; **re-homed 2026-07-03** to `2026-07-02_ph_asin_dashboard_v2_restyle_preview.html` in the D07 record — the 1 Jul navy live HTML was never exported) | 884658 | 951354efd8969d7d97762f9fc6a8d6e5172687524a418fe98f75179f321711b6 |
+| 6 | ~~2026-07-01_ph_asin_dashboard_id5_live_2026-07.html~~ (this file was the 2 Jul restyle `preview_v2`; **re-homed 2026-07-03** to `2026-07-02_ph_asin_dashboard_v2_restyle_preview.html` in the D07 record. The real 1 Jul navy build was later **found 6 Jul** in `Downloads\files (2)\` and imported — md5 `9b65e429`) | 884658 | 951354efd8969d7d97762f9fc6a8d6e5172687524a418fe98f75179f321711b6 |
 | 7 | evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_dashboard_ph_view_template.html | 752008 | 1bb90b8cca63a2457a27c76bdbf5879e3f0aa61fd62c2cf402c23ff4025319c0 |
 
 Sources: `unowned_asins_for_assignment_2026-07.csv` (Orphan-ASIN assignment output; keeps older
@@ -75,9 +75,8 @@ incl. `files.zip`; depth-4 `Desktop` sweep. The three files were not present the
 
 ## Result
 
-**AMBER (corrected 2026-07-03)** — the D06 knowledge file + 5 of the 6 supporting work-products are
-imported and checksum-verified (orphan/unowned CSV, UI template, engine v2, monthly routine, protocol
-clarifications). The 6th — the 1 Jul navy live dashboard HTML — is **MISSING_ARTIFACT** (never exported;
-only in DB backup `_css`). The file briefly counted as it was the 2 Jul restyle, re-homed to the D07
-record. No DB/automation/dashboard action; no backup dropped; no commit/push.
-_History: AMBER (1 Jul) → wrongly PASS (2 Jul) → corrected AMBER (3 Jul). See the D06 source manifest._
+**PASS (updated 2026-07-06)** — the D06 knowledge file + **all 6 supporting work-products** are imported
+and checksum-verified, including the **1 Jul navy live dashboard HTML** (md5 `9b65e429`, imported 6 Jul
+from `Downloads\files (2)\`) and the Option-A movement-fix SQL (bonus provenance). Nothing missing.
+No DB/automation/dashboard action; no backup dropped; no commit/push in the import run.
+_History: AMBER (1 Jul) → wrongly PASS (2 Jul) → AMBER (3 Jul, navy flagged missing) → PASS (6 Jul, navy found + imported)._

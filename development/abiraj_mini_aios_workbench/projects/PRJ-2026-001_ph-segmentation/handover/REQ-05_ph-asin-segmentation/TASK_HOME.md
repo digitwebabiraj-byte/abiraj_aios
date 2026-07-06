@@ -139,7 +139,7 @@ Executed by Abiraj in a live Claude Chat session; imported here read-only. Impor
 - Engine v2: `sql/REQ-05_ph-asin-segmentation/2026-07-01_ph_segment_engine_v2.sql`
 - Monthly routine: `prompts/implementation/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_monthly_routine.txt`
 - Protocol clarifications: `validation/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_protocol_v1_clarifications.md`
-- ~~Live dashboard HTML (id-5)~~ **corrected 3 Jul**: that file was the 2 Jul restyle, re-homed to the D07 record (`2026-07-02_ph_asin_dashboard_v2_restyle_preview.html`); the true 1 Jul navy live HTML was never exported → MISSING_ARTIFACT
+- Live dashboard HTML (1 Jul navy build): `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_dashboard_id5_navy_live_2026-07.html` **(imported 6 Jul, md5 `9b65e429`)**. (A separate file that was briefly mislabeled here on 1-3 Jul was actually the 2 Jul restyle, now in the D07 record.)
 - UI review template: `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_ph_asin_dashboard_ph_view_template.html` *(imported 2 Jul)*
 - Orphan/unowned assignment CSV (492 rows): `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-01_unowned_asins_for_assignment_2026-07.csv` *(imported 2 Jul)*
 - Manifest: `evidence/logs_or_screenshots/REQ-05_ph-asin-segmentation/2026-07-01_req-05-d06_source_manifest.md`
@@ -164,9 +164,9 @@ Executed by Abiraj in a live Claude Chat session; imported here read-only. Impor
 
 ### Status
 
-- Daily Increment REQ-05-D06: **COMPLETE** (import **AMBER**, corrected 3 Jul — the knowledge file + 5
-  of 6 supporting artifacts imported + checksummed; the 1 Jul navy live HTML is MISSING_ARTIFACT, never
-  exported. Was briefly marked PASS on 2 Jul before the D07 chat revealed the file was the 2 Jul restyle).
+- Daily Increment REQ-05-D06: **COMPLETE** (import **PASS** as of 6 Jul — knowledge file + all 6
+  supporting artifacts imported + checksummed, incl. the 1 Jul navy live HTML found 6 Jul in
+  `Downloads\files (2)\`, md5 `9b65e429`. Status trail: AMBER→wrongly-PASS→AMBER→PASS, kept for honesty).
 - Requirement REQ-05: **ACTIVE — FOLLOW-UP WORK REMAINS** (delivery gaps below, not import defects).
 
 ### Next Step
@@ -178,7 +178,7 @@ monthly run. (All 7 D06 work-products are now imported — the artifact-import s
 
 Fourth recorded delivery increment of REQ-05 (Phase-07). **Not a new Task ID.** Executed live by
 Abiraj; imported read-only. Import result **AMBER** (knowledge file + 3 dashboard previews + 24 per-PH
-views + chat transcript imported & checksummed; exact final live HTML + engine v3 MISSING_ARTIFACT).
+views + chat transcript + the strict-rank engine (imported 6 Jul) checksummed; only the superseded 2 Jul intermediate live build is absent).
 
 ### Work Completed (from the D07 knowledge file)
 
@@ -204,32 +204,33 @@ views + chat transcript imported & checksummed; exact final live HTML + engine v
 ### Current Live State (DOCUMENTED_IN_D07 — NOT RECHECKED)
 
 - Live dashboard row `ph_task` id 5 = 888,511 B (restyle + cards + strict-rank movement).
-- The exact final live file (`live_v4_movrule.html`) is **MISSING_ARTIFACT**; `preview_v3` (888,305 B)
-  is the closest saved copy. Engine v3 SQL is also MISSING_ARTIFACT.
+- The strict-rank engine is **imported** (`sql/…/2026-07-02_ph_segment_engine_strict_rank.sql`, 6 Jul).
+  The 2 Jul *intermediate* live file (`live_v4_movrule.html`) is absent but **superseded** by the current
+  live (the 3 Jul catfilter build, which is imported); `preview_v3` remains the nearest 2 Jul proxy.
 
 ### D06 correction folded in
 
 The file imported for D06 as the "1 Jul navy live dashboard" was actually the **2 Jul restyle** (preview_v2);
 it has been re-homed to `2026-07-02_ph_asin_dashboard_v2_restyle_preview.html` and the D06 records annotated.
-The true 1 Jul navy build was never exported (only in DB backup `ph_task_id5_backup_20260702_css`).
+The 1 Jul navy build was found 6 Jul in `Downloads\files (2)\` and is now imported (md5 `9b65e429`).
 
 ### Open Gaps
 
 - Monthly routine HTML BLOCK 1 still builds the **old** UI — swap before the 3 Aug run.
 - Cloud Routine automation still pending (Windows feature).
-- Engine v3 first live run pending (3 Aug); engine v3 SQL not in repo.
+- Strict-rank engine first live run pending (3 Aug); engine SQL now in repo (imported 6 Jul).
 - Three Bietrick sign-offs pending: NEW definition, edge-case protocol, 492 orphan assignments.
 - Backups (`_css`, `_cards`, `_movdata`, `_movrule`, + carried) retained — drop only after Bietrick accepts.
 
 ### Status
 
-- Daily Increment REQ-05-D07: **COMPLETE** (import **AMBER** — 2 artifacts missing).
+- Daily Increment REQ-05-D07: **COMPLETE** (import **PASS** as of 6 Jul — strict-rank engine imported; only the superseded 2 Jul intermediate live is absent, replaced by the imported current live).
 - Requirement REQ-05: **ACTIVE — FOLLOW-UP WORK REMAINS**.
 
 ### Next Step
 
-Swap the monthly routine's HTML BLOCK 1 to the new UI before the 3 Aug run; export + import
-`live_v4_movrule.html` and engine v3.
+Swap the monthly routine's HTML BLOCK 1 to the new UI before the 3 Aug run. (Engine + current live
+dashboard are now both captured; the only absent item is the superseded 2 Jul intermediate live — not needed.)
 
 ## Daily Increment — REQ-05-D08 — 2026-07-03
 
@@ -270,7 +271,7 @@ and `.../2026-07-02_ph_asin_dashboard_catfilter_preview.html`. Both source docs 
 - Standalone per-PH files are a 2026-07 snapshot (don't auto-update; regenerate each cycle).
 - Monthly routine HTML BLOCK 1 still builds the **old** UI — swap before the 3 Aug run.
 - Bietrick sign-offs pending: NEW definition (live 191 vs engine 121), edge-case protocol, 492 orphan assignments.
-- D07 items `live_v4_movrule.html` + engine v3 still MISSING; backup set retained.
+- D07 strict-rank engine imported 6 Jul; only the superseded 2 Jul intermediate live is absent (not needed). Backup set retained.
 
 ### Status
 

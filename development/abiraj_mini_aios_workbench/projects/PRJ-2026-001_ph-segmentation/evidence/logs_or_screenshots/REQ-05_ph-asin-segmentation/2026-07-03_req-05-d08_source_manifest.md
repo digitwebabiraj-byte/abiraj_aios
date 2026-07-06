@@ -69,7 +69,7 @@ plausibly spanned 2–3 Jul; both source documents are preserved so the record i
 **NONE new.** All D08 deliverables are either imported (knowledge file) or already in the repo from D07
 (24 views + clarity preview). The Assigned-Listings reconciliation is a live read-only result, honestly
 labelled DOCUMENTED_IN_D08 (no query output was exported — not a missing file, a not-created one).
-(Carried from earlier: `live_v4_movrule.html` and engine v3 remain MISSING from the D07 record.)
+(Update 6 Jul: the D07 strict-rank engine is now imported; only the superseded 2 Jul intermediate live build `live_v4_movrule.html` remains absent — not needed, the current live is captured.)
 
 ## Duplicate Check
 
