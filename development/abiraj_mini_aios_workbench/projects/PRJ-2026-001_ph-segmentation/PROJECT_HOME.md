@@ -190,7 +190,7 @@ read-only Assigned-Listings confirmation (diff 0, all 24 PHs) + clarity preview 
 | Orphan monitor | `analytics.v_orphan_asins` (permanent view) + live dashboard flag |
 | Main open gap | monthly routine HTML BLOCK 1 still builds the **old** UI (swap before 3 Aug) |
 | Automation | PENDING (Cloud Routine — Windows VM Platform feature) |
-| Import result | **AMBER (2 Jul, D07)** — knowledge file + 3 previews + 24 per-PH views + transcript imported & checksummed; `live_v4_movrule.html` + engine v3 MISSING_ARTIFACT. (D06 import remains PASS.) |
+| Import result | **AMBER (2 Jul, D07)** — knowledge file + 3 previews + 24 per-PH views + transcript imported & checksummed; `live_v4_movrule.html` + engine v3 MISSING_ARTIFACT. (D06 import is **AMBER** too, corrected 3 Jul — its 1 Jul navy live HTML was never exported; D08 import is GREEN.) |
 
 Records (D07): `handover/REQ-05_ph-asin-segmentation/2026-07-02__abiraj__ph-asin__REQ-05-D07.md`,
 `.../TASK_HOME.md`, `.../HANDOVER.md`,

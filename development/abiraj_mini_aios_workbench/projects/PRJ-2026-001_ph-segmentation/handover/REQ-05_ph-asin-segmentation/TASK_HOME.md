@@ -164,8 +164,9 @@ Executed by Abiraj in a live Claude Chat session; imported here read-only. Impor
 
 ### Status
 
-- Daily Increment REQ-05-D06: **COMPLETE** (import **PASS** as of 2 Jul — all 7 work-products
-  imported + checksummed; was AMBER on 1 Jul when 3 artifacts were absent).
+- Daily Increment REQ-05-D06: **COMPLETE** (import **AMBER**, corrected 3 Jul — the knowledge file + 5
+  of 6 supporting artifacts imported + checksummed; the 1 Jul navy live HTML is MISSING_ARTIFACT, never
+  exported. Was briefly marked PASS on 2 Jul before the D07 chat revealed the file was the 2 Jul restyle).
 - Requirement REQ-05: **ACTIVE — FOLLOW-UP WORK REMAINS** (delivery gaps below, not import defects).
 
 ### Next Step

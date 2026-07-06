@@ -75,6 +75,9 @@ incl. `files.zip`; depth-4 `Desktop` sweep. The three files were not present the
 
 ## Result
 
-**PASS (updated 2026-07-02)** — all 7 work-products imported and checksum-verified (4 on 1 Jul,
-3 on 2 Jul); no artifact missing. No DB/automation/dashboard action; no backup dropped; no commit/push.
-_(Was AMBER on 1 Jul when 3 artifacts were absent.)_
+**AMBER (corrected 2026-07-03)** — the D06 knowledge file + 5 of the 6 supporting work-products are
+imported and checksum-verified (orphan/unowned CSV, UI template, engine v2, monthly routine, protocol
+clarifications). The 6th — the 1 Jul navy live dashboard HTML — is **MISSING_ARTIFACT** (never exported;
+only in DB backup `_css`). The file briefly counted as it was the 2 Jul restyle, re-homed to the D07
+record. No DB/automation/dashboard action; no backup dropped; no commit/push.
+_History: AMBER (1 Jul) → wrongly PASS (2 Jul) → corrected AMBER (3 Jul). See the D06 source manifest._
