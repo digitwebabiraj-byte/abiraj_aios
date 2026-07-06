@@ -168,18 +168,20 @@ Status: CONFIRMED (Business Validator: Bietrick — confirmed by Abiraj on 2026-
 ## Project Status
 
 ACTIVE. Single task **REQ-05_ph-asin-segmentation**: onboarding/preservation scope CLOSED-PASS,
-now in a **delivery phase**. Four delivery increments recorded: the 26 June 2026 dashboard UI fix &
+now in a **delivery phase**. Five delivery increments recorded: the 26 June 2026 dashboard UI fix &
 live release, the 30 June 2026 final-June refresh + report validation + data-quality review, the
 **1 July 2026 (REQ-05-D06)** Option-A movement fix + Orphan-ASIN routing + engine v2 + protocol
-clarifications + dropdown UI redesign, and the **2 July 2026 (REQ-05-D07)** live restyle + card
-redesign + strict-rank movement rule + engine v3 + 24 per-PH views.
+clarifications + dropdown UI redesign, the **2 July 2026 (REQ-05-D07)** live restyle + card
+redesign + strict-rank movement rule + engine v3 + 24 per-PH views, and the **3 July 2026 (REQ-05-D08)**
+read-only Assigned-Listings confirmation (diff 0, all 24 PHs) + clarity preview + 24 per-PH hand-over.
 
-## Latest Increment (updated 2026-07-02)
+## Latest Increment (updated 2026-07-03)
 
 | Field | Value |
 |---|---|
-| Latest Work Date | 2026-07-02 |
-| Latest Deliverable | REQ-05-D07 |
+| Latest Work Date | 2026-07-03 |
+| Latest Deliverable | REQ-05-D08 |
+| D08 (3 Jul, read-only) | Assigned Listings confirmed diff 0 for **all 24 PHs** (paulr 466/464); clarity pass + 24 per-PH locked views (preview, **not pushed live**; imported under D07, cross-referenced). Import **GREEN/PASS**. Live `ph_task` id 5 unchanged from D07 |
 | Project Status | ACTIVE |
 | Current live UI | **Restyled** dashboard (`ph_task` id 5 = 888,511 B): gold header + slate/teal body, redesigned colour-coded cards, strict-rank movement. Closest saved copy = `evidence/final_outputs/…/2026-07-02_ph_asin_dashboard_v3_cards_preview.html` (888,305 B); exact `live_v4_movrule.html` is MISSING_ARTIFACT (live DB row not re-queried) |
 | Current live movement rule | **Strict segment rank** (HHH=1…LLL=6) — user-decided 2 Jul, **not yet Bietrick-ratified**; 65 rows moved SAME→IMPROVED/DECLINED |

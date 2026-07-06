@@ -172,8 +172,29 @@ Recorded read-only from the D07 knowledge file; live session run by Abiraj. Impo
 - Do not drop any backup (`_css`/`_cards`/`_movdata`/`_movrule`/carried) without a separately approved housekeeping task.
 - Do not run the monthly routine merely to validate its documentation; and swap BLOCK 1 before the 3 Aug run.
 
+## 3 July 2026 Increment (REQ-05-D08)
+
+Recorded from the D08 knowledge file. A **read-only** day — no live DB writes, no push. Import **GREEN/PASS**.
+
+- **What was confirmed** (DOCUMENTED_IN_D08): the dashboard **Assigned Listings** count is correct for
+  **all 24 PHs** — re-derived read-only and reconciled to `traffic_data`, **diff 0** (paulr 466/464).
+- **What is now live**: **unchanged from D07** — the clarity pass (jargon removal, category filter, window
+  dates, allocated card) is a **preview only**, not pushed to `ph_task` id 5.
+- **Files**: the D08 knowledge file imported; the **24 per-PH locked views** and the **clarity preview** are
+  the D08 deliverables but were physically imported under **D07** (dated 2 Jul in the D07 chat) — referenced
+  by path, not duplicated. The `…D08(old).md` draft was **not** imported (superseded, vague name).
+- **Privacy**: each per-PH file has other PHs' rows **physically removed** (not just hidden) and no dropdown.
+- **Logic changed**: none. Read-only confirmation + preview + packaging only.
+
+### Do Not Repeat
+
+- Do not treat the clarity pass as live — it is a preview pending Bietrick approval; push only via the D07 backup-first, byte-verified method.
+- Do not hand out per-PH files as live/auto-updating — they are a 2026-07 snapshot; regenerate each cycle.
+- Do not re-import or move the 24 per-PH views / clarity preview — they have one canonical home under the D07 date.
+
 ## One Next Step
 
-Swap the monthly routine's HTML shell (BLOCK 1) to the new dropdown/restyled UI before the 3 Aug run,
-and export + import the two D07 MISSING artifacts (`live_v4_movrule.html`, engine v3). Any future SQL
-execution still requires written write authorisation.
+Get Bietrick approval to push the clarity pass live (D07 backup-first, byte-verified method); swap the
+monthly routine's HTML shell (BLOCK 1) to the new UI before the 3 Aug run; and export + import the two D07
+MISSING artifacts (`live_v4_movrule.html`, engine v3). Any future SQL execution still requires written
+write authorisation.

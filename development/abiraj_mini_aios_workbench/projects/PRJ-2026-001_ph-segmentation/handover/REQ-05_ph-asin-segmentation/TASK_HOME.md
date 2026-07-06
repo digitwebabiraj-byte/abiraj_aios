@@ -230,13 +230,64 @@ The true 1 Jul navy build was never exported (only in DB backup `ph_task_id5_bac
 Swap the monthly routine's HTML BLOCK 1 to the new UI before the 3 Aug run; export + import
 `live_v4_movrule.html` and engine v3.
 
+## Daily Increment — REQ-05-D08 — 2026-07-03
+
+Fifth recorded delivery increment of REQ-05 (Phase-08). **Not a new Task ID.** A **read-only** day
+(no live DB writes, no push). Import result **GREEN/PASS** — knowledge file imported; deliverables
+present (imported here or cross-referenced from D07).
+
+### Work Completed (from the D08 knowledge file)
+
+- **Assigned Listings confirmed correct** — read-only re-derivation per PH reconciled to `traffic_data`,
+  **diff 0 for all 24 PHs** (paulr = 466 listings / 464 distinct ASINs).
+- **Preview-only clarity pass** — jargon removed ("Method-A"/"returning-aware" → 0), category-click filter,
+  explicit window dates, per-PH allocated card, plainer labels. **Preview only — NOT pushed live.**
+- **24 single-PH-locked standalone dashboards** — one per PH, other PHs' data physically removed, dropdown
+  hidden, filenames per Bietrick's authoritative list.
+
+### Attribution note (D07 ⇄ D08)
+
+Deliverables 2 & 3 above were **physically imported under D07** (the D07 chat dated them 2 Jul) and are
+already in the repo; this D08 knowledge file dates them 3 Jul. They are **cross-referenced by path** (not
+duplicated / moved): `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-02_ph_per_holder_views/`
+and `.../2026-07-02_ph_asin_dashboard_catfilter_preview.html`. Both source docs are preserved.
+
+### Canonical Assets (this increment)
+
+- Daily knowledge: `handover/REQ-05_ph-asin-segmentation/2026-07-03__abiraj__ph-asin__REQ-05-D08.md`
+- Manifest / update-evidence / duplicate-risk / validation: matching `2026-07-03_req-05-d08_*` records.
+- (Cross-refs: the D07 per-PH views + clarity preview above.)
+
+### Current Live State (DOCUMENTED_IN_D08 — NOT RECHECKED)
+
+- Live dashboard `ph_task` id 5 **unchanged from D07** (restyle + cards + strict-rank movement); the
+  clarity pass is a preview pending Bietrick approval.
+
+### Open Gaps (carried)
+
+- Clarity pass awaits Bietrick approval to push live (backup-first, byte-verified method).
+- Standalone per-PH files are a 2026-07 snapshot (don't auto-update; regenerate each cycle).
+- Monthly routine HTML BLOCK 1 still builds the **old** UI — swap before the 3 Aug run.
+- Bietrick sign-offs pending: NEW definition (live 191 vs engine 121), edge-case protocol, 492 orphan assignments.
+- D07 items `live_v4_movrule.html` + engine v3 still MISSING; backup set retained.
+
+### Status
+
+- Daily Increment REQ-05-D08: **COMPLETE** (import **GREEN/PASS**).
+- Requirement REQ-05: **ACTIVE — FOLLOW-UP WORK REMAINS**.
+
+### Next Step
+
+Get Bietrick approval to push the clarity pass live; keep the monthly-routine UI swap on track before 3 Aug.
+
 ## Current Status
 
 CLOSED for the onboarding/preservation scope (PASS) — **in a DELIVERY phase since 2026-06-26**,
-with four recorded delivery increments of this same requirement: 26 Jun (dashboard UI fix + live
+with five recorded delivery increments of this same requirement: 26 Jun (dashboard UI fix + live
 release), 30 Jun (final-June refresh + validation), **1 Jul (REQ-05-D06 — Option-A movement
-fix, Orphan ASIN routing, engine v2, protocol clarifications, dropdown UI redesign)**, and **2 Jul
-(REQ-05-D07 — restyle + card redesign + strict-rank movement + engine v3 + 24 per-PH views)**. None are
+fix, Orphan ASIN routing, engine v2, protocol clarifications, dropdown UI redesign)**, **2 Jul
+(REQ-05-D07 — restyle + card redesign + strict-rank movement + engine v3 + 24 per-PH views)**, and
+**3 Jul (REQ-05-D08 — read-only Assigned-Listings confirmation + clarity preview + 24 per-PH hand-over)**. None are
 new Task IDs.
 
 ## Final Task Result
