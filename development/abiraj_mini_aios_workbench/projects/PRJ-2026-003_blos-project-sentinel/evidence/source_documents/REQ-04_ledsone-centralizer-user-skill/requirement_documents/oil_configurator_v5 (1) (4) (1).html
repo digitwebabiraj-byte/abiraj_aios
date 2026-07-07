@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEDsOne — Business OS Configurator v5.0</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#f4f4f0;color:#1a1a18}
+.config-wrap{min-height:100vh;background:#f4f4f0}
+.topbar{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #e8e8e4;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px;box-shadow:0 1px 2px rgba(0,0,0,0.06)}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-title{font-size:13px;font-weight:700;color:#c0392b;text-transform:uppercase;letter-spacing:0.06em}
+.topbar-sub{font-size:11px;color:#9a9a95;font-family:'DM Mono',monospace}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#27ae60;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s}
+.btn-primary{background:#c0392b;color:#fff}.btn-primary:hover{background:#a93226}
+.btn-ghost{background:transparent;color:#5a5a55;border:1px solid #e8e8e4}.btn-ghost:hover{background:#f4f4f0}
+.main-layout{display:flex;height:calc(100vh - 52px)}
+.sidebar{width:220px;background:#fff;border-right:1px solid #e8e8e4;padding:12px 0;flex-shrink:0;overflow-y:auto}
+.sidebar-label{font-size:10px;font-weight:700;color:#9a9a95;text-transform:uppercase;letter-spacing:0.08em;padding:12px 14px 5px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:500;color:#5a5a55;transition:all 0.15s;margin:1px 4px}
+.nav-item:hover{background:#f4f4f0;color:#1a1a18}
+.nav-item.active{background:#fdecea;color:#c0392b;font-weight:600}
+.nav-icon{font-size:13px;flex-shrink:0;width:18px;text-align:center}
+.nav-badge{margin-left:auto;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:#f39c12}
+.content{flex:1;overflow-y:auto;padding:24px}
+.page-header{margin-bottom:20px}
+.page-title{font-size:15px;font-weight:700;color:#c0392b;text-transform:uppercase;letter-spacing:0.02em}
+.page-desc{font-size:12px;color:#5a5a55;margin-top:4px;line-height:1.55}
+.thr-card{background:#fff;border:1px solid #e8e8e4;border-radius:5px;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.04)}
+.thr-card-head{padding:12px 16px;border-bottom:1px solid #e8e8e4;display:flex;align-items:center;justify-content:space-between;background:#fafaf8}
+.thr-card-title{font-size:12px;font-weight:700;color:#1a1a18;text-transform:uppercase;letter-spacing:0.06em}
+.thr-card-body{padding:16px}
+.thr-field{display:flex;flex-direction:column;gap:4px}
+.thr-field-label{font-size:11px;font-weight:600;color:#5a5a55;text-transform:uppercase;letter-spacing:0.05em}
+.thr-field-key{font-size:10px;font-family:'DM Mono',monospace;color:#b0b0aa}
+.thr-field-note{font-size:11px;color:#9a9a95;line-height:1.4;margin-top:2px}
+.thr-field-rule{font-size:10px;font-family:'DM Mono',monospace;color:#2980b9;margin-top:2px}
+.thr-row{display:grid;gap:12px;margin-bottom:12px}
+.thr-row-2{grid-template-columns:1fr 1fr}
+.thr-row-3{grid-template-columns:1fr 1fr 1fr}
+.thr-row-4{grid-template-columns:1fr 1fr 1fr 1fr}
+.save-bar{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #e8e8e4;border-radius:5px;padding:10px 16px;margin-bottom:16px;position:sticky;top:0;z-index:10}
+.save-bar-info{font-size:12px;color:#5a5a55}
+.changed-dot{width:6px;height:6px;border-radius:50%;background:#f39c12;display:inline-block;margin-right:5px}
+.form-input{width:100%;padding:8px 10px;border:1px solid #e8e8e4;border-radius:5px;font-size:12px;font-family:'DM Sans',sans-serif;color:#1a1a18;background:#fff;outline:none;transition:border 0.15s}
+.form-input:focus{border-color:#c0392b;box-shadow:0 0 0 2px rgba(192,57,43,0.08)}
+.form-input.changed{border-color:#f39c12;background:#fef6e7}
+.input-with-suffix{display:flex;align-items:center}
+.input-with-suffix .form-input{border-radius:5px 0 0 5px;flex:1}
+.input-suffix{background:#f4f4f0;border:1px solid #e8e8e4;border-left:none;border-radius:0 5px 5px 0;padding:8px 10px;font-size:11px;color:#9a9a95;white-space:nowrap}
+.info-banner{background:#eaf4fb;border:1px solid #b3d4ec;border-radius:5px;padding:10px 14px;font-size:12px;color:#1a5276;line-height:1.6;margin-bottom:16px}
+.rule-ref-tag{display:inline-block;font-size:10px;font-family:'DM Mono',monospace;background:#eaf4fb;color:#2980b9;border:1px solid #b3d4ec;padding:1px 6px;border-radius:3px;margin-right:4px}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:#f4f4f0}
+::-webkit-scrollbar-thumb{background:#e8e8e4;border-radius:3px}
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+.stat-card{background:#fff;border:1px solid #e8e8e4;border-radius:5px;padding:14px 16px}
+.stat-val{font-size:22px;font-weight:700}
+.stat-label{font-size:11px;color:#9a9a95;margin-top:3px;text-transform:uppercase;letter-spacing:0.06em}
+.stat-card.b-red{border-top:3px solid #e74c3c}
+.stat-card.b-amber{border-top:3px solid #f39c12}
+.stat-card.b-green{border-top:3px solid #27ae60}
+.stat-card.b-blue{border-top:3px solid #2980b9}
+.stat-card.b-purple{border-top:3px solid #7e22ce}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const OIL_DEFAULTS = {
+  // MARGIN BANDS — confirmed Amazon FBM Apr 2026
+  band_red_max:0,band_amber_min:0,band_amber_max:3,band_yellow_min:4,band_yellow_max:8,
+  band_dkgreen_min:9,band_dkgreen_max:15,band_purple_min:16,
+  hips_min_revenue:2000,hips_min_margin_pct:22,hips_kill_margin_pct:12,
+  hips_kill_consecutive_months:2,hips_review_cycle_days:30,hips_data_required_months:3,
+  cppc_amazon:18,cppc_ebay:14,cppc_shopify:12,cppc_wayfair:22,
+  cppc_review_cycle_days:30,cppc_kill_multiplier:1.5,cppc_kill_consecutive_months:3,
+  nnv_review_period_days:30,nnv_improvement_window_days:14,
+  nnv_kill_consecutive_periods:3,nnv_activity_review_cycle:30,
+  oaf_kpi_floor_score:70,oaf_escalation_reviews:2,oaf_kill_reviews:4,
+  oaf_review_cycle_days:30,oaf_pip_window_days:30,
+  // CHANNEL FEES — confirmed Apr 2026 (Amazon referral updated 15→18%)
+  ch_amazon_referral_pct:18,ch_amazon_fba_per_unit:3.20,ch_ebay_fvf_pct:12.35,
+  ch_ebay_listing_fee:0.30,ch_shopify_transaction_pct:1.5,ch_shopify_payment_pct:1.7,
+  ch_wayfair_commission_pct:23,cogs_pct_of_listing:20,vat_pct:20,
+  // AMAZON FBM — confirmed thresholds Apr 2026
+  fbm_postage_cost_gbp:2.50,fbm_postage_max_weight_kg:2,fbm_min_aov_gbp:24,
+  fbm_refund_allowance_pct:5,fbm_referral_fee_pct:18,
+  fbm_dispatch_sla_standard_hrs:24,fbm_label_recon_tolerance_pct:1,
+  fbm_min_orders_for_action:10,fbm_return_window_days:30,
+  fbm_cancellation_rate_pct:2,fbm_cancellation_window_days:30,
+  fbm_return_rate_amazon_pct:4,fbm_return_rate_ebay_pct:3,fbm_return_rate_shopify_pct:2,
+  fbm_postage_cap_red_amber_gbp:2.50,fbm_amber_suppress_weeks:4,
+  // KPI ESCALATION LEVELS — confirmed Apr 2026
+  kpi_measurement_window_days:30,kpi_min_orders_qualification:10,
+  kpi_l2_amber_weeks:3,kpi_l2_response_hrs:48,
+  kpi_l3_amber_weeks:4,kpi_l4_resolution_hrs:48,kpi_l5_resolution_days:7,
+  // PPC — target ACOS updated 22→20% Apr 2026
+  ppc_acos_target:20,ppc_acos_escalation_days:14,ppc_wasted_spend_kill_gbp:50,
+  ppc_wasted_spend_window_days:30,ppc_wasted_spend_impression_review:5000,
+  ppc_search_term_promotion_sales:10,ppc_search_term_promotion_days:14,
+  ppc_budget_exhaust_days:3,ppc_budget_increase_pct:20,ppc_new_asin_daily_budget:10,
+  ppc_nnv_spend_threshold:200,ppc_seasonal_uplift_pct:30,
+  ph_ctr_floor:0.3,ph_cvr_floor:8,ph_suppression_resolution_hrs:24,
+  ph_suppression_hips_alert_hrs:1,ph_ctr_trigger_days:7,ph_cvr_trigger_days:7,
+  ph_backend_refresh_days_hips:90,ph_backend_refresh_days_standard:180,
+  ph_min_images:5,ph_main_image_fill_pct:85,ph_min_image_resolution:1000,ph_aplus_coverage_target:100,
+  eby_sell_through_floor:15,eby_price_vs_median_pct:10,eby_defect_rate_warning:1.5,
+  eby_defect_rate_penalty:2.0,eby_nnv_zero_sales_days:60,eby_nnv_kill_days:90,
+  eby_min_images:6,eby_title_max_chars:80,
+  shp_aov_floor:45,shp_aov_target:65,shp_cvr_floor:2.5,shp_cart_abandon_target:65,
+  shp_bundle_copurchase_min:20,shp_bundle_discount_pct:10,
+  shp_free_shipping_aov_buffer_pct:20,shp_min_images:5,
+  way_min_margin_pct:18,way_return_rate_warning:8,way_return_rate_escalate:12,
+  way_commission_discrepancy_pct:5,way_nnv_days:90,
+  whs_reorder_po_hours:4,whs_dispatch_sla_same_day_cutoff:14,
+  whs_pick_accuracy_floor:98,whs_pick_accuracy_target:99.5,
+  whs_returns_grading_hours:24,whs_cycle_count_variance_units:10,
+  whs_cycle_count_variance_pct:5,whs_lead_time_min_days:120,
+  whs_lead_time_max_days:180,whs_oos_risk_days:10,
+  cop_response_amazon_target_hrs:12,cop_response_amazon_max_hrs:24,
+  cop_response_shopify_target_hrs:8,cop_response_shopify_max_hrs:24,
+  cop_refund_self_approval_gbp:75,cop_pattern_threshold_count:5,
+  cop_pattern_window_days:7,cop_return_window_days:30,
+  cop_review_response_hrs:48,cop_abuse_return_count:4,cop_abuse_window_months:6,
+  seo_content_sla_standard_days:5,seo_content_sla_hips_days:2,
+  seo_hips_refresh_days:90,seo_meta_title_max:60,seo_meta_desc_max:160,
+  seo_ebay_title_max:80,seo_shopify_desc_min_words:150,
+  seo_shopify_desc_max_words:300,seo_internal_links_per_page:3,
+};
+
+function F({label,k,value,onChange,suffix,hint,rule,type="number",step,changed}){
+  return(
+    <div className="thr-field">
+      <div className="thr-field-label">{label}</div>
+      <div className="thr-field-key">{k}</div>
+      <div className="input-with-suffix">
+        <input className={"form-input"+(changed?" changed":"")} type={type} value={value}
+          step={step||(type==="number"?1:undefined)}
+          onChange={e=>onChange(k,type==="number"?parseFloat(e.target.value)||0:e.target.value)}/>
+        {suffix&&<span className="input-suffix">{suffix}</span>}
+      </div>
+      {rule&&<div className="thr-field-rule">→ {rule}</div>}
+      {hint&&<div className="thr-field-note">{hint}</div>}
+    </div>
+  );
+}
+
+function Card({title,accent="#2980b9",refs=[],intro,children}){
+  return(
+    <div className="thr-card" style={{borderTop:`3px solid ${accent}`}}>
+      <div className="thr-card-head">
+        <span className="thr-card-title">{title}</span>
+        <div>{refs.map(r=><span key={r} className="rule-ref-tag">{r}</span>)}</div>
+      </div>
+      <div className="thr-card-body">
+        {intro&&<div className="info-banner">{intro}</div>}
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function Bar({changed,onSave,onReset,msg}){
+  return(
+    <div className="save-bar">
+      <div className="save-bar-info">
+        {changed.length>0
+          ?<><span className="changed-dot"/>{changed.length} unsaved change{changed.length!==1?"s":""}</>
+          :msg||<span style={{color:"#27ae60"}}>✓ All values saved</span>}
+      </div>
+      <div style={{display:"flex",gap:8}}>
+        {changed.length>0&&<button className="btn btn-ghost" onClick={onReset}>Discard</button>}
+        <button className="btn btn-primary" onClick={onSave}
+          style={{opacity:changed.length===0?0.5:1}} disabled={changed.length===0}>💾 Save Changes</button>
+      </div>
+    </div>
+  );
+}
+
+function MarginBands({cfg,update,changed,onSave,onReset,msg}){
+  const ch=k=>changed.includes(k);
+  return(
+    <div className="content">
+      <div className="page-header">
+        <div className="page-title">Margin Bands — Colour Classification</div>
+        <div className="page-desc">Define the profit % boundaries for each colour band. Every SKU, channel, and staff output is scored against these bands. Change a band boundary here — it propagates everywhere.</div>
+      </div>
+      <Bar changed={changed} onSave={onSave} onReset={onReset} msg={msg}/>
+      <div className="stats-row">
+        {[
+          {label:"Red",val:`< ${cfg.band_red_max}%`,cls:"b-red",color:"#e74c3c"},
+          {label:"Amber",val:`${cfg.band_amber_min}–${cfg.band_amber_max}%`,cls:"b-amber",color:"#f39c12"},
+          {label:"Yellow",val:`${cfg.band_yellow_min}–${cfg.band_yellow_max}%`,cls:"b-blue",color:"#d4ac0d"},
+          {label:"Dark Green",val:`${cfg.band_dkgreen_min}–${cfg.band_dkgreen_max}%`,cls:"b-green",color:"#27ae60"},
+          {label:"Purple",val:`> ${cfg.band_purple_min}%`,cls:"b-purple",color:"#7e22ce"},
+        ].map(b=>(
+          <div key={b.label} className={`stat-card ${b.cls}`}>
+            <div className="stat-val" style={{color:b.color}}>{b.val}</div>
+            <div className="stat-label">{b.label}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{background:"#fff",border:"1px solid #e8e8e4",borderRadius:5,padding:"14px 16px",marginBottom:16}}>
+        <div style={{display:"flex",gap:3,height:12,borderRadius:3,overflow:"hidden"}}>
+          {[["#e74c3c",cfg.band_amber_max],["#f39c12",cfg.band_yellow_max-cfg.band_amber_max],
+            ["#d4ac0d",cfg.band_dkgreen_min-cfg.band_yellow_min],
+            ["#27ae60",cfg.band_purple_min-cfg.band_dkgreen_min],["#7e22ce",100-cfg.band_purple_min]
+          ].map(([c,w],i)=>(
+            <div key={i} style={{background:c,flex:Math.max(w,3),borderRadius:i===0?"3px 0 0 3px":i===4?"0 3px 3px 0":0}}/>
+          ))}
+        </div>
+        <div style={{display:"flex",justifyContent:"space-between",marginTop:6,fontSize:10,color:"#9a9a95",fontFamily:"'DM Mono',monospace"}}>
+          <span>0%</span><span style={{color:"#f39c12"}}>{cfg.band_amber_max}%</span>
+          <span style={{color:"#d4ac0d"}}>{cfg.band_yellow_max}%</span>
+          <span style={{color:"#27ae60"}}>{cfg.band_dkgreen_max}%</span>
+          <span style={{color:"#7e22ce"}}>{cfg.band_purple_min}%+</span>
+        </div>
+      </div>
+      <Card title="Margin Band Boundaries" accent="#c0392b" refs={["HIPS-001","NNV-001","CPPC-001"]}
+        intro="All percentage values refer to net profit margin (%). Each band boundary feeds into HIPS classification, NNV screening, and the colour-coded output across all dashboards.">
+        <div className="thr-row thr-row-2">
+          <F label="Red — below this % = loss" k="band_red_max" value={cfg.band_red_max} onChange={update} suffix="%" hint="Below 0 = negative net contribution" rule="NNV-001" changed={ch("band_red_max")}/>
+          <F label="Amber — max boundary" k="band_amber_max" value={cfg.band_amber_max} onChange={update} suffix="%" hint="0 to this% = low margin, watch zone" rule="HIPS-001" changed={ch("band_amber_max")}/>
+        </div>
+        <div className="thr-row thr-row-2">
+          <F label="Yellow — max boundary" k="band_yellow_max" value={cfg.band_yellow_max} onChange={update} suffix="%" hint="Functional, not optimised" changed={ch("band_yellow_max")}/>
+          <F label="Dark Green — max boundary" k="band_dkgreen_max" value={cfg.band_dkgreen_max} onChange={update} suffix="%" hint="Strong — target band for HIPS SKUs" rule="HIPS-001" changed={ch("band_dkgreen_max")}/>
+        </div>
+        <div className="thr-row thr-row-2">
+          <F label="Purple — above this % = exceptional" k="band_purple_min" value={cfg.band_purple_min} onChange={update} suffix="%" hint="Above 40% = leading edge margin" changed={ch("band_purple_min")}/>
+          <div/>
+        </div>
+      </Card>
+      <Card title="COGS and VAT Standards" accent="#9a9a95"
+        intro="COGS = 20% of listing price. VAT = 20% of selling price. Update if supplier terms change.">
+        <div className="thr-row thr-row-2">
+          <F label="COGS as % of listing price" k="cogs_pct_of_listing" value={cfg.cogs_pct_of_listing} onChange={update} suffix="%" hint="Landed cost. Update if supplier terms change." changed={ch("cogs_pct_of_listing")}/>
+          <F label="VAT rate" k="vat_pct" value={cfg.vat_pct} onChange={update} suffix="%" hint="Standard UK VAT rate" changed={ch("vat_pct")}/>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function SKUEcon({cfg,update,changed,onSave,onReset,msg}){
+  const ch=k=>changed.includes(k);
+  return(
+    <div className="content">
+      <div className="page-header">
+        <div className="page-title">SKU Economics — HIPS, NNV & OAF</div>
+        <div className="page-desc">Core business logic thresholds for SKU classification, negative net value screening, and staff accountability.</div>
+      </div>
+      <Bar changed={changed} onSave={onSave} onReset={onReset} msg={msg}/>
+      <Card title="HIPS — High Impact Profit SKU Qualification" accent="#c0392b" refs={["HIPS-001"]}
+        intro="A SKU qualifies as HIPS only when BOTH conditions are met: revenue ≥ floor AND margin ≥ floor. HIPS SKUs receive priority ad spend, inventory protection, and daily attention.">
+        <div className="thr-row thr-row-3">
+          <F label="Min monthly revenue" k="hips_min_revenue" value={cfg.hips_min_revenue} onChange={update} suffix="£/mo" rule="HIPS-001 trigger" hint="Below this = standard tier regardless of margin" changed={ch("hips_min_revenue")}/>
+          <F label="Min net margin % to qualify" k="hips_min_margin_pct" value={cfg.hips_min_margin_pct} onChange={update} suffix="%" rule="HIPS-001 trigger" changed={ch("hips_min_margin_pct")}/>
+          <F label="Review cycle" k="hips_review_cycle_days" value={cfg.hips_review_cycle_days} onChange={update} suffix="days" changed={ch("hips_review_cycle_days")}/>
+        </div>
+        <div className="thr-row thr-row-3">
+          <F label="Kill condition — margin below" k="hips_kill_margin_pct" value={cfg.hips_kill_margin_pct} onChange={update} suffix="%" rule="HIPS-001 kill" changed={ch("hips_kill_margin_pct")}/>
+          <F label="Kill — consecutive months" k="hips_kill_consecutive_months" value={cfg.hips_kill_consecutive_months} onChange={update} suffix="months" rule="HIPS-001 kill" changed={ch("hips_kill_consecutive_months")}/>
+          <F label="Data required before classification" k="hips_data_required_months" value={cfg.hips_data_required_months} onChange={update} suffix="months" hint="Prevents premature classification" changed={ch("hips_data_required_months")}/>
+        </div>
+      </Card>
+      <Card title="NNV — Negative Net Value Screening" accent="#e74c3c" refs={["NNV-001"]}
+        intro="Any task, role, SKU, campaign, or channel with zero or negative net contribution is flagged NNV. Improvement window runs before kill recommendation is made.">
+        <div className="thr-row thr-row-4">
+          <F label="Review period" k="nnv_review_period_days" value={cfg.nnv_review_period_days} onChange={update} suffix="days" rule="NNV-001 trigger" changed={ch("nnv_review_period_days")}/>
+          <F label="Improvement window" k="nnv_improvement_window_days" value={cfg.nnv_improvement_window_days} onChange={update} suffix="days" rule="NNV-001 action" hint="Days to fix before kill recommendation" changed={ch("nnv_improvement_window_days")}/>
+          <F label="Consecutive periods before kill" k="nnv_kill_consecutive_periods" value={cfg.nnv_kill_consecutive_periods} onChange={update} suffix="periods" rule="NNV-001 kill" changed={ch("nnv_kill_consecutive_periods")}/>
+          <F label="Activity review cycle" k="nnv_activity_review_cycle" value={cfg.nnv_activity_review_cycle} onChange={update} suffix="days" changed={ch("nnv_activity_review_cycle")}/>
+        </div>
+      </Card>
+      <Card title="OAF — Staff Operational Accountability" accent="#f39c12" refs={["OAF-001"]}
+        intro="Every staff role has a KPI floor score. Falling below it for N consecutive reviews triggers escalation. This governs the monthly boardroom review pack.">
+        <div className="thr-row thr-row-4">
+          <F label="KPI floor score" k="oaf_kpi_floor_score" value={cfg.oaf_kpi_floor_score} onChange={update} suffix="/ 100" rule="OAF-001 trigger" hint="Below this = performance watch" changed={ch("oaf_kpi_floor_score")}/>
+          <F label="Reviews before escalation" k="oaf_escalation_reviews" value={cfg.oaf_escalation_reviews} onChange={update} suffix="reviews" rule="OAF-001 escalate" changed={ch("oaf_escalation_reviews")}/>
+          <F label="Reviews before kill" k="oaf_kill_reviews" value={cfg.oaf_kill_reviews} onChange={update} suffix="reviews" rule="OAF-001 kill" changed={ch("oaf_kill_reviews")}/>
+          <F label="PIP window" k="oaf_pip_window_days" value={cfg.oaf_pip_window_days} onChange={update} suffix="days" hint="Performance improvement plan duration" changed={ch("oaf_pip_window_days")}/>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function ChannelPol({cfg,update,changed,onSave,onReset,msg}){
+  const ch=k=>changed.includes(k);
+  return(
+    <div className="content">
+      <div className="page-header">
+        <div className="page-title">Channel Policies — Fees, CPPC & Margins</div>
+        <div className="page-desc">Channel fee rates and CPPC (Cost Per Profitable Click) limits. These feed into vw_net_margin_per_sku, CPPC-001 rule, and all channel-level margin calculations.</div>
+      </div>
+      <Bar changed={changed} onSave={onSave} onReset={onReset} msg={msg}/>
+      <Card title="Channel Fee Rates" accent="#2980b9" refs={["CPPC-001","WAY-001"]}
+        intro="These rates are used in the automated net margin calculation for each channel. Update immediately when channel fee schedules change — stale rates produce incorrect CPPC figures.">
+        <div style={{display:"grid",gridTemplateColumns:"130px 1fr 1fr 1fr 1fr",gap:"8px 10px",marginBottom:8}}>
+          <div/>
+          {["Amazon","eBay","Shopify","Wayfair"].map(c=>(
+            <div key={c} style={{fontSize:11,fontWeight:700,color:"#1a1a18",textAlign:"center",padding:"6px 0",background:"#f4f4f0",borderRadius:4}}>{c}</div>
+          ))}
+        </div>
+        {[
+          {label:"Primary fee",keys:["ch_amazon_referral_pct","ch_ebay_fvf_pct","ch_shopify_transaction_pct","ch_wayfair_commission_pct"],suffixes:["%","%","%","%"]},
+          {label:"Secondary fee",keys:["ch_amazon_fba_per_unit","ch_ebay_listing_fee","ch_shopify_payment_pct",null],suffixes:["£/unit","£/listing","%",""]},
+        ].map(row=>(
+          <div key={row.label} style={{display:"grid",gridTemplateColumns:"130px 1fr 1fr 1fr 1fr",gap:"8px 10px",marginBottom:10,alignItems:"start"}}>
+            <div style={{fontSize:11,fontWeight:600,color:"#5a5a55",paddingTop:10}}>{row.label}</div>
+            {row.keys.map((k,i)=>k?(
+              <F key={k} label="" k={k} value={cfg[k]} onChange={update} suffix={row.suffixes[i]} step={0.01} changed={ch(k)}/>
+            ):<div key={i} style={{paddingTop:10,fontSize:12,color:"#9a9a95",textAlign:"center"}}>—</div>)}
+          </div>
+        ))}
+        <div style={{background:"#f4f4f0",borderRadius:5,padding:"10px 14px",fontSize:11,color:"#5a5a55"}}>
+          <strong>Net margin formula:</strong> (sell_price × (1 − primary_fee_pct)) − unit_cost − secondary_fee − fulfilment − return_provision
+        </div>
+      </Card>
+      <Card title="CPPC Limits Per Channel" accent="#c0392b" refs={["CPPC-001"]}
+        intro="Cost Per Profitable Click limit per channel. Breaching this triggers a FLAG. Sustained breach triggers ESCALATE.">
+        <div className="thr-row thr-row-4">
+          <F label="Amazon CPPC limit" k="cppc_amazon" value={cfg.cppc_amazon} onChange={update} suffix="£" rule="CPPC-001" changed={ch("cppc_amazon")}/>
+          <F label="eBay CPPC limit" k="cppc_ebay" value={cfg.cppc_ebay} onChange={update} suffix="£" rule="CPPC-001" changed={ch("cppc_ebay")}/>
+          <F label="Shopify CPPC limit" k="cppc_shopify" value={cfg.cppc_shopify} onChange={update} suffix="£" rule="CPPC-001" changed={ch("cppc_shopify")}/>
+          <F label="Wayfair CPPC limit" k="cppc_wayfair" value={cfg.cppc_wayfair} onChange={update} suffix="£" rule="CPPC-001" changed={ch("cppc_wayfair")}/>
+        </div>
+        <div className="thr-row thr-row-3">
+          <F label="Review cycle" k="cppc_review_cycle_days" value={cfg.cppc_review_cycle_days} onChange={update} suffix="days" changed={ch("cppc_review_cycle_days")}/>
+          <F label="Kill multiplier" k="cppc_kill_multiplier" value={cfg.cppc_kill_multiplier} onChange={update} suffix="×" step={0.1} rule="CPPC-001 kill" hint="e.g. 1.5 = 50% above limit triggers kill" changed={ch("cppc_kill_multiplier")}/>
+          <F label="Consecutive months before kill" k="cppc_kill_consecutive_months" value={cfg.cppc_kill_consecutive_months} onChange={update} suffix="months" rule="CPPC-001 kill" changed={ch("cppc_kill_consecutive_months")}/>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function AmazonPPC({cfg,update,changed,onSave,onReset,msg}){
+  const ch=k=>changed.includes(k);
+  return(
+    <div className="content">
+      <div className="page-header">
+        <div className="page-title">Amazon PPC — Skill Pack Thresholds</div>
+        <div className="page-desc">All configurable thresholds for the Amazon PPC team's rules.md. Changes here update the values referenced in every PPC guardrail check, ACoS response, and campaign decision.</div>
+      </div>
+      <Bar changed={changed} onSave={onSave} onReset={onReset} msg={msg}/>
+      <Card title="ACoS Management" accent="#e74c3c" refs={["PPC-001"]}>
+        <div className="thr-row thr-row-3">
+          <F label="ACoS target %" k="ppc_acos_target" value={cfg.ppc_acos_target} onChange={update} suffix="%" rule="PPC-001 trigger" hint="Above this for N days = bid reduction required" changed={ch("ppc_acos_target")}/>
+          <F label="Escalation if unresolved (days)" k="ppc_acos_escalation_days" value={cfg.ppc_acos_escalation_days} onChange={update} suffix="days" rule="PPC-001 escalate" changed={ch("ppc_acos_escalation_days")}/>
+          <div/>
+        </div>
+      </Card>
+      <Card title="Wasted Spend Kill" accent="#c0392b" refs={["PPC-002"]}>
+        <div className="thr-row thr-row-3">
+          <F label="Kill threshold (£, zero conversions)" k="ppc_wasted_spend_kill_gbp" value={cfg.ppc_wasted_spend_kill_gbp} onChange={update} suffix="£" rule="PPC-002 kill" hint="Spend above this with zero orders = negate keyword" changed={ch("ppc_wasted_spend_kill_gbp")}/>
+          <F label="Rolling window (days)" k="ppc_wasted_spend_window_days" value={cfg.ppc_wasted_spend_window_days} onChange={update} suffix="days" changed={ch("ppc_wasted_spend_window_days")}/>
+          <F label="Impression threshold before negate" k="ppc_wasted_spend_impression_review" value={cfg.ppc_wasted_spend_impression_review} onChange={update} suffix="impr" rule="PPC-002 exception" changed={ch("ppc_wasted_spend_impression_review")}/>
+        </div>
+      </Card>
+      <Card title="Search Term Promotion" accent="#f39c12" refs={["PPC-003"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Min sales to promote to exact match" k="ppc_search_term_promotion_sales" value={cfg.ppc_search_term_promotion_sales} onChange={update} suffix="orders" rule="PPC-003 trigger" changed={ch("ppc_search_term_promotion_sales")}/>
+          <F label="Min days converting before promotion" k="ppc_search_term_promotion_days" value={cfg.ppc_search_term_promotion_days} onChange={update} suffix="days" rule="PPC-003 trigger" changed={ch("ppc_search_term_promotion_days")}/>
+        </div>
+      </Card>
+      <Card title="Budget Management" accent="#2980b9" refs={["PPC-004","PPC-007"]}>
+        <div className="thr-row thr-row-4">
+          <F label="Budget exhaustion trigger (days)" k="ppc_budget_exhaust_days" value={cfg.ppc_budget_exhaust_days} onChange={update} suffix="days" rule="PPC-004 trigger" changed={ch("ppc_budget_exhaust_days")}/>
+          <F label="Budget increase increment %" k="ppc_budget_increase_pct" value={cfg.ppc_budget_increase_pct} onChange={update} suffix="%" rule="PPC-004 action" changed={ch("ppc_budget_increase_pct")}/>
+          <F label="New ASIN daily budget" k="ppc_new_asin_daily_budget" value={cfg.ppc_new_asin_daily_budget} onChange={update} suffix="£/day" rule="PPC-005" changed={ch("ppc_new_asin_daily_budget")}/>
+          <F label="Seasonal uplift %" k="ppc_seasonal_uplift_pct" value={cfg.ppc_seasonal_uplift_pct} onChange={update} suffix="%" rule="PPC-007" hint="Q4, Prime Day, Black Friday" changed={ch("ppc_seasonal_uplift_pct")}/>
+        </div>
+      </Card>
+      <Card title="NNV Campaign Identification" accent="#9a9a95" refs={["PPC-006"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Min total spend before NNV screen" k="ppc_nnv_spend_threshold" value={cfg.ppc_nnv_spend_threshold} onChange={update} suffix="£" rule="PPC-006 trigger" hint="Campaign must have spent this much before NNV eligibility" changed={ch("ppc_nnv_spend_threshold")}/>
+          <div/>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function AmazonPH({cfg,update,changed,onSave,onReset,msg}){
+  const ch=k=>changed.includes(k);
+  return(
+    <div className="content">
+      <div className="page-header">
+        <div className="page-title">Amazon PH — Listing Thresholds</div>
+        <div className="page-desc">CTR/CVR response triggers, suppression SLAs, image standards, and A+ Content coverage targets.</div>
+      </div>
+      <Bar changed={changed} onSave={onSave} onReset={onReset} msg={msg}/>
+      <Card title="CTR and CVR Response Triggers" accent="#c0392b" refs={["PH-003","PH-004"]}>
+        <div className="thr-row thr-row-4">
+          <F label="CTR floor — trigger listing review" k="ph_ctr_floor" value={cfg.ph_ctr_floor} onChange={update} suffix="%" step={0.1} rule="PH-003 trigger" changed={ch("ph_ctr_floor")}/>
+          <F label="CTR trigger window (days)" k="ph_ctr_trigger_days" value={cfg.ph_ctr_trigger_days} onChange={update} suffix="days" changed={ch("ph_ctr_trigger_days")}/>
+          <F label="CVR floor — trigger listing review" k="ph_cvr_floor" value={cfg.ph_cvr_floor} onChange={update} suffix="%" step={0.1} rule="PH-004 trigger" changed={ch("ph_cvr_floor")}/>
+          <F label="CVR trigger window (days)" k="ph_cvr_trigger_days" value={cfg.ph_cvr_trigger_days} onChange={update} suffix="days" changed={ch("ph_cvr_trigger_days")}/>
+        </div>
+      </Card>
+      <Card title="Suppression Response SLAs" accent="#e74c3c" refs={["PH-002"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Standard ASIN — resolve within" k="ph_suppression_resolution_hrs" value={cfg.ph_suppression_resolution_hrs} onChange={update} suffix="hrs" rule="PH-002 standard" changed={ch("ph_suppression_resolution_hrs")}/>
+          <F label="HIPS ASIN — notify Director within" k="ph_suppression_hips_alert_hrs" value={cfg.ph_suppression_hips_alert_hrs} onChange={update} suffix="hrs" rule="PH-002 HIPS" hint="Director notification required regardless of resolution status" changed={ch("ph_suppression_hips_alert_hrs")}/>
+        </div>
+      </Card>
+      <Card title="Image Standards" accent="#2980b9" refs={["PH-001","PH-008"]}>
+        <div className="thr-row thr-row-3">
+          <F label="Minimum images per listing" k="ph_min_images" value={cfg.ph_min_images} onChange={update} suffix="images" rule="PH-001" hint="Required before PPC launch" changed={ch("ph_min_images")}/>
+          <F label="Main image — product fill %" k="ph_main_image_fill_pct" value={cfg.ph_main_image_fill_pct} onChange={update} suffix="%" rule="PH-008" changed={ch("ph_main_image_fill_pct")}/>
+          <F label="Min image resolution" k="ph_min_image_resolution" value={cfg.ph_min_image_resolution} onChange={update} suffix="px" rule="PH-008" changed={ch("ph_min_image_resolution")}/>
+        </div>
+      </Card>
+      <Card title="Backend Keywords and A+ Content" accent="#27ae60" refs={["PH-005","PH-006"]}>
+        <div className="thr-row thr-row-3">
+          <F label="HIPS refresh cycle (days)" k="ph_backend_refresh_days_hips" value={cfg.ph_backend_refresh_days_hips} onChange={update} suffix="days" rule="PH-005" changed={ch("ph_backend_refresh_days_hips")}/>
+          <F label="Standard refresh cycle (days)" k="ph_backend_refresh_days_standard" value={cfg.ph_backend_refresh_days_standard} onChange={update} suffix="days" rule="PH-005" changed={ch("ph_backend_refresh_days_standard")}/>
+          <F label="A+ Coverage target (HIPS)" k="ph_aplus_coverage_target" value={cfg.ph_aplus_coverage_target} onChange={update} suffix="%" rule="PH-006" hint="% of HIPS ASINs that must have active A+ Content" changed={ch("ph_aplus_coverage_target")}/>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function EbayOrganic({cfg,update,changed,onSave,onReset,msg}){
+  const ch=k=>changed.includes(k);
+  return(
+    <div className="content">
+      <div className="page-header">
+        <div className="page-title">eBay Organic — Thresholds</div>
+        <div className="page-desc">Sell-through floors, pricing boundaries, defect rate warnings, NNV triggers, and listing standards.</div>
+      </div>
+      <Bar changed={changed} onSave={onSave} onReset={onReset} msg={msg}/>
+      <Card title="Sell-Through Performance" accent="#f39c12" refs={["EBY-003"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Sell-through floor (%/30 days)" k="eby_sell_through_floor" value={cfg.eby_sell_through_floor} onChange={update} suffix="%" rule="EBY-003 trigger" changed={ch("eby_sell_through_floor")}/>
+          <div/>
+        </div>
+      </Card>
+      <Card title="Pricing Competitiveness" accent="#2980b9" refs={["EBY-004"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Max % above market median (Terapeak)" k="eby_price_vs_median_pct" value={cfg.eby_price_vs_median_pct} onChange={update} suffix="%" rule="EBY-004" changed={ch("eby_price_vs_median_pct")}/>
+          <div/>
+        </div>
+      </Card>
+      <Card title="Defect Rate and Account Health" accent="#e74c3c" refs={["EBY-005"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Defect rate — warning (escalate to Director)" k="eby_defect_rate_warning" value={cfg.eby_defect_rate_warning} onChange={update} suffix="%" step={0.1} rule="EBY-005 warning" changed={ch("eby_defect_rate_warning")}/>
+          <F label="Defect rate — eBay penalty threshold" k="eby_defect_rate_penalty" value={cfg.eby_defect_rate_penalty} onChange={update} suffix="%" step={0.1} rule="EBY-005 penalty" changed={ch("eby_defect_rate_penalty")}/>
+        </div>
+      </Card>
+      <Card title="NNV Listing Identification" accent="#9a9a95" refs={["EBY-007"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Zero sales — NNV candidate (days)" k="eby_nnv_zero_sales_days" value={cfg.eby_nnv_zero_sales_days} onChange={update} suffix="days" rule="EBY-007 flag" changed={ch("eby_nnv_zero_sales_days")}/>
+          <F label="Zero sales — kill recommendation (days)" k="eby_nnv_kill_days" value={cfg.eby_nnv_kill_days} onChange={update} suffix="days" rule="EBY-007 kill" hint="Measured from date of price correction" changed={ch("eby_nnv_kill_days")}/>
+        </div>
+      </Card>
+      <Card title="Listing Standards" accent="#27ae60" refs={["EBY-001","EBY-006"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Minimum images per listing" k="eby_min_images" value={cfg.eby_min_images} onChange={update} suffix="images" rule="EBY-006" changed={ch("eby_min_images")}/>
+          <F label="Title character limit" k="eby_title_max_chars" value={cfg.eby_title_max_chars} onChange={update} suffix="chars" rule="EBY-001" hint="eBay truncates beyond this in search results" changed={ch("eby_title_max_chars")}/>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function ShopifyDTC({cfg,update,changed,onSave,onReset,msg}){
+  const ch=k=>changed.includes(k);
+  return(
+    <div className="content">
+      <div className="page-header">
+        <div className="page-title">Shopify DTC — Thresholds</div>
+        <div className="page-desc">AOV targets, CVR floors, bundle strategy triggers, cart abandonment thresholds, and margin protection rules.</div>
+      </div>
+      <Bar changed={changed} onSave={onSave} onReset={onReset} msg={msg}/>
+      <Card title="AOV Performance" accent="#c0392b" refs={["SHP-002"]}>
+        <div className="thr-row thr-row-2">
+          <F label="AOV floor" k="shp_aov_floor" value={cfg.shp_aov_floor} onChange={update} suffix="£" rule="SHP-002 trigger" changed={ch("shp_aov_floor")}/>
+          <F label="AOV target" k="shp_aov_target" value={cfg.shp_aov_target} onChange={update} suffix="£" changed={ch("shp_aov_target")}/>
+        </div>
+        <div className="thr-row thr-row-2">
+          <F label="Free shipping buffer above AOV" k="shp_free_shipping_aov_buffer_pct" value={cfg.shp_free_shipping_aov_buffer_pct} onChange={update} suffix="%" rule="SP-001" hint="Set free shipping threshold at AOV + this %. Drives AOV uplift." changed={ch("shp_free_shipping_aov_buffer_pct")}/>
+          <div/>
+        </div>
+      </Card>
+      <Card title="Conversion Rate" accent="#e74c3c" refs={["SHP-001"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Product page CVR floor" k="shp_cvr_floor" value={cfg.shp_cvr_floor} onChange={update} suffix="%" step={0.1} changed={ch("shp_cvr_floor")}/>
+          <F label="Cart abandonment target (max)" k="shp_cart_abandon_target" value={cfg.shp_cart_abandon_target} onChange={update} suffix="%" rule="SHP-004" changed={ch("shp_cart_abandon_target")}/>
+        </div>
+      </Card>
+      <Card title="Bundle Strategy" accent="#27ae60" refs={["SHP-003"]}>
+        <div className="thr-row thr-row-3">
+          <F label="Co-purchase threshold (30 days)" k="shp_bundle_copurchase_min" value={cfg.shp_bundle_copurchase_min} onChange={update} suffix="orders" rule="SHP-003 trigger" changed={ch("shp_bundle_copurchase_min")}/>
+          <F label="Bundle discount %" k="shp_bundle_discount_pct" value={cfg.shp_bundle_discount_pct} onChange={update} suffix="%" rule="SHP-003" changed={ch("shp_bundle_discount_pct")}/>
+          <F label="Min images per product page" k="shp_min_images" value={cfg.shp_min_images} onChange={update} suffix="images" rule="SHP-001" changed={ch("shp_min_images")}/>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function Wayfair({cfg,update,changed,onSave,onReset,msg}){
+  const ch=k=>changed.includes(k);
+  return(
+    <div className="content">
+      <div className="page-header">
+        <div className="page-title">Wayfair — Channel Thresholds</div>
+        <div className="page-desc">Margin gate, return rate warnings, commission discrepancy triggers, and NNV identification for the highest-commission channel.</div>
+      </div>
+      <Bar changed={changed} onSave={onSave} onReset={onReset} msg={msg}/>
+      <Card title="Margin Gate Before Listing" accent="#c0392b" refs={["WAY-001"]}
+        intro="Every SKU proposed for Wayfair must pass this margin calculation before listing. Wayfair's ~23% commission makes it easy to list unprofitable products accidentally.">
+        <div className="thr-row thr-row-2">
+          <F label="Minimum net margin after all Wayfair costs" k="way_min_margin_pct" value={cfg.way_min_margin_pct} onChange={update} suffix="%" rule="WAY-001 gate" changed={ch("way_min_margin_pct")}/>
+          <div/>
+        </div>
+      </Card>
+      <Card title="Return Rate Management" accent="#e74c3c" refs={["WAY-002"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Return rate — warning level" k="way_return_rate_warning" value={cfg.way_return_rate_warning} onChange={update} suffix="%" rule="WAY-002 flag" changed={ch("way_return_rate_warning")}/>
+          <F label="Return rate — HIPS escalation (same day)" k="way_return_rate_escalate" value={cfg.way_return_rate_escalate} onChange={update} suffix="%" rule="WAY-002 HIPS" changed={ch("way_return_rate_escalate")}/>
+        </div>
+      </Card>
+      <Card title="Commission and NNV" accent="#9a9a95" refs={["WAY-003","WAY-007"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Commission discrepancy — flag threshold %" k="way_commission_discrepancy_pct" value={cfg.way_commission_discrepancy_pct} onChange={update} suffix="%" rule="WAY-003" changed={ch("way_commission_discrepancy_pct")}/>
+          <F label="NNV listing — zero sales kill (days)" k="way_nnv_days" value={cfg.way_nnv_days} onChange={update} suffix="days" hint="Zero sales after price correction for this long = recommend delisting" changed={ch("way_nnv_days")}/>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function Warehouse({cfg,update,changed,onSave,onReset,msg}){
+  const ch=k=>changed.includes(k);
+  return(
+    <div className="content">
+      <div className="page-header">
+        <div className="page-title">Warehouse — Operations Thresholds</div>
+        <div className="page-desc">Reorder triggers, dispatch SLAs, pick accuracy floors, returns grading windows, and stock count variance thresholds.</div>
+      </div>
+      <Bar changed={changed} onSave={onSave} onReset={onReset} msg={msg}/>
+      <Card title="HIPS Reorder Alert" accent="#c0392b" refs={["WHS-001"]}>
+        <div className="thr-row thr-row-3">
+          <F label="Raise PO request within (hrs of detection)" k="whs_reorder_po_hours" value={cfg.whs_reorder_po_hours} onChange={update} suffix="hrs" rule="WHS-001" changed={ch("whs_reorder_po_hours")}/>
+          <F label="OOS risk threshold (days coverage)" k="whs_oos_risk_days" value={cfg.whs_oos_risk_days} onChange={update} suffix="days" hint="Below this = OOS risk" changed={ch("whs_oos_risk_days")}/>
+          <div/>
+        </div>
+      </Card>
+      <Card title="Dispatch SLA" accent="#f39c12" refs={["WHS-002"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Same-day dispatch cutoff time" k="whs_dispatch_sla_same_day_cutoff" value={cfg.whs_dispatch_sla_same_day_cutoff} onChange={update} suffix=":00" hint="Orders placed before this hour dispatched same day" changed={ch("whs_dispatch_sla_same_day_cutoff")}/>
+          <div/>
+        </div>
+      </Card>
+      <Card title="Pick Accuracy" accent="#2980b9" refs={["WHS-003"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Pick accuracy floor %" k="whs_pick_accuracy_floor" value={cfg.whs_pick_accuracy_floor} onChange={update} suffix="%" step={0.1} rule="WHS-003 floor" hint="Below this = process review required" changed={ch("whs_pick_accuracy_floor")}/>
+          <F label="Pick accuracy target %" k="whs_pick_accuracy_target" value={cfg.whs_pick_accuracy_target} onChange={update} suffix="%" step={0.1} changed={ch("whs_pick_accuracy_target")}/>
+        </div>
+      </Card>
+      <Card title="Returns Grading" accent="#27ae60" refs={["WHS-004"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Grade within (hours of receipt)" k="whs_returns_grading_hours" value={cfg.whs_returns_grading_hours} onChange={update} suffix="hrs" rule="WHS-004" changed={ch("whs_returns_grading_hours")}/>
+          <div/>
+        </div>
+      </Card>
+      <Card title="Stock Accuracy and Lead Time" accent="#9a9a95" refs={["WHS-005"]}>
+        <div className="thr-row thr-row-4">
+          <F label="Cycle count variance — investigate (units)" k="whs_cycle_count_variance_units" value={cfg.whs_cycle_count_variance_units} onChange={update} suffix="units" rule="WHS-005" changed={ch("whs_cycle_count_variance_units")}/>
+          <F label="Cycle count variance — escalate (%)" k="whs_cycle_count_variance_pct" value={cfg.whs_cycle_count_variance_pct} onChange={update} suffix="%" rule="WHS-005 escalate" changed={ch("whs_cycle_count_variance_pct")}/>
+          <F label="Lead time minimum" k="whs_lead_time_min_days" value={cfg.whs_lead_time_min_days} onChange={update} suffix="days" hint="4 months = 120 days" changed={ch("whs_lead_time_min_days")}/>
+          <F label="Lead time maximum" k="whs_lead_time_max_days" value={cfg.whs_lead_time_max_days} onChange={update} suffix="days" hint="6 months = 180 days" changed={ch("whs_lead_time_max_days")}/>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function CustomerOps({cfg,update,changed,onSave,onReset,msg}){
+  const ch=k=>changed.includes(k);
+  return(
+    <div className="content">
+      <div className="page-header">
+        <div className="page-title">Customer Ops — Response & Escalation Thresholds</div>
+        <div className="page-desc">Response time SLAs, refund self-approval limits, complaint pattern thresholds, and review response windows.</div>
+      </div>
+      <Bar changed={changed} onSave={onSave} onReset={onReset} msg={msg}/>
+      <Card title="Response Time SLAs" accent="#c0392b" refs={["COP-001"]}>
+        <div className="thr-row thr-row-4">
+          <F label="Amazon — target (hrs)" k="cop_response_amazon_target_hrs" value={cfg.cop_response_amazon_target_hrs} onChange={update} suffix="hrs" rule="COP-001" changed={ch("cop_response_amazon_target_hrs")}/>
+          <F label="Amazon — max (hrs)" k="cop_response_amazon_max_hrs" value={cfg.cop_response_amazon_max_hrs} onChange={update} suffix="hrs" hint="Account health metric — never miss this" changed={ch("cop_response_amazon_max_hrs")}/>
+          <F label="Shopify — target (hrs)" k="cop_response_shopify_target_hrs" value={cfg.cop_response_shopify_target_hrs} onChange={update} suffix="hrs" changed={ch("cop_response_shopify_target_hrs")}/>
+          <F label="Shopify — max (hrs)" k="cop_response_shopify_max_hrs" value={cfg.cop_response_shopify_max_hrs} onChange={update} suffix="hrs" changed={ch("cop_response_shopify_max_hrs")}/>
+        </div>
+      </Card>
+      <Card title="Refund Authority" accent="#f39c12" refs={["COP-006"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Self-approval limit (Team Lead)" k="cop_refund_self_approval_gbp" value={cfg.cop_refund_self_approval_gbp} onChange={update} suffix="£" rule="COP-006" hint="Below this value — Team Lead can refund without Director" changed={ch("cop_refund_self_approval_gbp")}/>
+          <div/>
+        </div>
+      </Card>
+      <Card title="Complaint Pattern Detection" accent="#2980b9" refs={["COP-005"]}>
+        <div className="thr-row thr-row-3">
+          <F label="Same reason — pattern trigger (count)" k="cop_pattern_threshold_count" value={cfg.cop_pattern_threshold_count} onChange={update} suffix="complaints" rule="COP-005" hint="This many same-reason complaints = systemic issue" changed={ch("cop_pattern_threshold_count")}/>
+          <F label="Pattern detection window" k="cop_pattern_window_days" value={cfg.cop_pattern_window_days} onChange={update} suffix="days" changed={ch("cop_pattern_window_days")}/>
+          <F label="Returns window" k="cop_return_window_days" value={cfg.cop_return_window_days} onChange={update} suffix="days" rule="COP-002" changed={ch("cop_return_window_days")}/>
+        </div>
+      </Card>
+      <Card title="Review Response and Abuse Detection" accent="#9a9a95" refs={["COP-003"]}>
+        <div className="thr-row thr-row-4">
+          <F label="Public review response — within" k="cop_review_response_hrs" value={cfg.cop_review_response_hrs} onChange={update} suffix="hrs" rule="COP-003" changed={ch("cop_review_response_hrs")}/>
+          <F label="Buyer abuse — return count trigger" k="cop_abuse_return_count" value={cfg.cop_abuse_return_count} onChange={update} suffix="returns" hint="This many returns from same buyer = abuse flag" changed={ch("cop_abuse_return_count")}/>
+          <F label="Buyer abuse — window (months)" k="cop_abuse_window_months" value={cfg.cop_abuse_window_months} onChange={update} suffix="months" changed={ch("cop_abuse_window_months")}/>
+          <div/>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function SEOContent({cfg,update,changed,onSave,onReset,msg}){
+  const ch=k=>changed.includes(k);
+  return(
+    <div className="content">
+      <div className="page-header">
+        <div className="page-title">SEO / Content — Thresholds</div>
+        <div className="page-desc">Content delivery SLAs, HIPS refresh cycles, character limits per channel, and internal linking standards.</div>
+      </div>
+      <Bar changed={changed} onSave={onSave} onReset={onReset} msg={msg}/>
+      <Card title="Content Delivery SLAs" accent="#27ae60" refs={["SEO-003"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Standard SKU — content pack within" k="seo_content_sla_standard_days" value={cfg.seo_content_sla_standard_days} onChange={update} suffix="days" rule="SEO-003" changed={ch("seo_content_sla_standard_days")}/>
+          <F label="HIPS SKU — content pack within" k="seo_content_sla_hips_days" value={cfg.seo_content_sla_hips_days} onChange={update} suffix="days" rule="SEO-003 HIPS" hint="Elevated priority for high-impact SKUs" changed={ch("seo_content_sla_hips_days")}/>
+        </div>
+      </Card>
+      <Card title="HIPS Refresh Cycle" accent="#2980b9" refs={["SEO-004"]}>
+        <div className="thr-row thr-row-2">
+          <F label="HIPS content refresh cycle" k="seo_hips_refresh_days" value={cfg.seo_hips_refresh_days} onChange={update} suffix="days" rule="SEO-004" hint="Trigger refresh if content not updated in this many days" changed={ch("seo_hips_refresh_days")}/>
+          <div/>
+        </div>
+      </Card>
+      <Card title="Content Character Limits" accent="#c0392b" refs={["SEO-006"]}>
+        <div className="thr-row thr-row-4">
+          <F label="Shopify meta title max" k="seo_meta_title_max" value={cfg.seo_meta_title_max} onChange={update} suffix="chars" rule="SEO-006" hint="Google truncates beyond this" changed={ch("seo_meta_title_max")}/>
+          <F label="Shopify meta description max" k="seo_meta_desc_max" value={cfg.seo_meta_desc_max} onChange={update} suffix="chars" rule="SEO-006" changed={ch("seo_meta_desc_max")}/>
+          <F label="eBay title max" k="seo_ebay_title_max" value={cfg.seo_ebay_title_max} onChange={update} suffix="chars" rule="SEO-006" changed={ch("seo_ebay_title_max")}/>
+          <F label="Internal links per Shopify page" k="seo_internal_links_per_page" value={cfg.seo_internal_links_per_page} onChange={update} suffix="links" rule="SEO-005" changed={ch("seo_internal_links_per_page")}/>
+        </div>
+        <div className="thr-row thr-row-2">
+          <F label="Shopify description min words" k="seo_shopify_desc_min_words" value={cfg.seo_shopify_desc_min_words} onChange={update} suffix="words" rule="SEO-006" changed={ch("seo_shopify_desc_min_words")}/>
+          <F label="Shopify description max words" k="seo_shopify_desc_max_words" value={cfg.seo_shopify_desc_max_words} onChange={update} suffix="words" changed={ch("seo_shopify_desc_max_words")}/>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+
+function AmazonFBM({cfg,update,changed,onSave,onReset,msg}){
+  const ch=k=>changed.includes(k);
+  const band=(v)=>{
+    if(v<cfg.band_red_max)return{label:"Red",color:"#e74c3c"};
+    if(v<=cfg.band_amber_max)return{label:"Amber",color:"#f39c12"};
+    if(v<=cfg.band_yellow_max)return{label:"Yellow",color:"#d4ac0d"};
+    if(v<=cfg.band_dkgreen_max)return{label:"Dark Green",color:"#27ae60"};
+    return{label:"Purple",color:"#7e22ce"};
+  };
+  const estNet=()=>{
+    const gross=100;
+    const n=gross-cfg.cogs_pct_of_listing-cfg.vat_pct-cfg.fbm_referral_fee_pct-cfg.ppc_acos_target-cfg.fbm_refund_allowance_pct-((cfg.fbm_postage_cost_gbp/cfg.fbm_min_aov_gbp)*100);
+    return Math.round(n*10)/10;
+  };
+  const net=estNet();
+  const b=band(net);
+  return(
+    <div className="content">
+      <div className="page-header">
+        <div className="page-title">Amazon FBM — Threshold Registry</div>
+        <div className="page-desc">Confirmed thresholds for Amazon Fulfilled by Merchant. Signed off April 2026. These values feed directly into SKU profit band classification, postage reconciliation alerts, and KPI escalation triggers.</div>
+      </div>
+      <Bar changed={changed} onSave={onSave} onReset={onReset} msg={msg}/>
+      <div className="stats-row" style={{gridTemplateColumns:"repeat(4,1fr)"}}>
+        <div className="stat-card b-red"><div className="stat-val" style={{color:"#e74c3c",fontSize:18}}>£{cfg.fbm_postage_cost_gbp.toFixed(2)}</div><div className="stat-label">Postage Cost</div></div>
+        <div className="stat-card b-amber"><div className="stat-val" style={{color:"#f39c12",fontSize:18}}>£{cfg.fbm_min_aov_gbp}</div><div className="stat-label">Min AOV</div></div>
+        <div className="stat-card b-green"><div className="stat-val" style={{color:b.color,fontSize:18}}>{net}%</div><div className="stat-label">Est. Net Margin</div></div>
+        <div className="stat-card b-blue"><div className="stat-val" style={{color:"#2980b9",fontSize:18}}>{cfg.fbm_label_recon_tolerance_pct}%</div><div className="stat-label">Label Recon Tolerance</div></div>
+      </div>
+      <div style={{background:"#fff",border:"1px solid #e8e8e4",borderRadius:5,padding:"10px 16px",marginBottom:16,fontSize:12,color:"#5a5a55",lineHeight:1.7}}>
+        <strong style={{color:"#1a1a18"}}>Live margin estimate:</strong> {cfg.fbm_min_aov_gbp}£ AOV → COGS {cfg.cogs_pct_of_listing}% + VAT {cfg.vat_pct}% + Referral {cfg.fbm_referral_fee_pct}% + PPC {cfg.ppc_acos_target}% + Refund {cfg.fbm_refund_allowance_pct}% + Postage ~{Math.round((cfg.fbm_postage_cost_gbp/cfg.fbm_min_aov_gbp)*1000)/10}% = <strong style={{color:b.color}}>{net}% net ({b.label})</strong>
+      </div>
+      <Card title="Cost Structure" accent="#2980b9" refs={["FBM-001"]} intro="All cost components used in the automated True Profit % calculation per SKU.">
+        <div className="thr-row thr-row-4">
+          <F label="COGS % of listing price" k="cogs_pct_of_listing" value={cfg.cogs_pct_of_listing} onChange={update} suffix="%" hint="Landed cost — fixed" changed={ch("cogs_pct_of_listing")}/>
+          <F label="VAT rate" k="vat_pct" value={cfg.vat_pct} onChange={update} suffix="%" hint="Standard UK VAT" changed={ch("vat_pct")}/>
+          <F label="Amazon referral fee" k="fbm_referral_fee_pct" value={cfg.fbm_referral_fee_pct} onChange={update} suffix="%" hint="Blended average FBM" changed={ch("fbm_referral_fee_pct")}/>
+          <F label="Refund allowance" k="fbm_refund_allowance_pct" value={cfg.fbm_refund_allowance_pct} onChange={update} suffix="%" hint="Blended average" changed={ch("fbm_refund_allowance_pct")}/>
+        </div>
+        <div className="thr-row thr-row-3">
+          <F label="Standard postage cost" k="fbm_postage_cost_gbp" value={cfg.fbm_postage_cost_gbp} onChange={update} suffix="£" step={0.01} hint="Per order up to 2kg" changed={ch("fbm_postage_cost_gbp")}/>
+          <F label="Max weight at standard rate" k="fbm_postage_max_weight_kg" value={cfg.fbm_postage_max_weight_kg} onChange={update} suffix="kg" hint="Covers majority of catalogue" changed={ch("fbm_postage_max_weight_kg")}/>
+          <F label="Minimum Average Order Value" k="fbm_min_aov_gbp" value={cfg.fbm_min_aov_gbp} onChange={update} suffix="£" rule="FBM-001" hint="AOV must not fall below this" changed={ch("fbm_min_aov_gbp")}/>
+        </div>
+      </Card>
+      <Card title="Postage Cost Controls" accent="#c0392b" refs={["FBM-002"]} intro="Two simultaneous monitoring rules. Rule 1 caps postage on loss-making SKUs. Rule 2 reconciles every courier invoice against generated labels.">
+        <div style={{fontWeight:700,fontSize:11,color:"#5a5a55",textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:8}}>Rule 1 — SKU-Level Postage Cap</div>
+        <div className="thr-row thr-row-2">
+          <F label="Postage hard cap (Red & Amber SKUs)" k="fbm_postage_cap_red_amber_gbp" value={cfg.fbm_postage_cap_red_amber_gbp} onChange={update} suffix="£" step={0.01} rule="FBM-002 cap" hint="Any Red/Amber SKU with postage above this — flag immediately" changed={ch("fbm_postage_cap_red_amber_gbp")}/>
+          <div style={{background:"#fdf1f0",border:"1px solid #f5c6c2",borderRadius:5,padding:"10px 12px",fontSize:11,color:"#922b21",lineHeight:1.6}}>
+            <strong>Rule:</strong> Yellow / Dark Green / Purple SKUs — postage monitored but no hard cap enforced. Cap applies only when SKU is Red or Amber.
+          </div>
+        </div>
+        <div style={{fontWeight:700,fontSize:11,color:"#5a5a55",textTransform:"uppercase",letterSpacing:"0.05em",margin:"12px 0 8px"}}>Rule 2 — Label Reconciliation (Courier Invoice Integrity)</div>
+        <div className="thr-row thr-row-2">
+          <F label="Variance tolerance — all reconciliation checks" k="fbm_label_recon_tolerance_pct" value={cfg.fbm_label_recon_tolerance_pct} onChange={update} suffix="%" rule="FBM-002 recon" hint="Orders vs labels • Labels vs projected invoice • Projected vs actual courier invoice" changed={ch("fbm_label_recon_tolerance_pct")}/>
+          <div style={{background:"#eaf4fb",border:"1px solid #b3d4ec",borderRadius:5,padding:"10px 12px",fontSize:11,color:"#1a5276",lineHeight:1.6}}>
+            <strong>Three checks run simultaneously:</strong> Orders received vs labels generated · Labels generated vs projected invoice · Projected invoice vs courier actual. Any single variance above tolerance fires alert immediately.
+          </div>
+        </div>
+      </Card>
+      <Card title="Order Performance SLAs" accent="#f39c12" refs={["FBM-003"]}>
+        <div className="thr-row thr-row-3">
+          <F label="Standard dispatch SLA" k="fbm_dispatch_sla_standard_hrs" value={cfg.fbm_dispatch_sla_standard_hrs} onChange={update} suffix="hrs" hint="Excludes weekends. 1st Class/Prime = same day, no exceptions." changed={ch("fbm_dispatch_sla_standard_hrs")}/>
+          <F label="Cancellation rate threshold" k="fbm_cancellation_rate_pct" value={cfg.fbm_cancellation_rate_pct} onChange={update} suffix="%" rule="FBM-003 cancel" hint="Account level" changed={ch("fbm_cancellation_rate_pct")}/>
+          <F label="Cancellation measurement window" k="fbm_cancellation_window_days" value={cfg.fbm_cancellation_window_days} onChange={update} suffix="days" hint="Rolling window" changed={ch("fbm_cancellation_window_days")}/>
+        </div>
+      </Card>
+      <Card title="Return Rate Thresholds by Channel" accent="#27ae60" refs={["FBM-004"]} intro="Return rates measured per SKU over a rolling 30-day window. Two-stage review applies: Stage 1 = immediate review regardless of order volume. Stage 2 = at 10 orders, decide to allow trend or take action.">
+        <div className="thr-row thr-row-3">
+          <F label="Amazon FBM — max return rate" k="fbm_return_rate_amazon_pct" value={cfg.fbm_return_rate_amazon_pct} onChange={update} suffix="%" rule="FBM-004 amazon" changed={ch("fbm_return_rate_amazon_pct")}/>
+          <F label="eBay — max return rate" k="fbm_return_rate_ebay_pct" value={cfg.fbm_return_rate_ebay_pct} onChange={update} suffix="%" rule="FBM-004 ebay" changed={ch("fbm_return_rate_ebay_pct")}/>
+          <F label="Shopify — max return rate" k="fbm_return_rate_shopify_pct" value={cfg.fbm_return_rate_shopify_pct} onChange={update} suffix="%" rule="FBM-004 shopify" changed={ch("fbm_return_rate_shopify_pct")}/>
+        </div>
+        <div className="thr-row thr-row-3">
+          <F label="Return measurement window" k="fbm_return_window_days" value={cfg.fbm_return_window_days} onChange={update} suffix="days" hint="Rolling window — all channels" changed={ch("fbm_return_window_days")}/>
+          <F label="Min orders before automated action fires" k="fbm_min_orders_for_action" value={cfg.fbm_min_orders_for_action} onChange={update} suffix="orders" hint="Below this — band recorded but no action fires" changed={ch("fbm_min_orders_for_action")}/>
+          <div/>
+        </div>
+      </Card>
+      <Card title="Band Action Rules" accent="#9a9a95" refs={["FBM-005"]}>
+        <div className="thr-row thr-row-2">
+          <F label="Amber band — weeks before L3 Missed Opportunity fires" k="fbm_amber_suppress_weeks" value={cfg.fbm_amber_suppress_weeks} onChange={update} suffix="weeks" rule="FBM-005 amber" hint="At L3: formal KPI review logged against Team Leader scorecard" changed={ch("fbm_amber_suppress_weeks")}/>
+          <div style={{background:"#fdf1f0",border:"1px solid #f5c6c2",borderRadius:5,padding:"10px 12px",fontSize:11,color:"#922b21",lineHeight:1.7}}>
+            <strong>Red band:</strong> Investigate immediately + suppress listing. Do not allow SKU to trade in Red.<br/>
+            <strong>Amber → L2:</strong> 3 weeks → Performance Warning (48hr written response).<br/>
+            <strong>Amber → L3:</strong> 4 weeks → Missed Opportunity KPI review.
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function KPILevels({cfg,update,changed,onSave,onReset,msg}){
+  const ch=k=>changed.includes(k);
+  const levels=[
+    {n:"L1",name:"Early Warning",trigger:`SKU enters Amber for first time. Under ${cfg.kpi_l2_amber_weeks} weeks.`,action:"KPI log only. No action. Team Leader monitors passively.",bg:"#fefde7",border:"#d4ac0d",color:"#d4ac0d"},
+    {n:"L2",name:"Performance Warning",trigger:`SKU in Amber for ${cfg.kpi_l2_amber_weeks} consecutive weeks. OR any metric within 20% of breach threshold.`,action:`Team Leader notified. Written response within ${cfg.kpi_l2_response_hrs} hours required.`,bg:"#fef6e7",border:"#f39c12",color:"#f39c12"},
+    {n:"L3",name:"Missed Opportunity",trigger:`SKU in Amber for ${cfg.kpi_l3_amber_weeks} consecutive weeks. OR any metric breaching threshold for first time.`,action:"Formal KPI review. Logged against Team Leader scorecard. Written intervention plan with timeline required.",bg:"#fdecea",border:"#e74c3c",color:"#e74c3c"},
+    {n:"L4",name:"Critical — Liability",trigger:`SKU enters Red band. OR L3 plan not executed within agreed timeline.`,action:`Team Leader acts immediately. Escalated to Admin Manager if unresolved within ${cfg.kpi_l4_resolution_hrs} hours.`,bg:"#f4f4f0",border:"#5a5a55",color:"#5a5a55"},
+    {n:"L5",name:"Management Escalation",trigger:`L4 unresolved within ${cfg.kpi_l5_resolution_days} days. OR repeated L3/L4 pattern across multiple SKUs or staff.`,action:"Escalated to Operational Manager. Formal written record. May result in process change or staff conduct action.",bg:"#1a1a18",border:"#1a1a18",color:"#ffffff"},
+  ];
+  return(
+    <div className="content">
+      <div className="page-header">
+        <div className="page-title">KPI Escalation Levels — Company-Wide Framework</div>
+        <div className="page-desc">Five-level escalation framework applying to all SKUs, all channels, and all staff output. Confirmed April 2026. Every level has a fixed trigger — no discretion.</div>
+      </div>
+      <Bar changed={changed} onSave={onSave} onReset={onReset} msg={msg}/>
+      <div style={{marginBottom:16}}>
+        {levels.map(l=>(
+          <div key={l.n} style={{background:l.bg,border:`1px solid ${l.border}`,borderLeft:`4px solid ${l.border}`,borderRadius:5,padding:"12px 16px",marginBottom:8,display:"grid",gridTemplateColumns:"80px 1fr 1fr",gap:12,alignItems:"start"}}>
+            <div>
+              <div style={{fontFamily:"'DM Mono',monospace",fontSize:13,fontWeight:700,color:l.color}}>{l.n}</div>
+              <div style={{fontSize:11,fontWeight:700,color:l.color,marginTop:2}}>{l.name}</div>
+            </div>
+            <div>
+              <div style={{fontSize:10,fontWeight:700,color:"#9a9a95",textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>Trigger</div>
+              <div style={{fontSize:12,color:l.n==="L5"?"#ffffff":"#1a1a18",lineHeight:1.55}}>{l.trigger}</div>
+            </div>
+            <div>
+              <div style={{fontSize:10,fontWeight:700,color:"#9a9a95",textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>Intervention</div>
+              <div style={{fontSize:12,color:l.n==="L5"?"#9a9a95":"#5a5a55",lineHeight:1.55}}>{l.action}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <Card title="Configurable Timing Thresholds" accent="#c0392b" refs={["KPI-001"]} intro="Adjust the week and hour thresholds that control when each level fires. Changes here update the live escalation logic.">
+        <div className="thr-row thr-row-3">
+          <F label="L2 trigger — Amber weeks" k="kpi_l2_amber_weeks" value={cfg.kpi_l2_amber_weeks} onChange={update} suffix="weeks" rule="KPI L2 trigger" hint="Amber for this many consecutive weeks → Performance Warning" changed={ch("kpi_l2_amber_weeks")}/>
+          <F label="L3 trigger — Amber weeks" k="kpi_l3_amber_weeks" value={cfg.kpi_l3_amber_weeks} onChange={update} suffix="weeks" rule="KPI L3 trigger" hint="Amber for this many consecutive weeks → Missed Opportunity" changed={ch("kpi_l3_amber_weeks")}/>
+          <F label="L2 response window" k="kpi_l2_response_hrs" value={cfg.kpi_l2_response_hrs} onChange={update} suffix="hrs" rule="KPI L2 response" hint="Team Leader must submit written response within this window" changed={ch("kpi_l2_response_hrs")}/>
+        </div>
+        <div className="thr-row thr-row-3">
+          <F label="L4 resolution window" k="kpi_l4_resolution_hrs" value={cfg.kpi_l4_resolution_hrs} onChange={update} suffix="hrs" rule="KPI L4 resolve" hint="Unresolved after this → Admin Manager escalation" changed={ch("kpi_l4_resolution_hrs")}/>
+          <F label="L5 resolution window" k="kpi_l5_resolution_days" value={cfg.kpi_l5_resolution_days} onChange={update} suffix="days" rule="KPI L5 resolve" hint="L4 unresolved after this → Operational Manager" changed={ch("kpi_l5_resolution_days")}/>
+          <F label="Measurement window (all levels)" k="kpi_measurement_window_days" value={cfg.kpi_measurement_window_days} onChange={update} suffix="days" hint="Rolling window for return rate, cancellation rate" changed={ch("kpi_measurement_window_days")}/>
+        </div>
+      </Card>
+      <Card title="Order Qualification Gate" accent="#2980b9" refs={["KPI-002"]} intro="SKU must meet minimum order count before automated band actions fire. Prevents premature action on low-volume data.">
+        <div className="thr-row thr-row-2">
+          <F label="Minimum orders before band action fires" k="kpi_min_orders_qualification" value={cfg.kpi_min_orders_qualification} onChange={update} suffix="orders" rule="KPI-002 gate" hint="Below this count — band recorded but no automated action. At 10 orders: two-stage review." changed={ch("kpi_min_orders_qualification")}/>
+          <div style={{background:"#eaf4fb",border:"1px solid #b3d4ec",borderRadius:5,padding:"10px 12px",fontSize:11,color:"#1a5276",lineHeight:1.7}}>
+            <strong>Two-stage return rate review:</strong><br/>
+            Stage 1 — Immediate review regardless of order volume.<br/>
+            Stage 2 — At {cfg.kpi_min_orders_qualification} orders: decide to allow trend or take action.
+          </div>
+        </div>
+      </Card>
+      <Card title="Non-Negotiable Rules" accent="#9a9a95">
+        {[
+          ["01","Levels are sequential","A SKU moves through levels in order. You cannot skip from L1 to L4 unless the L4 trigger is independently met."],
+          ["02","Written response mandatory at L2 and above","Verbal acknowledgement not accepted. Response logged in KPI system within the defined window."],
+          ["03","Thresholds are fixed","No Team Leader or developer may alter a threshold. All changes require Business Owner sign-off."],
+          ["04","Framework applies to staff output as well as SKUs","Staff weekly ROI output below defined band triggers the same level structure."],
+        ].map(([n,bold,normal])=>(
+          <div key={n} style={{display:"flex",gap:12,padding:"10px 0",borderBottom:"1px solid #e8e8e4"}}>
+            <div style={{fontFamily:"'DM Mono',monospace",fontSize:12,fontWeight:700,color:"#c0392b",minWidth:24}}>{n}</div>
+            <div style={{fontSize:12,color:"#1a1a18",lineHeight:1.6}}><strong>{bold} — </strong>{normal}</div>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+}
+
+function ExportPage({allCfg}){
+  const [copied,setCopied]=useState(false);
+  const sections=[
+    {label:"Margin Bands",prefix:["band_","cogs_","vat_"]},
+    {label:"HIPS / NNV / OAF",prefix:["hips_","nnv_","oaf_"]},
+    {label:"Amazon FBM",prefix:["fbm_"]},
+    {label:"KPI Levels",prefix:["kpi_"]},
+    {label:"Channel Fees + CPPC",prefix:["ch_","cppc_"]},
+    {label:"Amazon PPC",prefix:["ppc_"]},
+    {label:"Amazon PH",prefix:["ph_"]},
+    {label:"eBay Organic",prefix:["eby_"]},
+    {label:"Shopify DTC",prefix:["shp_"]},
+    {label:"Wayfair",prefix:["way_"]},
+    {label:"Warehouse",prefix:["whs_"]},
+    {label:"Customer Ops",prefix:["cop_"]},
+    {label:"SEO / Content",prefix:["seo_"]},
+  ].map(s=>({...s,keys:Object.keys(OIL_DEFAULTS).filter(k=>s.prefix.some(p=>k.startsWith(p)))}));
+  const yaml=Object.entries(allCfg).map(([k,v])=>`${k}: ${v}`).join("\n");
+  const copy=()=>{navigator.clipboard.writeText(yaml).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);});};
+  const dl=()=>{const b=new Blob([yaml],{type:"text/yaml"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="rules_registry.yaml";a.click();};
+  return(
+    <div className="content">
+      <div className="page-header">
+        <div className="page-title">Export — rules_registry.yaml</div>
+        <div className="page-desc">Copy the current configuration as YAML. Paste into registries/rules_registry.yaml in your /business-os/ folder. This is the single source of truth that all AI agents and N8N workflows read at runtime.</div>
+      </div>
+      <div style={{display:"flex",gap:10,marginBottom:20}}>
+        <button className="btn btn-primary" onClick={copy}>{copied?"✓ Copied!":"📋 Copy YAML"}</button>
+        <button className="btn btn-ghost" onClick={dl}>⬇ Download .yaml</button>
+      </div>
+      {sections.map(sec=>(
+        <div key={sec.label} className="thr-card" style={{borderTop:"3px solid #2980b9",marginBottom:10}}>
+          <div className="thr-card-head">
+            <span className="thr-card-title">{sec.label}</span>
+            <span style={{fontSize:11,color:"#9a9a95"}}>{sec.keys.length} keys</span>
+          </div>
+          <div className="thr-card-body">
+            <div style={{fontFamily:"'DM Mono',monospace",fontSize:11,lineHeight:1.8,background:"#f4f4f0",padding:"10px 14px",borderRadius:5}}>
+              {sec.keys.map(k=>(
+                <div key={k} style={{display:"flex",gap:16}}>
+                  <span style={{color:"#2980b9",minWidth:280}}>{k}:</span>
+                  <span style={{color:"#c0392b"}}>{allCfg[k]}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function App(){
+  const [page,setPage]=useState("margin-bands");
+  const [cfg,setCfg]=useState({...OIL_DEFAULTS});
+  const [saved,setSaved]=useState({...OIL_DEFAULTS});
+  const [msg,setMsg]=useState("");
+  const update=(k,v)=>setCfg(c=>({...c,[k]:v}));
+  const changed=Object.keys(cfg).filter(k=>cfg[k]!==saved[k]);
+  const save=()=>{
+    setSaved({...cfg});
+    setMsg(`${changed.length} value${changed.length!==1?"s":""} saved`);
+    setTimeout(()=>setMsg(""),3000);
+    try{localStorage.setItem("oil_config_v5",JSON.stringify(cfg));}catch(e){}
+  };
+  const reset=()=>setCfg({...saved});
+  useEffect(()=>{
+    try{const v=localStorage.getItem("oil_config_v5");if(v){const p=JSON.parse(v);setCfg(p);setSaved(p);}}catch(e){}
+  },[]);
+  const pp={cfg,update,changed,onSave:save,onReset:reset,msg};
+  const nav=[
+    {group:"OIL Core Rules",items:[
+      {id:"margin-bands",icon:"🎨",label:"Margin Bands"},
+      {id:"sku-economics",icon:"📊",label:"SKU Economics"},
+      {id:"channel-policies",icon:"🌐",label:"Channel Policies"},
+    ]},
+    {group:"Channel Domain Packs",items:[
+      {id:"amazon-fbm",icon:"📦",label:"Amazon FBM"},
+      {id:"kpi-levels",icon:"🚦",label:"KPI Levels"},
+    ]},
+    {group:"Skill Pack Thresholds",items:[
+      {id:"amazon-ppc",icon:"⚡",label:"Amazon PPC"},
+      {id:"amazon-ph",icon:"🖼",label:"Amazon PH"},
+      {id:"ebay-organic",icon:"🛒",label:"eBay Organic"},
+      {id:"shopify-dtc",icon:"🛍",label:"Shopify DTC"},
+      {id:"wayfair",icon:"🏠",label:"Wayfair"},
+      {id:"warehouse",icon:"📦",label:"Warehouse"},
+      {id:"customer-ops",icon:"💬",label:"Customer Ops"},
+      {id:"seo-content",icon:"✍️",label:"SEO / Content"},
+    ]},
+    {group:"System",items:[
+      {id:"export",icon:"📤",label:"Export YAML"},
+    ]},
+  ];
+  const total=changed.length;
+  return(
+    <div className="config-wrap">
+      <div className="topbar">
+        <div className="topbar-left">
+          <div className="live-dot"/>
+          <span className="topbar-title">LEDsOne — Business OS Configurator</span>
+          <span className="topbar-sub">v5.0 · OIL rules_registry · {Object.keys(OIL_DEFAULTS).length} configurable values{total>0?` · ${total} unsaved`:""}</span>
+        </div>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          {total>0&&<span style={{fontSize:11,color:"#f39c12",fontWeight:600}}><span className="changed-dot"/>{total} unsaved</span>}
+          <button className="btn btn-ghost" style={{fontSize:11}} onClick={()=>setPage("export")}>📤 Export YAML</button>
+          <button className="btn btn-primary" style={{fontSize:11,opacity:total===0?0.5:1}} onClick={save} disabled={total===0}>💾 Save All</button>
+        </div>
+      </div>
+      <div className="main-layout">
+        <div className="sidebar">
+          {nav.map(g=>(
+            <div key={g.group}>
+              <div className="sidebar-label">{g.group}</div>
+              {g.items.map(n=>(
+                <div key={n.id} className={"nav-item"+(page===n.id?" active":"")} onClick={()=>setPage(n.id)}>
+                  <span className="nav-icon">{n.icon}</span>
+                  <span>{n.label}</span>
+                  {n.id==="export"&&total>0&&<span className="nav-badge">{total}</span>}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        {page==="amazon-fbm"&&<AmazonFBM {...pp}/>}
+        {page==="kpi-levels"&&<KPILevels {...pp}/>}
+        {page==="margin-bands"&&<MarginBands {...pp}/>}
+        {page==="sku-economics"&&<SKUEcon {...pp}/>}
+        {page==="channel-policies"&&<ChannelPol {...pp}/>}
+        {page==="amazon-ppc"&&<AmazonPPC {...pp}/>}
+        {page==="amazon-ph"&&<AmazonPH {...pp}/>}
+        {page==="ebay-organic"&&<EbayOrganic {...pp}/>}
+        {page==="shopify-dtc"&&<ShopifyDTC {...pp}/>}
+        {page==="wayfair"&&<Wayfair {...pp}/>}
+        {page==="warehouse"&&<Warehouse {...pp}/>}
+        {page==="customer-ops"&&<CustomerOps {...pp}/>}
+        {page==="seo-content"&&<SEOContent {...pp}/>}
+        {page==="export"&&<ExportPage allCfg={cfg}/>}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
