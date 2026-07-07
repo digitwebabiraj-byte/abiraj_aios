@@ -9,7 +9,7 @@
 | **requirement_id** | REQ-04 |
 | **deliverable_id** | REQ-04-D06 (this user skill file) — its deep companion documents are **REQ-04-D07**, same task folder |
 | **revision** | **Rev 2 (2026-07-07)** — this D06 skill file was updated in place after the D07 deep code analysis: the four previously-open questions are now resolved (see §11–§12), missing UI behaviours added, evidence expanded. Deliverable ID intentionally stays D06 (updated in place, not forked); the D07 ID belongs to the eight companion analysis documents. |
-| **status** | DRAFT — awaiting Queryability review |
+| **status** | **VALIDATED — CLOSED** (validated by Satheewaran, user, 2026-07-07; adversarial fact-check CORRECT; closure gates PASS). No pending next steps. |
 | **audience** | New Centralizer users, dept leaders, developers or MD (and LLMs) |
 | **repository** | `ledsone-centralizer` (GitLab `sajeesans2/ledsone-centralizer`, branch `Abiraj`) · live: https://centralizer.vintageinterior.co.uk |
 | **evidence basis** | Repository scan of 2026-07-07 + git history + imported delivery archive (see §11 Evidence Map) |

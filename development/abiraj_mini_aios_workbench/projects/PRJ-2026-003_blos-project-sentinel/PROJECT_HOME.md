@@ -126,11 +126,12 @@ preserved; all 19 SHA-256 checksums matched). See
 
 ## Status
 
-ACTIVE
+**CLOSED — VALIDATED** (by Satheewaran, user, 2026-07-07). All documentation deliverables
+(D06 skill file in 4 formats + D07 deep continuation package) are complete, verified and
+validated. See `closure/REQ-04_ledsone-centralizer-user-skill/2026-07-07_final_closure.md`.
 
 ## One Next Action
 
-Submit the D06 skill file (Rev 2) + the D07 continuation package for Queryability review
-(Tamil Selvan) and Technical review (Sajeesan — priority: the P0 security findings: public
-`role=admin` registration, and the plaintext production credential committed in
-`.vscode/sftp.json`). Developers continuing the project start from the D07 continuation guide.
+**NONE — task closed.** (Informational only, outside this task: application-side security
+findings surfaced during analysis are handed to the app/security owner (Sajeesan) and tracked
+separately — they are not open steps of this documentation task.)
