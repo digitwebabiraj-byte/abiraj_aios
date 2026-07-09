@@ -55,22 +55,31 @@ Two coverage modes exist from the same rules:
 
 - **Sellers-only (D01/D02):** 240 (ASIN, account) rows — only ASINs with ≥1 sale in 90 days.
   Query `generate_dataset.sql` → `dataset.py` → `build_html.py`.
-- **Full-portfolio (D03):** **733 ASINs** — universe = every Amazon-UK ASIN with a live FBM listing
-  **OR** a 90-day sale (`listing_data` ∪ `analytics.ph_segment` ∪ `order_transaction`), a strict
-  superset of the 240 sellers (**0 dropped**, verified). Stock shown for all; velocity & days only
-  where there are sales; no-sales-with-stock flagged idle. Query `generate_dataset_all_asins.sql`
-  → `data_all.json` → `build_all_html.py` (polished) / `build_all.py` (plain + Excel).
+- **Full-portfolio (D03):** **756 ASINs** (current live build) — universe = every Amazon-UK ASIN
+  with a live FBM listing **OR** a 90-day sale (`listing_data` ∪ `analytics.ph_segment` ∪
+  `order_transaction`), a strict superset of the 240 sellers (**0 dropped**, verified). Stock shown
+  for all; velocity & days only where there are sales; no-sales-with-stock flagged idle. Query
+  `generate_dataset_all_asins.sql` → `data_all.json` → `build_all_html.py` (polished) / `build_all.py`.
+
+**FBM display rule (D03 fix):** the "Amazon Qty (FBM)" column reads `listing_data.quantity` (merchant)
+**regardless of `wrong_sku`** (prefer clean, else flagged), via the `fbm_all` CTE — so it matches the
+live Amazon system (e.g. `B09JZ61NJM` 0 → 39). Stock/master-SKU logic stays strict on `wrong_sku=0`;
+this is display-only and does not affect stock/velocity/days/status.
 
 **D03 status categories** (the dashboard refines the SQL's `stock_status`, which lumps all 0-stock
 into "No Stock / Critical"):
 
-| Category | Rule | Count (2026-07-09) | Colour |
+| Category | Rule | Count (2026-07-09, 756-build) | Colour |
 |---|---|---|---|
 | Stockout — Reorder | sold in 90d **and** UK stock 0 | 9 | Red |
 | Going Out of Stock | ≤ 60 days cover | 0 | Yellow |
-| Healthy Stock | > 60 days cover | 229 | Peacock |
-| Idle Stock | UK stock > 0, no recent sales | 376 | Grey-blue |
+| Healthy Stock | > 60 days cover | 234 | Peacock |
+| Idle Stock | UK stock > 0, no recent sales | 394 | Grey-blue |
 | Inactive Listing | UK stock 0 **and** no sales (dead listing) | 119 | Faint grey |
+
+**Published (live):** `tech_team_outputs.ph_task` — id **122** (`SMAW_thuwaraga_table5_all_asins-V1`,
+733-row snapshot) · id **137** (`…-V2`, 756-row current, FBM-fixed) — both `released`; project SMAW,
+developer Abiraj, assigned_user thuwaraga, assigned_user_team ph_priors, team Development.
 
 Rebuild: run `generate_dataset_all_asins.sql` via the Postgresql MCP; save the JSON array as
 `data_all.json`; `python build_all_html.py` (dashboard) and/or `python build_all.py` (Excel).

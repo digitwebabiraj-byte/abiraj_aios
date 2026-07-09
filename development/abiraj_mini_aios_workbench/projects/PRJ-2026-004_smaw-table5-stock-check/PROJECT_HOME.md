@@ -137,11 +137,15 @@ Imported 2026-07-09 under Task `REQ-06_table5-weekly-stock-check` (COPY-only; or
 
 ## Status
 
-**IN PROGRESS.** D01 (governed view), D02 (sellers-only dashboard) and D03 (full-portfolio all-ASIN
-dashboard, 733 ASINs) all delivered and reconciled. Reviewer sign-offs and Thuwaraga's confirmation
-of the Stockout/Inactive labelling split are open. Not yet validated/closed.
+**DELIVERED & LIVE (2026-07-09).** D01 (governed report), D02 (sellers-only dashboard) and D03
+(full-portfolio all-ASIN dashboard, **756 ASINs**) are complete, reconciled 0-mismatch to the live
+DB, and **published** to `tech_team_outputs.ph_task` (id **122** V1=733 · id **137** V2=756, FBM-fixed,
+both `released`). The Amazon-FBM display was corrected to match the live system (`wrong_sku` listings
+now read their real qty, display-only). Remaining are confirmations, not build work: reviewer sign-off
+(Tamil Selvan · Sajeesan) and Thuwaraga's nod on the Stockout/Inactive labelling.
 
 ## One Next Action
 
-**Have Thuwaraga review the D03 full-portfolio dashboard** (`Table5_Weekly_Stock_Check_Thuwaraga_ALL.html`)
-and confirm the Stockout-vs-Inactive labelling; then route to reviewer sign-off (Tamil Selvan · Sajeesan).
+**Route the published V2 dashboard (`ph_task` id 137) for reviewer sign-off** (Tamil Selvan ·
+Sajeesan) and Thuwaraga confirmation. (Standing, out of scope: obtain the legacy→canonical mapping
+source to retire the last `LEGACY?` flags.)

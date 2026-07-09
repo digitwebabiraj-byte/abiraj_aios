@@ -23,6 +23,12 @@ live AS (
   WHERE which_channel=1 AND market_place='UK' AND wrong_sku=0 AND fulfilment='merchant' AND ref_id IN (SELECT a FROM her_uk)
   ORDER BY ref_id, sub_source_name, quantity DESC NULLS LAST
 ),
+fbm_all AS (   -- Amazon FBM listing qty for DISPLAY only, regardless of wrong_sku (prefer clean, else flagged)
+  SELECT DISTINCT ON (ref_id, sub_source_name) ref_id AS asin, sub_source_name AS account, quantity::int AS fbm_qty
+  FROM public.listing_data
+  WHERE which_channel=1 AND market_place='UK' AND fulfilment='merchant' AND ref_id IN (SELECT a FROM her_uk)
+  ORDER BY ref_id, sub_source_name, wrong_sku ASC, quantity DESC NULLS LAST
+),
 order_sku AS (
   SELECT DISTINCT ON (asin, ss_name) asin, ss_name AS account, sku AS o_sku
   FROM public.order_transaction WHERE lower(user_name)='thuwaraga' AND source_name='AMAZON' AND market_place='UK' AND asin<>'' AND sku<>''
@@ -64,7 +70,8 @@ incoming AS (
   WHERE o.status_arrived=0 GROUP BY oi.sku
 )
 SELECT
-  r.asin, r.account, r.listing_sku, r.master_sku, r.amazon_fbm,
+  r.asin, r.account, r.listing_sku, r.master_sku,
+  COALESCE(fb.fbm_qty, r.amazon_fbm, 0) AS amazon_fbm,   -- display FBM qty incl. wrong_sku listings
   COALESCE(inv.uk_wh,0) AS uk_warehouse, r.units_90 AS order_count_90,
   CASE WHEN r.units_90>0 THEN ROUND((r.units_90/90.0)::numeric,2) END AS velocity,
   CASE WHEN r.units_90>0 AND COALESCE(inv.uk_wh,0)>0 THEN ROUND((COALESCE(inv.uk_wh,0)/(r.units_90/90.0))::numeric,0) END AS days_remaining,
@@ -77,6 +84,7 @@ SELECT
 FROM resolved r
 LEFT JOIN inv ON inv.sku=r.master_sku
 LEFT JOIN incoming inc ON inc.sku=r.master_sku
+LEFT JOIN fbm_all fb ON fb.asin=r.asin AND fb.account=r.account
 WHERE r.master_sku NOT LIKE 'amzn.gr.%'
 ORDER BY
   (CASE WHEN r.units_90>0 AND COALESCE(inv.uk_wh,0)<=0 THEN 0 WHEN r.units_90>0 THEN 1 ELSE 2 END),
