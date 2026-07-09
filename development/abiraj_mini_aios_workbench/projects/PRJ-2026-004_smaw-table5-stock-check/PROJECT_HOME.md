@@ -46,6 +46,10 @@ weekly every Monday).
   - **D02 (2026-07-09, Phase-02 — Reporting & Presentation):** Portfolio-Holder-facing
     interactive **HTML dashboard** rendering the Table 5 output (delivers the Peacock/Yellow/Red
     colour bands D01 left to the renderer) + scopes the full-portfolio (all-ASIN) expansion.
+  - **D03 (2026-07-09, Phase-03 — Full-Portfolio Coverage):** the all-ASIN build — universe =
+    every Amazon-UK ASIN with a live FBM listing OR a 90-day sale (listings ∪ `analytics.ph_segment`
+    ∪ sales), a strict superset of the sellers plus all idle stock. **733 ASINs**; all-ASIN HTML
+    dashboard that splits the zero-stock reds into real **Stockouts (9)** vs **Inactive listings (119)**.
 
 ## Approved Scope
 
@@ -87,18 +91,23 @@ Imported 2026-07-09 under Task `REQ-06_table5-weekly-stock-check` (COPY-only; or
   open task + validation steps.
 - `sql/REQ-06_table5-weekly-stock-check/generate_dataset.sql` — the dataset-rebuild query.
 - `evidence/final_outputs/REQ-06_table5-weekly-stock-check/`:
-  - `dataset.py` — current 240-row dataset (`DATA = [...]`).
-  - `build_report.py` — openpyxl styled-Excel builder.
-  - `build_html.py` — generator for the HTML dashboard (D02).
-  - `Table5_Weekly_Stock_Check_Thuwaraga.html` — the rendered dashboard (D02 deliverable).
+  - **Sellers-only (D01/D02, 240 rows):** `dataset.py` · `build_report.py` (Excel) ·
+    `build_html.py` → `Table5_Weekly_Stock_Check_Thuwaraga.html`.
+  - **Full-portfolio (D03, 733 ASINs):** `data_all.json` (raw pull) · `build_all.py` (plain
+    HTML + Excel) · `build_all_html.py` → `Table5_Weekly_Stock_Check_Thuwaraga_ALL.html`
+    (polished dashboard) · `Table5_Weekly_Stock_Check_Thuwaraga_ALL.xlsx`.
+- `sql/.../generate_dataset_all_asins.sql` — all-ASIN rebuild query (D03).
+- `evidence/source_documents/.../RUN_IN_CLAUDE_CODE.md` — D03 run instructions / handoff.
 
 ## Source-of-Truth Locations
 
-- **D02 dashboard (key deliverable):**
+- **D03 full-portfolio dashboard (current key deliverable, 733 ASINs):**
+  `evidence/final_outputs/REQ-06_table5-weekly-stock-check/Table5_Weekly_Stock_Check_Thuwaraga_ALL.html`
+  (regenerate via `build_all_html.py`; data spine `data_all.json`; rebuild query
+  `sql/.../generate_dataset_all_asins.sql`).
+- **D02 sellers-only dashboard (240 rows):**
   `evidence/final_outputs/REQ-06_table5-weekly-stock-check/Table5_Weekly_Stock_Check_Thuwaraga.html`
-  (regenerate via `build_html.py`).
-- **Data spine:** `evidence/final_outputs/REQ-06_table5-weekly-stock-check/dataset.py` (240 rows).
-- **Rebuild query:** `sql/REQ-06_table5-weekly-stock-check/generate_dataset.sql`.
+  (regenerate via `build_html.py`; data spine `dataset.py`; rebuild query `generate_dataset.sql`).
 - **Locked decisions / handoff:**
   `evidence/source_documents/REQ-06_table5-weekly-stock-check/HANDOFF.md`.
 - **Requirement docs (referenced, live outside this project):**
@@ -113,9 +122,12 @@ Imported 2026-07-09 under Task `REQ-06_table5-weekly-stock-check` (COPY-only; or
   master-mapping table exists in `order_management_copy` beyond `listing_data.mapped_sku` (NULL
   for these). 4 rows auto-flagged `LEGACY?` (B0DG25H3RQ, B0DGL8XMR7, B0DG2BN5YP, B0DGKR9FSM).
   **Decision: flag, do not auto-correct.**
-- **Sales-only coverage:** the report covers only ASINs with ≥1 sale in 90 days (all 240 rows).
-  Thuwaraga wants **all her ASINs incl. in-stock-but-no-sales** — needs an authoritative PH→ASIN
-  ownership source (ph-asin segmentation / `ph_action_board`) + a live re-pull. Awaiting decision.
+- **Sales-only coverage — RESOLVED in D03.** The all-ASIN build now covers the full portfolio
+  (733 ASINs: listings ∪ `analytics.ph_segment` ∪ 90-day sales, a strict superset of the 240
+  sellers — 0 dropped). Note the SQL marks every 0-stock row "No Stock / Critical" (128 rows);
+  the D03 dashboard splits these into **9 real Stockouts** (sold + 0 stock → reorder) vs **119
+  Inactive listings** (no stock, no sales → dead) so the red band isn't misread. Labelling split
+  awaiting Thuwaraga confirmation.
 - **4 UNPROVEN D01 fields:** Amazon FBA on-hand source · container ETA date · W1/W2/W3 warehouse
   mapping · authoritative "Last Stock Checked Date".
 - **Duplicate-truth:** `tech_team_outputs.ph_task` already holds `PSLD_thuwaraga_stock_Dashboard-V1`
@@ -125,11 +137,11 @@ Imported 2026-07-09 under Task `REQ-06_table5-weekly-stock-check` (COPY-only; or
 
 ## Status
 
-**IN PROGRESS.** D01 (governed view) and D02 (HTML dashboard) delivered; reviewer sign-offs and
-the full-portfolio-coverage decision are open. Not yet validated/closed.
+**IN PROGRESS.** D01 (governed view), D02 (sellers-only dashboard) and D03 (full-portfolio all-ASIN
+dashboard, 733 ASINs) all delivered and reconciled. Reviewer sign-offs and Thuwaraga's confirmation
+of the Stockout/Inactive labelling split are open. Not yet validated/closed.
 
 ## One Next Action
 
-**Get Thuwaraga's decision on the full-portfolio coverage** (which source defines "all her ASINs"
-+ whether no-sales-zero-stock items are included), then — once the Postgresql MCP is reconnected —
-re-pull and rebuild `dataset.py` to include no-sales-but-in-stock ASINs.
+**Have Thuwaraga review the D03 full-portfolio dashboard** (`Table5_Weekly_Stock_Check_Thuwaraga_ALL.html`)
+and confirm the Stockout-vs-Inactive labelling; then route to reviewer sign-off (Tamil Selvan · Sajeesan).
