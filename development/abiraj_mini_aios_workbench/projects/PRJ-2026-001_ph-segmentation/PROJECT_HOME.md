@@ -229,6 +229,12 @@ As of **2026-07-01** (DOCUMENTED_IN_D06 unless marked otherwise; the 30 Jun rows
 forward except where superseded by the 1 Jul increment — dashboard UI, movement window, orphan
 monitor, engine v2):
 
+> ⚠️ **This status snapshot is as of 30 Jun–3 Jul and is SUPERSEDED by REQ-05-D10 (2026-07-10).**
+> Current live state: leader (`ph_task` id 5) + **30** per-PH dashboards on the **corrected 9,947 / 30-PH**
+> build; every `8,149 / 24-PH` figure in the table below is the earlier build. See §1 of SYSTEM_REFERENCE,
+> the D10 handover, and the runbook. (The `analytics.ph_segment_report` table rebuild is the only open
+> source-of-truth gap — privileged `postgres` session, not `temp_user`.)
+
 | Aspect | State |
 |---|---|
 | Dashboard UI (`ph_task` row id 5) | **PH-dropdown + one-view flat table** (Rank/Avg Conv/Δ Conv/Status), classification logic unchanged; pushed live 1 Jul (~879,907 bytes) — supersedes the tabs/sidebar layout |
@@ -245,9 +251,10 @@ monitor, engine v2):
 | Final post-June refresh | **DONE 30 Jun** (reported) — was PENDING on 26 Jun |
 | Mark done database persistence | PENDING — **CONFIRMED not implemented** (file persists ticks to browser `localStorage` only) |
 
-> **Source-of-truth note:** `SYSTEM_REFERENCE.md` §1/§7 still show the superseded 7,855 distribution.
-> They were **not** overwritten because the 8,149 build is REPORTED_BY_ABIRAJ with no imported
-> artifact. Update §1/§7 only after the 30 Jun rebuilt HTML is imported and checksummed.
+> **Source-of-truth note (updated 2026-07-10 · D10):** `SYSTEM_REFERENCE.md` §1 now reflects the
+> **corrected 9,947 / 30-PH** build (queried + validated live); §7's older 8,149 detail is flagged
+> superseded. The corrected leader + 30 per-PH dashboards are live on `ph_task`. The one remaining gap
+> is the `analytics.ph_segment_report` **table** rebuild (privileged `postgres` session — see runbook §7).
 
 Records: `handover/REQ-05_ph-asin-segmentation/2026-06-30_delivery_final-june-refresh-and-data-quality-validation.md`,
 `validation/REQ-05_ph-asin-segmentation/2026-06-30_final-june-refresh_validation.md`,
@@ -263,8 +270,12 @@ Candidates only — **no Task IDs assigned** (no approved written requirement ex
 
 1. Enable and validate monthly PH report automation (Cloud Routine / `pg_cron` / manual on the 3rd).
 2. Implement database persistence for the "Mark done" action.
-3. Import the 30 Jun work products (rebuilt HTML + checksum, forced-window SQL line, chat link) and
-   then update `SYSTEM_REFERENCE.md` §1/§7 to the 8,149 build in a governed step.
+3. Import the 30 Jun work products (rebuilt HTML + checksum, forced-window SQL line, chat link).
+   *(2026-07-10 · REQ-05-D10 update: this is now historical. `SYSTEM_REFERENCE.md` §1 has been updated
+   to the **corrected 9,947 / 30-PH build** and §7 flagged superseded. The live dashboards (leader id 5 +
+   30 per-PH) are on the corrected build; the ONLY remaining source-of-truth gap is the
+   `analytics.ph_segment_report` table rebuild — which needs the privileged `postgres` session, not
+   `temp_user` — see `capability/2026-07-10_monthly-rebuild-and-push-runbook.md` §7.)*
 4. Adopt the **"last 4 complete weeks"** window (trial, then run past Bietrick) and fix the report
    **header label**; document the **66 "lateral SAME" moves** treatment in `SYSTEM_REFERENCE.md`.
    See `capability/2026-06-30_weekly-snapshot-window-and-data-quality-findings.md`.

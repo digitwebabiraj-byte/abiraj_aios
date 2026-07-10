@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PH ASIN Segmentation — Portfolio Holder View</title>
+<style>
+  :root{
+    --navy:#232a33; --navy2:#2f3a46; --ink:#1f2733; --muted:#6b7688; --line:#e3e8ef;
+    --bg:#eef1f4; --card:#ffffff; --green:#1b6e46; --greenhead:#14683f;
+    --teal:#0f9b8e; --teal2:#0c7d78; --slate:#2b333d; --slate2:#39434f;
+    --hHHH:#1A8A4A; --hHHL:#B87800; --hHLH:#1A6E99; --hLHH:#6B3FA0; --hLLH:#0D7377; --hLLL:#C0392B;
+    --mUP:#1A8A4A; --mDN:#C0392B; --mSAME:#8792a3; --mNEW:#2f6fb0;
+    --warn-bg:#fdeceb; --warn-line:#e6a59e; --warn-ink:#9a2a1f;
+    --shadow-sm:0 1px 2px rgba(16,33,56,.06),0 1px 3px rgba(16,33,56,.05);
+    --shadow-md:0 2px 6px rgba(16,33,56,.08),0 4px 14px rgba(16,33,56,.06);
+    --shadow-lg:0 6px 20px rgba(16,33,56,.12);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:
+         radial-gradient(1200px 400px at 100% -100px,rgba(15,155,142,.07),transparent 60%),
+         var(--bg);
+       color:var(--ink);font-size:13px;line-height:1.4}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  @keyframes escPulse{0%,100%{box-shadow:inset 4px 0 0 #c0392b}50%{box-shadow:inset 4px 0 0 #e0544a,0 2px 10px rgba(192,57,43,.14)}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* header */
+  .top{background:linear-gradient(120deg,#0a0b0e 0%,#111318 55%,#16191f 100%);
+       color:#fff;padding:15px 26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+       box-shadow:var(--shadow-md);position:relative;z-index:5;border-bottom:1px solid #23262d}
+  .top::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;
+       background:linear-gradient(90deg,transparent,#8a6d1f,#d4af37,#f0d878,#d4af37,#8a6d1f,transparent);
+       background-size:200% 100%;animation:goldSheen 8s linear infinite}
+  @keyframes goldSheen{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  .top .brand{font-weight:700;font-size:15.5px;letter-spacing:.4px;
+       background:linear-gradient(90deg,#f0d878,#d4af37);-webkit-background-clip:text;background-clip:text;
+       -webkit-text-fill-color:transparent;color:#d4af37}
+  .top .sub{color:#8f96a1;font-size:11.5px}
+  .top .spacer{flex:1}
+  .top label{color:#aeb4bf;font-size:12px;margin-right:8px;letter-spacing:.3px}
+  .top select{font-size:13px;padding:8px 12px;border-radius:8px;border:1px solid #b89540;
+       background:#ffffff;color:#1a1d22;font-weight:600;min-width:200px;box-shadow:var(--shadow-sm);
+       transition:box-shadow .18s ease}
+  .top select option{background:#ffffff;color:#1a1d22}
+  .top select:hover{box-shadow:0 0 0 3px rgba(212,175,55,.22)}
+  .top select:focus{outline:none;box-shadow:0 0 0 3px rgba(212,175,55,.4)}
+
+  .greet{background:linear-gradient(120deg,#111318,#1a1e25);color:#fff;padding:14px 26px;
+       border-bottom:1px solid #23262d;animation:fadeUp .4s ease both}
+  .greet h1{margin:0;font-size:17.5px;font-weight:700;color:#f3ead2;letter-spacing:.3px}
+  .greet .scope{color:#b7bdc7;font-size:12px;margin-top:3px}
+
+  /* escalation banner */
+  .esc{background:linear-gradient(90deg,#fbdedb,var(--warn-bg));border-bottom:1px solid var(--warn-line);
+       padding:12px 26px 12px 24px;font-size:12.5px;color:var(--warn-ink);display:flex;gap:22px;flex-wrap:wrap;
+       font-weight:600;box-shadow:inset 4px 0 0 #c0392b;animation:escPulse 3.4s ease-in-out infinite}
+  .esc div{display:flex;align-items:center;gap:6px}
+  .esc b{color:#a5241a;font-weight:800;font-size:14px}
+  .esc.ok{background:linear-gradient(90deg,#eaf6ef,#eef7f0);border-color:#bfe0cb;color:#2b6b43;
+       box-shadow:inset 4px 0 0 #3f9e63;animation:none;font-weight:600}
+
+  /* body */
+  .wrap{padding:20px 26px 60px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px 14px;
+       box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+       transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;animation:fadeUp .45s ease both}
+  .card::before{content:"";position:absolute;top:0;left:0;width:100%;height:4px;
+       background:var(--cAccent,linear-gradient(90deg,var(--teal),var(--hHHH)))}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+  .card:nth-child(1){animation-delay:.02s} .card:nth-child(2){animation-delay:.06s}
+  .card:nth-child(3){animation-delay:.10s} .card:nth-child(4){animation-delay:.14s}
+  .card:nth-child(5){animation-delay:.18s} .card:nth-child(6){animation-delay:.22s}
+  .card .k{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:600;padding-right:34px}
+  .card .v{font-size:26px;font-weight:800;margin-top:5px;color:var(--slate);line-height:1}
+  .card .s{color:var(--muted);font-size:11.5px;margin-top:4px}
+  /* per-card icon badge (top-right) */
+  .card .cardIcon{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:9px;
+       display:flex;align-items:center;justify-content:center;background:var(--cSoft,#eef4f6);
+       background-repeat:no-repeat;background-position:center;background-size:17px 17px}
+  /* c1 Assigned listings — teal (list) */
+  .card.c1{--cAccent:linear-gradient(90deg,#0f9b8e,#37c8bb);--cSoft:#e3f5f2}
+  .card.c1 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f9b8e' stroke-width='2.2' stroke-linecap='round'><line x1='8' y1='6' x2='21' y2='6'/><line x1='8' y1='12' x2='21' y2='12'/><line x1='8' y1='18' x2='21' y2='18'/><line x1='3' y1='6' x2='3.01' y2='6'/><line x1='3' y1='12' x2='3.01' y2='12'/><line x1='3' y1='18' x2='3.01' y2='18'/></svg>")}
+  /* c2 Distinct ASINs — blue (tag) */
+  .card.c2{--cAccent:linear-gradient(90deg,#2f6fb0,#5b9bd8);--cSoft:#e7f0fa}
+  .card.c2 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f6fb0' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z'/><line x1='7' y1='7' x2='7.01' y2='7'/></svg>")}
+  /* c3 Distinct SKUs — purple (box) */
+  .card.c3{--cAccent:linear-gradient(90deg,#6b3fa0,#9165c9);--cSoft:#f0e9f8}
+  .card.c3 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b3fa0' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'/><polyline points='3.27 6.96 12 12.01 20.73 6.96'/><line x1='12' y1='22.08' x2='12' y2='12'/></svg>")}
+  /* c4 Categories — slate (grid) */
+  .card.c4{--cAccent:linear-gradient(90deg,#39434f,#5b6675);--cSoft:#eceef1}
+  .card.c4 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2339434f' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='7' height='7'/><rect x='14' y='3' width='7' height='7'/><rect x='14' y='14' width='7' height='7'/><rect x='3' y='14' width='7' height='7'/></svg>")}
+  /* c5 Champions — GREEN, emphasized (trophy) */
+  .card.c5{--cAccent:linear-gradient(90deg,#1A8A4A,#37c26b);--cSoft:#dff3e6;
+       border-color:#a7dcbb;background:linear-gradient(180deg,#f2fbf5,#ffffff)}
+  .card.c5 .v{color:#1A8A4A}
+  .card.c5 .k{color:#1A8A4A}
+  .card.c5 .cardIcon{background:#1A8A4A;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M10.1 13.2L7.7 21.5l2.7-1.4 1.3 2.3.7-6.6z'/><path d='M13.9 13.2l2.4 8.3-2.7-1.4-1.3 2.3-.7-6.6z' opacity='0.9'/><circle cx='12' cy='8.5' r='6.3'/><circle cx='12' cy='8.5' r='3.1' fill='%231A8A4A'/></svg>")}
+  /* c6 Dead Horses — RED, emphasized (alert) */
+  .card.c6{--cAccent:linear-gradient(90deg,#C0392B,#e0685a);--cSoft:#fce4e1;
+       border-color:#eab5ae;background:linear-gradient(180deg,#fdf2f0,#ffffff)}
+  .card.c6 .v{color:#C0392B}
+  .card.c6 .k{color:#C0392B}
+  .card.c6 .cardIcon{background:#C0392B;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M12 3.2c.5 0 .95.26 1.2.7l8.3 14.4c.55.95-.14 2.15-1.24 2.15H3.74c-1.1 0-1.79-1.2-1.24-2.15L10.8 3.9c.25-.44.7-.7 1.2-.7z'/><rect x='11' y='9' width='2' height='5.4' rx='1' fill='%23C0392B'/><circle cx='12' cy='17' r='1.25' fill='%23C0392B'/></svg>")}
+  /* c7 Allocated — slate-blue (clipboard) */
+  .card.c7{--cAccent:linear-gradient(90deg,#4a6b8a,#7a97b5);--cSoft:#e9eff5}
+  .card.c7 .v{color:#3a5570}
+  .card.c7 .cardIcon{background:#4a6b8a;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='4' width='16' height='16' rx='2'/><path d='M9 9h6M9 13h6M9 17h3'/></svg>")}
+
+  .meta{display:flex;gap:26px;flex-wrap:wrap;background:linear-gradient(180deg,#ffffff,#fbfcfe);
+        border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:18px;
+        box-shadow:var(--shadow-sm);animation:fadeUp .5s ease both}
+  .meta div{font-size:12px}
+  .meta .k{color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+  .meta .v{font-weight:600;margin-top:3px;color:var(--ink)}
+
+  /* segment / movement chips */
+  .mix{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 18px}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:5px 12px;font-size:12px;
+        cursor:pointer;font-weight:600;color:#3a4658;user-select:none;box-shadow:var(--shadow-sm);
+        transition:transform .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease,border-color .15s ease;
+        animation:popIn .3s ease both}
+  .chip:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:#c3ceda}
+  .chip.on{background:linear-gradient(120deg,var(--slate),var(--teal2));color:#fff;border-color:var(--slate);
+        box-shadow:0 3px 10px rgba(43,51,61,.3)}
+  .chip .n{opacity:.7;font-weight:700;margin-left:5px}
+  .chip.on .n{opacity:.9}
+  /* colored dot before each segment chip label uses inline text; add left tint bar */
+  #segMix .chip{border-left:3px solid transparent}
+
+  h2.sec{font-size:13px;font-weight:700;margin:24px 0 9px;color:#26313f;text-transform:uppercase;
+       letter-spacing:.5px;position:relative;padding-left:12px}
+  h2.sec::before{content:"";position:absolute;left:0;top:1px;bottom:1px;width:4px;border-radius:3px;
+       background:linear-gradient(180deg,var(--teal),var(--hHHH))}
+  h2.sec .hint{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:12px}
+
+  /* tables */
+  .tblwrap{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:70vh;
+       box-shadow:var(--shadow-sm);animation:fadeUp .5s ease both}
+  table{border-collapse:collapse;width:100%;font-size:12px}
+  thead th{position:sticky;top:0;background:linear-gradient(180deg,#1a7a4c,var(--greenhead));color:#fff;
+       text-align:left;padding:10px 10px;font-weight:600;white-space:nowrap;cursor:pointer;font-size:11.5px;
+       z-index:2}
+  thead th.num{text-align:right}
+  thead th .ar{opacity:.5;font-size:10px;margin-left:3px}
+  tbody td{padding:8px 10px;border-bottom:1px solid #eef1f5;white-space:nowrap}
+  tbody td.num{text-align:right;font-variant-numeric:tabular-nums}
+  tbody tr{transition:background .12s ease}
+  tbody tr:nth-child(even){background:#fbfcfe}
+  tbody tr:hover{background:#eef6f1}
+  #catTbl tbody tr.catrow:hover{background:#eaf3fb}
+  #catTbl tbody tr.catrow:hover .catcue{color:var(--teal2)}
+  #catTbl tbody tr.catrow.on{background:linear-gradient(90deg,rgba(15,155,142,.16),rgba(15,155,142,.05));box-shadow:inset 3px 0 0 var(--teal)}
+  #catTbl tbody tr.catrow.on td{font-weight:600}
+  .catcue{display:inline-block;width:12px;color:#9aa7b5;font-size:11px;transition:color .15s ease}
+  #catTbl tbody tr.catrow.on .catcue{color:var(--teal2)}
+  .catactive{display:inline-block;margin-left:8px;font-size:10.5px;font-weight:700;color:var(--teal2);
+       background:rgba(15,155,142,.12);border:1px solid rgba(15,155,142,.35);border-radius:10px;padding:1px 7px;vertical-align:middle}
+  tbody tr.row-review{background:linear-gradient(90deg,rgba(224,169,46,.18),rgba(224,169,46,.06))}
+  tbody tr.row-review:hover{background:linear-gradient(90deg,rgba(224,169,46,.26),rgba(224,169,46,.10))}
+  tbody tr.row-review td:first-child{box-shadow:inset 3px 0 0 #d99b1c}
+  .seg{display:inline-block;padding:3px 8px;border-radius:6px;color:#fff;font-weight:700;font-size:11px;
+       box-shadow:0 1px 2px rgba(0,0,0,.12)}
+  .badge{display:inline-block;padding:3px 8px;border-radius:6px;font-weight:600;font-size:11px}
+  .dpos{color:var(--mUP);font-weight:600}.dneg{color:var(--mDN);font-weight:600}
+  .man{color:#9a6a00;font-weight:600}
+  .empty{padding:26px;text-align:center;color:var(--muted)}
+  .foot{color:var(--muted);font-size:11px;margin-top:14px}
+</style>
+</head>
+<body>
+  <div class="top">
+    <div>
+      <div class="brand">PH ASIN Segmentation</div>
+      <div class="sub">Growth Protection Engine · UK Amazon FBM · category-wise benchmarks</div>
+    </div>
+    <div class="spacer"></div>
+    <div><label for="phsel">Portfolio Holder</label>
+      <select id="phsel"></select></div>
+  </div>
+
+  <div class="greet">
+    <h1 id="gTitle">Select a Portfolio Holder</h1>
+    <div class="scope" id="gScope">Pick a name to see that portfolio only — segments, movement and benchmarks in one view.</div>
+  </div>
+
+  <div class="esc" id="escBar" style="display:none"></div>
+
+  <div class="wrap">
+    <div class="cards" id="cards"></div>
+    <div class="meta" id="meta"></div>
+
+    <h2 class="sec">Segment mix <span class="hint">— where each ASIN stands now · click to filter the table</span></h2>
+    <div class="mix" id="segMix"></div>
+    <h2 class="sec" style="margin-top:16px">Movement <span class="hint">— how each ASIN changed vs last window · NEW = first time seen (nothing to compare yet)</span></h2>
+    <div class="mix" id="movMix"></div>
+
+    <h2 class="sec">Category benchmark <span class="hint">— click a category row to see only its ranking · top-30 best-sellers per category (units-sold ranked); CVR = average of each product's conversion rate</span></h2>
+    <div class="tblwrap"><table id="catTbl"><thead></thead><tbody></tbody></table></div>
+
+    <h2 class="sec">ASIN-level view <span class="hint" id="asinHint"></span></h2>
+    <div class="foot" style="margin:0 0 8px">Status vs the category's top-N average conversions: <b>ABOVE</b> ≥ avg×1.10 · <b>NEAR</b> ±10% · <b>BELOW</b> ≤ avg×0.90 · <b>NEEDS REVIEW</b> = data-quality flag (conversions &gt; clicks, CVR &gt; 100%, or conversions with zero clicks). Segment &amp; Movement remain our engine's classification.</div>
+    <div class="tblwrap"><table id="asinTbl"><thead></thead><tbody></tbody></table></div>
+
+    <div class="foot" id="foot"></div>
+  </div>
+
+<script>
+const D=

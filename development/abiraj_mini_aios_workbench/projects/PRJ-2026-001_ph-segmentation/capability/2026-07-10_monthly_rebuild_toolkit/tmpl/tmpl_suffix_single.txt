@@ -1,0 +1,181 @@
+;
+const ACC=["DCVoltage UK","LEDSone UK"];
+const SEGCOL={HHH:"--hHHH",HHL:"--hHHL",HLH:"--hHLH",LHH:"--hLHH",LLH:"--hLLH",LLL:"--hLLL"};
+const SEGNAME={HHH:"Champions",HHL:"Leaky Buckets",HLH:"Wallflowers",LHH:"Hidden Gems",LLH:"Niche Winners",LLL:"Dead Horses"};
+const SEGORDER=["HHH","HHL","HLH","LHH","LLH","LLL"];
+const MOVCOL={IMPROVED:"--mUP",DECLINED:"--mDN",SAME:"--mSAME",NEW:"--mNEW"};
+const MOVORDER=["IMPROVED","DECLINED","SAME","NEW"];
+const STATCOL={ABOVE_TOP30_AVG:"--mUP",BELOW_TOP30_AVG:"--mDN",NEAR_TOP30_AVG:"--mSAME",NEEDS_REVIEW:"--hHHL"};
+// row columns: [phIdx,cat,seg,mov,asin,sku,acc,i,k,v,cvr,bi,bk,bcvr,rank]
+const C={ph:0,cat:1,seg:2,mov:3,asin:4,sku:5,acc:6,i:7,k:8,v:9,cvr:10,bi:11,bk:12,bcvr:13,rank:14};
+// category avg-conversion benchmark lookup (cats: [phIdx,cat,listings,topn,b_imp,b_clk,b_cvr,status,b_conv])
+const CATCONV={}; (D.cats||[]).forEach(c=>{CATCONV[c[0]+"|"+c[1]]=c[8];});
+function avgConvOf(r){const x=CATCONV[r[C.ph]+"|"+r[C.cat]];return x==null?0:x;}
+function statusOf(r){const v=r[C.v],k=r[C.k],cvr=r[C.cvr],avg=avgConvOf(r);
+  if(v>k || cvr>100 || (v>0&&k===0)) return "NEEDS_REVIEW";
+  if(avg>0){ if(v>=avg*1.10) return "ABOVE_TOP30_AVG"; if(v<=avg*0.90) return "BELOW_TOP30_AVG"; }
+  return "NEAR_TOP30_AVG";}
+function statBadge(s){const col=getComputedStyle(document.documentElement).getPropertyValue(STATCOL[s]||"--mSAME");
+  return `<span class="badge" style="background:${col}22;color:${col}">${s.replace(/_/g," ")}</span>`;}
+
+let cur=null, segFilter=null, movFilter=null, catFilter=null, sortKey=null, sortDir=1;
+
+const sel=document.getElementById("phsel");
+sel.innerHTML='<option value="">— choose —</option>'+D.phs.map((n,i)=>`<option value="${i}">${n}</option>`).join("");
+sel.addEventListener("change",()=>{const v=sel.value; cur=v===""?null:+v; segFilter=null; movFilter=null; catFilter=null; sortKey=null; render();});
+
+function fmt(n){return (n==null?0:n).toLocaleString()}
+function f1(n){return (n==null?0:n).toFixed(1)}
+function segBadge(s){return `<span class="seg" style="background:var(${SEGCOL[s]})">${s}</span>`}
+function movBadge(m){const c=MOVCOL[m];const col=getComputedStyle(document.documentElement).getPropertyValue(c);
+  return `<span class="badge" style="background:${col}22;color:${col}">${m}</span>`}
+function delta(x){const cls=x>0?"dpos":x<0?"dneg":"";const s=x>0?"+"+fmt(x):fmt(x);return `<span class="${cls}">${s}</span>`}
+
+function render(){
+  const esc=document.getElementById("escBar");
+  if(cur===null){
+    document.getElementById("gTitle").textContent="Select a Portfolio Holder";
+    document.getElementById("gScope").textContent="Pick a name to see that portfolio only — segments, movement and benchmarks in one view.";
+    document.getElementById("cards").innerHTML="";
+    document.getElementById("meta").innerHTML="";
+    document.getElementById("segMix").innerHTML="";
+    document.getElementById("movMix").innerHTML="";
+    esc.style.display="none";
+    catBody([]); asinBody([]); document.getElementById("foot").textContent="";
+    document.getElementById("asinHint").textContent="";
+    return;
+  }
+  const name=D.phs[cur];
+  const rows=D.rows.filter(r=>r[C.ph]===cur);
+  const cats=D.cats.filter(c=>c[0]===cur);
+  const listings=rows.length;
+  const asins=new Set(rows.map(r=>r[C.asin])).size;
+  const skus=new Set(rows.filter(r=>r[C.sku]).map(r=>r[C.sku])).size;
+  const ncat=new Set(rows.map(r=>r[C.cat])).size;
+  const segCount={},movCount={};
+  SEGORDER.forEach(s=>segCount[s]=0); MOVORDER.forEach(m=>movCount[m]=0);
+  rows.forEach(r=>{segCount[r[C.seg]]++;movCount[r[C.mov]]++});
+  const lllPct=listings?Math.round(1000*segCount.LLL/listings)/10:0;
+
+  document.getElementById("gTitle").textContent=name;
+  const _alloc=(D.alloc&&D.alloc[name])||0;
+  const _notActive=_alloc>asins?_alloc-asins:0;
+  document.getElementById("gScope").textContent=`${fmt(listings)} listings · ${fmt(asins)} ASINs active this window · ${fmt(_alloc)} allocated${_notActive>0?` (${fmt(_notActive)} not active)`:""} · ${fmt(skus)} SKUs · ${ncat} categor${ncat===1?"y":"ies"} — this portfolio only.`;
+
+  // cards
+  document.getElementById("cards").innerHTML=[
+    ["Assigned listings",fmt(listings),"rows in scope"],
+    ["Distinct ASINs",fmt(asins),""],
+    ["Distinct SKUs",fmt(skus),""],
+    ["Categories",fmt(ncat),""],
+    ["Champions (HHH)",fmt(segCount.HHH),"scale these"],
+    ["Dead Horses (LLL)",fmt(segCount.LLL),lllPct+"% of portfolio"],
+    ["Allocated",fmt(_alloc),_notActive>0?`${fmt(_notActive)} not active this window`:"all active"]
+  ].map((c,ci)=>`<div class="card c${ci+1}"><div class="cardIcon"></div><div class="k">${c[0]}</div><div class="v">${c[1]}</div><div class="s">${c[2]}</div></div>`).join("");
+
+  // meta strip
+  document.getElementById("meta").innerHTML=[
+    ["Current window (this report)","31 May – 27 Jun 2026 · last 4 complete weeks (UK Amazon FBM)"],
+    ["Benchmark","Top-30 best-sellers / category · average conversion rate"],
+    ["Movement compares","current vs previous 4 weeks: 3 May – 30 May 2026 → 31 May – 27 Jun 2026"],
+    ["Report period",D.period],
+    ["Generated",D.generated]
+  ].map(m=>`<div><div class="k">${m[0]}</div><div class="v">${m[1]}</div></div>`).join("");
+
+  // escalation banner (our §8 rules, this PH)
+  let e="";
+  if(lllPct>30) e+=`<div>\u26A0 <b>${lllPct}%</b> of this portfolio is in LLL (Dead Horses) \u2014 portfolio restructure review (\u00a78)</div>`;
+  if(movCount.DECLINED>5) e+=`<div>\u26A0 <b>${movCount.DECLINED}</b> ASINs declined this cycle \u2014 Bietrick + sub-leader review (\u00a78)</div>`;
+  if(e){esc.className="esc";esc.innerHTML=e;esc.style.display="flex";}
+  else {esc.className="esc ok";esc.innerHTML="\u2713 No \u00a78 escalation thresholds breached for this portfolio.";esc.style.display="flex";}
+
+  // mixes (filter chips)
+  document.getElementById("segMix").innerHTML=SEGORDER.map(s=>
+    `<span class="chip ${segFilter===s?'on':''}" data-seg="${s}"><span style="color:var(${SEGCOL[s]})">\u25CF</span> ${s} <span class="n">${segCount[s]}</span></span>`).join("");
+  document.getElementById("movMix").innerHTML=MOVORDER.map(m=>
+    `<span class="chip ${movFilter===m?'on':''}" data-mov="${m}">${m} <span class="n">${movCount[m]}</span></span>`).join("");
+  document.querySelectorAll("[data-seg]").forEach(el=>el.onclick=()=>{segFilter=segFilter===el.dataset.seg?null:el.dataset.seg;render();});
+  document.querySelectorAll("[data-mov]").forEach(el=>el.onclick=()=>{movFilter=movFilter===el.dataset.mov?null:el.dataset.mov;render();});
+
+  // category table
+  catHead();
+  catBody(cats);
+  document.querySelectorAll("[data-cat]").forEach(el=>el.onclick=()=>{const c=el.getAttribute("data-cat");catFilter=catFilter===c?null:c;render();});
+
+  // asin table
+  let ar=rows.slice();
+  if(catFilter) ar=ar.filter(r=>r[C.cat]===catFilter);
+  if(segFilter) ar=ar.filter(r=>r[C.seg]===segFilter);
+  if(movFilter) ar=ar.filter(r=>r[C.mov]===movFilter);
+  if(sortKey!=null){ar.sort((a,b)=>{
+    let x,y;
+    if(sortKey==="dImp"){x=a[C.i]-a[C.bi];y=b[C.i]-b[C.bi];}
+    else if(sortKey==="dClk"){x=a[C.k]-a[C.bk];y=b[C.k]-b[C.bk];}
+    else if(sortKey==="avgc"){x=avgConvOf(a);y=avgConvOf(b);}
+    else if(sortKey==="dConv"){x=a[C.v]-avgConvOf(a);y=b[C.v]-avgConvOf(b);}
+    else if(sortKey==="status"){x=statusOf(a);y=statusOf(b);}
+    else {x=a[sortKey];y=b[sortKey];}
+    if(typeof x==="string"){return sortDir*x.localeCompare(y)} return sortDir*((x||0)-(y||0))});}
+  asinHead();
+  asinBody(ar);
+  document.getElementById("asinHint").textContent=`— ${fmt(ar.length)} shown${catFilter?` · category: ${catFilter} (click it again to clear)`:""}${segFilter?` · segment ${segFilter}`:""}${movFilter?` · ${movFilter}`:""}`;
+  document.getElementById("foot").textContent=`Source: analytics.ph_segment_report (read-only). Segments, movement and benchmarks are the production engine's output — this view only reorganises them per portfolio holder.`;
+}
+
+/* ---- category table ---- */
+function catHead(){
+  document.querySelector("#catTbl thead").innerHTML=
+   `<tr><th>Category</th><th class="num">Listings</th><th class="num">Top-N used</th>
+    <th class="num">Avg impressions</th><th class="num">Avg clicks</th><th class="num">Avg conversions</th><th class="num">Benchmark CVR%</th><th>Status</th></tr>`;
+}
+function catBody(cats){
+  const tb=document.querySelector("#catTbl tbody");
+  if(!cats.length){tb.innerHTML='<tr><td class="empty" colspan="8">No categories.</td></tr>';return;}
+  tb.innerHTML=cats.map(c=>`<tr class="catrow ${catFilter===c[1]?'on':''}" data-cat="${String(c[1]).replace(/"/g,'&quot;')}" style="cursor:pointer">
+     <td><span class="catcue">${catFilter===c[1]?'▾':'▸'}</span> ${c[1]}${catFilter===c[1]?' <span class="catactive">filtering ✓</span>':''}</td><td class="num">${fmt(c[2])}</td><td class="num">${c[3]}</td>
+     <td class="num">${fmt(c[4])}</td><td class="num">${f1(c[5])}</td><td class="num">${f1(c[8])}</td><td class="num">${f1(c[6])}%</td>
+     <td>${c[7]==='NEEDS_MANUAL'?'<span class="man">NEEDS MANUAL</span>':c[7].replace('_',' ')}</td></tr>`).join("");
+}
+
+/* ---- asin table ---- */
+const ACOLS=[
+  ["Rank",C.rank,1],["Category",C.cat,0],["Segment",C.seg,0],["Movement",C.mov,0],["ASIN",C.asin,0],["SKU",C.sku,0],["Account",C.acc,0],
+  ["Impr",C.i,1],["Clicks",C.k,1],["Conv",C.v,1],["Row CVR%",C.cvr,1],
+  ["Avg impr",C.bi,1],["Avg clk",C.bk,1],["Avg conv","avgc",1],["Bench CVR%",C.bcvr,1],
+  ["\u0394 Impr","dImp",1],["\u0394 Clk","dClk",1],["\u0394 Conv","dConv",1],["Status","status",0]
+];
+function asinHead(){
+  document.querySelector("#asinTbl thead").innerHTML="<tr>"+ACOLS.map((c,idx)=>{
+    const num=c[2]?"num":"";const ar=(String(sortKey)===String(c[1]))?(sortDir>0?"\u25B2":"\u25BC"):"\u21C5";
+    return `<th class="${num}" data-k="${c[1]}">${c[0]}<span class="ar">${ar}</span></th>`;}).join("")+"</tr>";
+  document.querySelectorAll("#asinTbl thead th").forEach(th=>th.onclick=()=>{
+    const k=th.dataset.k; if(k==="dImp"||k==="dClk"){/*sort by computed*/}
+    if(sortKey===k){sortDir*=-1}else{sortKey=k;sortDir=1} render();});
+}
+function asinBody(rows){
+  const tb=document.querySelector("#asinTbl tbody");
+  if(!rows.length){tb.innerHTML='<tr><td class="empty" colspan="19">No ASINs match this filter.</td></tr>';return;}
+  const frag=rows.map(r=>{
+    const avgc=avgConvOf(r);
+    const dImp=r[C.i]-r[C.bi], dClk=r[C.k]-r[C.bk], dConv=r[C.v]-avgc;
+    const _st=statusOf(r);
+    const _rowcls=_st==="NEEDS_REVIEW"?" row-review":"";
+    return `<tr class="${_rowcls.trim()}">
+      <td class="num">${r[C.rank]}</td>
+      <td>${r[C.cat]}</td><td>${segBadge(r[C.seg])}</td><td>${movBadge(r[C.mov])}</td>
+      <td>${r[C.asin]}</td><td>${r[C.sku]||'<span class="man">—</span>'}</td><td>${ACC[r[C.acc]]}</td>
+      <td class="num">${fmt(r[C.i])}</td><td class="num">${fmt(r[C.k])}</td><td class="num">${fmt(r[C.v])}</td>
+      <td class="num">${f1(r[C.cvr])}%</td>
+      <td class="num">${fmt(r[C.bi])}</td><td class="num">${f1(r[C.bk])}</td><td class="num">${f1(avgc)}</td><td class="num">${f1(r[C.bcvr])}%</td>
+      <td class="num">${delta(dImp)}</td><td class="num">${delta(Math.round(dClk))}</td><td class="num">${delta(Math.round(dConv*10)/10)}</td>
+      <td>${statBadge(statusOf(r))}</td></tr>`;
+  }).join("");
+  tb.innerHTML=frag;
+}
+// sort support for computed delta columns
+const _origSort=render;
+if(D.phs.length===1){sel.value='0';cur=0;}
+render();
+</script>
+</body>
+</html>

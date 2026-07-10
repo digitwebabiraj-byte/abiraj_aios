@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PH ASIN Segmentation — Portfolio Holder View</title>
+<style>
+  :root{
+    --navy:#232a33; --navy2:#2f3a46; --ink:#1f2733; --muted:#6b7688; --line:#e3e8ef;
+    --bg:#eef1f4; --card:#ffffff; --green:#1b6e46; --greenhead:#14683f;
+    --teal:#0f9b8e; --teal2:#0c7d78; --slate:#2b333d; --slate2:#39434f;
+    --hHHH:#1A8A4A; --hHHL:#B87800; --hHLH:#1A6E99; --hLHH:#6B3FA0; --hLLH:#0D7377; --hLLL:#C0392B;
+    --mUP:#1A8A4A; --mDN:#C0392B; --mSAME:#8792a3; --mNEW:#2f6fb0;
+    --warn-bg:#fdeceb; --warn-line:#e6a59e; --warn-ink:#9a2a1f;
+    --shadow-sm:0 1px 2px rgba(16,33,56,.06),0 1px 3px rgba(16,33,56,.05);
+    --shadow-md:0 2px 6px rgba(16,33,56,.08),0 4px 14px rgba(16,33,56,.06);
+    --shadow-lg:0 6px 20px rgba(16,33,56,.12);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:
+         radial-gradient(1200px 400px at 100% -100px,rgba(15,155,142,.07),transparent 60%),
+         var(--bg);
+       color:var(--ink);font-size:13px;line-height:1.4}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  @keyframes escPulse{0%,100%{box-shadow:inset 4px 0 0 #c0392b}50%{box-shadow:inset 4px 0 0 #e0544a,0 2px 10px rgba(192,57,43,.14)}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* header */
+  .top{background:linear-gradient(120deg,#0a0b0e 0%,#111318 55%,#16191f 100%);
+       color:#fff;padding:15px 26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+       box-shadow:var(--shadow-md);position:relative;z-index:5;border-bottom:1px solid #23262d}
+  .top::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;
+       background:linear-gradient(90deg,transparent,#8a6d1f,#d4af37,#f0d878,#d4af37,#8a6d1f,transparent);
+       background-size:200% 100%;animation:goldSheen 8s linear infinite}
+  @keyframes goldSheen{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  .top .brand{font-weight:700;font-size:15.5px;letter-spacing:.4px;
+       background:linear-gradient(90deg,#f0d878,#d4af37);-webkit-background-clip:text;background-clip:text;
+       -webkit-text-fill-color:transparent;color:#d4af37}
+  .top .sub{color:#8f96a1;font-size:11.5px}
+  .top .spacer{flex:1}
+  .top label{color:#aeb4bf;font-size:12px;margin-right:8px;letter-spacing:.3px}
+  .top select{font-size:13px;padding:8px 12px;border-radius:8px;border:1px solid #b89540;
+       background:#ffffff;color:#1a1d22;font-weight:600;min-width:200px;box-shadow:var(--shadow-sm);
+       transition:box-shadow .18s ease}
+  .top select option{background:#ffffff;color:#1a1d22}
+  .top select:hover{box-shadow:0 0 0 3px rgba(212,175,55,.22)}
+  .top select:focus{outline:none;box-shadow:0 0 0 3px rgba(212,175,55,.4)}
+
+  .greet{background:linear-gradient(120deg,#111318,#1a1e25);color:#fff;padding:14px 26px;
+       border-bottom:1px solid #23262d;animation:fadeUp .4s ease both}
+  .greet h1{margin:0;font-size:17.5px;font-weight:700;color:#f3ead2;letter-spacing:.3px}
+  .greet .scope{color:#b7bdc7;font-size:12px;margin-top:3px}
+
+  /* escalation banner */
+  .esc{background:linear-gradient(90deg,#fbdedb,var(--warn-bg));border-bottom:1px solid var(--warn-line);
+       padding:12px 26px 12px 24px;font-size:12.5px;color:var(--warn-ink);display:flex;gap:22px;flex-wrap:wrap;
+       font-weight:600;box-shadow:inset 4px 0 0 #c0392b;animation:escPulse 3.4s ease-in-out infinite}
+  .esc div{display:flex;align-items:center;gap:6px}
+  .esc b{color:#a5241a;font-weight:800;font-size:14px}
+  .esc.ok{background:linear-gradient(90deg,#eaf6ef,#eef7f0);border-color:#bfe0cb;color:#2b6b43;
+       box-shadow:inset 4px 0 0 #3f9e63;animation:none;font-weight:600}
+
+  /* body */
+  .wrap{padding:20px 26px 60px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px 14px;
+       box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+       transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;animation:fadeUp .45s ease both}
+  .card::before{content:"";position:absolute;top:0;left:0;width:100%;height:4px;
+       background:var(--cAccent,linear-gradient(90deg,var(--teal),var(--hHHH)))}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+  .card:nth-child(1){animation-delay:.02s} .card:nth-child(2){animation-delay:.06s}
+  .card:nth-child(3){animation-delay:.10s} .card:nth-child(4){animation-delay:.14s}
+  .card:nth-child(5){animation-delay:.18s} .card:nth-child(6){animation-delay:.22s}
+  .card .k{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:600;padding-right:34px}
+  .card .v{font-size:26px;font-weight:800;margin-top:5px;color:var(--slate);line-height:1}
+  .card .s{color:var(--muted);font-size:11.5px;margin-top:4px}
+  /* per-card icon badge (top-right) */
+  .card .cardIcon{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:9px;
+       display:flex;align-items:center;justify-content:center;background:var(--cSoft,#eef4f6);
+       background-repeat:no-repeat;background-position:center;background-size:17px 17px}
+  /* c1 Assigned listings — teal (list) */
+  .card.c1{--cAccent:linear-gradient(90deg,#0f9b8e,#37c8bb);--cSoft:#e3f5f2}
+  .card.c1 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f9b8e' stroke-width='2.2' stroke-linecap='round'><line x1='8' y1='6' x2='21' y2='6'/><line x1='8' y1='12' x2='21' y2='12'/><line x1='8' y1='18' x2='21' y2='18'/><line x1='3' y1='6' x2='3.01' y2='6'/><line x1='3' y1='12' x2='3.01' y2='12'/><line x1='3' y1='18' x2='3.01' y2='18'/></svg>")}
+  /* c2 Distinct ASINs — blue (tag) */
+  .card.c2{--cAccent:linear-gradient(90deg,#2f6fb0,#5b9bd8);--cSoft:#e7f0fa}
+  .card.c2 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f6fb0' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z'/><line x1='7' y1='7' x2='7.01' y2='7'/></svg>")}
+  /* c3 Distinct SKUs — purple (box) */
+  .card.c3{--cAccent:linear-gradient(90deg,#6b3fa0,#9165c9);--cSoft:#f0e9f8}
+  .card.c3 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b3fa0' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'/><polyline points='3.27 6.96 12 12.01 20.73 6.96'/><line x1='12' y1='22.08' x2='12' y2='12'/></svg>")}
+  /* c4 Categories — slate (grid) */
+  .card.c4{--cAccent:linear-gradient(90deg,#39434f,#5b6675);--cSoft:#eceef1}
+  .card.c4 .cardIcon{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2339434f' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='7' height='7'/><rect x='14' y='3' width='7' height='7'/><rect x='14' y='14' width='7' height='7'/><rect x='3' y='14' width='7' height='7'/></svg>")}
+  /* c5 Champions — GREEN, emphasized (trophy) */
+  .card.c5{--cAccent:linear-gradient(90deg,#1A8A4A,#37c26b);--cSoft:#dff3e6;
+       border-color:#a7dcbb;background:linear-gradient(180deg,#f2fbf5,#ffffff)}
+  .card.c5 .v{color:#1A8A4A}
+  .card.c5 .k{color:#1A8A4A}
+  .card.c5 .cardIcon{background:#1A8A4A;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M10.1 13.2L7.7 21.5l2.7-1.4 1.3 2.3.7-6.6z'/><path d='M13.9 13.2l2.4 8.3-2.7-1.4-1.3 2.3-.7-6.6z' opacity='0.9'/><circle cx='12' cy='8.5' r='6.3'/><circle cx='12' cy='8.5' r='3.1' fill='%231A8A4A'/></svg>")}
+  /* c6 Dead Horses — RED, emphasized (alert) */
+  .card.c6{--cAccent:linear-gradient(90deg,#C0392B,#e0685a);--cSoft:#fce4e1;
+       border-color:#eab5ae;background:linear-gradient(180deg,#fdf2f0,#ffffff)}
+  .card.c6 .v{color:#C0392B}
+  .card.c6 .k{color:#C0392B}
+  .card.c6 .cardIcon{background:#C0392B;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M12 3.2c.5 0 .95.26 1.2.7l8.3 14.4c.55.95-.14 2.15-1.24 2.15H3.74c-1.1 0-1.79-1.2-1.24-2.15L10.8 3.9c.25-.44.7-.7 1.2-.7z'/><rect x='11' y='9' width='2' height='5.4' rx='1' fill='%23C0392B'/><circle cx='12' cy='17' r='1.25' fill='%23C0392B'/></svg>")}
+  /* c7 Allocated — slate-blue (clipboard) */
+  .card.c7{--cAccent:linear-gradient(90deg,#4a6b8a,#7a97b5);--cSoft:#e9eff5}
+  .card.c7 .v{color:#3a5570}
+  .card.c7 .cardIcon{background:#4a6b8a;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='4' width='16' height='16' rx='2'/><path d='M9 9h6M9 13h6M9 17h3'/></svg>")}
+
+  .meta{display:flex;gap:26px;flex-wrap:wrap;background:linear-gradient(180deg,#ffffff,#fbfcfe);
+        border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:18px;
+        box-shadow:var(--shadow-sm);animation:fadeUp .5s ease both}
+  .meta div{font-size:12px}
+  .meta .k{color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+  .meta .v{font-weight:600;margin-top:3px;color:var(--ink)}
+
+  /* segment / movement chips */
+  .mix{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 18px}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:5px 12px;font-size:12px;
+        cursor:pointer;font-weight:600;color:#3a4658;user-select:none;box-shadow:var(--shadow-sm);
+        transition:transform .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease,border-color .15s ease;
+        animation:popIn .3s ease both}
+  .chip:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:#c3ceda}
+  .chip.on{background:linear-gradient(120deg,var(--slate),var(--teal2));color:#fff;border-color:var(--slate);
+        box-shadow:0 3px 10px rgba(43,51,61,.3)}
+  .chip .n{opacity:.7;font-weight:700;margin-left:5px}
+  .chip.on .n{opacity:.9}
+  /* colored dot before each segment chip label uses inline text; add left tint bar */
+  #segMix .chip{border-left:3px solid transparent}
+
+  h2.sec{font-size:13px;font-weight:700;margin:24px 0 9px;color:#26313f;text-transform:uppercase;
+       letter-spacing:.5px;position:relative;padding-left:12px}
+  h2.sec::before{content:"";position:absolute;left:0;top:1px;bottom:1px;width:4px;border-radius:3px;
+       background:linear-gradient(180deg,var(--teal),var(--hHHH))}
+  h2.sec .hint{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:12px}
+
+  /* tables */
+  .tblwrap{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:70vh;
+       box-shadow:var(--shadow-sm);animation:fadeUp .5s ease both}
+  table{border-collapse:collapse;width:100%;font-size:12px}
+  thead th{position:sticky;top:0;background:linear-gradient(180deg,#1a7a4c,var(--greenhead));color:#fff;
+       text-align:left;padding:10px 10px;font-weight:600;white-space:nowrap;cursor:pointer;font-size:11.5px;
+       z-index:2}
+  thead th.num{text-align:right}
+  thead th .ar{opacity:.5;font-size:10px;margin-left:3px}
+  tbody td{padding:8px 10px;border-bottom:1px solid #eef1f5;white-space:nowrap}
+  tbody td.num{text-align:right;font-variant-numeric:tabular-nums}
+  tbody tr{transition:background .12s ease}
+  tbody tr:nth-child(even){background:#fbfcfe}
+  tbody tr:hover{background:#eef6f1}
+  #catTbl tbody tr.catrow:hover{background:#eaf3fb}
+  #catTbl tbody tr.catrow:hover .catcue{color:var(--teal2)}
+  #catTbl tbody tr.catrow.on{background:linear-gradient(90deg,rgba(15,155,142,.16),rgba(15,155,142,.05));box-shadow:inset 3px 0 0 var(--teal)}
+  #catTbl tbody tr.catrow.on td{font-weight:600}
+  .catcue{display:inline-block;width:12px;color:#9aa7b5;font-size:11px;transition:color .15s ease}
+  #catTbl tbody tr.catrow.on .catcue{color:var(--teal2)}
+  .catactive{display:inline-block;margin-left:8px;font-size:10.5px;font-weight:700;color:var(--teal2);
+       background:rgba(15,155,142,.12);border:1px solid rgba(15,155,142,.35);border-radius:10px;padding:1px 7px;vertical-align:middle}
+  tbody tr.row-review{background:linear-gradient(90deg,rgba(224,169,46,.18),rgba(224,169,46,.06))}
+  tbody tr.row-review:hover{background:linear-gradient(90deg,rgba(224,169,46,.26),rgba(224,169,46,.10))}
+  tbody tr.row-review td:first-child{box-shadow:inset 3px 0 0 #d99b1c}
+  .seg{display:inline-block;padding:3px 8px;border-radius:6px;color:#fff;font-weight:700;font-size:11px;
+       box-shadow:0 1px 2px rgba(0,0,0,.12)}
+  .badge{display:inline-block;padding:3px 8px;border-radius:6px;font-weight:600;font-size:11px}
+  .dpos{color:var(--mUP);font-weight:600}.dneg{color:var(--mDN);font-weight:600}
+  .man{color:#9a6a00;font-weight:600}
+  .empty{padding:26px;text-align:center;color:var(--muted)}
+  .foot{color:var(--muted);font-size:11px;margin-top:14px}
+  .top label,.top select{display:none!important}
+</style>
+</head>
+<body>
+  <div class="top">
+    <div>
+      <div class="brand">PH ASIN Segmentation</div>
+      <div class="sub">Growth Protection Engine · UK Amazon FBM · category-wise benchmarks</div>
+    </div>
+    <div class="spacer"></div>
+    <div><label for="phsel">Portfolio Holder</label>
+      <select id="phsel"></select></div>
+  </div>
+
+  <div class="greet">
+    <h1 id="gTitle">Select a Portfolio Holder</h1>
+    <div class="scope" id="gScope">Pick a name to see that portfolio only — segments, movement and benchmarks in one view.</div>
+  </div>
+
+  <div class="esc" id="escBar" style="display:none"></div>
+
+  <div class="wrap">
+    <div class="cards" id="cards"></div>
+    <div class="meta" id="meta"></div>
+
+    <h2 class="sec">Segment mix <span class="hint">— where each ASIN stands now · click to filter the table</span></h2>
+    <div class="mix" id="segMix"></div>
+    <h2 class="sec" style="margin-top:16px">Movement <span class="hint">— how each ASIN changed vs last window · NEW = first time seen (nothing to compare yet)</span></h2>
+    <div class="mix" id="movMix"></div>
+
+    <h2 class="sec">Category benchmark <span class="hint">— click a category row to see only its ranking · top-30 best-sellers per category (units-sold ranked); CVR = average of each product's conversion rate</span></h2>
+    <div class="tblwrap"><table id="catTbl"><thead></thead><tbody></tbody></table></div>
+
+    <h2 class="sec">ASIN-level view <span class="hint" id="asinHint"></span></h2>
+    <div class="foot" style="margin:0 0 8px">Status vs the category's top-N average conversions: <b>ABOVE</b> ≥ avg×1.10 · <b>NEAR</b> ±10% · <b>BELOW</b> ≤ avg×0.90 · <b>NEEDS REVIEW</b> = data-quality flag (conversions &gt; clicks, CVR &gt; 100%, or conversions with zero clicks). Segment &amp; Movement remain our engine's classification.</div>
+    <div class="tblwrap"><table id="asinTbl"><thead></thead><tbody></tbody></table></div>
+
+    <div class="foot" id="foot"></div>
+  </div>
+
+<script>
+const D={"period":"2026-07", "generated":"01 Jul 2026", "phs":["Dilani"], "alloc":{"Dilani":332}, "rows":[[0, "LED Module", "HHH", "SAME", "B0DGGGFFWN", "IMWW", 0, 230, 8, 3, 37.5, 159, 3.8, 31.5, 1], [0, "LED Module", "HHL", "IMPROVED", "B0DGGKGSZL", "IMWW FPK", 0, 353, 10, 2, 20, 159, 3.8, 31.5, 2], [0, "LED Module", "LLL", "DECLINED", "B0C5TGB9R1", "IMCWEPK", 0, 87, 0, 1, 0, 159, 3.8, 31.5, 3], [0, "LED Module", "LLH", "IMPROVED", "B0C5THWZNQ", "IMRGCPK", 0, 96, 1, 1, 100, 159, 3.8, 31.5, 4], [0, "LED Module", "LLL", "SAME", "B0D9GYS3S4", "CMWHCPK", 1, 28, 0, 1, 0, 159, 3.8, 31.5, 5], [0, "LED Module", "LLL", "SAME", "B07Y5F6QJD", "IMRGCPK", 0, 116, 1, 0, 0, 159, 3.8, 31.5, 6], [0, "LED Module", "LLL", "SAME", "B0C5TH4HZL", "IMRGEPK", 0, 27, 0, 0, 0, 159, 3.8, 31.5, 7], [0, "LED Module", "LLL", "DECLINED", "B0C5TJ51QZ", "IMCWAPK", 0, 149, 2, 0, 0, 159, 3.8, 31.5, 8], [0, "LED Module", "HLH", "DECLINED", "B0C5TJDGHJ", "IMRGAPK", 0, 200, 3, 0, 0, 159, 3.8, 31.5, 9], [0, "LED Module", "LLL", "SAME", "B0D8P6SQWH", "IMBLEPK", 1, 4, 0, 0, 0, 159, 3.8, 31.5, 10], [0, "LED Module", "LLL", "SAME", "B0D8P7DH2B", "IMREFPK", 1, 1, 0, 0, 0, 159, 3.8, 31.5, 11], [0, "LED Module", "LLL", "SAME", "B0D8PBCCH6", "IMRECPK", 1, 1, 0, 0, 0, 159, 3.8, 31.5, 12], [0, "LED Module", "LLL", "SAME", "B0D8PDZN82", "IMRGCPK", 1, 42, 0, 0, 0, 159, 3.8, 31.5, 13], [0, "LED Module", "HLH", "DECLINED", "B0D8PFN4W7", "IMCWEPK", 1, 263, 1, 0, 0, 159, 3.8, 31.5, 14], [0, "LED Module", "LLL", "SAME", "B0D8PLSVLL", "IMGRFPK", 1, 1, 0, 0, 0, 159, 3.8, 31.5, 15], [0, "LED Module", "HHL", "SAME", "B0D8PSM4WH", "IMRGEPK", 1, 619, 8, 0, 0, 159, 3.8, 31.5, 16], [0, "LED Module", "LLL", "SAME", "B0D8PV3WSH", "IMCWCPK", 1, 8, 0, 0, 0, 159, 3.8, 31.5, 17], [0, "LED Module", "LLL", "SAME", "B0D9GYHRNK", "CMWHEPK", 1, 5, 0, 0, 0, 159, 3.8, 31.5, 18], [0, "LED Module", "HHL", "DECLINED", "B0D9GYV6MY", "CMWHEPK", 1, 177, 5, 0, 0, 159, 3.8, 31.5, 19], [0, "LED Module", "LLL", "SAME", "B0D9GZCMXN", "CMWHAPK", 1, 55, 1, 0, 0, 159, 3.8, 31.5, 20], [0, "LED Module", "LLL", "SAME", "B0DBHMG5DT", "IMGRFPK", 0, 2, 0, 0, 0, 159, 3.8, 31.5, 21], [0, "LED Module", "LLL", "SAME", "B0DBHPLXYS", "IMRGFPK", 0, 8, 0, 0, 0, 159, 3.8, 31.5, 22], [0, "LED Module", "LLL", "SAME", "B0DC9NC1C9", "IMGREPK", 0, 5, 1, 0, 0, 159, 3.8, 31.5, 23], [0, "LED Module", "HHL", "SAME", "B0DCBHCVDT", "IMBLEPK", 0, 374, 4, 0, 0, 159, 3.8, 31.5, 24], [0, "LED Module", "LLL", "SAME", "B0DGGFPWBS", "", 1, 5, 0, 0, 0, 159, 3.8, 31.5, 25], [0, "LED Module", "LLL", "SAME", "B0DGGG4BDH", "IMCWCPK", 1, 16, 0, 0, 0, 159, 3.8, 31.5, 26], [0, "LED Module", "LLL", "SAME", "B0DGGGRR3V", "", 1, 5, 0, 0, 0, 159, 3.8, 31.5, 27], [0, "LED Module", "LLL", "SAME", "B0DZX2WJ3Y", "CMWHDPK", 1, 113, 1, 0, 0, 159, 3.8, 31.5, 28], [0, "LED Module", "LLL", "SAME", "B0F37W8XS9", "CMWHDPK", 0, 5, 0, 0, 0, 159, 3.8, 31.5, 29], [0, "LED Module", "LLL", "SAME", "B0G42GDKFN", "", 1, 1, 0, 0, 0, 159, 3.8, 31.5, 30], [0, "LED Module", "LLL", "SAME", "B0G42JPF13", "IMBLCPK", 1, 16, 0, 0, 0, 159, 3.8, 31.5, 31], [0, "LED Module", "LLL", "SAME", "B0G42NY6Z3", "IMCWCPK", 1, 37, 0, 0, 0, 159, 3.8, 31.5, 32], [0, "LED Module", "LLL", "SAME", "B0G42RDQVX", "", 1, 13, 0, 0, 0, 159, 3.8, 31.5, 33], [0, "LED Module", "LLL", "SAME", "B0G6CMXXWS", "IMGRCPK", 0, 2, 0, 0, 0, 159, 3.8, 31.5, 34], [0, "LED Module", "LLL", "SAME", "B0G6CQRZ6Z", "IMBLEPK", 0, 3, 0, 0, 0, 159, 3.8, 31.5, 35], [0, "LED Module", "LLL", "SAME", "B0G6CZ2SMK", "IMBLCPK", 0, 72, 0, 0, 0, 159, 3.8, 31.5, 36], [0, "LED Module", "LLL", "SAME", "B0G6D2CY6C", "IMRGEPK", 0, 9, 0, 0, 0, 159, 3.8, 31.5, 37], [0, "LED Module", "LLL", "DECLINED", "B0G6D98NRY", "IMCWEPK", 0, 122, 1, 0, 0, 159, 3.8, 31.5, 38], [0, "LED Module", "LLL", "SAME", "B0G6D9CKR6", "IMCWCPK", 0, 43, 1, 0, 0, 159, 3.8, 31.5, 39], [0, "Transformer", "LLH", "IMPROVED", "B0DP24V286", "12UK3P2A", 0, 277, 1, 2, 200, 613, 4.1, 81.1, 1], [0, "Transformer", "HLH", "IMPROVED", "B0G7CBNVMV", "12UK3P5A+SLW8", 0, 654, 1, 8, 800, 613, 4.1, 81.1, 2], [0, "Transformer", "HHL", "IMPROVED", "B08PYZLJCK", "12IP6745", 1, 690, 6, 2, 33.3, 613, 4.1, 81.1, 3], [0, "Transformer", "HLH", "IMPROVED", "B07CPZMYPX", "12IP6736", 1, 685, 2, 2, 100, 613, 4.1, 81.1, 4], [0, "Transformer", "HHL", "SAME", "B07D3Q8SQ9", "12IP67150", 1, 1441, 11, 3, 27.3, 613, 4.1, 81.1, 5], [0, "Transformer", "HHL", "IMPROVED", "B07DW3ZY1P", "CCBC3", 1, 206, 5, 0, 0, 613, 4.1, 81.1, 6], [0, "Transformer", "LLL", "SAME", "B07FDTMWHC", "CCBC24", 1, 600, 4, 0, 0, 613, 4.1, 81.1, 7], [0, "Transformer", "LLL", "SAME", "B07FDVJPTV", "CCBC12", 1, 124, 2, 0, 0, 613, 4.1, 81.1, 8], [0, "Transformer", "LLL", "SAME", "B07MF6MSMS", "CCBKNWE36", 1, 238, 3, 0, 0, 613, 4.1, 81.1, 9], [0, "Transformer", "LLL", "SAME", "B07Q5Z23V7", "24IP20360", 0, 275, 2, 1, 50, 613, 4.1, 81.1, 10], [0, "Transformer", "LLL", "SAME", "B07SSFPBJJ", "24IP67120", 1, 516, 4, 2, 50, 613, 4.1, 81.1, 11], [0, "Transformer", "LLH", "DECLINED", "B07B26JKDT", "12IP67250", 1, 587, 1, 2, 200, 613, 4.1, 81.1, 12], [0, "Transformer", "HHL", "IMPROVED", "B07B2WVRJ5", "12IP6715", 1, 461, 6, 2, 33.3, 613, 4.1, 81.1, 13], [0, "Transformer", "LLH", "IMPROVED", "B07CJHLMX1", "24IP20360", 0, 343, 1, 2, 200, 613, 4.1, 81.1, 14], [0, "Transformer", "LLL", "SAME", "B07MBLMGLL", "CCBKNWE12", 1, 543, 2, 0, 0, 613, 4.1, 81.1, 15], [0, "Transformer", "LLL", "SAME", "B07MLDZW2R", "CCBKNWE3", 1, 394, 0, 0, 0, 613, 4.1, 81.1, 16], [0, "Transformer", "HLH", "DECLINED", "B07QV1YKZW", "12RPIP45100", 0, 821, 4, 5, 125, 613, 4.1, 81.1, 17], [0, "Transformer", "LLH", "SAME", "B098QMRLZN", "CCBC3", 1, 282, 1, 1, 100, 613, 4.1, 81.1, 18], [0, "Transformer", "HHL", "IMPROVED", "B09L11514G", "12UK3P5A", 1, 818, 8, 2, 25, 613, 4.1, 81.1, 19], [0, "Transformer", "HLH", "IMPROVED", "B09L115HFJ", "12UK3P10A", 1, 809, 3, 6, 200, 613, 4.1, 81.1, 20], [0, "Transformer", "LLL", "DECLINED", "B09Z6RHPL3", "CCBC5", 1, 527, 4, 2, 50, 613, 4.1, 81.1, 21], [0, "Transformer", "LLL", "SAME", "B0C6LY8XZG", "12UK3P1A", 0, 296, 4, 1, 25, 613, 4.1, 81.1, 22], [0, "Transformer", "LLL", "SAME", "B01B1MTQ64", "12IP67100", 1, 240, 0, 1, 0, 613, 4.1, 81.1, 23], [0, "Transformer", "LLH", "IMPROVED", "B079ZV5MZL", "12IP6710", 1, 353, 1, 2, 200, 613, 4.1, 81.1, 24], [0, "Transformer", "LLL", "SAME", "B07CJMB6Q2", "12IP20480", 0, 347, 2, 1, 50, 613, 4.1, 81.1, 25], [0, "Transformer", "HHL", "SAME", "B07CM4KTJW", "12IP67100", 1, 2461, 8, 4, 50, 613, 4.1, 81.1, 26], [0, "Transformer", "LLL", "DECLINED", "B07CPXW4HM", "12IP6760", 1, 363, 0, 1, 0, 613, 4.1, 81.1, 27], [0, "Transformer", "LLH", "IMPROVED", "B07CWF9BYT", "12IP20180", 0, 303, 1, 1, 100, 613, 4.1, 81.1, 28], [0, "Transformer", "HHL", "DECLINED", "B07DH89GTY", "12UK3P2A", 1, 1263, 16, 0, 0, 613, 4.1, 81.1, 29], [0, "Transformer", "LLL", "SAME", "B07FDZHM1C", "CCBC18", 1, 228, 1, 0, 0, 613, 4.1, 81.1, 30], [0, "Transformer", "LLL", "SAME", "B07GJPMHCT", "24IP6750", 1, 388, 2, 0, 0, 613, 4.1, 81.1, 31], [0, "Transformer", "LLL", "SAME", "B07Q8KHSCQ", "24IP67120", 0, 211, 0, 1, 0, 613, 4.1, 81.1, 32], [0, "Transformer", "LLL", "SAME", "B07R181VCV", "12IP6750", 1, 307, 0, 1, 0, 613, 4.1, 81.1, 33], [0, "Transformer", "LLL", "DECLINED", "B07VDSFT4B", "12RPIP45250", 1, 419, 3, 1, 33.3, 613, 4.1, 81.1, 34], [0, "Transformer", "LLH", "IMPROVED", "B081H5W2QN", "12IP67150", 0, 187, 1, 1, 100, 613, 4.1, 81.1, 35], [0, "Transformer", "HHL", "SAME", "B0868DXK1B", "CCBKNWE48", 1, 1333, 25, 9, 36, 613, 4.1, 81.1, 36], [0, "Transformer", "LLH", "IMPROVED", "B09813DB8F", "12IP2030", 1, 265, 1, 1, 100, 613, 4.1, 81.1, 37], [0, "Transformer", "HLH", "IMPROVED", "B09ZVJG535", "CCBKNWE12", 1, 793, 4, 1, 25, 613, 4.1, 81.1, 38], [0, "Transformer", "LLL", "SAME", "B0BGPQGL3C", "12UK3P8A", 1, 202, 2, 1, 50, 613, 4.1, 81.1, 39], [0, "Transformer", "LLL", "SAME", "B0BGPRXYVF", "12UK3P10A", 1, 161, 2, 1, 50, 613, 4.1, 81.1, 40], [0, "Transformer", "LLL", "SAME", "B0C6LTGB83", "12UK3P5A", 0, 86, 1, 0, 0, 613, 4.1, 81.1, 41], [0, "Transformer", "HHL", "IMPROVED", "B0D45Q2F5X", "CCBC32PK", 1, 583, 5, 1, 20, 613, 4.1, 81.1, 42], [0, "Transformer", "LLL", "DECLINED", "B0DJ19521Q", "12IP6720", 1, 441, 0, 1, 0, 613, 4.1, 81.1, 43], [0, "Transformer", "LLH", "IMPROVED", "B0DKF4WF2H", "12IP20720", 0, 153, 1, 1, 100, 613, 4.1, 81.1, 44], [0, "Transformer", "LLL", "DECLINED", "B0DMSD8DPD", "CCBKNWE50", 0, 383, 2, 1, 50, 613, 4.1, 81.1, 45], [0, "Transformer", "LLL", "SAME", "B06XQW29NP", "CCBC5", 1, 127, 1, 0, 0, 613, 4.1, 81.1, 46], [0, "Transformer", "LLL", "SAME", "B06XRJVLYJ", "12IP67120OL2", 1, 21, 0, 0, 0, 613, 4.1, 81.1, 47], [0, "Transformer", "LLL", "SAME", "B06XTHSKYY", "12IP6736", 1, 130, 1, 0, 0, 613, 4.1, 81.1, 48], [0, "Transformer", "LLL", "SAME", "B06XTLWBTC", "12IP6720", 1, 119, 0, 0, 0, 613, 4.1, 81.1, 49], [0, "Transformer", "LLH", "IMPROVED", "B072R5FSMB", "12IP20300", 1, 216, 2, 2, 100, 613, 4.1, 81.1, 50], [0, "Transformer", "LLL", "DECLINED", "B079ZVSK6P", "12IP6710", 1, 513, 2, 0, 0, 613, 4.1, 81.1, 51], [0, "Transformer", "LLL", "SAME", "B079ZY6RM6", "12IP6736", 1, 52, 0, 0, 0, 613, 4.1, 81.1, 52], [0, "Transformer", "HLH", "SAME", "B07B146LP1", "12IP6720", 1, 895, 4, 0, 0, 613, 4.1, 81.1, 53], [0, "Transformer", "LLL", "SAME", "B07B2357SS", "12IP67100", 1, 301, 0, 0, 0, 613, 4.1, 81.1, 54], [0, "Transformer", "LLL", "SAME", "B07B2W9L5J", "12IP6730", 1, 14, 0, 0, 0, 613, 4.1, 81.1, 55], [0, "Transformer", "LLL", "DECLINED", "B07B2XHMK9", "12IP6720", 1, 475, 4, 0, 0, 613, 4.1, 81.1, 56], [0, "Transformer", "LLL", "SAME", "B07B4RXHH5", "12IP6724", 1, 85, 0, 0, 0, 613, 4.1, 81.1, 57], [0, "Transformer", "HLH", "IMPROVED", "B07B4SSPLT", "12IP6710", 1, 665, 4, 0, 0, 613, 4.1, 81.1, 58], [0, "Transformer", "HHL", "IMPROVED", "B07B4TRJRF", "12IP6715", 1, 297, 5, 0, 0, 613, 4.1, 81.1, 59], [0, "Transformer", "LLL", "SAME", "B07BK26JGM", "12IP6760OL2", 1, 343, 1, 0, 0, 613, 4.1, 81.1, 60], [0, "Transformer", "LLL", "SAME", "B07BK2CV53", "12IP67100", 1, 12, 0, 0, 0, 613, 4.1, 81.1, 61], [0, "Transformer", "LLL", "SAME", "B07C7G69F8", "12IP6715", 0, 35, 0, 0, 0, 613, 4.1, 81.1, 62], [0, "Transformer", "LLL", "SAME", "B07C7STSRY", "12IP6750", 0, 111, 0, 0, 0, 613, 4.1, 81.1, 63], [0, "Transformer", "LLL", "SAME", "B07C7WWTKC", "12IP67150", 0, 121, 0, 0, 0, 613, 4.1, 81.1, 64], [0, "Transformer", "LLL", "SAME", "B07C7WXSV1", "12IP6780", 0, 21, 0, 0, 0, 613, 4.1, 81.1, 65], [0, "Transformer", "LLL", "SAME", "B07CJ9HS9Q", "12IP2030", 0, 65, 0, 0, 0, 613, 4.1, 81.1, 66], [0, "Transformer", "HLH", "IMPROVED", "B07CJHQ1KW", "5IP2030", 0, 618, 2, 0, 0, 613, 4.1, 81.1, 67], [0, "Transformer", "LLL", "SAME", "B07CJM69LM", "5IP20150", 0, 76, 0, 0, 0, 613, 4.1, 81.1, 68], [0, "Transformer", "LLL", "SAME", "B07CJMBH43", "12IP20100", 0, 38, 1, 0, 0, 613, 4.1, 81.1, 69], [0, "Transformer", "LLL", "SAME", "B07CJNZ8W8", "12IP20200", 0, 87, 0, 0, 0, 613, 4.1, 81.1, 70], [0, "Transformer", "LLL", "SAME", "B07CJNZC38", "24IP2072", 0, 175, 1, 0, 0, 613, 4.1, 81.1, 71], [0, "Transformer", "LLL", "DECLINED", "B07CJNZCFN", "5IP2050", 0, 309, 0, 0, 0, 613, 4.1, 81.1, 72], [0, "Transformer", "LLL", "SAME", "B07CK1NRBT", "12IP2060", 0, 33, 0, 0, 0, 613, 4.1, 81.1, 73], [0, "Transformer", "LLL", "SAME", "B07CK3RLTM", "24IP2048", 0, 8, 0, 0, 0, 613, 4.1, 81.1, 74], [0, "Transformer", "LLL", "SAME", "B07CK4Y6R6", "24IP2024", 0, 193, 4, 2, 50, 613, 4.1, 81.1, 75], [0, "Transformer", "HHL", "SAME", "B07CM1B86W", "12IP67150", 1, 859, 6, 2, 33.3, 613, 4.1, 81.1, 76], [0, "Transformer", "LLL", "SAME", "B07CM5GJW2", "12IP6780", 1, 13, 0, 0, 0, 613, 4.1, 81.1, 77], [0, "Transformer", "LLL", "SAME", "B07CP4SFT5", "12IP6750", 1, 257, 0, 0, 0, 613, 4.1, 81.1, 78], [0, "Transformer", "LLL", "SAME", "B07CPPWJL4", "12IP67150", 1, 247, 0, 0, 0, 613, 4.1, 81.1, 79], [0, "Transformer", "HHL", "SAME", "B07CPWC9PP", "12IP6780", 1, 851, 7, 3, 42.9, 613, 4.1, 81.1, 80], [0, "Transformer", "LLL", "SAME", "B07CQ1JXSP", "12IP6760", 1, 97, 1, 0, 0, 613, 4.1, 81.1, 81], [0, "Transformer", "LLL", "SAME", "B07CQ25M4K", "12IP67150", 1, 391, 2, 1, 50, 613, 4.1, 81.1, 82], [0, "Transformer", "HHL", "SAME", "B07CQLS5VT", "12IP6750", 1, 1806, 14, 4, 28.6, 613, 4.1, 81.1, 83], [0, "Transformer", "LLL", "SAME", "B07CRNNQ2P", "12IP20240", 1, 47, 0, 0, 0, 613, 4.1, 81.1, 84], [0, "Transformer", "LLL", "SAME", "B07CRQXVJR", "12IP6730", 0, 62, 0, 0, 0, 613, 4.1, 81.1, 85], [0, "Transformer", "HLH", "SAME", "B07CRRLC1M", "", 1, 729, 0, 0, 0, 613, 4.1, 81.1, 86], [0, "Transformer", "LLL", "SAME", "B07CRRW78B", "12IP6760", 0, 125, 0, 0, 0, 613, 4.1, 81.1, 87], [0, "Transformer", "LLL", "SAME", "B07CRSLRRW", "12IP67300", 0, 229, 1, 0, 0, 613, 4.1, 81.1, 88], [0, "Transformer", "LLL", "DECLINED", "B07CRTS1LD", "12IP67100", 0, 364, 1, 0, 0, 613, 4.1, 81.1, 89], [0, "Transformer", "LLL", "SAME", "B07CRVLJM6", "12IP6780", 0, 106, 1, 0, 0, 613, 4.1, 81.1, 90], [0, "Transformer", "LLH", "IMPROVED", "B07CRWS5KR", "12IP6750", 0, 234, 1, 1, 100, 613, 4.1, 81.1, 91], [0, "Transformer", "LLL", "SAME", "B07CRWZWQQ", "12IP67250", 0, 140, 0, 0, 0, 613, 4.1, 81.1, 92], [0, "Transformer", "LLL", "SAME", "B07CRXQFR5", "12IP67150", 0, 168, 0, 0, 0, 613, 4.1, 81.1, 93], [0, "Transformer", "HHL", "IMPROVED", "B07CS22K8L", "12IP6720", 0, 1094, 9, 6, 66.7, 613, 4.1, 81.1, 94], [0, "Transformer", "LLL", "SAME", "B07CVVKVLJ", "12IP67100", 0, 246, 0, 0, 0, 613, 4.1, 81.1, 95], [0, "Transformer", "LLL", "SAME", "B07CVWZKCC", "12IP67300", 0, 37, 0, 0, 0, 613, 4.1, 81.1, 96], [0, "Transformer", "HLH", "SAME", "B07CVXRPPZ", "12IP67150", 0, 830, 2, 0, 0, 613, 4.1, 81.1, 97], [0, "Transformer", "LLL", "SAME", "B07CVY62DL", "12IP6760", 0, 91, 0, 0, 0, 613, 4.1, 81.1, 98], [0, "Transformer", "LLL", "SAME", "B07CW15JT4", "12IP6760", 0, 97, 0, 0, 0, 613, 4.1, 81.1, 99], [0, "Transformer", "LLL", "SAME", "B07CW261HK", "12IP6736", 0, 113, 0, 0, 0, 613, 4.1, 81.1, 100], [0, "Transformer", "LLL", "SAME", "B07CW2V6X4", "12IP6750", 0, 20, 0, 0, 0, 613, 4.1, 81.1, 101], [0, "Transformer", "LLL", "SAME", "B07CWBZK89", "12IP6780", 0, 57, 0, 0, 0, 613, 4.1, 81.1, 102], [0, "Transformer", "LLL", "SAME", "B07CWDD16N", "12IP67100", 0, 314, 0, 0, 0, 613, 4.1, 81.1, 103], [0, "Transformer", "LLL", "SAME", "B07CWDSVQV", "12IP6760", 0, 133, 0, 0, 0, 613, 4.1, 81.1, 104], [0, "Transformer", "LLL", "SAME", "B07CWF3NXW", "12IP20480", 0, 43, 0, 0, 0, 613, 4.1, 81.1, 105], [0, "Transformer", "LLL", "SAME", "B07CWF4X53", "12IP20200", 0, 23, 0, 0, 0, 613, 4.1, 81.1, 106], [0, "Transformer", "LLL", "SAME", "B07CWFSGB3", "12IP20360", 0, 299, 0, 0, 0, 613, 4.1, 81.1, 107], [0, "Transformer", "HHL", "IMPROVED", "B07CWGNBBJ", "12IP20120", 0, 744, 9, 1, 11.1, 613, 4.1, 81.1, 108], [0, "Transformer", "LLL", "SAME", "B07D36S6NH", "12IP67300", 0, 72, 0, 0, 0, 613, 4.1, 81.1, 109], [0, "Transformer", "LLL", "SAME", "B07DGX6NJ3", "24IP20400", 1, 25, 0, 0, 0, 613, 4.1, 81.1, 110], [0, "Transformer", "HLH", "IMPROVED", "B07DK3HQ85", "5IP20100", 0, 804, 4, 0, 0, 613, 4.1, 81.1, 111], [0, "Transformer", "LLL", "SAME", "B07DK5R68L", "5IP20200", 0, 237, 1, 0, 0, 613, 4.1, 81.1, 112], [0, "Transformer", "LLL", "SAME", "B07DX6F734", "12MIP20360", 1, 322, 1, 0, 0, 613, 4.1, 81.1, 113], [0, "Transformer", "LLL", "SAME", "B07DX6TC5F", "12MIP20250", 1, 54, 1, 0, 0, 613, 4.1, 81.1, 114], [0, "Transformer", "LLL", "SAME", "B07DX9V5Z6", "12MIP20100", 1, 10, 0, 0, 0, 613, 4.1, 81.1, 115], [0, "Transformer", "LLL", "SAME", "B07FDQHGQT", "CCIP6724", 1, 13, 0, 0, 0, 613, 4.1, 81.1, 116], [0, "Transformer", "LLL", "SAME", "B07FDTPY8S", "CCBC5", 1, 71, 0, 0, 0, 613, 4.1, 81.1, 117], [0, "Transformer", "LLL", "SAME", "B07FDXJG55", "CCBC36", 1, 226, 4, 0, 0, 613, 4.1, 81.1, 118], [0, "Transformer", "LLL", "SAME", "B07FDXRCHB", "CCBC3", 1, 23, 0, 0, 0, 613, 4.1, 81.1, 119], [0, "Transformer", "LLL", "SAME", "B07FF12CFB", "CCBC7", 0, 9, 0, 0, 0, 613, 4.1, 81.1, 120], [0, "Transformer", "LLL", "SAME", "B07GJRL3Y7", "24IP6780", 1, 30, 0, 0, 0, 613, 4.1, 81.1, 121], [0, "Transformer", "LLL", "SAME", "B07GJTBWVR", "24IP6736", 1, 88, 0, 0, 0, 613, 4.1, 81.1, 122], [0, "Transformer", "LLL", "SAME", "B07HRDKFG6", "CCBKNWE25", 1, 115, 0, 0, 0, 613, 4.1, 81.1, 123], [0, "Transformer", "LLL", "SAME", "B07HRDMSF2", "CCBKNWE36", 1, 147, 1, 0, 0, 613, 4.1, 81.1, 124], [0, "Transformer", "LLL", "SAME", "B07HRFS84S", "CCBKNWE7", 1, 122, 1, 0, 0, 613, 4.1, 81.1, 125], [0, "Transformer", "LLL", "SAME", "B07HRGXZJD", "CCBKNWE12", 1, 409, 2, 0, 0, 613, 4.1, 81.1, 126], [0, "Transformer", "LLL", "SAME", "B07M6F7B7B", "12BO18", 0, 80, 0, 0, 0, 613, 4.1, 81.1, 127], [0, "Transformer", "LLL", "SAME", "B07MDRC21L", "12BO28", 1, 21, 0, 0, 0, 613, 4.1, 81.1, 128], [0, "Transformer", "LLL", "SAME", "B07ML2QQYM", "12BO72", 0, 29, 0, 0, 0, 613, 4.1, 81.1, 129], [0, "Transformer", "LLL", "SAME", "B07ML2SH33", "12BO48", 0, 189, 0, 0, 0, 613, 4.1, 81.1, 130], [0, "Transformer", "LLL", "SAME", "B07MLGW3PK", "CCBKNWE7", 1, 77, 0, 0, 0, 613, 4.1, 81.1, 131], [0, "Transformer", "LLL", "SAME", "B07MP6K6MJ", "12BO48", 1, 12, 0, 0, 0, 613, 4.1, 81.1, 132], [0, "Transformer", "LLL", "SAME", "B07MPB44DV", "12BO18", 0, 79, 0, 0, 0, 613, 4.1, 81.1, 133], [0, "Transformer", "LLL", "SAME", "B07NDDD8SR", "12IP67120", 1, 27, 0, 0, 0, 613, 4.1, 81.1, 134], [0, "Transformer", "LLL", "DECLINED", "B07NJQ8DYV", "12IP6780", 1, 445, 0, 0, 0, 613, 4.1, 81.1, 135], [0, "Transformer", "LLL", "SAME", "B07NQKQDRT", "24IP67100", 1, 8, 0, 0, 0, 613, 4.1, 81.1, 136], [0, "Transformer", "LLL", "SAME", "B07Q6BNRW7", "24IP6750", 0, 45, 0, 0, 0, 613, 4.1, 81.1, 137], [0, "Transformer", "LLL", "SAME", "B07Q7G6Q1F", "24IP67150", 0, 59, 0, 0, 0, 613, 4.1, 81.1, 138], [0, "Transformer", "LLL", "SAME", "B07Q8JHHF4", "24IP6745", 0, 81, 0, 0, 0, 613, 4.1, 81.1, 139], [0, "Transformer", "LLL", "SAME", "B07Q8KHJTW", "24IP6760", 0, 138, 0, 0, 0, 613, 4.1, 81.1, 140], [0, "Transformer", "LLL", "DECLINED", "B07Q8KKJJS", "24IP6780", 0, 146, 0, 0, 0, 613, 4.1, 81.1, 141], [0, "Transformer", "LLL", "SAME", "B07QRGY2H7", "12IP67100", 0, 90, 0, 0, 0, 613, 4.1, 81.1, 142], [0, "Transformer", "LLL", "SAME", "B07QV1ZDZX", "12RPIP4560", 0, 75, 0, 0, 0, 613, 4.1, 81.1, 143], [0, "Transformer", "LLL", "SAME", "B07QW1KPCD", "12RPIP45400", 0, 186, 1, 0, 0, 613, 4.1, 81.1, 144], [0, "Transformer", "LLL", "SAME", "B07RGVCC66", "12IP20100", 0, 67, 0, 0, 0, 613, 4.1, 81.1, 145], [0, "Transformer", "LLL", "SAME", "B07RL6L1GL", "12IP20120", 0, 36, 0, 0, 0, 613, 4.1, 81.1, 146], [0, "Transformer", "LLL", "SAME", "B07RM175Z3", "12IP2024", 0, 117, 0, 0, 0, 613, 4.1, 81.1, 147], [0, "Transformer", "LLL", "SAME", "B07RM2DXJ9", "12IP2015", 0, 46, 0, 0, 0, 613, 4.1, 81.1, 148], [0, "Transformer", "LLL", "SAME", "B07SQC9K9D", "24IP67150", 1, 12, 0, 0, 0, 613, 4.1, 81.1, 149], [0, "Transformer", "LLL", "SAME", "B07SRGZ57F", "24IP6780", 0, 16, 0, 0, 0, 613, 4.1, 81.1, 150], [0, "Transformer", "LLL", "SAME", "B07SYZP9MR", "12IP6780", 1, 6, 0, 0, 0, 613, 4.1, 81.1, 151], [0, "Transformer", "LLL", "SAME", "B07VDSZWGD", "12ASIP20100", 1, 7, 0, 0, 0, 613, 4.1, 81.1, 152], [0, "Transformer", "HHL", "IMPROVED", "B07VFV228J", "12RPIP45400", 1, 376, 6, 1, 16.7, 613, 4.1, 81.1, 153], [0, "Transformer", "LLL", "SAME", "B07VL5CS4J", "12BO100", 1, 47, 0, 0, 0, 613, 4.1, 81.1, 154], [0, "Transformer", "LLL", "SAME", "B07VM9T7XN", "12BO72", 1, 54, 0, 0, 0, 613, 4.1, 81.1, 155], [0, "Transformer", "LLL", "SAME", "B07VN69LWT", "12BO28", 1, 185, 1, 0, 0, 613, 4.1, 81.1, 156], [0, "Transformer", "LLL", "SAME", "B081H6HHCN", "12IP6780", 0, 143, 0, 0, 0, 613, 4.1, 81.1, 157], [0, "Transformer", "LLL", "SAME", "B083JWH1W2", "12IP2015", 1, 253, 2, 0, 0, 613, 4.1, 81.1, 158], [0, "Transformer", "LLL", "SAME", "B084WP4MVH", "12MIP20250", 1, 38, 0, 0, 0, 613, 4.1, 81.1, 159], [0, "Transformer", "LLL", "SAME", "B084WS2CVS", "12MIP2060", 1, 51, 0, 0, 0, 613, 4.1, 81.1, 160], [0, "Transformer", "LLL", "SAME", "B084X6BJBP", "12MIP20200", 1, 4, 0, 0, 0, 613, 4.1, 81.1, 161], [0, "Transformer", "LLL", "SAME", "B084X8VG19", "12MIP20360", 1, 72, 0, 0, 0, 613, 4.1, 81.1, 162], [0, "Transformer", "LLL", "DECLINED", "B08KPVBJG1", "12IP20600", 0, 154, 3, 0, 0, 613, 4.1, 81.1, 163], [0, "Transformer", "LLL", "SAME", "B08KQ7MR5W", "12IP2015", 0, 10, 0, 0, 0, 613, 4.1, 81.1, 164], [0, "Transformer", "LLL", "SAME", "B08KQB8251", "12IP20100", 0, 8, 0, 0, 0, 613, 4.1, 81.1, 165], [0, "Transformer", "LLL", "SAME", "B08L6HKQJS", "12IP6760", 0, 85, 0, 0, 0, 613, 4.1, 81.1, 166], [0, "Transformer", "LLL", "SAME", "B08PVWBXPL", "12IP6724", 1, 371, 2, 0, 0, 613, 4.1, 81.1, 167], [0, "Transformer", "LLL", "SAME", "B08PZ2S8X3", "12IP67100", 1, 271, 1, 0, 0, 613, 4.1, 81.1, 168], [0, "Transformer", "LLL", "SAME", "B08PZ4C8H1", "24IP6720", 1, 94, 0, 0, 0, 613, 4.1, 81.1, 169], [0, "Transformer", "LLL", "SAME", "B08PZ5BJ3W", "24IP6780", 1, 41, 0, 0, 0, 613, 4.1, 81.1, 170], [0, "Transformer", "LLL", "SAME", "B08PZ757L4", "24IP6736", 1, 43, 0, 0, 0, 613, 4.1, 81.1, 171], [0, "Transformer", "HHL", "IMPROVED", "B08PZ7KFNS", "24IP6715", 1, 1014, 13, 0, 0, 613, 4.1, 81.1, 172], [0, "Transformer", "LLL", "SAME", "B08PZ7Q1FD", "24IP6745", 1, 139, 2, 0, 0, 613, 4.1, 81.1, 173], [0, "Transformer", "LLL", "SAME", "B08PZFT5K5", "24IP6730", 1, 114, 0, 0, 0, 613, 4.1, 81.1, 174], [0, "Transformer", "LLL", "SAME", "B08Q493TWV", "24IP67120", 1, 77, 0, 0, 0, 613, 4.1, 81.1, 175], [0, "Transformer", "LLL", "SAME", "B08Q4CYX34", "24IP67200", 1, 310, 1, 0, 0, 613, 4.1, 81.1, 176], [0, "Transformer", "LLL", "DECLINED", "B08Q4DNN6C", "24IP67150", 1, 261, 1, 0, 0, 613, 4.1, 81.1, 177], [0, "Transformer", "LLL", "SAME", "B08SWFSFYW", "CCBKNWE7", 1, 538, 4, 0, 0, 613, 4.1, 81.1, 178], [0, "Transformer", "LLL", "SAME", "B08X1RGHNS", "12IP2015", 0, 13, 0, 0, 0, 613, 4.1, 81.1, 179], [0, "Transformer", "LLL", "SAME", "B08X26TXHC", "12IP20180", 0, 3, 0, 0, 0, 613, 4.1, 81.1, 180], [0, "Transformer", "LLL", "SAME", "B094R2QJ57", "12ASIP20150", 0, 58, 0, 0, 0, 613, 4.1, 81.1, 181], [0, "Transformer", "LLL", "SAME", "B094R4MYNH", "12ASIP20200", 0, 15, 0, 0, 0, 613, 4.1, 81.1, 182], [0, "Transformer", "LLL", "SAME", "B097VD438N", "CCBC9", 0, 33, 1, 0, 0, 613, 4.1, 81.1, 183], [0, "Transformer", "LLL", "SAME", "B09812VSLD", "12IP2060", 1, 95, 0, 0, 0, 613, 4.1, 81.1, 184], [0, "Transformer", "LLL", "SAME", "B09812WZJL", "12IP20360", 1, 295, 1, 0, 0, 613, 4.1, 81.1, 185], [0, "Transformer", "HHL", "SAME", "B098138JF2", "12IP20720", 1, 927, 9, 1, 11.1, 613, 4.1, 81.1, 186], [0, "Transformer", "LLL", "SAME", "B09813FQJ4", "12IP20200", 1, 6, 0, 0, 0, 613, 4.1, 81.1, 187], [0, "Transformer", "LLL", "SAME", "B09813Q1X8", "12IP20150", 1, 39, 0, 0, 0, 613, 4.1, 81.1, 188], [0, "Transformer", "LLL", "SAME", "B09813VCCJ", "12IP20100", 1, 121, 1, 0, 0, 613, 4.1, 81.1, 189], [0, "Transformer", "LLL", "SAME", "B09813XKZG", "12IP20600", 1, 153, 1, 0, 0, 613, 4.1, 81.1, 190], [0, "Transformer", "LLL", "SAME", "B098147NXZ", "12IP20180", 1, 272, 0, 0, 0, 613, 4.1, 81.1, 191], [0, "Transformer", "LLL", "SAME", "B098LN7SGT", "12IP6730", 0, 15, 0, 0, 0, 613, 4.1, 81.1, 192], [0, "Transformer", "LLL", "SAME", "B098QL7XWR", "CCBKNWE3", 1, 311, 4, 0, 0, 613, 4.1, 81.1, 193], [0, "Transformer", "HHL", "SAME", "B098QLF674", "CCBKNWE7", 1, 1264, 10, 0, 0, 613, 4.1, 81.1, 194], [0, "Transformer", "HLH", "IMPROVED", "B098QLN1W3", "CCBC7", 1, 647, 2, 0, 0, 613, 4.1, 81.1, 195], [0, "Transformer", "HHL", "IMPROVED", "B098QYJHWR", "12BO18", 1, 263, 9, 0, 0, 613, 4.1, 81.1, 196], [0, "Transformer", "LLL", "SAME", "B09KZY52QQ", "12UK3P8A", 1, 7, 0, 0, 0, 613, 4.1, 81.1, 197], [0, "Transformer", "HHL", "IMPROVED", "B09WVQ252S", "12BO48", 1, 330, 6, 0, 0, 613, 4.1, 81.1, 198], [0, "Transformer", "LLL", "SAME", "B09WVSSVJ3", "12BO72", 1, 254, 2, 0, 0, 613, 4.1, 81.1, 199], [0, "Transformer", "LLL", "SAME", "B09Z6RMG91", "12MIP2025", 1, 128, 0, 0, 0, 613, 4.1, 81.1, 200], [0, "Transformer", "HHL", "IMPROVED", "B09Z6RQPJT", "CCBC9", 1, 255, 5, 0, 0, 613, 4.1, 81.1, 201], [0, "Transformer", "LLL", "DECLINED", "B09Z6SCCQ6", "CCBC18", 1, 323, 1, 0, 0, 613, 4.1, 81.1, 202], [0, "Transformer", "HHL", "SAME", "B09Z6ST6HR", "12MIP2015", 1, 847, 8, 0, 0, 613, 4.1, 81.1, 203], [0, "Transformer", "HLH", "DECLINED", "B09Z6TRY44", "CCBC12", 1, 1034, 4, 0, 0, 613, 4.1, 81.1, 204], [0, "Transformer", "LLL", "SAME", "B09ZVH3JKY", "CCBKNWE18", 1, 120, 0, 0, 0, 613, 4.1, 81.1, 205], [0, "Transformer", "LLL", "SAME", "B0BGPRLQD3", "12UK3P5A", 1, 76, 0, 0, 0, 613, 4.1, 81.1, 206], [0, "Transformer", "LLH", "SAME", "B0C6LV14PT", "12UK3P2A", 0, 409, 2, 8, 400, 613, 4.1, 81.1, 207], [0, "Transformer", "LLL", "SAME", "B0C6LV4T1R", "12UK3P8A", 0, 58, 0, 0, 0, 613, 4.1, 81.1, 208], [0, "Transformer", "HHL", "SAME", "B0D3X4WHGV", "CCBKNWE482PK", 1, 840, 22, 6, 27.3, 613, 4.1, 81.1, 209], [0, "Transformer", "LLL", "DECLINED", "B0D3X5CMCJ", "CCBKNWE502PK", 1, 94, 3, 0, 0, 613, 4.1, 81.1, 210], [0, "Transformer", "LLL", "SAME", "B0D3X5D5CF", "CCBKNWE32PK", 1, 64, 0, 0, 0, 613, 4.1, 81.1, 211], [0, "Transformer", "LLL", "SAME", "B0D3X5SFSB", "CCBKNWE72PK", 1, 192, 3, 0, 0, 613, 4.1, 81.1, 212], [0, "Transformer", "LLL", "SAME", "B0D3X6K2R8", "CCBKNWE36", 1, 113, 1, 0, 0, 613, 4.1, 81.1, 213], [0, "Transformer", "LLL", "SAME", "B0D3X73VV3", "CCBKNWE5", 1, 56, 0, 0, 0, 613, 4.1, 81.1, 214], [0, "Transformer", "LLL", "SAME", "B0D45MSJ37", "CCBC52PK", 0, 179, 1, 0, 0, 613, 4.1, 81.1, 215], [0, "Transformer", "LLL", "SAME", "B0D45NPDVR", "CCBC9", 0, 78, 0, 0, 0, 613, 4.1, 81.1, 216], [0, "Transformer", "LLL", "SAME", "B0D45NQZYZ", "CCBC362PK", 1, 81, 0, 0, 0, 613, 4.1, 81.1, 217], [0, "Transformer", "LLL", "SAME", "B0D45NY3TP", "CCBC24", 1, 122, 2, 0, 0, 613, 4.1, 81.1, 218], [0, "Transformer", "HHL", "SAME", "B0D6YF7VPY", "CCGNNWE48", 0, 569, 10, 3, 30, 613, 4.1, 81.1, 219], [0, "Transformer", "HLH", "IMPROVED", "B0D9RSTF8F", "12IP6715", 1, 626, 4, 0, 0, 613, 4.1, 81.1, 220], [0, "Transformer", "LLL", "SAME", "B0D9RTPH2F", "12IP6720", 1, 160, 1, 0, 0, 613, 4.1, 81.1, 221], [0, "Transformer", "LLL", "SAME", "B0D9RTZZJZ", "12IP67202PK", 1, 77, 0, 0, 0, 613, 4.1, 81.1, 222], [0, "Transformer", "LLL", "SAME", "B0DC6VC5F6", "12IP67350", 1, 177, 0, 0, 0, 613, 4.1, 81.1, 223], [0, "Transformer", "LLL", "SAME", "B0DJ17TQZ9", "12IP6730", 1, 45, 0, 0, 0, 613, 4.1, 81.1, 224], [0, "Transformer", "LLL", "SAME", "B0DJ184JQH", "12IP67250", 1, 28, 0, 0, 0, 613, 4.1, 81.1, 225], [0, "Transformer", "HHL", "IMPROVED", "B0DJ18XMS6", "12IP6715", 1, 724, 9, 0, 0, 613, 4.1, 81.1, 226], [0, "Transformer", "LLL", "SAME", "B0DJ96MVP9", "12IP6736", 1, 73, 0, 0, 0, 613, 4.1, 81.1, 227], [0, "Transformer", "LLL", "SAME", "B0DJ98JG6N", "12IP6780", 1, 73, 0, 0, 0, 613, 4.1, 81.1, 228], [0, "Transformer", "LLL", "SAME", "B0DJ99CZJ3", "12IP6750", 1, 80, 1, 0, 0, 613, 4.1, 81.1, 229], [0, "Transformer", "LLL", "SAME", "B0DKF35RMQ", "12IP20300", 0, 325, 2, 1, 50, 613, 4.1, 81.1, 230], [0, "Transformer", "LLL", "SAME", "B0DKF3C23T", "12IP20200", 0, 87, 0, 0, 0, 613, 4.1, 81.1, 231], [0, "Transformer", "LLL", "SAME", "B0DKF3P7XK", "12IP20600", 0, 169, 0, 0, 0, 613, 4.1, 81.1, 232], [0, "Transformer", "LLL", "SAME", "B0DKF3RBTL", "12IP20400", 0, 99, 0, 0, 0, 613, 4.1, 81.1, 233], [0, "Transformer", "LLL", "SAME", "B0DKF5347P", "12IP20480", 0, 304, 1, 0, 0, 613, 4.1, 81.1, 234], [0, "Transformer", "LLL", "SAME", "B0DMS67346", "CCBKNWE12", 0, 148, 2, 0, 0, 613, 4.1, 81.1, 235], [0, "Transformer", "LLL", "SAME", "B0DNJ45JVX", "12BO28", 0, 20, 0, 0, 0, 613, 4.1, 81.1, 236], [0, "Transformer", "LLL", "SAME", "B0DNJ5C2T3", "12BO100", 0, 36, 0, 0, 0, 613, 4.1, 81.1, 237], [0, "Transformer", "LLL", "SAME", "B0DNJQ6Q1Q", "12BO282PK", 0, 16, 0, 0, 0, 613, 4.1, 81.1, 238], [0, "Transformer", "LLL", "SAME", "B0DNJSD877", "12BO722PK", 0, 21, 0, 0, 0, 613, 4.1, 81.1, 239], [0, "Transformer", "LLL", "SAME", "B0DP24HTMV", "12UK3P5A", 0, 127, 2, 0, 0, 613, 4.1, 81.1, 240], [0, "Transformer", "HHL", "SAME", "B0DP264BLC", "12UK3P10A", 0, 1553, 18, 5, 27.8, 613, 4.1, 81.1, 241], [0, "Transformer", "LLL", "SAME", "B0DZ6KXJVZ", "12ASIP20150", 1, 282, 0, 0, 0, 613, 4.1, 81.1, 242], [0, "Transformer", "LLL", "SAME", "B0DZ6LGPLM", "12ASIP20200", 1, 523, 3, 0, 0, 613, 4.1, 81.1, 243]], "cats":[[0, "LED Module", 39, 5, 159, 3.8, 31.5, "NEEDS_MANUAL", 1.6], [0, "Transformer", 243, 30, 613, 4.1, 81.1, "FULL_TOP_30", 1.77]]};;
+const ACC=["DCVoltage UK","LEDSone UK"];
+const SEGCOL={HHH:"--hHHH",HHL:"--hHHL",HLH:"--hHLH",LHH:"--hLHH",LLH:"--hLLH",LLL:"--hLLL"};
+const SEGNAME={HHH:"Champions",HHL:"Leaky Buckets",HLH:"Wallflowers",LHH:"Hidden Gems",LLH:"Niche Winners",LLL:"Dead Horses"};
+const SEGORDER=["HHH","HHL","HLH","LHH","LLH","LLL"];
+const MOVCOL={IMPROVED:"--mUP",DECLINED:"--mDN",SAME:"--mSAME",NEW:"--mNEW"};
+const MOVORDER=["IMPROVED","DECLINED","SAME","NEW"];
+const STATCOL={ABOVE_TOP30_AVG:"--mUP",BELOW_TOP30_AVG:"--mDN",NEAR_TOP30_AVG:"--mSAME",NEEDS_REVIEW:"--hHHL"};
+// row columns: [phIdx,cat,seg,mov,asin,sku,acc,i,k,v,cvr,bi,bk,bcvr,rank]
+const C={ph:0,cat:1,seg:2,mov:3,asin:4,sku:5,acc:6,i:7,k:8,v:9,cvr:10,bi:11,bk:12,bcvr:13,rank:14};
+// category avg-conversion benchmark lookup (cats: [phIdx,cat,listings,topn,b_imp,b_clk,b_cvr,status,b_conv])
+const CATCONV={}; (D.cats||[]).forEach(c=>{CATCONV[c[0]+"|"+c[1]]=c[8];});
+function avgConvOf(r){const x=CATCONV[r[C.ph]+"|"+r[C.cat]];return x==null?0:x;}
+function statusOf(r){const v=r[C.v],k=r[C.k],cvr=r[C.cvr],avg=avgConvOf(r);
+  if(v>k || cvr>100 || (v>0&&k===0)) return "NEEDS_REVIEW";
+  if(avg>0){ if(v>=avg*1.10) return "ABOVE_TOP30_AVG"; if(v<=avg*0.90) return "BELOW_TOP30_AVG"; }
+  return "NEAR_TOP30_AVG";}
+function statBadge(s){const col=getComputedStyle(document.documentElement).getPropertyValue(STATCOL[s]||"--mSAME");
+  return `<span class="badge" style="background:${col}22;color:${col}">${s.replace(/_/g," ")}</span>`;}
+
+let cur=null, segFilter=null, movFilter=null, catFilter=null, sortKey=null, sortDir=1;
+
+const sel=document.getElementById("phsel");
+sel.innerHTML='<option value="">— choose —</option>'+D.phs.map((n,i)=>`<option value="${i}">${n}</option>`).join("");
+sel.addEventListener("change",()=>{const v=sel.value; cur=v===""?null:+v; segFilter=null; movFilter=null; catFilter=null; sortKey=null; render();});
+
+function fmt(n){return (n==null?0:n).toLocaleString()}
+function f1(n){return (n==null?0:n).toFixed(1)}
+function segBadge(s){return `<span class="seg" style="background:var(${SEGCOL[s]})">${s}</span>`}
+function movBadge(m){const c=MOVCOL[m];const col=getComputedStyle(document.documentElement).getPropertyValue(c);
+  return `<span class="badge" style="background:${col}22;color:${col}">${m}</span>`}
+function delta(x){const cls=x>0?"dpos":x<0?"dneg":"";const s=x>0?"+"+fmt(x):fmt(x);return `<span class="${cls}">${s}</span>`}
+
+function render(){
+  const esc=document.getElementById("escBar");
+  if(cur===null){
+    document.getElementById("gTitle").textContent="Select a Portfolio Holder";
+    document.getElementById("gScope").textContent="Pick a name to see that portfolio only — segments, movement and benchmarks in one view.";
+    document.getElementById("cards").innerHTML="";
+    document.getElementById("meta").innerHTML="";
+    document.getElementById("segMix").innerHTML="";
+    document.getElementById("movMix").innerHTML="";
+    esc.style.display="none";
+    catBody([]); asinBody([]); document.getElementById("foot").textContent="";
+    document.getElementById("asinHint").textContent="";
+    return;
+  }
+  const name=D.phs[cur];
+  const rows=D.rows.filter(r=>r[C.ph]===cur);
+  const cats=D.cats.filter(c=>c[0]===cur);
+  const listings=rows.length;
+  const asins=new Set(rows.map(r=>r[C.asin])).size;
+  const skus=new Set(rows.filter(r=>r[C.sku]).map(r=>r[C.sku])).size;
+  const ncat=new Set(rows.map(r=>r[C.cat])).size;
+  const segCount={},movCount={};
+  SEGORDER.forEach(s=>segCount[s]=0); MOVORDER.forEach(m=>movCount[m]=0);
+  rows.forEach(r=>{segCount[r[C.seg]]++;movCount[r[C.mov]]++});
+  const lllPct=listings?Math.round(1000*segCount.LLL/listings)/10:0;
+
+  document.getElementById("gTitle").textContent=name;
+  const _alloc=(D.alloc&&D.alloc[name])||0;
+  const _notActive=_alloc>asins?_alloc-asins:0;
+  document.getElementById("gScope").textContent=`${fmt(listings)} listings · ${fmt(asins)} ASINs active this window · ${fmt(_alloc)} allocated${_notActive>0?` (${fmt(_notActive)} not active)`:""} · ${fmt(skus)} SKUs · ${ncat} categor${ncat===1?"y":"ies"} — this portfolio only.`;
+
+  // cards
+  document.getElementById("cards").innerHTML=[
+    ["Assigned listings",fmt(listings),"rows in scope"],
+    ["Distinct ASINs",fmt(asins),""],
+    ["Distinct SKUs",fmt(skus),""],
+    ["Categories",fmt(ncat),""],
+    ["Champions (HHH)",fmt(segCount.HHH),"scale these"],
+    ["Dead Horses (LLL)",fmt(segCount.LLL),lllPct+"% of portfolio"],
+    ["Allocated",fmt(_alloc),_notActive>0?`${fmt(_notActive)} not active this window`:"all active"]
+  ].map((c,ci)=>`<div class="card c${ci+1}"><div class="cardIcon"></div><div class="k">${c[0]}</div><div class="v">${c[1]}</div><div class="s">${c[2]}</div></div>`).join("");
+
+  // meta strip
+  document.getElementById("meta").innerHTML=[
+    ["Current window (this report)","31 May – 27 Jun 2026 · last 4 complete weeks (UK Amazon FBM)"],
+    ["Benchmark","Top-30 best-sellers / category · average conversion rate"],
+    ["Movement compares","current vs previous 4 weeks: 3 May – 30 May 2026 → 31 May – 27 Jun 2026"],
+    ["Report period",D.period],
+    ["Generated",D.generated]
+  ].map(m=>`<div><div class="k">${m[0]}</div><div class="v">${m[1]}</div></div>`).join("");
+
+  // escalation banner (our §8 rules, this PH)
+  let e="";
+  if(lllPct>30) e+=`<div>\u26A0 <b>${lllPct}%</b> of this portfolio is in LLL (Dead Horses) \u2014 portfolio restructure review (\u00a78)</div>`;
+  if(movCount.DECLINED>5) e+=`<div>\u26A0 <b>${movCount.DECLINED}</b> ASINs declined this cycle \u2014 Bietrick + sub-leader review (\u00a78)</div>`;
+  if(e){esc.className="esc";esc.innerHTML=e;esc.style.display="flex";}
+  else {esc.className="esc ok";esc.innerHTML="\u2713 No \u00a78 escalation thresholds breached for this portfolio.";esc.style.display="flex";}
+
+  // mixes (filter chips)
+  document.getElementById("segMix").innerHTML=SEGORDER.map(s=>
+    `<span class="chip ${segFilter===s?'on':''}" data-seg="${s}"><span style="color:var(${SEGCOL[s]})">\u25CF</span> ${s} <span class="n">${segCount[s]}</span></span>`).join("");
+  document.getElementById("movMix").innerHTML=MOVORDER.map(m=>
+    `<span class="chip ${movFilter===m?'on':''}" data-mov="${m}">${m} <span class="n">${movCount[m]}</span></span>`).join("");
+  document.querySelectorAll("[data-seg]").forEach(el=>el.onclick=()=>{segFilter=segFilter===el.dataset.seg?null:el.dataset.seg;render();});
+  document.querySelectorAll("[data-mov]").forEach(el=>el.onclick=()=>{movFilter=movFilter===el.dataset.mov?null:el.dataset.mov;render();});
+
+  // category table
+  catHead();
+  catBody(cats);
+  document.querySelectorAll("[data-cat]").forEach(el=>el.onclick=()=>{const c=el.getAttribute("data-cat");catFilter=catFilter===c?null:c;render();});
+
+  // asin table
+  let ar=rows.slice();
+  if(catFilter) ar=ar.filter(r=>r[C.cat]===catFilter);
+  if(segFilter) ar=ar.filter(r=>r[C.seg]===segFilter);
+  if(movFilter) ar=ar.filter(r=>r[C.mov]===movFilter);
+  if(sortKey!=null){ar.sort((a,b)=>{
+    let x,y;
+    if(sortKey==="dImp"){x=a[C.i]-a[C.bi];y=b[C.i]-b[C.bi];}
+    else if(sortKey==="dClk"){x=a[C.k]-a[C.bk];y=b[C.k]-b[C.bk];}
+    else if(sortKey==="avgc"){x=avgConvOf(a);y=avgConvOf(b);}
+    else if(sortKey==="dConv"){x=a[C.v]-avgConvOf(a);y=b[C.v]-avgConvOf(b);}
+    else if(sortKey==="status"){x=statusOf(a);y=statusOf(b);}
+    else {x=a[sortKey];y=b[sortKey];}
+    if(typeof x==="string"){return sortDir*x.localeCompare(y)} return sortDir*((x||0)-(y||0))});}
+  asinHead();
+  asinBody(ar);
+  document.getElementById("asinHint").textContent=`— ${fmt(ar.length)} shown${catFilter?` · category: ${catFilter} (click it again to clear)`:""}${segFilter?` · segment ${segFilter}`:""}${movFilter?` · ${movFilter}`:""}`;
+  document.getElementById("foot").textContent=`Source: analytics.ph_segment_report (read-only). Segments, movement and benchmarks are the production engine's output — this view only reorganises them per portfolio holder.`;
+}
+
+/* ---- category table ---- */
+function catHead(){
+  document.querySelector("#catTbl thead").innerHTML=
+   `<tr><th>Category</th><th class="num">Listings</th><th class="num">Top-N used</th>
+    <th class="num">Avg impressions</th><th class="num">Avg clicks</th><th class="num">Avg conversions</th><th class="num">Benchmark CVR%</th><th>Status</th></tr>`;
+}
+function catBody(cats){
+  const tb=document.querySelector("#catTbl tbody");
+  if(!cats.length){tb.innerHTML='<tr><td class="empty" colspan="8">No categories.</td></tr>';return;}
+  tb.innerHTML=cats.map(c=>`<tr class="catrow ${catFilter===c[1]?'on':''}" data-cat="${String(c[1]).replace(/"/g,'&quot;')}" style="cursor:pointer">
+     <td><span class="catcue">${catFilter===c[1]?'▾':'▸'}</span> ${c[1]}${catFilter===c[1]?' <span class="catactive">filtering ✓</span>':''}</td><td class="num">${fmt(c[2])}</td><td class="num">${c[3]}</td>
+     <td class="num">${fmt(c[4])}</td><td class="num">${f1(c[5])}</td><td class="num">${f1(c[8])}</td><td class="num">${f1(c[6])}%</td>
+     <td>${c[7]==='NEEDS_MANUAL'?'<span class="man">NEEDS MANUAL</span>':c[7].replace('_',' ')}</td></tr>`).join("");
+}
+
+/* ---- asin table ---- */
+const ACOLS=[
+  ["Rank",C.rank,1],["Category",C.cat,0],["Segment",C.seg,0],["Movement",C.mov,0],["ASIN",C.asin,0],["SKU",C.sku,0],["Account",C.acc,0],
+  ["Impr",C.i,1],["Clicks",C.k,1],["Conv",C.v,1],["Row CVR%",C.cvr,1],
+  ["Avg impr",C.bi,1],["Avg clk",C.bk,1],["Avg conv","avgc",1],["Bench CVR%",C.bcvr,1],
+  ["\u0394 Impr","dImp",1],["\u0394 Clk","dClk",1],["\u0394 Conv","dConv",1],["Status","status",0]
+];
+function asinHead(){
+  document.querySelector("#asinTbl thead").innerHTML="<tr>"+ACOLS.map((c,idx)=>{
+    const num=c[2]?"num":"";const ar=(String(sortKey)===String(c[1]))?(sortDir>0?"\u25B2":"\u25BC"):"\u21C5";
+    return `<th class="${num}" data-k="${c[1]}">${c[0]}<span class="ar">${ar}</span></th>`;}).join("")+"</tr>";
+  document.querySelectorAll("#asinTbl thead th").forEach(th=>th.onclick=()=>{
+    const k=th.dataset.k; if(k==="dImp"||k==="dClk"){/*sort by computed*/}
+    if(sortKey===k){sortDir*=-1}else{sortKey=k;sortDir=1} render();});
+}
+function asinBody(rows){
+  const tb=document.querySelector("#asinTbl tbody");
+  if(!rows.length){tb.innerHTML='<tr><td class="empty" colspan="19">No ASINs match this filter.</td></tr>';return;}
+  const frag=rows.map(r=>{
+    const avgc=avgConvOf(r);
+    const dImp=r[C.i]-r[C.bi], dClk=r[C.k]-r[C.bk], dConv=r[C.v]-avgc;
+    const _st=statusOf(r);
+    const _rowcls=_st==="NEEDS_REVIEW"?" row-review":"";
+    return `<tr class="${_rowcls.trim()}">
+      <td class="num">${r[C.rank]}</td>
+      <td>${r[C.cat]}</td><td>${segBadge(r[C.seg])}</td><td>${movBadge(r[C.mov])}</td>
+      <td>${r[C.asin]}</td><td>${r[C.sku]||'<span class="man">—</span>'}</td><td>${ACC[r[C.acc]]}</td>
+      <td class="num">${fmt(r[C.i])}</td><td class="num">${fmt(r[C.k])}</td><td class="num">${fmt(r[C.v])}</td>
+      <td class="num">${f1(r[C.cvr])}%</td>
+      <td class="num">${fmt(r[C.bi])}</td><td class="num">${f1(r[C.bk])}</td><td class="num">${f1(avgc)}</td><td class="num">${f1(r[C.bcvr])}%</td>
+      <td class="num">${delta(dImp)}</td><td class="num">${delta(Math.round(dClk))}</td><td class="num">${delta(Math.round(dConv*10)/10)}</td>
+      <td>${statBadge(statusOf(r))}</td></tr>`;
+  }).join("");
+  tb.innerHTML=frag;
+}
+// sort support for computed delta columns
+const _origSort=render;
+render();
+
+(function(){ var s=document.getElementById("phsel"); if(s){ s.value="0"; s.dispatchEvent(new Event("change")); } })();
+</script>
+</body>
+</html>

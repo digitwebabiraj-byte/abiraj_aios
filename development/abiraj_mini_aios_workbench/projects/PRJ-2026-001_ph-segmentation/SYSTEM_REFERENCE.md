@@ -5,7 +5,10 @@
 > the movement rule, the Orphan-ASIN monitor, the two per-PH counts, the report, and the escalations.
 > It is a **derived reference** synthesised from the canonical sources; it does not replace them.
 >
-> **Currency:** updated **2026-07-06** to reflect the work through **REQ-05-D08** (increments D05–D08).
+> **Currency:** updated **2026-07-10** — counts refreshed for the **REQ-05-D10** corrected 2026-07
+> rebuild (**9,947 ASINs / 30 PHs**; see §1 and `handover/…/2026-07-10__abiraj__ph-asin__REQ-05-D10.md`).
+> The classification/movement/benchmark **rules below are unchanged since D08** — only the input data
+> and the roster changed. Repeatable process: `capability/2026-07-10_monthly-rebuild-and-push-runbook.md`.
 > Where an older statement was superseded, the current rule is given and the change is flagged in §11.
 >
 > **Canonical sources:**
@@ -32,7 +35,7 @@ never takes commercial action automatically.
 
 - **Owner:** Bietrick (TL). **Scope:** UK Amazon **FBM** (Fulfilled by Merchant), all PHs under Bietrick.
 - **Cadence:** Monthly. **Comparison window:** the **last 4 complete weeks** vs the **previous 4 complete weeks** (Saturday-ending weeks) — *not* a calendar month (see §6). **Tool:** Claude + Postgres (MCP). **Source of truth (output):** `analytics.ph_segment_report`.
-- **Current build (report_period 2026-07, window 31 May–27 Jun 2026):** **8,149 ASINs** across **24 PHs** and 57 categories (2 accounts: LEDSone UK, DCVoltage UK).
+- **Current build (report_period 2026-07, window 31 May–27 Jun 2026):** **9,947 ASINs** across **30 PHs** and 76 categories (2 accounts: LEDSone UK, DCVoltage UK) — **corrected 2026-07-10 (REQ-05-D10)** from the earlier 3-Jul build of 8,149 / 24 PHs. The **+1,798 / +6 PHs is a database ownership & orphan-assignment restructure, not a rule change** (segments HHH 42 · HHL 580 · HLH 173 · LHH 10 · LLH 626 · LLL 8,516). The corrected leader + 30 per-PH dashboards are **live** on `tech_team_outputs.ph_task` (id 5 + 30 rows); **note:** `analytics.ph_segment_report` still holds the old 8,149 build until the engine is re-run in the authorised DB session.
 
 ## 2. The three signals
 
@@ -162,6 +165,13 @@ on weekly `traffic_data`. Key locked rules:
 | LLL Dead Horses | 7,088 |
 | **Total** | **8,149** |
 
+> ⚠️ **SUPERSEDED (2026-07-10 · REQ-05-D10).** This distribution table and the reconciliation /
+> escalation figures in this §7 describe the **3-Jul build (8,149 / 24 PHs)**. The **current corrected
+> build is 9,947 ASINs / 30 PHs** — HHH **42** · HHL **580** · HLH **173** · LHH **10** · LLH **626** ·
+> LLL **8,516** (see §1 and `handover/REQ-05_ph-asin-segmentation/2026-07-10__abiraj__ph-asin__REQ-05-D10.md`).
+> The per-category reconciliation and escalation counts below have **not** been recomputed for the new
+> build — treat every number in this §7 as the *superseded* reference until the source table is rebuilt.
+
 ~87% land in LLL (expected — the bar is the top sellers' average). Movement this cycle: declines 574,
 escalation flags 24 PHs >30% LLL / 22 PHs with >5 declines. Source reconciliation vs `traffic_data`:
 8,146 of 8,149 rows match exactly (3 differ by ±1 conversion — benign late-attribution restatement).
@@ -190,7 +200,7 @@ Two different, both-correct counts exist for the same PH and must not be confuse
 | **Allocated / roster** | "how many IDs is this PH allocated **in total**" | `user → ph_categories → ph_cate_products`, `which_channel=1`, distinct `ref_id` | 503 |
 
 The gap (503 − 464 = 39 for paulr) = allocated ASINs **not active** in this window (4 never had UK traffic).
-The dashboard's **Assigned Listings** count is verified against `traffic_data` with **diff 0 for all 24 PHs**.
+The dashboard's **Assigned Listings** count is verified against `traffic_data` with **diff 0 for all 24 PHs**. *(3-Jul build figure — the current corrected build is **30 PHs**; see §1 / D10.)*
 
 ## 8. The dashboard / HTML report (what it looks like)
 
