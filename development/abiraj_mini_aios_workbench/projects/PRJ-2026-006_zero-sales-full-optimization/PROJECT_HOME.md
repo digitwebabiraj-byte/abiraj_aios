@@ -135,6 +135,17 @@ listed 66 · No visibility 33. Same design + the full-screen UI pass (compact he
 visible rows). Footer wording **corrected** to "122 removed — sold in June per Amazon (sibling-ASIN)"
 (the earlier inaccurate "missing vendor data" line is gone). Window label = "June 2026 (last month)".
 
+**FBM-stock bug fixed (2026-07-13).** The "Amazon FBM Stock" column was 0 for **bundle SKUs**
+(`LSCY…2PK+RPR…2PK`) because the FBA test `is_fba = false` dropped rows where the SKU has no `_AM`
+segment (test returns NULL). Fix in `generate_dataset.sql`: `COALESCE(is_fba,false)=false`. Impact:
+**885 of the 1,115** June rows had FBM corrected; total FBM shown **5,215 → 34,422 units**. Matches
+the KPI sheet's Stock (col F) for those ASINs. Republished to row 167.
+**Two residual FBM data-quality items (NOT fixed — flagged):** (a) **parent-row exclusion** — a few
+ASINs (e.g. B095PRHY6W) carry their merchant qty on an `is_parent=1` row, which the report excludes
+by design → FBM still 0; (b) **stale `listing_data.quantity`** — some rows hold 0 while Amazon shows
+a value (e.g. B0CVKHL1MF: DB 0 vs sheet 9) — a source-refresh issue, not a query bug. The KPI-sheet
+Stock column is also a different snapshot, so it won't reconcile 100% even after the fix.
+
 ## Status
 - **D01: COMPLETE (technical) — VALIDATION GREEN; BUSINESS SIGN-OFF PENDING.** Corrected query
   (vendor OVERLAP + NULL-channel bridge), 1,250-row governed pull, xlsx + HTML dashboard, 6/6

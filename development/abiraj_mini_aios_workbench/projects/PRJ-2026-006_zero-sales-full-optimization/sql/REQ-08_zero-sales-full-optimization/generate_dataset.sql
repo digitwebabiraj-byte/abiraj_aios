@@ -107,8 +107,11 @@ tw AS (
   GROUP BY td.ref_id
 ),
 fbm AS (
+  -- FBM = merchant-fulfilled listing qty, excluding CONFIRMED FBA (AM-family) SKUs.
+  -- Use COALESCE(is_fba,false): bundle SKUs (no `_AM` segment) yield is_fba=NULL, and
+  -- `is_fba = false` would WRONGLY drop them (NULL <> false) -> FBM understated to 0.
   SELECT asin, SUM(COALESCE(quantity, 0)) AS fbm
-  FROM resolved WHERE fulfilment = 'merchant' AND is_fba = false GROUP BY asin
+  FROM resolved WHERE fulfilment = 'merchant' AND COALESCE(is_fba, false) = false GROUP BY asin
 ),
 uk AS (
   SELECT r.asin, SUM(COALESCE(s.stock, 0)) AS uk
