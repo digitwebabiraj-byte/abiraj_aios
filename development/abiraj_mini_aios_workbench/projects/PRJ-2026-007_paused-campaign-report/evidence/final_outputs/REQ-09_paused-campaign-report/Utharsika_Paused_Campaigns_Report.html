@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paused Campaigns — Utharsika</title>
+<style>
+:root{
+  --bg:#EEF1F6; --surface:#FFFFFF; --ink:#161B24; --muted:#5C6675; --faint:#909AA8;
+  --hair:#E1E6EE; --hair2:#EDF0F5; --navy:#22375A; --navy2:#1A2C49;
+  /* rule identity colours */
+  --r1:#D53B45; --r1b:#FCE9EA; --r1d:#8E2229;      /* ACOS */
+  --r2:#C9862B; --r2b:#FaF0DC; --r2d:#7E5312;      /* Zero orders + spend */
+  --r3:#7A57C4; --r3b:#EFE9FA; --r3d:#4C3488;      /* Spend based */
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Consolas",monospace;
+  --ease:cubic-bezier(.22,.7,.2,1);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;
+     -webkit-font-smoothing:antialiased;overflow:hidden}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.app{display:flex;flex-direction:column;height:100vh;width:100%;padding:8px 7px 6px}
+.app::before{content:'';position:fixed;left:0;right:0;top:0;height:3px;z-index:9;
+  background:linear-gradient(90deg,var(--r2),var(--r1) 45%,var(--r3))}
+
+/* ---- slim KPI ribbon (small, gives the table the room) ---- */
+.ribbon{display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--hair);border-radius:11px;
+  padding:10px 16px;margin-bottom:9px;box-shadow:0 1px 2px rgba(20,30,50,.04)}
+.rb-title{display:flex;flex-direction:column;gap:1px;min-width:210px}
+.rb-title .t{font-size:16px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
+.rb-title .s{font-size:12px;color:var(--muted)}
+.rb-title .s b{color:var(--navy2);font-weight:700}
+.rb-sep{width:1px;align-self:stretch;background:var(--hair)}
+.kpi{display:flex;flex-direction:column;gap:1px;padding:0 2px}
+.kpi .v{font-size:20px;font-weight:800;line-height:1;letter-spacing:-.01em;color:var(--navy2)}
+.kpi .v .u{font-size:11px;font-weight:600;color:var(--faint);margin-left:2px}
+.kpi.hot .v{color:var(--r2d)}
+.kpi .k{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.split{flex:1;min-width:220px}
+.split .k{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.sbar{height:9px;border-radius:6px;overflow:hidden;display:flex;background:var(--hair2)}
+.sbar i{height:100%;transition:width .8s var(--ease)}
+.sleg{display:flex;gap:14px;margin-top:7px;flex-wrap:wrap}
+.sleg span{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)}
+.sleg .d{width:9px;height:9px;border-radius:3px}
+.sleg b{color:var(--ink);font-weight:700}
+.roflag{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);
+  background:#EAF6EF;border:1px solid #CBE7D6;border-radius:999px;padding:4px 11px;white-space:nowrap}
+.roflag i{width:6px;height:6px;border-radius:50%;background:#2FA36B}
+
+/* ---- toolbar ---- */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.tabs{display:flex;gap:3px;background:var(--surface);border:1px solid var(--hair);border-radius:9px;padding:3px}
+.tab{border:none;background:transparent;border-radius:7px;padding:7px 13px;font:inherit;font-size:12.5px;
+  font-weight:600;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  transition:background .18s var(--ease),color .15s}
+.tab:hover{color:var(--ink)}
+.tab .c{font-family:var(--mono);font-size:11px;font-weight:700;background:var(--hair2);color:var(--muted);
+  border-radius:20px;padding:1px 7px}
+.tab[aria-selected=true]{color:#fff}
+.tab[data-f=all][aria-selected=true]{background:var(--navy)}
+.tab[data-f="1"][aria-selected=true]{background:var(--r1)}
+.tab[data-f="2"][aria-selected=true]{background:var(--r2)}
+.tab[data-f="3"][aria-selected=true]{background:var(--r3)}
+.tab[aria-selected=true] .c{background:rgba(255,255,255,.25);color:#fff}
+.spacer{flex:1}
+.count{font-size:12px;color:var(--muted)}
+.search{position:relative;width:250px}
+.search input{width:100%;border:1px solid var(--hair);background:var(--surface);border-radius:8px;
+  padding:9px 12px 9px 33px;font-family:var(--mono);font-size:12px;color:var(--ink);
+  transition:border .16s,box-shadow .16s}
+.search input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(34,55,90,.12)}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--faint)}
+.btn{border:1px solid var(--hair);background:var(--surface);border-radius:8px;height:36px;padding:0 12px;
+  display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12.5px;font-weight:600;
+  color:var(--ink);cursor:pointer;transition:border .16s,transform .12s,box-shadow .16s}
+.btn:hover{border-color:#C6CDD8;transform:translateY(-1px);box-shadow:0 4px 12px rgba(20,30,50,.08)}
+.btn svg{width:14px;height:14px;color:var(--muted)}
+
+/* ---- TABLE = hero ---- */
+.tablecard{flex:1;min-height:0;background:var(--surface);border:1px solid var(--hair);border-radius:12px;
+  overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 8px rgba(20,30,50,.05)}
+.tscroll{flex:1;min-height:0;overflow:auto}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:1120px}
+thead th{position:sticky;top:0;z-index:3;background:linear-gradient(180deg,#2B4368,#213A5D);
+  color:rgba(255,255,255,.82);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;
+  text-align:left;padding:13px 18px;white-space:nowrap;cursor:pointer;user-select:none;
+  border-bottom:2px solid rgba(255,255,255,.14);transition:color .15s,background .18s}
+thead th.r{text-align:right}
+thead th:hover{color:#fff;background:linear-gradient(180deg,#33507b,#274568)}
+thead th .ar{opacity:0;font-family:var(--mono);margin-left:5px;color:#AFD0F5}
+thead th[data-active]{color:#fff}
+thead th[data-active] .ar{opacity:1}
+tbody td{padding:0;border-bottom:1px solid var(--hair2);vertical-align:middle}
+tbody td .cell{padding:14px 18px}
+tbody tr{animation:rin .4s var(--ease) both;transition:background .14s}
+@keyframes rin{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+tbody tr:hover{background:#F6F9FD}
+tbody tr:last-child td{border-bottom:none}
+/* rule colour band on the left of every row */
+td.band{width:6px;padding:0}
+td.band .b{width:6px;height:100%;min-height:46px}
+tr[data-rule="1"] td.band .b{background:var(--r1)} tr[data-rule="1"]:hover{background:var(--r1b)}
+tr[data-rule="2"] td.band .b{background:var(--r2)} tr[data-rule="2"]:hover{background:var(--r2b)}
+tr[data-rule="3"] td.band .b{background:var(--r3)} tr[data-rule="3"]:hover{background:var(--r3b)}
+.c-campaign{font-weight:650;font-size:12.5px;min-width:210px;max-width:280px;line-height:1.35}
+.c-campaign .tag{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.03em;
+  padding:1px 6px;border-radius:5px;margin-right:7px;vertical-align:1px}
+tr[data-rule="1"] .c-campaign .tag{background:var(--r1b);color:var(--r1d)}
+tr[data-rule="2"] .c-campaign .tag{background:var(--r2b);color:var(--r2d)}
+tr[data-rule="3"] .c-campaign .tag{background:var(--r3b);color:var(--r3d)}
+.c-adgroup{color:var(--muted);font-size:12.5px;min-width:130px}
+.c-asin .cell{font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--navy2);white-space:nowrap}
+.c-sku .cell{font-family:var(--mono);font-size:11.5px;color:var(--muted);max-width:190px;word-break:break-all}
+.c-reason{min-width:300px;max-width:380px}
+.rbadge{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:2px 10px;margin-bottom:6px}
+tr[data-rule="1"] .rbadge{background:var(--r1b);color:var(--r1d)}
+tr[data-rule="2"] .rbadge{background:var(--r2b);color:var(--r2d)}
+tr[data-rule="3"] .rbadge{background:var(--r3b);color:var(--r3d)}
+.rsum{font-size:12.5px;color:var(--ink);line-height:1.4;margin-bottom:7px}
+.rchips{display:flex;flex-wrap:wrap;gap:6px}
+.rchip{font-family:var(--mono);font-size:10.5px;color:var(--muted);background:var(--surface);
+  border:1px solid var(--hair);border-radius:6px;padding:2px 8px;white-space:nowrap}
+.rchip b{color:var(--ink);font-weight:700}
+tr[data-rule="1"] .rchip{border-color:#F1CCce} tr[data-rule="2"] .rchip{border-color:#EBD8B0}
+tr[data-rule="3"] .rchip{border-color:#DACdF0}
+.c-date .cell{font-family:var(--mono);font-size:12.5px;color:var(--ink);white-space:nowrap}
+.c-days{text-align:right}
+.c-days .cell{display:flex;justify-content:flex-end}
+.daychip{display:inline-flex;align-items:baseline;gap:3px;font-family:var(--mono);font-weight:800;font-size:14px;
+  border-radius:8px;padding:5px 12px;line-height:1}
+.daychip .u{font-size:10px;font-weight:600;opacity:.72}
+.empty{padding:70px 20px;text-align:center;color:var(--muted)}
+.empty b{display:block;font-size:16px;color:var(--ink);margin-bottom:5px}
+.foot{padding:7px 4px 4px;font-size:11px;color:var(--faint);line-height:1.5}
+.foot code{font-family:var(--mono);color:var(--muted)}
+@media(max-width:920px){
+  body{overflow:auto}.app{height:auto}
+  .ribbon{gap:12px}.rb-sep{display:none}.search{width:170px}.tscroll{overflow-x:auto}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.sbar i{transition:none}}
+</style></head>
+<body>
+<div class="app">
+
+  <div class="ribbon">
+    <div class="rb-title">
+      <div class="t">Paused Campaigns — Utharsika</div>
+      <div class="s" id="sub"></div>
+    </div>
+    <div class="rb-sep"></div>
+    <div class="kpi"><div class="v"><span id="k-targets">0</span></div><div class="k">Paused targets</div></div>
+    <div class="kpi"><div class="v"><span id="k-asins">0</span></div><div class="k">Distinct ASINs</div></div>
+    <div class="kpi hot"><div class="v"><span id="k-days">0</span><span class="u">days</span></div><div class="k">Longest paused</div></div>
+    <div class="kpi"><div class="v"><span id="k-rate">0</span><span class="u">%</span></div><div class="k">Still-paused of 41</div></div>
+    <div class="rb-sep"></div>
+    <div class="split">
+      <div class="k">Reason for pause</div>
+      <div class="sbar" id="sbar"></div>
+      <div class="sleg" id="sleg"></div>
+    </div>
+    <span class="roflag"><i></i> Read-only · live source</span>
+  </div>
+
+  <div class="toolbar">
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <button class="btn" id="fs" title="Full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m0 8v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3m0-8V5a2 2 0 0 0-2-2h-3"/></svg>Full screen</button>
+    <div class="spacer"></div>
+    <span class="count" id="count"></span>
+    <div class="search">
+      <input id="q" type="search" placeholder="Search campaign, ASIN, SKU…" autocomplete="off">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    </div>
+  </div>
+
+  <div class="tablecard">
+    <div class="tscroll">
+      <table><thead><tr id="head"></tr></thead><tbody id="body"></tbody></table>
+    </div>
+  </div>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<script id="payload" type="application/json">[{"campaign": "SP | AK | ST | Screw | Utharsika | Auto", "adgroup": "Ad group - 29/05/2026 15:05:26.946", "asin": "B0F1D59PXR", "sku": "RWWPSY08GY-UK", "reason": "Rule 3 - Spend Based (Condition 1 (Price <= £15)): Date Range 2026-05-11 - 2026-06-10, Product Price 1.99, Last 7 Days Spend 0.83 (41.71% of product price, threshold: 22.00%), Last 30 days Orders 1 (>0) & Last 7 days Orders 0 (=0)", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 3 · Spend based", "summary": "Orders dried up, spend continued", "chips": [["Spend 7d", "£0.83"], ["of £1.99", "41.71%"], ["Orders 30d→7d", "1→0"]], "rulenum": 3}, {"campaign": "SP | PH | AK |  Lamp Shade | Utharsika | PT,KT | Manual", "adgroup": "black lampshade", "asin": "B0CQT78SLK", "sku": "LSDO210BI-PK", "reason": "Rule 2 - Condition 1 (Price <= 15): Product Price 11.89, Last 30 Days Spend 3.51 (29.52% of product price, threshold: 20.00%) with 0 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£3.51"], ["of £11.89", "29.52%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | AK |  Lamp Shade | Utharsika | PT,KT | Manual", "adgroup": "black lampshade", "asin": "B0CS9PNL8L", "sku": "LSFT220BG3PK-AMD", "reason": "Rule 2 - Condition 3 (25 < Price <= 35): Product Price 31.98, Last 30 Days Spend 10.45 (32.68% of product price, threshold: 17.00%) with 0 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£10.45"], ["of £31.98", "32.68%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | AK | Lamp shade | Crystal  | Utharsika | Auto", "adgroup": "Other Curvy Shade", "asin": "B0DFHM8LHQ", "sku": "LSCY290CH+RPR44WH-AC", "reason": "Rule 1 - ACOS Based Rules: ACOS 285.9% (>=50%) & Last 7 Days ACOS 0% (<50%) with 1 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 1 · ACOS", "summary": "High ACOS — spend outrunning sales", "chips": [["ACOS", "285.9%"], ["7-day ACOS", "0%"], ["Orders", "1"]], "rulenum": 1}, {"campaign": "SP | PH | AK | Lamp shade | Crystal  | Utharsika | Auto", "adgroup": "22cm Cone Shade-", "asin": "B0F7LV6KMS", "sku": "LSFT220CO2PK+RPR44WH2PK_2", "reason": "Rule 2 - Condition 2 (15 < Price <= 25): Product Price 20.09, Last 30 Days Spend 7.87 (39.17% of product price, threshold: 19.00%) with 0 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£7.87"], ["of £20.09", "39.17%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | AK | Lamp shade | Crystal  | Utharsika | Auto", "adgroup": "Crystal Light Shade", "asin": "B0FX2SZFZM", "sku": "LSCYRO300BM2PK+RPR44WH2PK", "reason": "Rule 1 - ACOS Based Rules: ACOS 23.2% (<50%) & Last 7 Days ACOS 51.01% (>=50%) with 10 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 1 · ACOS", "summary": "High ACOS — spend outrunning sales", "chips": [["ACOS", "23.2%"], ["7-day ACOS", "51.01%"], ["Orders", "10"]], "rulenum": 1}, {"campaign": "SP | PH | AK | Lamp shade | Utharsika | Auto", "adgroup": "Curvy Lamp Shade", "asin": "B08VGMNGYN", "sku": "LSCY290YB+RPR44WH W", "reason": "Rule 1 - ACOS Based Rules: ACOS 55.62% (>=50%) & Last 7 Days ACOS 0% (<50%) with 1 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 1 · ACOS", "summary": "High ACOS — spend outrunning sales", "chips": [["ACOS", "55.62%"], ["7-day ACOS", "0%"], ["Orders", "1"]], "rulenum": 1}, {"campaign": "SP | PH | AK | Lamp shade | Utharsika | Auto", "adgroup": "B0CC9LSNXF", "asin": "B0CTSKY12R", "sku": "LSCO335BM2PK+RPR44WH2PK-AMZ", "reason": "Rule 2 - Condition 2 (15 < Price <= 25): Product Price 23.89, Last 30 Days Spend 6.02 (25.20% of product price, threshold: 19.00%) with 0 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£6.02"], ["of £23.89", "25.20%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | MH | Lamp Shade | Bl & Wh | Utharsika | Manual", "adgroup": "White shade KT", "asin": "B0DXQ8VVR7", "sku": "LSCY290WH2PK+RPR44WH2PK_AMN2", "reason": "Rule 2 - Condition 3 (25 < Price <= 35): Product Price 25.79, Last 30 Days Spend 4.78 (18.53% of product price, threshold: 17.00%) with 0 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£4.78"], ["of £25.79", "18.53%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | MH | Lamp Shade | CURVY | ST | Utharsika | Auto", "adgroup": "curvy pack", "asin": "B0DFM8C9N6", "sku": "LSCY290RE2PK+RPR44WH2PK M", "reason": "Rule 2 - Condition 3 (25 < Price <= 35): Product Price 26.89, Last 30 Days Spend 5.43 (20.19% of product price, threshold: 17.00%) with 0 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£5.43"], ["of £26.89", "20.19%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | MH | Lamp Shade | CURVY | ST | Utharsika | Auto", "adgroup": "curvy pack", "asin": "B0DXQ87HLP", "sku": "LSCY290CY2PK+RPR44WH2PK-U", "reason": "Rule 2 - Condition 3 (25 < Price <= 35): Product Price 25.79, Last 30 Days Spend 5.41 (20.98% of product price, threshold: 17.00%) with 0 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£5.41"], ["of £25.79", "20.98%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | MH | Lamp Shade | Curvy | Utharsika | Auto", "adgroup": "Curvy-2pack", "asin": "B0DXQ84YT7", "sku": "LSCY290BD2PK+RPR44WH2PK-U", "reason": "Rule 2 - Condition 3 (25 < Price <= 35): Product Price 25.89, Last 30 Days Spend 4.83 (18.66% of product price, threshold: 17.00%) with 0 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£4.83"], ["of £25.89", "18.66%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | MH | Lamp Shade | Curvy | Utharsika | Auto", "adgroup": "B0D7ZRWBS2", "asin": "B0DXQ7YWGJ", "sku": "LSCY290YB2PK+RPR44WH2PK-U", "reason": "Rule 3 - Spend Based (Condition 3 (£25 < Price <= £35)): Product Price 27.89, Last 7 Days Spend 7.04 (25.24% of product price, threshold: 18.00%), Last 30 days Orders 1 (>0) & Last 7 days Orders 0 (=0)", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 3 · Spend based", "summary": "Orders dried up, spend continued", "chips": [["Spend 7d", "£7.04"], ["of £27.89", "25.24%"], ["Orders 30d→7d", "1→0"]], "rulenum": 3}, {"campaign": "SP | PH | MH | Lamp Shade | Curvy | Utharsika | Auto", "adgroup": "B0D7ZRWBS2", "asin": "B0DXQ84YT7", "sku": "LSCY290BD2PK+RPR44WH2PK-U", "reason": "Rule 2 - Condition 3 (25 < Price <= 35): Product Price 25.89, Last 30 Days Spend 4.62 (17.84% of product price, threshold: 17.00%) with 0 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£4.62"], ["of £25.89", "17.84%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | MH | Lamp shade | Utharsika | Auto", "adgroup": "Mosaic Glass Lamp Shade", "asin": "B0DDC11VMP", "sku": "LSMCSPDRFL+RPM40WH", "reason": "Rule 1 - ACOS Based Rules: ACOS 20.7% (<50%) & Last 7 Days ACOS 71.18% (>=50%) with 3 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 1 · ACOS", "summary": "High ACOS — spend outrunning sales", "chips": [["ACOS", "20.7%"], ["7-day ACOS", "71.18%"], ["Orders", "3"]], "rulenum": 1}, {"campaign": "SP | PH | MH | Lampshades | Target_Sales | Test | Utharsika | Manual", "adgroup": "Lamp Shade_June - KT", "asin": "B0DZNJDHCQ", "sku": "RWWPSY12GY-UK", "reason": "Rule 2 - Condition 1 (Price <= 15): Product Price 1.99, Last 30 Days Spend 0.46 (23.12% of product price, threshold: 20.00%) with 0 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£0.46"], ["of £1.99", "23.12%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | MH | Lampshades | Target_Sales | Test | Utharsika | Manual", "adgroup": "Lamp Shade_June - KT", "asin": "B0DZNQCJX5", "sku": "RWWPSY08GY-UK", "reason": "Rule 2 - Condition 1 (Price <= 15): Product Price 1.69, Last 30 Days Spend 3.99 (236.09% of product price, threshold: 20.00%) with 0 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£3.99"], ["of £1.69", "236.09%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | MH | Lampshades | Target_Sales | Test | Utharsika | Manual", "adgroup": "Lamp Shade_June - KT", "asin": "B0DZNLF6LK", "sku": "RWWPSY10GY-UK", "reason": "Rule 2 - Condition 1 (Price <= 15): Product Price 2.49, Last 30 Days Spend 1.54 (61.85% of product price, threshold: 20.00%) with 0 orders", "pause_date": "2026-06-10", "days": 33, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£1.54"], ["of £2.49", "61.85%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | MH | ST | Cone Shade | Utharsika | Auto", "adgroup": "Lamp Shades", "asin": "B0BX44PZG7", "sku": "LSSS300BC+RPR44WH", "reason": "Rule 2 - Condition 1 (Price <= 15): Product Price 14.29, Last 30 Days Spend 2.92 (20.43% of product price, threshold: 20.00%) with 0 orders", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£2.92"], ["of £14.29", "20.43%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | MH | ST | Crystal Shade | Utharsika | Auto", "adgroup": "crystal cage", "asin": "B0DPMQZ1WP", "sku": "LSCYRO120GD", "reason": "Rule 1 - ACOS Based Rules: ACOS 50.91% (>=50%) & Last 7 Days ACOS 0% (<50%) with 7 orders | Rule 3 - Spend Based (Condition 1 (Price <= £15)): Product Price 14.99, Last 7 Days Spend 14.75 (98.40% of product price, threshold: 22.00%), Last 30 days Orders 7 (>0) & Last 7 days Orders 0 (=0)", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 1 · ACOS", "summary": "High ACOS — spend outrunning sales", "chips": [["ACOS", "50.91%"], ["7-day ACOS", "0%"], ["Orders", "7"]], "rulenum": 1}, {"campaign": "SP | PH | AK | Lamp shade | Crystal  | Utharsika | Auto", "adgroup": "Crystal Light Shade", "asin": "B0FX2SP39V", "sku": "LSCYRO200WH2PK+RPR44WH2PK", "reason": "Rule 2 - Condition 2 (15 < Price <= 25): Product Price 24.89, Last 30 Days Spend 8.61 (34.59% of product price, threshold: 19.00%) with 0 orders", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£8.61"], ["of £24.89", "34.59%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | AK | Lamp shade | Utharsika | Auto", "adgroup": "Barn shade", "asin": "B0CJCDZWRB", "sku": "LSSS300SN2PK+RPR44WH2PK-SN", "reason": "Rule 1 - ACOS Based Rules: ACOS 54.54% (>=50%) & Last 7 Days ACOS 0% (<50%) with 1 orders", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 1 · ACOS", "summary": "High ACOS — spend outrunning sales", "chips": [["ACOS", "54.54%"], ["7-day ACOS", "0%"], ["Orders", "1"]], "rulenum": 1}, {"campaign": "SP | PH | AK | Lamp shade | Utharsika | Auto", "adgroup": "Barn shade", "asin": "B0CJCDXV8R", "sku": "LSSS300WH2PK+RPR44WH2PK-WA", "reason": "Rule 2 - Condition 2 (15 < Price <= 25): Product Price 23.79, Last 30 Days Spend 4.61 (19.38% of product price, threshold: 19.00%) with 0 orders", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£4.61"], ["of £23.79", "19.38%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | AK | Lamp shade | Utharsika | Auto", "adgroup": "Curvy Lamp Shade", "asin": "B0CS9QXNXQ", "sku": "LSDO210BG3PK", "reason": "Rule 2 - Condition 3 (25 < Price <= 35): Product Price 29.89, Last 30 Days Spend 9.67 (32.35% of product price, threshold: 17.00%) with 0 orders", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£9.67"], ["of £29.89", "32.35%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | AK | Lamp Shade | Utharsika | Manual", "adgroup": "Semi Curvy single", "asin": "B08TX216Y4", "sku": "LSMS320BD+RPR44WH", "reason": "Rule 2 - Condition 1 (Price <= 15): Product Price 14.99, Last 30 Days Spend 4.36 (29.09% of product price, threshold: 20.00%) with 0 orders", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£4.36"], ["of £14.99", "29.09%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | AK | Lamp Shade | Utharsika | Manual", "adgroup": "Semi Curvy single", "asin": "B0CTT4CH4C", "sku": "LSMS320GR+RPR44WH -AMD", "reason": "Rule 2 - Condition 1 (Price <= 15): Product Price 14.99, Last 30 Days Spend 6.44 (42.96% of product price, threshold: 20.00%) with 0 orders", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£6.44"], ["of £14.99", "42.96%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | MH | Lamp Shade | CURVY | ST | Utharsika | Auto", "adgroup": "curvy pack", "asin": "B0D294TFL1", "sku": "LSCY290CY2PK+RPR44WH2PK LS", "reason": "Rule 2 - Condition 3 (25 < Price <= 35): Product Price 27.89, Last 30 Days Spend 6.92 (24.81% of product price, threshold: 17.00%) with 0 orders", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£6.92"], ["of £27.89", "24.81%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | MH | Lamp Shade | CURVY | ST | Utharsika | Auto", "adgroup": "curvy pack", "asin": "B0DXQ7LC8N", "sku": "LSCY290GR2PK+RPR44WH2PK-AMN", "reason": "Rule 1 - ACOS Based Rules: ACOS 62.09% (>=50%) & Last 7 Days ACOS 0% (<50%) with 1 orders", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 1 · ACOS", "summary": "High ACOS — spend outrunning sales", "chips": [["ACOS", "62.09%"], ["7-day ACOS", "0%"], ["Orders", "1"]], "rulenum": 1}, {"campaign": "SP | PH | MH | Lamp Shade | CURVY | ST | Utharsika | Auto", "adgroup": "curvy pack", "asin": "B0DXQB65RY", "sku": "LSCY290AA2PK+RPR44WH2PK AMN", "reason": "Rule 2 - Condition 3 (25 < Price <= 35): Product Price 26.49, Last 30 Days Spend 5.80 (21.90% of product price, threshold: 17.00%) with 0 orders", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£5.80"], ["of £26.49", "21.90%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | MH | Lamp Shade | Curvy | Utharsika | Auto", "adgroup": "Curvy 3pack", "asin": "B0D28Y45YZ", "sku": "LSCY290BL3PK+RPR44WH3PK LS", "reason": "Rule 2 - Condition 3 (25 < Price <= 35): Product Price 30.59, Last 30 Days Spend 10.19 (33.31% of product price, threshold: 17.00%) with 0 orders", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£10.19"], ["of £30.59", "33.31%"], ["Orders", "0"]], "rulenum": 2}, {"campaign": "SP | PH | MH | Lamp Shade | Curvy | Utharsika | Auto", "adgroup": "Curvy-2pack", "asin": "B0DXQ727KG", "sku": "LSCY290RE2PK+RPR44WH2PK-U", "reason": "Rule 1 - ACOS Based Rules: ACOS 54.22% (>=50%) & Last 7 Days ACOS 0% (<50%) with 1 orders", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 1 · ACOS", "summary": "High ACOS — spend outrunning sales", "chips": [["ACOS", "54.22%"], ["7-day ACOS", "0%"], ["Orders", "1"]], "rulenum": 1}, {"campaign": "SP | PH | MH | Lamp shade | Utharsika | Auto", "adgroup": "Mosaic Glass Lamp Shade", "asin": "B0F6775Q2J", "sku": "LSMCSQWYRE+RPM40WH", "reason": "Rule 1 - ACOS Based Rules: ACOS 39.93% (<50%) & Last 7 Days ACOS 56.93% (>=50%) with 3 orders", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 1 · ACOS", "summary": "High ACOS — spend outrunning sales", "chips": [["ACOS", "39.93%"], ["7-day ACOS", "56.93%"], ["Orders", "3"]], "rulenum": 1}, {"campaign": "SP | PH | MH | Lampshades | Target_Sales | Test | Utharsika | Manual", "adgroup": "Lamp Shade_June - KT", "asin": "B0CVLFG3DT", "sku": "RWWPSY0840YE", "reason": "Rule 2 - Condition 1 (Price <= 15): Product Price 2.99, Last 30 Days Spend 0.68 (22.74% of product price, threshold: 20.00%) with 0 orders", "pause_date": "2026-06-17", "days": 26, "rule": "Rule 2 · Zero orders + spend", "summary": "Zero orders while spending", "chips": [["Spend 30d", "£0.68"], ["of £2.99", "22.74%"], ["Orders", "0"]], "rulenum": 2}]</script>
+<script>
+const ROWS=JSON.parse(document.getElementById('payload').textContent);
+const RUN='13 Jul 2026', TOTAL_PAUSES=41, WINDOW='11 May – 17 Jun 2026';
+const RULES={1:{tag:'R1',short:'Rule 1 · ACOS',leg:'ACOS',col:'var(--r1)'},
+             2:{tag:'R2',short:'Rule 2 · Zero orders',leg:'Zero orders + spend',col:'var(--r2)'},
+             3:{tag:'R3',short:'Rule 3 · Spend based',leg:'Spend based',col:'var(--r3)'}};
+const N_ASINS=new Set(ROWS.map(r=>r.asin)).size;
+const counts={1:0,2:0,3:0}; ROWS.forEach(r=>counts[r.rulenum]++);
+const maxd=Math.max(...ROWS.map(r=>r.days));
+const mind=Math.min(...ROWS.map(r=>r.days));
+const oldest=ROWS.reduce((a,b)=>a.pause_date<b.pause_date?a:b).pause_date;
+const rate=Math.round(ROWS.length/TOTAL_PAUSES*100);
+
+document.getElementById('sub').innerHTML=`Performance window <b>${WINDOW}</b> &nbsp;·&nbsp; still paused as of ${RUN}`;
+document.getElementById('k-targets').textContent=ROWS.length;
+document.getElementById('k-asins').textContent=N_ASINS;
+document.getElementById('k-days').textContent=maxd;
+document.getElementById('k-rate').textContent=rate;
+document.getElementById('sbar').innerHTML=[2,1,3].map(k=>`<i style="width:${counts[k]/ROWS.length*100}%;background:${RULES[k].col}"></i>`).join('');
+document.getElementById('sleg').innerHTML=[2,1,3].map(k=>`<span><i class="d" style="background:${RULES[k].col}"></i>${RULES[k].leg} <b>${counts[k]}</b></span>`).join('');
+
+let state={filter:'all',q:'',sort:'days',dir:-1};
+const tabs=[['all','All',ROWS.length],[2,'Rule 2',counts[2]],[1,'Rule 1',counts[1]],[3,'Rule 3',counts[3]]];
+document.getElementById('tabs').innerHTML=tabs.map(([k,n,c])=>`<button class="tab" role="tab" data-f="${k}" aria-selected="${k===state.filter}">${n}<span class="c">${c}</span></button>`).join('');
+
+const COLS=[['campaign','Campaign'],['adgroup','Ad Group'],['asin','ASIN'],['sku','SKU'],['reason','Pause Reason'],['pause_date','Pause Date'],['days','Days Paused',1]];
+document.getElementById('head').innerHTML=`<th class="hband" style="width:6px;padding:0"></th>`+COLS.map(c=>`<th class="${c[2]?'r':''}" data-k="${c[0]}">${c[1]}<span class="ar"></span></th>`).join('');
+
+function dayStyle(d){ // heat: cool -> hot within the observed range
+  const t=maxd===mind?1:(d-mind)/(maxd-mind);
+  const bg=`rgba(${196+t*24},${150-t*70},${60-t*20},${.16+t*.12})`;
+  const fg=`rgb(${150-t*40},${90-t*55},${30})`;
+  return `background:${bg};color:${fg}`;
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function render(){
+  const q=state.q.trim().toLowerCase();
+  let rows=ROWS.filter(r=>state.filter==='all'||r.rulenum==state.filter);
+  if(q)rows=rows.filter(r=>(r.campaign+' '+r.asin+' '+r.sku+' '+r.adgroup+' '+r.reason).toLowerCase().includes(q));
+  const s=state.sort,d=state.dir;
+  rows.sort((a,b)=>{let x=a[s],y=b[s];if(typeof x==='string'){x=x.toLowerCase();y=(y||'').toLowerCase();return x<y?-d:x>y?d:0;}return (x-y)*d;});
+  document.getElementById('count').textContent=`${rows.length} of ${ROWS.length} shown`;
+  const body=document.getElementById('body');
+  if(!rows.length){body.innerHTML=`<tr><td colspan="8"><div class="empty"><b>No matches</b>Adjust the search or rule filter.</div></td></tr>`;head();return;}
+  body.innerHTML=rows.map((r,i)=>{const R=RULES[r.rulenum];
+    const chips=(r.chips||[]).map(c=>`<span class="rchip">${esc(c[0])} <b>${esc(c[1])}</b></span>`).join('');
+    const delay=Math.min(i,26)*20;
+    return `<tr data-rule="${r.rulenum}" style="animation-delay:${delay}ms">
+      <td class="band"><div class="b"></div></td>
+      <td class="c-campaign"><div class="cell"><span class="tag">${R.tag}</span>${esc(r.campaign)}</div></td>
+      <td class="c-adgroup"><div class="cell">${esc(r.adgroup||'—')}</div></td>
+      <td class="c-asin"><div class="cell">${esc(r.asin||'—')}</div></td>
+      <td class="c-sku"><div class="cell">${esc(r.sku||'—')}</div></td>
+      <td class="c-reason"><div class="cell"><span class="rbadge">${R.short}</span><div class="rsum">${esc(r.summary||'')}</div><div class="rchips">${chips}</div></div></td>
+      <td class="c-date"><div class="cell">${esc(r.pause_date)}</div></td>
+      <td class="c-days"><div class="cell"><span class="daychip" style="${dayStyle(r.days)}">${r.days}<span class="u">d</span></span></div></td>
+    </tr>`;}).join('');
+  head();
+}
+function head(){document.querySelectorAll('#head th[data-k]').forEach(th=>{const on=th.dataset.k===state.sort;
+  th.toggleAttribute('data-active',on);th.querySelector('.ar').textContent=on?(state.dir<0?'↓':'↑'):'';});}
+
+document.getElementById('tabs').addEventListener('click',e=>{const t=e.target.closest('.tab');if(!t)return;
+  state.filter=t.dataset.f==='all'?'all':+t.dataset.f;
+  document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',(x.dataset.f==='all'?'all':+x.dataset.f)===state.filter));render();});
+document.getElementById('q').addEventListener('input',e=>{state.q=e.target.value;render();});
+document.getElementById('head').addEventListener('click',e=>{const th=e.target.closest('th[data-k]');if(!th)return;
+  const k=th.dataset.k;if(state.sort===k)state.dir*=-1;else{state.sort=k;state.dir=(k==='days')?-1:1;}render();});
+document.getElementById('fs').addEventListener('click',()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();});
+
+document.getElementById('foot').innerHTML=`Row colour = pause rule &nbsp;·&nbsp; <b style="color:var(--r2d)">Rule 2</b> zero orders + spend &nbsp; <b style="color:var(--r1d)">Rule 1</b> ACOS &nbsp; <b style="color:var(--r3d)">Rule 3</b> spend based. “Days Paused” heat = longer paused → warmer. As of ${RUN}. Source: <code>ppc_etl_automation_log</code> (automation pauses, still active) joined to <code>ppc</code> + <code>ppc_performance</code>, scoped to campaigns named “Utharsika”, Amazon only. Read-only — no source data modified.`;
+render();
+</script>
+</body></html>

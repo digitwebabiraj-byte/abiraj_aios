@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "project_id": "PRJ-2026-007_paused-campaign-report",
+    "task_id": "REQ-09_paused-campaign-report",
+    "deliverable": "D01",
+    "source_requirement": "REQ-09-D01",
+    "project_code": "PH-2026-07-UTHAR10",
+    "report_name": "Paused Campaign Report — Utharsika",
+    "database": "order_management_copy",
+    "access": "read-only",
+    "run_date": "2026-07-13",
+    "grain": "one row per still-paused ad target (per ASIN)",
+    "scope": "campaigns whose name contains 'Utharsika' (ILIKE), Amazon (source=1), SB excluded",
+    "pause_source": "ppc_etl_automation_log: action_type='ad_pause_logs', status='success', applied_by='0'",
+    "still_paused_filter": "current ppc.record_status='paused' at ad grain (child_id=record_id)",
+    "reconciliation": {
+      "targets": 33,
+      "distinct_asins": 32,
+      "total_automation_pauses": 41,
+      "still_paused": 33,
+      "reactivated_excluded": 8,
+      "pause_wave_2026_06_10_targets": 18,
+      "pause_wave_2026_06_17_targets": 15
+    },
+    "columns": [
+      "Campaign Name",
+      "Ad Group Name",
+      "ASIN",
+      "SKU",
+      "Pause Reason",
+      "Campaign Pause Date",
+      "Days Paused"
+    ],
+    "notes": "Pause reasons verbatim from ppc_etl_automation_log.reason. Days Paused = CURRENT_DATE - pause_date. Workbook sample rows are illustrative only."
+  },
+  "rows": [
+    {
+      "campaign_name": "SP | AK | ST | Screw | Utharsika | Auto",
+      "ad_group_name": "Ad group - 29/05/2026 15:05:26.946",
+      "asin": "B0F1D59PXR",
+      "sku": "RWWPSY08GY-UK",
+      "pause_reason": "Rule 3 - Spend Based (Condition 1 (Price <= £15)): Date Range for performance date: 2026-05-11 - 2026-06-10, Product Price 1.99, Last 7 Days Spend 0.83 (41.71% of product price, threshold: 22.00%), Last 30 days Orders 1 (>0) & Last 7 days Orders 0 (=0)",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | AK |  Lamp Shade | Utharsika | PT,KT | Manual",
+      "ad_group_name": "black lampshade",
+      "asin": "B0CQT78SLK",
+      "sku": "LSDO210BI-PK",
+      "pause_reason": "Rule 2 - Condition 1 (Price <= 15): Date Range for performance date: 2026-05-11 - 2026-06-10, Product Price 11.89, Last 30 Days Spend 3.51 (29.52% of product price, threshold: 20.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | AK |  Lamp Shade | Utharsika | PT,KT | Manual",
+      "ad_group_name": "black lampshade",
+      "asin": "B0CS9PNL8L",
+      "sku": "LSFT220BG3PK-AMD",
+      "pause_reason": "Rule 2 - Condition 3 (25 < Price <= 35): Date Range for performance date: 2026-05-11 - 2026-06-10, Product Price 31.98, Last 30 Days Spend 10.45 (32.68% of product price, threshold: 17.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | AK | Lamp shade | Crystal  | Utharsika | Auto",
+      "ad_group_name": "Other Curvy Shade",
+      "asin": "B0DFHM8LHQ",
+      "sku": "LSCY290CH+RPR44WH-AC",
+      "pause_reason": "Rule 1 - ACOS Based Rules: Date Range for performance date: 2026-05-11 - 2026-06-10, ACOS 285.9% (≥50%) & Last 7 Days ACOS 0% (<50%) with 1 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | AK | Lamp shade | Crystal  | Utharsika | Auto",
+      "ad_group_name": "22cm Cone Shade-",
+      "asin": "B0F7LV6KMS",
+      "sku": "LSFT220CO2PK+RPR44WH2PK_2",
+      "pause_reason": "Rule 2 - Condition 2 (15 < Price <= 25): Date Range for performance date: 2026-05-11 - 2026-06-10, Product Price 20.09, Last 30 Days Spend 7.87 (39.17% of product price, threshold: 19.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | AK | Lamp shade | Crystal  | Utharsika | Auto",
+      "ad_group_name": "Crystal Light Shade",
+      "asin": "B0FX2SZFZM",
+      "sku": "LSCYRO300BM2PK+RPR44WH2PK",
+      "pause_reason": "Rule 1 - ACOS Based Rules: Date Range for performance date: 2026-05-11 - 2026-06-10, ACOS 23.2% (<50%) & Last 7 Days ACOS 51.01% (≥50%) with 10 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | AK | Lamp shade | Utharsika | Auto",
+      "ad_group_name": "Curvy Lamp Shade",
+      "asin": "B08VGMNGYN",
+      "sku": "LSCY290YB+RPR44WH W",
+      "pause_reason": "Rule 1 - ACOS Based Rules: Date Range for performance date: 2026-05-11 - 2026-06-10, ACOS 55.62% (≥50%) & Last 7 Days ACOS 0% (<50%) with 1 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | AK | Lamp shade | Utharsika | Auto",
+      "ad_group_name": "B0CC9LSNXF",
+      "asin": "B0CTSKY12R",
+      "sku": "LSCO335BM2PK+RPR44WH2PK-AMZ",
+      "pause_reason": "Rule 2 - Condition 2 (15 < Price <= 25): Date Range for performance date: 2026-05-11 - 2026-06-10, Product Price 23.89, Last 30 Days Spend 6.02 (25.20% of product price, threshold: 19.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lamp Shade | Bl & Wh | Utharsika | Manual",
+      "ad_group_name": "White shade KT",
+      "asin": "B0DXQ8VVR7",
+      "sku": "LSCY290WH2PK+RPR44WH2PK_AMN2",
+      "pause_reason": "Rule 2 - Condition 3 (25 < Price <= 35): Date Range for performance date: 2026-05-11 - 2026-06-10, Product Price 25.79, Last 30 Days Spend 4.78 (18.53% of product price, threshold: 17.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lamp Shade | CURVY | ST | Utharsika | Auto",
+      "ad_group_name": "curvy pack",
+      "asin": "B0DFM8C9N6",
+      "sku": "LSCY290RE2PK+RPR44WH2PK M",
+      "pause_reason": "Rule 2 - Condition 3 (25 < Price <= 35): Date Range for performance date: 2026-05-11 - 2026-06-10, Product Price 26.89, Last 30 Days Spend 5.43 (20.19% of product price, threshold: 17.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lamp Shade | CURVY | ST | Utharsika | Auto",
+      "ad_group_name": "curvy pack",
+      "asin": "B0DXQ87HLP",
+      "sku": "LSCY290CY2PK+RPR44WH2PK-U",
+      "pause_reason": "Rule 2 - Condition 3 (25 < Price <= 35): Date Range for performance date: 2026-05-11 - 2026-06-10, Product Price 25.79, Last 30 Days Spend 5.41 (20.98% of product price, threshold: 17.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lamp Shade | Curvy | Utharsika | Auto",
+      "ad_group_name": "Curvy-2pack",
+      "asin": "B0DXQ84YT7",
+      "sku": "LSCY290BD2PK+RPR44WH2PK-U",
+      "pause_reason": "Rule 2 - Condition 3 (25 < Price <= 35): Date Range for performance date: 2026-05-11 - 2026-06-10, Product Price 25.89, Last 30 Days Spend 4.83 (18.66% of product price, threshold: 17.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lamp Shade | Curvy | Utharsika | Auto",
+      "ad_group_name": "B0D7ZRWBS2",
+      "asin": "B0DXQ7YWGJ",
+      "sku": "LSCY290YB2PK+RPR44WH2PK-U",
+      "pause_reason": "Rule 3 - Spend Based (Condition 3 (£25 < Price <= £35)): Date Range for performance date: 2026-05-11 - 2026-06-10, Product Price 27.89, Last 7 Days Spend 7.04 (25.24% of product price, threshold: 18.00%), Last 30 days Orders 1 (>0) & Last 7 days Orders 0 (=0)",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lamp Shade | Curvy | Utharsika | Auto",
+      "ad_group_name": "B0D7ZRWBS2",
+      "asin": "B0DXQ84YT7",
+      "sku": "LSCY290BD2PK+RPR44WH2PK-U",
+      "pause_reason": "Rule 2 - Condition 3 (25 < Price <= 35): Date Range for performance date: 2026-05-11 - 2026-06-10, Product Price 25.89, Last 30 Days Spend 4.62 (17.84% of product price, threshold: 17.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lamp shade | Utharsika | Auto",
+      "ad_group_name": "Mosaic Glass Lamp Shade",
+      "asin": "B0DDC11VMP",
+      "sku": "LSMCSPDRFL+RPM40WH",
+      "pause_reason": "Rule 1 - ACOS Based Rules: Date Range for performance date: 2026-05-11 - 2026-06-10, ACOS 20.7% (<50%) & Last 7 Days ACOS 71.18% (≥50%) with 3 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lampshades | Target_Sales | Test | Utharsika | Manual",
+      "ad_group_name": "Lamp Shade_June - KT",
+      "asin": "B0DZNJDHCQ",
+      "sku": "RWWPSY12GY-UK",
+      "pause_reason": "Rule 2 - Condition 1 (Price <= 15): Date Range for performance date: 2026-05-11 - 2026-06-10, Product Price 1.99, Last 30 Days Spend 0.46 (23.12% of product price, threshold: 20.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lampshades | Target_Sales | Test | Utharsika | Manual",
+      "ad_group_name": "Lamp Shade_June - KT",
+      "asin": "B0DZNQCJX5",
+      "sku": "RWWPSY08GY-UK",
+      "pause_reason": "Rule 2 - Condition 1 (Price <= 15): Date Range for performance date: 2026-05-11 - 2026-06-10, Product Price 1.69, Last 30 Days Spend 3.99 (236.09% of product price, threshold: 20.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lampshades | Target_Sales | Test | Utharsika | Manual",
+      "ad_group_name": "Lamp Shade_June - KT",
+      "asin": "B0DZNLF6LK",
+      "sku": "RWWPSY10GY-UK",
+      "pause_reason": "Rule 2 - Condition 1 (Price <= 15): Date Range for performance date: 2026-05-11 - 2026-06-10, Product Price 2.49, Last 30 Days Spend 1.54 (61.85% of product price, threshold: 20.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-10",
+      "days_paused": 33
+    },
+    {
+      "campaign_name": "SP | MH | ST | Cone Shade | Utharsika | Auto",
+      "ad_group_name": "Lamp Shades",
+      "asin": "B0BX44PZG7",
+      "sku": "LSSS300BC+RPR44WH",
+      "pause_reason": "Rule 2 - Condition 1 (Price <= 15): Date Range for performance date: 2026-05-18 - 2026-06-17, Product Price 14.29, Last 30 Days Spend 2.92 (20.43% of product price, threshold: 20.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    },
+    {
+      "campaign_name": "SP | MH | ST | Crystal Shade | Utharsika | Auto",
+      "ad_group_name": "crystal cage",
+      "asin": "B0DPMQZ1WP",
+      "sku": "LSCYRO120GD",
+      "pause_reason": "Rule 1 - ACOS Based Rules: Date Range for performance date: 2026-05-18 - 2026-06-17, ACOS 50.91% (≥50%) & Last 7 Days ACOS 0% (<50%) with 7 orders | Rule 3 - Spend Based (Condition 1 (Price <= £15)): Date Range for performance date: 2026-05-18 - 2026-06-17, Product Price 14.99, Last 7 Days Spend 14.75 (98.40% of product price, threshold: 22.00%), Last 30 days Orders 7 (>0) & Last 7 days Orders 0 (=0)",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    },
+    {
+      "campaign_name": "SP | PH | AK | Lamp shade | Crystal  | Utharsika | Auto",
+      "ad_group_name": "Crystal Light Shade",
+      "asin": "B0FX2SP39V",
+      "sku": "LSCYRO200WH2PK+RPR44WH2PK",
+      "pause_reason": "Rule 2 - Condition 2 (15 < Price <= 25): Date Range for performance date: 2026-05-18 - 2026-06-17, Product Price 24.89, Last 30 Days Spend 8.61 (34.59% of product price, threshold: 19.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    },
+    {
+      "campaign_name": "SP | PH | AK | Lamp shade | Utharsika | Auto",
+      "ad_group_name": "Barn shade",
+      "asin": "B0CJCDZWRB",
+      "sku": "LSSS300SN2PK+RPR44WH2PK-SN",
+      "pause_reason": "Rule 1 - ACOS Based Rules: Date Range for performance date: 2026-05-18 - 2026-06-17, ACOS 54.54% (≥50%) & Last 7 Days ACOS 0% (<50%) with 1 orders",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    },
+    {
+      "campaign_name": "SP | PH | AK | Lamp shade | Utharsika | Auto",
+      "ad_group_name": "Barn shade",
+      "asin": "B0CJCDXV8R",
+      "sku": "LSSS300WH2PK+RPR44WH2PK-WA",
+      "pause_reason": "Rule 2 - Condition 2 (15 < Price <= 25): Date Range for performance date: 2026-05-18 - 2026-06-17, Product Price 23.79, Last 30 Days Spend 4.61 (19.38% of product price, threshold: 19.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    },
+    {
+      "campaign_name": "SP | PH | AK | Lamp shade | Utharsika | Auto",
+      "ad_group_name": "Curvy Lamp Shade",
+      "asin": "B0CS9QXNXQ",
+      "sku": "LSDO210BG3PK",
+      "pause_reason": "Rule 2 - Condition 3 (25 < Price <= 35): Date Range for performance date: 2026-05-18 - 2026-06-17, Product Price 29.89, Last 30 Days Spend 9.67 (32.35% of product price, threshold: 17.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    },
+    {
+      "campaign_name": "SP | PH | AK | Lamp Shade | Utharsika | Manual",
+      "ad_group_name": "Semi Curvy single",
+      "asin": "B08TX216Y4",
+      "sku": "LSMS320BD+RPR44WH",
+      "pause_reason": "Rule 2 - Condition 1 (Price <= 15): Date Range for performance date: 2026-05-18 - 2026-06-17, Product Price 14.99, Last 30 Days Spend 4.36 (29.09% of product price, threshold: 20.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    },
+    {
+      "campaign_name": "SP | PH | AK | Lamp Shade | Utharsika | Manual",
+      "ad_group_name": "Semi Curvy single",
+      "asin": "B0CTT4CH4C",
+      "sku": "LSMS320GR+RPR44WH -AMD",
+      "pause_reason": "Rule 2 - Condition 1 (Price <= 15): Date Range for performance date: 2026-05-18 - 2026-06-17, Product Price 14.99, Last 30 Days Spend 6.44 (42.96% of product price, threshold: 20.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lamp Shade | CURVY | ST | Utharsika | Auto",
+      "ad_group_name": "curvy pack",
+      "asin": "B0D294TFL1",
+      "sku": "LSCY290CY2PK+RPR44WH2PK LS",
+      "pause_reason": "Rule 2 - Condition 3 (25 < Price <= 35): Date Range for performance date: 2026-05-18 - 2026-06-17, Product Price 27.89, Last 30 Days Spend 6.92 (24.81% of product price, threshold: 17.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lamp Shade | CURVY | ST | Utharsika | Auto",
+      "ad_group_name": "curvy pack",
+      "asin": "B0DXQ7LC8N",
+      "sku": "LSCY290GR2PK+RPR44WH2PK-AMN",
+      "pause_reason": "Rule 1 - ACOS Based Rules: Date Range for performance date: 2026-05-18 - 2026-06-17, ACOS 62.09% (≥50%) & Last 7 Days ACOS 0% (<50%) with 1 orders",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lamp Shade | CURVY | ST | Utharsika | Auto",
+      "ad_group_name": "curvy pack",
+      "asin": "B0DXQB65RY",
+      "sku": "LSCY290AA2PK+RPR44WH2PK AMN",
+      "pause_reason": "Rule 2 - Condition 3 (25 < Price <= 35): Date Range for performance date: 2026-05-18 - 2026-06-17, Product Price 26.49, Last 30 Days Spend 5.80 (21.90% of product price, threshold: 17.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lamp Shade | Curvy | Utharsika | Auto",
+      "ad_group_name": "Curvy 3pack",
+      "asin": "B0D28Y45YZ",
+      "sku": "LSCY290BL3PK+RPR44WH3PK LS",
+      "pause_reason": "Rule 2 - Condition 3 (25 < Price <= 35): Date Range for performance date: 2026-05-18 - 2026-06-17, Product Price 30.59, Last 30 Days Spend 10.19 (33.31% of product price, threshold: 17.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lamp Shade | Curvy | Utharsika | Auto",
+      "ad_group_name": "Curvy-2pack",
+      "asin": "B0DXQ727KG",
+      "sku": "LSCY290RE2PK+RPR44WH2PK-U",
+      "pause_reason": "Rule 1 - ACOS Based Rules: Date Range for performance date: 2026-05-18 - 2026-06-17, ACOS 54.22% (≥50%) & Last 7 Days ACOS 0% (<50%) with 1 orders",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lamp shade | Utharsika | Auto",
+      "ad_group_name": "Mosaic Glass Lamp Shade",
+      "asin": "B0F6775Q2J",
+      "sku": "LSMCSQWYRE+RPM40WH",
+      "pause_reason": "Rule 1 - ACOS Based Rules: Date Range for performance date: 2026-05-18 - 2026-06-17, ACOS 39.93% (<50%) & Last 7 Days ACOS 56.93% (≥50%) with 3 orders",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    },
+    {
+      "campaign_name": "SP | PH | MH | Lampshades | Target_Sales | Test | Utharsika | Manual",
+      "ad_group_name": "Lamp Shade_June - KT",
+      "asin": "B0CVLFG3DT",
+      "sku": "RWWPSY0840YE",
+      "pause_reason": "Rule 2 - Condition 1 (Price <= 15): Date Range for performance date: 2026-05-18 - 2026-06-17, Product Price 2.99, Last 30 Days Spend 0.68 (22.74% of product price, threshold: 20.00%) with 0 orders",
+      "campaign_pause_date": "2026-06-17",
+      "days_paused": 26
+    }
+  ]
+}
