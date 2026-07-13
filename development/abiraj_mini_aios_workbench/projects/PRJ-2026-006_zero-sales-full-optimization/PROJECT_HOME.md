@@ -122,15 +122,18 @@ Published to the shared ops store `tech_team_outputs.ph_task` (DB `order_managem
 **row id 167**: `project_code=ZSFO` · `task_id=ZSFO_utharsika_zero_sales_dashboard-V1` ·
 `task_name=ZSFO · Zero Sales Full Optimization — Utharsika (Amazon UK)` · `team=Development` ·
 `developer=Abiraj` · `assigned_user=utharsika` · `assigned_user_team=ph_priors` ·
-`version_status=released`. Written via guarded single-row INSERT then UPDATE (owner-authorised, via
-the `temp_user` write connection); no other row touched, no schema/DDL, no application/`public` data
-changed. The published HTML is the **D02 (AMZ-cross-checked, 1,065)** dashboard with a UI pass for
-full-screen readability (compact header/hero, table given the remaining height — ~2→12 visible rows).
-Canonical copy in-repo:
+`version_status=released`. Written via guarded single-row INSERT/UPDATE (owner-authorised, via the
+`temp_user` write connection); no other row touched, no schema/DDL, no application/`public` data
+changed. Canonical copy in-repo:
 `evidence/final_outputs/REQ-08_.../D02_amz_crosscheck/ZSFO_Utharsika_dashboard_PUBLISHED_id167_v1.html`.
-Note: this published build still carries the footer wording "189 false positives removed (missing
-vendor data)", which the D02 validation shows is inaccurate (sibling-ASIN attribution, not a vendor
-gap) — flagged, not yet corrected in the live copy.
+
+**Current live version (2026-07-13): period switched to LAST MONTH = June 2026** (per end-user
+request — reverses the original spec's "do not use previous calendar month"; the 30-day rolling
+window is retired for now). Basis: **1,237 DB June-zero − 122 sold-in-June-per-Amazon (KPI col N) =
+1,115 true June zero-sale.** Root-cause: Low CTR 654 · Clicks-no-sale 225 · No stock 137 · Not
+listed 66 · No visibility 33. Same design + the full-screen UI pass (compact header/hero, ~2→12
+visible rows). Footer wording **corrected** to "122 removed — sold in June per Amazon (sibling-ASIN)"
+(the earlier inaccurate "missing vendor data" line is gone). Window label = "June 2026 (last month)".
 
 ## Status
 - **D01: COMPLETE (technical) — VALIDATION GREEN; BUSINESS SIGN-OFF PENDING.** Corrected query
