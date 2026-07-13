@@ -187,7 +187,7 @@ function rowHTML(d,idx){const rc=RC[d.r];return `<tr class="r-${rc.cls}"><td cla
 
 function apply(){
   let rows=DATA;
-  if(state.q){const q=state.q.toLowerCase();rows=rows.filter(d=>d.a.toLowerCase().includes(q)||d.s.toLowerCase().includes(q));}
+  if(state.q){const q=state.q.toLowerCase();rows=rows.filter(d=>d.a.toLowerCase().includes(q)||(d.s||'').toLowerCase().includes(q));}
   if(state.rc.size)rows=rows.filter(d=>state.rc.has(d.r));
   const k=state.sort,dir=state.dir;
   rows=rows.slice().sort((x,y)=>{let a=x[k],b=y[k];if(typeof a==='string')return dir*a.localeCompare(b);return dir*((a>b)-(a<b));});
