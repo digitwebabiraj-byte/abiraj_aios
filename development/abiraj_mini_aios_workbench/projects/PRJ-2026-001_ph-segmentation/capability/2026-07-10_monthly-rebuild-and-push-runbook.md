@@ -68,6 +68,10 @@ The "Allocated" card number per PH. Save as `{"<PH>": n, …}`.
 Re-pull the whole-portfolio counts fresh, then compare **cell-by-cell** to the numbers embedded in the
 built HTML (total, 6 segments, roster, every per-PH count). Must be 100% match before pushing.
 *(2026-07-10: total 9,947; HHH 42 · HHL 580 · HLH 173 · LHH 10 · LLH 626 · LLL 8516 — matched.)*
+> ⚠ **That distribution is the RATE-based D10 build.** The toolkit SQL (`01`/`02`/`03`) was switched to the
+> **COUNT-based** conversion rule (Bietrick-approved 2026-07-10) — so the **next** rebuild's segment counts
+> **will differ** (some HHL Leaky Buckets → HHH Champions). Do **not** validate a count-based build against
+> these numbers; re-checksum the freshly built count-based HTML. Old rate rule is preserved in each SQL header.
 
 ### Step 6 — PUSH to `tech_team_outputs.ph_task`  (writes, temp_user)
 **Always back up first; verify md5 inside the transaction.**
@@ -121,5 +125,9 @@ Expect **1 leader + N per-PH** (N = roster size), all `assigned_user_team='ph_pr
   (2) **`TRUNCATE` + `INSERT INTO`** the existing table (keeps the 11 views alive) using the engine
   logic **pinned to the SAME window as the dashboards** (correction = `rn 2..5`); (3) verify new counts
   == dashboards (9,947 / 30 / 42·580·173·10·626·8516) before accepting. **Never `DROP/CREATE` this table.**
+  **NOTE (2026-07-10 conversion change):** those counts match the *rate-based* live dashboards. The toolkit
+  engine is now *count-based*; if the count-based rule is adopted, rebuild the **dashboards and the table
+  together** to the NEW distribution (they must agree). The rate figures above apply only to backfilling the
+  table to match the *existing, unchanged* live dashboards.
 - **Roster sign-off** — the 30-PH roster (7 new, Poovitha/thanucha out) is live for Bietrick to ratify.
 - Monthly in-DB routine still builds the OLD UI (from D06–D09 notes) — align before any auto-run.

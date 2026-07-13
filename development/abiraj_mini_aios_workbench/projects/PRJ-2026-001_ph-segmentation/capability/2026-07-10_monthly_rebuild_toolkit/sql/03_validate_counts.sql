@@ -10,8 +10,12 @@
 --   Same-period CORRECTION      : cur = rn 2..5   (drops the just-loaded newest
 --                                 week so the window == the published report's)
 -- Change the two "BETWEEN 1 AND 4" below to "BETWEEN 2 AND 5" for a correction.
--- 2026-07-10 correction result: 9,947 ASINs / 30 PHs
---   HHH 42 · HHL 580 · HLH 173 · LHH 10 · LLH 626 · LLL 8516
+-- 2026-07-10 correction result (RATE-based conversion rule — this was the LIVE D10 build):
+--   9,947 ASINs / 30 PHs · HHH 42 · HHL 580 · HLH 173 · LHH 10 · LLH 626 · LLL 8516
+-- *** CONVERSION RULE NOW = COUNT-BASED (Bietrick-approved 2026-07-10) *** — this file was switched
+-- to conv COUNT (a.conv >= b.bcv) below, same as 01/02. Re-running WILL change the distribution
+-- above (some HHL Leaky Buckets -> HHH Champions); it no longer reproduces the D10 build. Old rate
+-- rule kept for revert: (CASE WHEN a.conv>=b.bcv THEN 'H' ELSE 'L' END).
 -- ============================================================================
 WITH sats AS (
   SELECT date, ROW_NUMBER() OVER (ORDER BY date DESC) rn
@@ -49,14 +53,15 @@ cur_bm AS (
   SELECT user_name,category_name,
     AVG(imp) FILTER (WHERE rnk<=CASE WHEN scnt>=30 THEN 30 ELSE 10 END) bi,
     AVG(clk) FILTER (WHERE rnk<=CASE WHEN scnt>=30 THEN 30 ELSE 10 END) bc,
+    AVG(conv) FILTER (WHERE rnk<=CASE WHEN scnt>=30 THEN 30 ELSE 10 END) bcv,
     AVG(cvr) FILTER (WHERE rnk<=CASE WHEN scnt>=30 THEN 30 ELSE 10 END) bv
   FROM cur_sellers GROUP BY user_name,category_name),
 cur_seg AS (
   SELECT a.user_name,
     CASE
-      WHEN (CASE WHEN a.imp>=b.bi THEN 'H' ELSE 'L' END)||(CASE WHEN a.clk>=b.bc THEN 'H' ELSE 'L' END)||(CASE WHEN a.clk=0 THEN 'L' WHEN a.conv>a.clk THEN 'H' WHEN a.cvr>=b.bv THEN 'H' ELSE 'L' END) = 'HLL' THEN 'HLH'
-      WHEN (CASE WHEN a.imp>=b.bi THEN 'H' ELSE 'L' END)||(CASE WHEN a.clk>=b.bc THEN 'H' ELSE 'L' END)||(CASE WHEN a.clk=0 THEN 'L' WHEN a.conv>a.clk THEN 'H' WHEN a.cvr>=b.bv THEN 'H' ELSE 'L' END) = 'LHL' THEN 'HHL'
-      ELSE (CASE WHEN a.imp>=b.bi THEN 'H' ELSE 'L' END)||(CASE WHEN a.clk>=b.bc THEN 'H' ELSE 'L' END)||(CASE WHEN a.clk=0 THEN 'L' WHEN a.conv>a.clk THEN 'H' WHEN a.cvr>=b.bv THEN 'H' ELSE 'L' END)
+      WHEN (CASE WHEN a.imp>=b.bi THEN 'H' ELSE 'L' END)||(CASE WHEN a.clk>=b.bc THEN 'H' ELSE 'L' END)||(CASE WHEN a.conv>=b.bcv THEN 'H' ELSE 'L' END) = 'HLL' THEN 'HLH'
+      WHEN (CASE WHEN a.imp>=b.bi THEN 'H' ELSE 'L' END)||(CASE WHEN a.clk>=b.bc THEN 'H' ELSE 'L' END)||(CASE WHEN a.conv>=b.bcv THEN 'H' ELSE 'L' END) = 'LHL' THEN 'HHL'
+      ELSE (CASE WHEN a.imp>=b.bi THEN 'H' ELSE 'L' END)||(CASE WHEN a.clk>=b.bc THEN 'H' ELSE 'L' END)||(CASE WHEN a.conv>=b.bcv THEN 'H' ELSE 'L' END)
     END AS segment
   FROM cur_asins a LEFT JOIN cur_bm b ON a.user_name=b.user_name AND a.category_name=b.category_name)
 SELECT segment, user_name, COUNT(*) n

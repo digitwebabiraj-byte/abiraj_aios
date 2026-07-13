@@ -1,10 +1,13 @@
 # Proposed Rule Change — the Conversion signal (count vs rate)
 
 > **Status (conversion signal):** ✅ **APPROVED by Bietrick 2026-07-10** → switch to **count-based**.
-> Engine prepared: `sql/REQ-05_ph-asin-segmentation/2026-07-10_ph_segment_engine_strict_rank_count_conv.sql`
-> (one line changed in both windows: `a.cvr>=b.bv` → `a.conv>=b.bcv`). **STORED, not executed** — the
-> re-run + HTML regenerate + live push must be done in the authorised DB session, and the result validated
-> before going live.
+> The change is now applied in **two** places (one line each window: `a.cvr>=b.bv` → `a.conv>=b.bcv`):
+> 1. **Live D10 rebuild toolkit** (the process actually run each cycle) — `capability/2026-07-10_monthly_rebuild_toolkit/sql/01_recompute_per_ph.sql`, `02_recompute_category_split.sql`, `03_validate_counts.sql`. The previous-window benchmark CTEs gained an `AVG(conv) … bcv` column; the old rate rule is preserved in each file's header for revert.
+> 2. Standalone reference engine — `sql/REQ-05_ph-asin-segmentation/2026-07-10_ph_segment_engine_strict_rank_count_conv.sql`.
+> **STORED, not executed** — the re-run + HTML regenerate + live push happen in the authorised DB session,
+> and the result is validated before going live. ⚠ **The current LIVE dashboards are still the RATE-based
+> D10 build** (9,947/30 · 42/580/173/10/626/8516); the count-based rebuild will produce a **different**
+> distribution and must be re-checksummed — the old rate numbers are **not** the count-based validation target.
 > **Status (undefined-combo mapping HLL→HLH / LHL→HHL):** still PENDING — unchanged in the new engine.
 > **Raised:** 2026-07-10, from a review of the live July 2026 dashboard. **Owner:** Abiraj → Bietrick.
 
