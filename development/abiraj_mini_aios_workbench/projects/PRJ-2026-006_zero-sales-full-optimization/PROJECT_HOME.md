@@ -117,6 +117,21 @@ and produced a "corrected" report of **1,065** ASINs (zero in both postgres and 
   (AMZ shows June £0/332 items + July £730.64/88 — the £2,659 came from the stale IMPORTRANGE tab).
 - **No DB re-sync performed** — read-only project, and the fix is unwarranted.
 
+## Live Publish
+Published to the shared ops store `tech_team_outputs.ph_task` (DB `order_management_copy`) —
+**row id 167**: `project_code=ZSFO` · `task_id=ZSFO_utharsika_zero_sales_dashboard-V1` ·
+`task_name=ZSFO · Zero Sales Full Optimization — Utharsika (Amazon UK)` · `team=Development` ·
+`developer=Abiraj` · `assigned_user=utharsika` · `assigned_user_team=ph_priors` ·
+`version_status=released`. Written via guarded single-row INSERT then UPDATE (owner-authorised, via
+the `temp_user` write connection); no other row touched, no schema/DDL, no application/`public` data
+changed. The published HTML is the **D02 (AMZ-cross-checked, 1,065)** dashboard with a UI pass for
+full-screen readability (compact header/hero, table given the remaining height — ~2→12 visible rows).
+Canonical copy in-repo:
+`evidence/final_outputs/REQ-08_.../D02_amz_crosscheck/ZSFO_Utharsika_dashboard_PUBLISHED_id167_v1.html`.
+Note: this published build still carries the footer wording "189 false positives removed (missing
+vendor data)", which the D02 validation shows is inaccurate (sibling-ASIN attribution, not a vendor
+gap) — flagged, not yet corrected in the live copy.
+
 ## Status
 - **D01: COMPLETE (technical) — VALIDATION GREEN; BUSINESS SIGN-OFF PENDING.** Corrected query
   (vendor OVERLAP + NULL-channel bridge), 1,250-row governed pull, xlsx + HTML dashboard, 6/6
