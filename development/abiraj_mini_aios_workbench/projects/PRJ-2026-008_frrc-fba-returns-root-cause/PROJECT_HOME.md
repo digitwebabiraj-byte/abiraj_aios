@@ -84,6 +84,7 @@ Under Task `REQ-10_fba-returns-root-cause` (COPY-only import; Downloads original
 - `evidence/final_outputs/REQ-10_.../frrc30.json` — governed 91-row pull — **system of record**.
 - `evidence/final_outputs/REQ-10_.../build_frrc30.py` → the 3-tab threshold-driven `.xlsx`.
 - `evidence/final_outputs/REQ-10_.../build_console.py` → the full-screen HTML console (owner dropdown).
+- `evidence/final_outputs/REQ-10_.../FRRC_FBA_Returns_Console_REQ-10-D01_30day.html` — **rendered console output** (md5 `fb00ff20`, 35,625 bytes); data parity with `frrc30.json` verified exact.
 - `evidence/logs_or_screenshots/REQ-10_.../2026-07-14_import_checksum_evidence.md` — import + dataset-integrity evidence.
 
 ## Source-of-Truth Locations
@@ -92,10 +93,11 @@ Under Task `REQ-10_fba-returns-root-cause` (COPY-only import; Downloads original
 - **Locked rules / functional detail:** `SYSTEM_REFERENCE.md` (+ `HANDOFF_FRRC_REQ-10-D01.md` §4).
 - **Canonical query:** `sql/REQ-10_.../generate_report.sql`.
 - **Approved handoff/spec:** `evidence/source_documents/REQ-10_.../`.
-- **Note:** the rendered dashboards (`FRRC_FBA_Returns_Console_*.html`, `FRRC_FBA_Returns_Tracker_*.xlsx`)
-  were produced by the prior build session and are **not in this import bundle**; they are regenerable
-  from `frrc30.json` via the two build scripts. `build_console.py` loads Google Fonts (CDN) but embeds
-  all report data — no network call fetches data. Re-import or regenerate the outputs on next run.
+- **Note:** the rendered **HTML console** is now imported (`FRRC_FBA_Returns_Console_REQ-10-D01_30day.html`,
+  data-parity-exact with `frrc30.json`). The `FRRC_FBA_Returns_Tracker_*.xlsx` and the simpler grouped
+  `FRRC_FBA_Returns_Report_*.html` are still to import — regenerable from `frrc30.json` via the build
+  scripts. `build_console.py` / the console load Google Fonts (CDN) but embed all report data — no
+  network call fetches data.
 
 ## Run Snapshot (fixed window 2026-06-14 → 2026-07-13, run 2026-07-14)
 - **91** returning Amazon FBA ASINs · **105** return units · bucket-sum = total_returns on every row

@@ -28,6 +28,7 @@ tracker `_Amazon_FBA_Returns_Tracker_-_Rebecca.xlsx` into live data.
 | `evidence/final_outputs/REQ-10_.../frrc30.json` | Governed 91-row pull — **system of record** |
 | `evidence/final_outputs/REQ-10_.../build_frrc30.py` | Builds the 3-tab threshold-driven Excel |
 | `evidence/final_outputs/REQ-10_.../build_console.py` | Builds the full-screen HTML console (owner dropdown) |
+| `evidence/final_outputs/REQ-10_.../FRRC_FBA_Returns_Console_REQ-10-D01_30day.html` | **Rendered console (key deliverable)** — owner dropdown, KPI tiles, per-ASIN cards; parity-exact with `frrc30.json` |
 | `evidence/source_documents/REQ-10_.../HANDOFF_FRRC_REQ-10-D01.md` | **Single source of truth** (locked rules, SQL, open items) |
 | `evidence/source_documents/REQ-10_.../SOURCE_MANIFEST.md` | Provenance + SHA-256 |
 

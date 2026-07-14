@@ -24,6 +24,7 @@ project's canonical copies. Imported **2026-07-14**.
 | `frrc30.json` | `2cbfe13d0a5e6451498150d05eaab0cf94c2dfb1b0be85658b672edc2f35cbca` | **Governed dataset (system of record)** — 91 rows, executed & validated (30-day window 2026-06-14→2026-07-13) |
 | `build_frrc30.py` | `b50ac6968d9eb6db21175c3ef392654e3c06c843423ba0045d8581ea3da9c541` | Builds the 3-tab threshold-driven Excel from `frrc30.json` (needs `openpyxl`) |
 | `build_console.py` | `e13adc841c223b2247a58e991cd08fb6452b05c06458d17321a7c4f1e04bad0f` | Builds the full-screen HTML console (owner dropdown) from `frrc30.json` |
+| `FRRC_FBA_Returns_Console_REQ-10-D01_30day.html` | md5 `fb00ff20fff5f13af1582a61fb72ae8f` (35,625 bytes) | **Rendered console output** — the actual `build_console.py` result, added 2026-07-14; data parity with `frrc30.json` verified exact (91 rows / 105 returns / all tuples match) |
 
 ## Derived assets (created during onboarding, not in the zip)
 - `sql/REQ-10_.../generate_report.sql` — the canonical query, extracted verbatim from HANDOFF §5 (with a `CURRENT_DATE` roll note).
@@ -33,7 +34,7 @@ project's canonical copies. Imported **2026-07-14**.
 ## Referenced by the handoff but NOT in this import package (kept in the platform project knowledge)
 - `_Amazon_FBA_Returns_Tracker_-_Rebecca.xlsx` — the source spec workbook (Objective & Guide / Thresholds / Tracker tabs). **The ground-truth spec + editable Thresholds live here.**
 - `project_knowledge/`: `SKILL_multi_table.md`, `SKILL_ppc_stock_lookup.md`, `SKILL_single_table.md`, `TABLE_amazon_returns.md`, `TABLE_order_transaction.md`, `TABLE_listing_data_1.md`.
-- The prior-session **rendered outputs**: `FRRC_FBA_Returns_Tracker_REQ-10-D01_30day.xlsx`, `FRRC_FBA_Returns_Console_REQ-10-D01_30day.html`, `FRRC_FBA_Returns_Report_REQ-10-D01_30day.html`. These are regenerable from `frrc30.json` via the two build scripts; re-import or regenerate on next run.
+- The prior-session **rendered outputs**: `FRRC_FBA_Returns_Tracker_REQ-10-D01_30day.xlsx` and `FRRC_FBA_Returns_Report_REQ-10-D01_30day.html` (simpler grouped HTML) — still to import; regenerable from `frrc30.json`. **`FRRC_FBA_Returns_Console_REQ-10-D01_30day.html` is now imported** (see the final_outputs table above).
 
 ## Verification
 - All 6 imported files copied byte-for-byte; SHA-256 recomputed post-copy (see `2026-07-14_import_checksum_evidence.md`).

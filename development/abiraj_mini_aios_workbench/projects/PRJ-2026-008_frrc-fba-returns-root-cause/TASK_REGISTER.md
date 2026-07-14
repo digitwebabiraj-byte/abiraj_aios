@@ -17,8 +17,11 @@ Canonical index of tasks in this project. One requirement = one Task ID.
   arithmetic (0 failures), one-ASIN-one-owner, return-status split (feeds open item F).
 - **Data:** `evidence/final_outputs/REQ-10_.../frrc30.json` — 91 rows — **system of record**.
 - **Outputs (build scripts):** `build_frrc30.py` → 3-tab threshold-driven `.xlsx`;
-  `build_console.py` → full-screen HTML console with the Portfolio-holder dropdown. (The prior
-  session's rendered `.xlsx`/`.html` are not in the import bundle — regenerate from `frrc30.json`.)
+  `build_console.py` → full-screen HTML console with the Portfolio-holder dropdown.
+- **Rendered output (imported 2026-07-14):** `FRRC_FBA_Returns_Console_REQ-10-D01_30day.html`
+  (md5 `fb00ff20`, 35,625 bytes) — the canonical console; data parity with `frrc30.json` verified
+  exact (91 rows / 105 returns / all tuples). The `.xlsx` + simpler grouped `.html` are still to
+  import (regenerable from `frrc30.json`).
 - **Reconciliation:** 91 ASINs · 105 returns · 0 bucket failures · Flag CRITICAL 44 / HIGH 20 / OK 9 /
   N/A 18 · 19 named owners + 18 unassigned. Cross-check vs source tracker: Returns 95/101, Units 65/101
   exact (misses 1–3 higher in live). Excel recalc 0 errors.
