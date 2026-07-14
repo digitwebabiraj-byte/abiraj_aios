@@ -1,15 +1,15 @@
 # Count-based July rebuild — RUN CARD (for the authorised DB session)
 
-> ✅ **DONE — published live 2026-07-13.** All 31 rows updated (leader id 5 md5 → `a3043461`). Executed
+> ✅ **DONE — published live 2026-07-14.** All 31 rows updated (leader id 5 md5 → `a3043461`). Executed
 > from this session via direct psycopg2 (`temp_user`), backup-first + md5-verified. Full before→after
-> record: `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-13_countbased_publish_record.md`.
+> record: `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-14_countbased_publish_record.md`.
 > This run card is kept as the repeatable procedure for future cycles.
 
 **Goal:** regenerate the **2026-07** PH dashboards with the **count-based conversion rule**
 (Bietrick-approved 2026-07-10) and publish. **Same window, same roster, same UI — only the segment
-data changes.** This is the "update those HTMLs" ask from 2026-07-13.
+data changes.** This is the "update those HTMLs" ask from 2026-07-14.
 
-## Already verified READ-ONLY on 2026-07-13 (via Postgres MCP) — you can trust these
+## Already verified READ-ONLY on 2026-07-14 (via Postgres MCP) — you can trust these
 - **Window** = the same 4 weeks as the live D10 build: weeks ending **2026-06-06, 06-13, 06-20, 06-27**
   (now `rn 2..5`, because a newer week ending **2026-07-04** has since loaded). Prev = 05-09/16/23/30
   (`rn 6..9`); prior = 04-11/18/25 + 05-02 (`rn 10..13`). `01`/`03` already default to these rn offsets.

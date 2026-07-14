@@ -1,4 +1,4 @@
-# Count-based conversion — LIVE PUBLISH record (2026-07-13)
+# Count-based conversion — LIVE PUBLISH record (2026-07-14)
 
 **What:** regenerated the 2026-07 PH dashboards under the **count-based conversion rule**
 (Bietrick-approved 2026-07-10, `a.cvr>=b.bv` → `a.conv>=b.bcv`) and published all 31 rows live to
