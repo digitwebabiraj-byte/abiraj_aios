@@ -135,6 +135,10 @@ confirmed unused first; ph-asin/PC/ZSFO precedent); independently re-verified vi
 Rollback = `DELETE … WHERE project_code='frrc'` (new rows only). Full record:
 `evidence/logs_or_screenshots/REQ-10_.../2026-07-14_per_ph_publish_record.md`. The credential-bearing
 publish script stays in the session scratchpad — never committed.
+**V2 UI (same day):** the per-PH dashboards were rebuilt with an embed-friendly document-flow layout
+(sticky sidebar + sticky filter bar, cards fill full height — fixes the cramped internal-scroll box in
+the portal) and a polished sidebar (avatar, mini stats, severity-split bar); published as a guarded
+in-place UPDATE of the same 19 rows, `version_level` 1→2, identity fields unchanged, md5-verified.
 
 ## Status
 - **D01: COMPLETE (technical) — PUBLISHED per-PH (rows 216–234); VALIDATION GREEN (self-checked);

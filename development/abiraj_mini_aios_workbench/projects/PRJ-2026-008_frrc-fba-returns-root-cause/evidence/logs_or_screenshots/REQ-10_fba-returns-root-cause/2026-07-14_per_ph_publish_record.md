@@ -43,8 +43,26 @@ Total across holders: **73 of 91 ASINs** (the **18 unassigned** N/A ASINs have n
 - Independent post-commit verification via the **read-only MCP connector** (separate connection): 19 rows / 19 distinct users / all `assigned_user_team='ph_priors'` / all `version_status='released'` / all `html_content` present / ids 216–234. PASS.
 - The credential-bearing publish script (`push_frrc_per_ph.py`) is kept in the **session scratchpad only** — never committed.
 
+## V2 UI update (2026-07-14, same run)
+The initial per-PH dashboards used a fixed `height:100vh` two-pane layout with an internal card
+scroll — inside the `ph_task` portal frame this collapsed the card area to a small scrolling box and
+left dead space in the sidebar. **Rebuilt with an embed-friendly layout** (`build_per_ph.py` V2):
+document-flow (no forced viewport height / no internal overflow so cards fill the full height and the
+portal supplies a single scroll), **sticky sidebar** + **sticky filter bar**, and a polished sidebar
+(logo, holder avatar, mini stat tiles, **severity-split** mini-bar, footer). Verified locally
+(Jasmini render: sidebar + all 14 cards flow as one document).
+
+Published as a guarded **UPDATE** of the same 19 rows (match by `task_id`, one txn, md5-verified
+pre-commit, auto-rollback on mismatch), **`version_level` 1→2**, `updated_at=now()`; identity fields
+(`assigned_user`, `task_id`, `project_code`, `assigned_user_team`) unchanged. Independently re-verified
+via read-only MCP: 19 rows at `version_level=2`, all `html_content` present; stored md5 matches local
+(e.g. Jasmini `a7baa215…`, utharsika `84205a4a…`). Update script `push_frrc_update_v2.py` kept in
+scratchpad (carries credential), NOT committed.
+
 ## Reversibility
-New rows only (216–234); rollback = `DELETE FROM tech_team_outputs.ph_task WHERE id BETWEEN 216 AND 234` (or `WHERE project_code='frrc'`). No pre-existing row was modified.
+Rows 216–234 only. Rollback of the whole publish = `DELETE FROM tech_team_outputs.ph_task WHERE
+project_code='frrc'`. No pre-existing (non-frrc) row was ever modified; the V2 change was an in-place
+UPDATE of the 19 frrc rows.
 
 ## Data integrity
 Each per-PH dashboard is a filtered render of the governed `frrc30.json` (single owner). Row counts per holder reconcile to the dataset; sum = 73 named-owner ASINs. (`length(html_content)` in Postgres counts characters, so it reads a few less than the local byte count where the UI uses multi-byte —/→ glyphs — not a discrepancy; md5 of the exact stored text matched local.)
