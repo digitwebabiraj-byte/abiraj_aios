@@ -125,15 +125,22 @@ Under Task `REQ-10_fba-returns-root-cause` (COPY-only import; Downloads original
   ASIN) so all 91 rows show a named owner.
 
 ## Live Publish
-**NOT PUBLISHED.** Unlike PRJ-2026-005/007, this report has **not** been pushed to the shared ops store
-`tech_team_outputs.ph_task`. Publishing (if requested) is an owner-directed, guarded single-row write
-done outside the read-only documentation session — not part of onboarding.
+**PUBLISHED LIVE per-PH 2026-07-14** to `tech_team_outputs.ph_task` (DB `order_management_copy`) —
+**19 rows, ids 216–234**, `project_code=frrc`, `assigned_user_team=ph_priors`, `version_status=released`,
+one row per named portfolio holder (each holder sees **only their own** returning ASINs). Identifiers
+from `2026-07-14_abiraj_REQ-frrc_REQ-10-D01.md`; `task_id=frrc_<PH-slug>_fba_returns_root_cause-V1`.
+Covers **73 of 91 ASINs**; the **18 unassigned** N/A ASINs route to nobody (open item G). Done via an
+owner-directed guarded write as `temp_user` (INSERT-only, one txn, md5-verified pre-commit, `frrc`
+confirmed unused first; ph-asin/PC/ZSFO precedent); independently re-verified via the read-only MCP.
+Rollback = `DELETE … WHERE project_code='frrc'` (new rows only). Full record:
+`evidence/logs_or_screenshots/REQ-10_.../2026-07-14_per_ph_publish_record.md`. The credential-bearing
+publish script stays in the session scratchpad — never committed.
 
 ## Status
-- **D01: COMPLETE (technical) — VALIDATION GREEN (self-checked); REVIEWER + BUSINESS SIGN-OFF PENDING.**
-  Validated multi-table query, 91-row governed pull, threshold-driven xlsx + HTML console build scripts,
-  control totals reconciled (91 ASINs / 105 returns / 0 bucket failures) and cross-checked vs the source
-  tracker. Not published, not committed/pushed.
+- **D01: COMPLETE (technical) — PUBLISHED per-PH (rows 216–234); VALIDATION GREEN (self-checked);
+  REVIEWER + BUSINESS SIGN-OFF PENDING.** Validated multi-table query, 91-row governed pull,
+  threshold-driven xlsx + HTML console + 19 per-PH dashboards, control totals reconciled (91 ASINs /
+  105 returns / 0 bucket failures) and cross-checked vs the source tracker.
 - Not yet signed off by Tamil Selvan (queryability), Sajeesan (technical), or Satheesvaran (items A–G).
 
 ## One Next Action

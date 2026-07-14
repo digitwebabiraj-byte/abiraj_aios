@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FBA Returns · mothajini</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef0f4; --panel:#ffffff; --line:#e4e7ee; --ink:#141824; --ink2:#3a4152; --muted:#7b8296;
+  --nav:#0d1120; --nav2:#161c30; --navtx:#c7cede;
+  --accent:#3b5bd9; --accent-soft:#eaeefc;
+  --crit:#d23b31; --crit-bg:#fdecea; --high:#c07d10; --high-bg:#fcf3e0;
+  --ok:#2b8a5b; --ok-bg:#e7f5ee; --na:#5c6577; --na-bg:#eceef2;
+  --s-lm:#3f6fd1; --s-ql:#d23b31; --s-bp:#8158cc; --s-sh:#159b8a; --s-uk:#98a1b3;
+  --shadow:0 1px 2px rgba(20,24,36,.04),0 8px 24px rgba(20,24,36,.06);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:Inter,-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
+.app{display:flex;height:100vh;overflow:hidden}
+.side{width:290px;flex:none;background:linear-gradient(185deg,var(--nav),var(--nav2));
+  color:var(--navtx);display:flex;flex-direction:column;padding:22px 18px;gap:16px}
+.brand{font-family:Space Grotesk,sans-serif;font-weight:700;font-size:19px;color:#fff;letter-spacing:-.01em;line-height:1.15}
+.brand small{display:block;font-family:Inter;font-weight:450;font-size:12px;color:#8b93a9;margin-top:6px;letter-spacing:0}
+.win{background:#1e263c;border:1px solid #2a3350;border-radius:10px;padding:9px 12px;font-size:12.5px;color:#c9d1e6}
+.win b{color:#fff;font-weight:600}
+.phcard{background:#1a2136;border:1px solid #2a3350;border-radius:12px;padding:14px}
+.phcard .lab{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#828aa2;margin-bottom:8px}
+.phcard .who{display:flex;align-items:center;gap:10px}
+.phcard .av{width:38px;height:38px;border-radius:50%;flex:none;background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:Space Grotesk,sans-serif;font-weight:700;font-size:16px}
+.phcard .nm{font-family:Space Grotesk,sans-serif;font-weight:600;font-size:16px;color:#fff;line-height:1.15;word-break:break-word}
+.phcard .mini{margin-top:12px;display:flex;gap:14px}
+.phcard .mini div{font-size:11px;color:#8b93a9}
+.phcard .mini b{display:block;font-family:Space Grotesk,sans-serif;font-size:18px;color:#fff;font-weight:700;margin-top:2px}
+.foot{font-size:11px;color:#6f7690;line-height:1.5;margin-top:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.top{background:var(--panel);border-bottom:1px solid var(--line);padding:20px 28px 0}
+.h-title{font-family:Space Grotesk,sans-serif;font-size:23px;font-weight:600;margin:0;letter-spacing:-.01em}
+.h-sub{color:var(--muted);font-size:13px;margin-top:3px}
+.tiles{display:flex;gap:12px;margin:18px 0 16px;flex-wrap:wrap}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px 17px;min-width:112px;position:relative;overflow:hidden}
+.tile .n{font-family:Space Grotesk,sans-serif;font-size:27px;font-weight:700;line-height:1}
+.tile .l{font-size:11.5px;color:var(--muted);margin-top:5px;text-transform:uppercase;letter-spacing:.04em}
+.tile.total{background:var(--ink);border-color:var(--ink)}.tile.total .n{color:#fff}.tile.total .l{color:#9aa2b6}
+.tile.crit .n{color:var(--crit)}.tile.high .n{color:var(--high)}.tile.ok .n{color:var(--ok)}.tile.na .n{color:var(--na)}
+.tile .edge{position:absolute;left:0;top:0;bottom:0;width:4px}
+.tile.crit .edge{background:var(--crit)}.tile.high .edge{background:var(--high)}.tile.ok .edge{background:var(--ok)}.tile.na .edge{background:var(--na)}
+.controls{display:flex;gap:10px;align-items:center;padding:0 0 16px;flex-wrap:wrap}
+.search{position:relative;flex:1;min-width:200px}
+.search input{width:100%;font:inherit;padding:10px 12px 10px 36px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.search svg{position:absolute;left:12px;top:11px;color:var(--muted)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 13px;font-size:12.5px;font-weight:600;color:var(--muted);user-select:none;transition:.12s}
+.chip:hover{border-color:#c9cfdc}
+.chip.on{color:#fff;border-color:transparent}
+.chip.on[data-f=CRITICAL]{background:var(--crit)}.chip.on[data-f=HIGH]{background:var(--high)}
+.chip.on[data-f=OK]{background:var(--ok)}.chip.on[data-f=NA]{background:var(--na)}.chip.on[data-f=ALL]{background:var(--ink)}
+select.sort{font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}
+.scroll{flex:1;overflow-y:auto;padding:22px 28px 60px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;color:var(--muted);font-size:12px;margin-bottom:16px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:6px;vertical-align:-1px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-left-width:5px;border-radius:14px;padding:16px 18px;box-shadow:var(--shadow);transition:transform .12s,box-shadow .12s}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(20,24,36,.10)}
+.card.CRITICAL{border-left-color:var(--crit)}.card.HIGH{border-left-color:var(--high)}
+.card.OK{border-left-color:var(--ok)}.card.NA{border-left-color:var(--na)}
+.c-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.sku{font-family:Space Grotesk,sans-serif;font-weight:600;font-size:15px;word-break:break-word;line-height:1.25}
+.asin{color:var(--muted);font-size:11.5px;margin-top:3px}
+.badge{font-size:11px;font-weight:700;padding:6px 11px;border-radius:9px;white-space:nowrap}
+.badge.CRITICAL{background:var(--crit-bg);color:var(--crit)}.badge.HIGH{background:var(--high-bg);color:var(--high)}
+.badge.OK{background:var(--ok-bg);color:var(--ok)}.badge.NA{background:var(--na-bg);color:var(--na)}
+.metrics{display:flex;gap:20px;margin:14px 0 10px}
+.metrics div{font-size:11.5px;color:var(--muted)}
+.metrics b{display:block;font-family:Space Grotesk,sans-serif;font-size:19px;color:var(--ink);font-weight:600;margin-top:1px}
+.metrics .rate.crit{color:var(--crit)}.metrics .rate.high{color:var(--high)}.metrics .rate.ok{color:var(--ok)}
+.mix{display:flex;height:8px;border-radius:5px;overflow:hidden;background:#eef0f4;margin:2px 0 13px}
+.mix span{height:100%}
+.cause{font-size:13px;margin-bottom:10px}.cause b{font-weight:600}
+.act{font-size:12.5px;background:#f5f7fb;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.act .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:3px}
+.note{margin-top:9px;font-size:11.5px;color:var(--crit)}
+.empty{text-align:center;color:var(--muted);padding:70px 20px;font-size:15px}
+.burger{display:none}
+@media(max-width:880px){
+  .side{position:fixed;left:0;top:0;bottom:0;z-index:30;transform:translateX(-100%);transition:.2s;box-shadow:0 0 40px rgba(0,0,0,.4)}
+  .side.open{transform:none}
+  .burger{display:inline-flex;align-items:center;gap:8px;cursor:pointer;background:var(--ink);color:#fff;border:none;border-radius:9px;padding:9px 13px;font:inherit;font-weight:600;margin-bottom:14px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side">
+    <div class="brand">FBA Returns<small>Root-cause &amp; action — your products</small></div>
+    <div class="win">Last 30 days<br><b>2026-06-14 → 2026-07-13</b></div>
+    <div class="phcard">
+      <div class="lab">Portfolio holder</div>
+      <div class="who"><div class="av">MO</div><div class="nm">mothajini</div></div>
+      <div class="mini">
+        <div>Products<b>2</b></div>
+        <div>Returns<b>2</b></div>
+        <div>Critical<b>1</b></div>
+      </div>
+    </div>
+    <div class="foot">Live Postgres · amazon_returns (FBA) + order_transaction (FBA-UK Completed) · run 2026-07-14. Shows only your ASINs. Cross-checked vs source tracker.</div>
+  </aside>
+  <main class="main">
+    <div class="top">
+      <button class="burger" onclick="document.getElementById('side').classList.toggle('open')">☰ Summary</button>
+      <h1 class="h-title" id="scope">mothajini · FBA returns</h1>
+      <div class="h-sub" id="scopesub"></div>
+      <div class="tiles" id="tiles"></div>
+      <div class="controls">
+        <div class="search">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <input id="q" placeholder="Search SKU or ASIN…">
+        </div>
+        <div class="chips" id="chips">
+          <span class="chip on" data-f="ALL">All</span>
+          <span class="chip" data-f="CRITICAL">Critical</span>
+          <span class="chip" data-f="HIGH">High</span>
+          <span class="chip" data-f="OK">OK</span>
+          <span class="chip" data-f="NA">N/A</span>
+        </div>
+        <select class="sort" id="sort">
+          <option value="sev">Worst first</option>
+          <option value="rate">Highest return rate</option>
+          <option value="ret">Most returns</option>
+        </select>
+      </div>
+    </div>
+    <div class="scroll">
+      <div class="legend">
+        <span><i style="background:var(--s-lm)"></i>Listing mismatch</span>
+        <span><i style="background:var(--s-ql)"></i>Quality / defect</span>
+        <span><i style="background:var(--s-bp)"></i>Buyer preference</span>
+        <span><i style="background:var(--s-sh)"></i>Shipping</span>
+        <span><i style="background:var(--s-uk)"></i>Unknown</span>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </main>
+</div>
+<script>
+const DATA = [{"sku": "CRFF500BM+PHRI1PBRCO3PK+LSOL220CO3PK", "asin": "B0963P71QD", "return_sku": "CRFF500BM+PHRI1PBRCO3PK+LSOL220CO3PK A", "units": 4, "returns": 1, "lm": 0, "ql": 1, "bp": 0, "sh": 0, "uk": 0, "top": "DAMAGED_BY_CARRIER", "ph": "mothajini"}, {"sku": "CRFF500BM+PHCH1BMRBM3PK+LSCY210BG3PK+ICST64E273PK", "asin": "B0CBCN1B9S", "return_sku": "CRFF500BM+PHCH1BMRBM3PK+LSCY210BG3PK+IC", "units": 10, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_COMPATIBLE", "ph": "mothajini"}], TH = {"crit": 0.2, "high": 0.1, "minret": 2, "listing": 0.4, "quality": 0.4, "buyer": 0.5};
+function flagOf(d){ if(d.units<=0) return 'NA'; const r=d.returns/d.units; return r>TH.crit?'CRITICAL':r>TH.high?'HIGH':'OK'; }
+function rootOf(d){
+  if(d.returns<TH.minret) return 'Too few returns to evaluate';
+  if(d.lm/d.returns>=TH.listing) return 'Listing / expectation mismatch';
+  if(d.ql/d.returns>=TH.quality) return 'Quality / defect issue';
+  if(d.bp/d.returns>=TH.buyer)  return 'Buyer preference — not a product issue';
+  return 'Mixed reasons — no single cause';
+}
+function actionOf(f,root){
+  if(f==='OK') return 'Monitor — no action needed';
+  if(root.startsWith('Listing')) return 'Fix title / images / description to match the product; review A+ content';
+  if(root.startsWith('Quality')) return 'Raise with supplier / QC; inspect the next inbound shipment';
+  if(root.startsWith('Buyer'))   return 'Monitor only — not a product or listing issue';
+  if(root.startsWith('Too few')) return 'Monitor — not enough returns yet to judge';
+  return 'Review manually — mixed signal';
+}
+const RARE=['MISSING_PARTS','SWITCHEROO','MISSED_ESTIMATED_DELIVERY','POOR_FIT','MISORDERED','UNAUTHORIZED_PURCHASE'];
+const FLABEL={CRITICAL:'Critical',HIGH:'High',OK:'OK',NA:'N/A — no sales'};
+const SEV={CRITICAL:0,HIGH:1,OK:2,NA:3};
+DATA.forEach(d=>{d.flag=flagOf(d);d.root=rootOf(d);d.rate=d.units>0?d.returns/d.units:null;});
+let flag='ALL', q='', sort='sev';
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function tiles(rows){
+  const c={CRITICAL:0,HIGH:0,OK:0,NA:0}; rows.forEach(d=>c[d.flag]++);
+  document.getElementById('tiles').innerHTML=
+   `<div class="tile total"><div class="n">${rows.length}</div><div class="l">Products</div></div>
+    <div class="tile crit"><span class="edge"></span><div class="n">${c.CRITICAL}</div><div class="l">Critical</div></div>
+    <div class="tile high"><span class="edge"></span><div class="n">${c.HIGH}</div><div class="l">High</div></div>
+    <div class="tile ok"><span class="edge"></span><div class="n">${c.OK}</div><div class="l">OK</div></div>
+    <div class="tile na"><span class="edge"></span><div class="n">${c.NA}</div><div class="l">N/A</div></div>`;
+}
+function mixbar(d){
+  const seg=(v,col)=> v>0?`<span style="width:${v/d.returns*100}%;background:${col}"></span>`:'';
+  return `<div class="mix">${seg(d.lm,'var(--s-lm)')}${seg(d.ql,'var(--s-ql)')}${seg(d.bp,'var(--s-bp)')}${seg(d.sh,'var(--s-sh)')}${seg(d.uk,'var(--s-uk)')}</div>`;
+}
+function card(d){
+  const rate=d.rate===null?'N/A':(d.rate*100).toFixed(0)+'%';
+  const rc=d.flag==='CRITICAL'?'crit':d.flag==='HIGH'?'high':d.flag==='OK'?'ok':'';
+  const note = RARE.includes(d.top)?`<div class="note">Reason “${d.top}” isn’t in the standard map — counted as Unknown (pending confirmation).</div>`:'';
+  return `<div class="card ${d.flag}">
+    <div class="c-top">
+      <div><div class="sku">${esc(d.sku)}</div><div class="asin">${d.asin} · filed as ${esc(d.return_sku)}</div></div>
+      <span class="badge ${d.flag}">${FLABEL[d.flag]}</span>
+    </div>
+    <div class="metrics">
+      <div>Units sold<b>${d.units}</b></div>
+      <div>Returns<b>${d.returns}</b></div>
+      <div>Return rate<b class="rate ${rc}">${rate}</b></div>
+    </div>
+    ${mixbar(d)}
+    <div class="cause">Likely cause: <b>${d.root}</b></div>
+    <div class="act"><div class="lab">Recommended action</div>${actionOf(d.flag,d.root)}</div>
+    ${note}
+  </div>`;
+}
+function render(){
+  let rows=DATA.slice();
+  tiles(rows);
+  const qq=q.toLowerCase();
+  rows=rows.filter(d=>{
+    if(flag!=='ALL'&&d.flag!==flag) return false;
+    if(qq&&!(d.sku.toLowerCase().includes(qq)||d.asin.toLowerCase().includes(qq))) return false;
+    return true;
+  });
+  const cmp={sev:(a,b)=>SEV[a.flag]-SEV[b.flag]||(b.rate||0)-(a.rate||0),
+             rate:(a,b)=>(b.rate||0)-(a.rate||0), ret:(a,b)=>b.returns-a.returns||(b.rate||0)-(a.rate||0)};
+  rows.sort(cmp[sort]);
+  document.getElementById('scopesub').textContent = `${rows.length} of ${DATA.length} shown · window 2026-06-14 to 2026-07-13`;
+  const g=document.getElementById('grid');
+  g.innerHTML = rows.length? rows.map(card).join('') : '<div class="empty">No products match this filter.</div>';
+}
+document.getElementById('q').oninput=e=>{q=e.target.value;render();};
+document.getElementById('sort').onchange=e=>{sort=e.target.value;render();};
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+  c.classList.add('on'); flag=c.dataset.f; render();
+});
+render();
+</script>
+</body>
+</html>

@@ -6,7 +6,7 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 
 | Task ID | Deliverable | Source ref | Status | Evidence | Validation |
 |---|---|---|---|---|---|
-| REQ-10_fba-returns-root-cause | **D01** — FRRC returns root-cause report (multi-table CTE query + 3-tab xlsx + full-screen HTML console + control-total validation), run 2026-07-14, fixed window 2026-06-14→2026-07-13: **91 returning ASINs / 105 return units**. **NOT published, NOT committed.** | `_Amazon_FBA_Returns_Tracker_-_Rebecca.xlsx` `REQ-10-D01` (project_code `frrc`) + `HANDOFF_FRRC_REQ-10-D01.md` | **COMPLETE (technical) — VALIDATION GREEN (self-checked); REVIEWER + BUSINESS SIGN-OFF PENDING** | `evidence/final_outputs/REQ-10_fba-returns-root-cause/` + `evidence/source_documents/REQ-10_fba-returns-root-cause/` | `sql/REQ-10_.../validation_checks.sql` + `evidence/logs_or_screenshots/REQ-10_.../2026-07-14_import_checksum_evidence.md` |
+| REQ-10_fba-returns-root-cause | **D01** — FRRC returns root-cause report (multi-table CTE query + 3-tab xlsx + full-screen HTML console + 19 per-PH dashboards + control-total validation), run 2026-07-14, fixed window 2026-06-14→2026-07-13: **91 returning ASINs / 105 return units**. **PUBLISHED per-PH to `ph_task` ids 216–234** (`project_code=frrc`, `ph_priors`, released). | `_Amazon_FBA_Returns_Tracker_-_Rebecca.xlsx` `REQ-10-D01` (project_code `frrc`) + `HANDOFF_FRRC_REQ-10-D01.md` | **COMPLETE (technical) — PUBLISHED per-PH (216–234); VALIDATION GREEN (self-checked); REVIEWER + BUSINESS SIGN-OFF PENDING** | `evidence/final_outputs/REQ-10_fba-returns-root-cause/` + `evidence/source_documents/REQ-10_fba-returns-root-cause/` | `sql/REQ-10_.../validation_checks.sql` + `evidence/logs_or_screenshots/REQ-10_.../2026-07-14_import_checksum_evidence.md` + `…/2026-07-14_per_ph_publish_record.md` |
 
 ## D01 — Deliverable detail
 - **Query:** `sql/REQ-10_.../generate_report.sql` — `returns_agg` (by asin, reason-bucket split) LEFT
@@ -19,9 +19,12 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 - **Outputs (build scripts):** `build_frrc30.py` → 3-tab threshold-driven `.xlsx`;
   `build_console.py` → full-screen HTML console with the Portfolio-holder dropdown.
 - **Rendered output (imported 2026-07-14):** `FRRC_FBA_Returns_Console_REQ-10-D01_30day.html`
-  (md5 `fb00ff20`, 35,625 bytes) — the canonical console; data parity with `frrc30.json` verified
-  exact (91 rows / 105 returns / all tuples). The `.xlsx` + simpler grouped `.html` are still to
-  import (regenerable from `frrc30.json`).
+  (md5 `fb00ff20`, 35,625 bytes) — the canonical all-owners console; data parity with `frrc30.json`
+  verified exact (91 rows / 105 returns / all tuples). The `.xlsx` + simpler grouped `.html` are still
+  to import (regenerable from `frrc30.json`).
+- **Per-PH dashboards (published 2026-07-14):** `evidence/final_outputs/REQ-10_.../per_ph/<PH>.html`
+  (19 files + `_manifest.json`) built by `build_per_ph.py` — each locked to one holder. Published to
+  `ph_task` ids 216–234; see `evidence/logs_or_screenshots/REQ-10_.../2026-07-14_per_ph_publish_record.md`.
 - **Reconciliation:** 91 ASINs · 105 returns · 0 bucket failures · Flag CRITICAL 44 / HIGH 20 / OK 9 /
   N/A 18 · 19 named owners + 18 unassigned. Cross-check vs source tracker: Returns 95/101, Units 65/101
   exact (misses 1–3 higher in live). Excel recalc 0 errors.

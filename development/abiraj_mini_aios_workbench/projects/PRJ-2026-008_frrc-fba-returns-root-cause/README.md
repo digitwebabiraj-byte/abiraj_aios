@@ -15,6 +15,9 @@ tracker `_Amazon_FBA_Returns_Tracker_-_Rebecca.xlsx` into live data.
 - Flag distribution: **CRITICAL 44 · HIGH 20 · OK 9 · N/A 18** · **19** named owners + 18 unassigned.
 - Reproduces the source tracker on cross-check (Returns 95/101, Units 65/101 exact; misses 1–3 higher
   in live). Excel recalc 0 errors. Validation **GREEN (self-checked)**; reviewer + business sign-off pending.
+- **PUBLISHED per-PH 2026-07-14** to `tech_team_outputs.ph_task` (ids 216–234) — 19 rows, one per named
+  holder, each sees only their own ASINs (`project_code=frrc`, `ph_priors`, released). 18 unassigned
+  ASINs route to nobody. See `evidence/logs_or_screenshots/REQ-10_.../2026-07-14_per_ph_publish_record.md`.
 
 ## Key files
 | File | What |
