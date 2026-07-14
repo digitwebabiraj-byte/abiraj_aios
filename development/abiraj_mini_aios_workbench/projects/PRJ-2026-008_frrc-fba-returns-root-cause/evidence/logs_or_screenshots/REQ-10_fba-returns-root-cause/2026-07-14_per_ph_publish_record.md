@@ -90,10 +90,26 @@ as a guarded in-place **UPDATE** of the same 19 rows (match by `task_id`, one tx
 `task_name='FBA Returns — Root-Cause Report'`, all `description IS NULL`; utharsika md5 `1c5f7bde…`
 matches local.
 
+## V5 sticky-header root-cause fix (2026-07-14, same run)
+V4 still showed a ghost row above the column header in the portal. **Root cause:** `.wrap{overflow-x:auto}`
+established a scroll container that trapped `position:sticky` — the `thead` stuck relative to `.wrap`
+(which does not scroll vertically) instead of the viewport, so it scrolled away and left content
+showing in the band above it (measured `thead top: -234` at scrollY 400). **Fix:** removed the
+horizontal-overflow container on desktop and pinned the column header to the very top
+(`thead th{position:sticky;top:0}`) with the filter toolbar left non-sticky (no offset to mismatch);
+trimmed column padding + min-widths so the table's min-content (~935px) fits the portal main width
+(~1095px) with no page-level horizontal scroll; added a `@media(max-width:1200px)` safety net that
+re-enables a contained `overflow-x:auto` (and drops sticky) for narrower embeds, and the existing
+`@media(max-width:940px)` mobile stack. Verified numerically in-browser: at 1360px the header pins at
+`top:0`, table fills full width (1095px), page horizontal scroll = 0; at 1120px the scroll is contained
+in the table (no page scroll). Published as a guarded in-place **UPDATE** of the same 19 rows (match by
+`task_id`, one txn, md5-verified), **`version_level` 4→5**; identity fields unchanged. Re-verified via
+read-only MCP (19 rows `version_level=5`; utharsika md5 `9852ec78…` == local).
+
 ## Reversibility
 Rows 216–234 only. Rollback of the whole publish = `DELETE FROM tech_team_outputs.ph_task WHERE
-project_code='frrc'`. No pre-existing (non-frrc) row was ever modified; the V2/V3/V4 changes were
-in-place UPDATEs of the 19 frrc rows.
+project_code='frrc'`. No pre-existing (non-frrc) row was ever modified; the V2–V5 changes were in-place
+UPDATEs of the 19 frrc rows.
 
 ## Data integrity
 Each per-PH dashboard is a filtered render of the governed `frrc30.json` (single owner). Row counts per holder reconcile to the dataset; sum = 73 named-owner ASINs. (`length(html_content)` in Postgres counts characters, so it reads a few less than the local byte count where the UI uses multi-byte —/→ glyphs — not a discrepancy; md5 of the exact stored text matched local.)

@@ -77,8 +77,8 @@ body{margin:0;background:var(--bg);color:var(--ink);
 .head .hdesc{color:var(--muted);font-size:13px;margin:7px 0 0;max-width:1000px;line-height:1.5}
 .head .hdesc b{color:var(--ink);font-weight:600}
 
-.toolbar{position:sticky;top:0;z-index:6;background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);
-  display:flex;align-items:center;gap:12px;padding:0 24px;height:var(--bar);flex-wrap:nowrap;overflow:hidden}
+.toolbar{background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:12px;padding:10px 24px;flex-wrap:wrap}
 .toolbar .who{font-size:12.5px;color:var(--muted);white-space:nowrap}
 .toolbar .who b{color:var(--ink);font-weight:600}
 .grow{flex:1}
@@ -94,17 +94,17 @@ body{margin:0;background:var(--bg);color:var(--ink);
 .chip.on[data-f=OK]{background:var(--ok)}.chip.on[data-f=NA]{background:var(--na)}.chip.on[data-f=ALL]{background:var(--ink)}
 select.sort{font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}
 
-.wrap{width:100%;overflow-x:auto}
+.wrap{width:100%}
 table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
-thead th{position:sticky;top:var(--bar);z-index:4;background:#e9edf4;color:var(--muted);text-align:left;
+thead th{position:sticky;top:0;z-index:4;background:#e9edf4;color:var(--muted);text-align:left;
   font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;
-  padding:10px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+  padding:10px 11px;border-bottom:1px solid var(--line);white-space:nowrap}
 thead th.num{text-align:right}
-tbody td{padding:13px 16px;border-bottom:1px solid var(--line);vertical-align:middle;background:#fff}
+tbody td{padding:12px 11px;border-bottom:1px solid var(--line);vertical-align:middle;background:#fff}
 tbody tr:hover td{background:#f7f9fc}
 tbody tr:nth-child(even) td{background:#fbfcfe}
 tbody tr:nth-child(even):hover td{background:#f7f9fc}
-tbody td.band{border-left:4px solid transparent;padding-left:14px}
+tbody td.band{border-left:4px solid transparent;padding-left:12px}
 tr.CRITICAL td.band{border-left-color:var(--crit)}tr.HIGH td.band{border-left-color:var(--high)}
 tr.OK td.band{border-left-color:var(--ok)}tr.NA td.band{border-left-color:var(--na)}
 .badge{font-size:10.5px;font-weight:700;padding:5px 10px;border-radius:8px;white-space:nowrap;display:inline-block}
@@ -113,21 +113,22 @@ tr.OK td.band{border-left-color:var(--ok)}tr.NA td.band{border-left-color:var(--
 td.st{white-space:nowrap}
 td .sku{font-family:Space Grotesk,sans-serif;font-weight:600;font-size:13.5px;line-height:1.25;word-break:break-word}
 td .asin{color:var(--muted);font-size:11px;margin-top:3px}
-td.prod{min-width:210px;max-width:330px}
+td.prod{min-width:178px;max-width:300px}
 td.num{text-align:right;font-family:Space Grotesk,sans-serif;font-weight:600;font-size:15px;white-space:nowrap}
 td.num .u{font-family:Inter;font-weight:400;font-size:11px;color:var(--muted)}
 td.rate.crit{color:var(--crit)}td.rate.high{color:var(--high)}td.rate.ok{color:var(--ok)}td.rate.na{color:var(--na)}
-.mix{display:flex;height:8px;width:120px;border-radius:5px;overflow:hidden;background:#eef0f4}
+.mix{display:flex;height:8px;width:96px;border-radius:5px;overflow:hidden;background:#eef0f4}
 .mix span{height:100%}
-td.cause{min-width:165px;font-size:12.5px}
-td.act{min-width:230px;font-size:12px;color:var(--ink)}
+td.cause{min-width:128px;font-size:12.5px}
+td.act{min-width:186px;font-size:12px;color:var(--ink)}
 td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
 .empty{padding:60px 20px;text-align:center;color:var(--muted);font-size:15px}
+@media(max-width:1200px){.wrap{overflow-x:auto}thead th{position:static}}
 @media(max-width:940px){
   .app{flex-direction:column}
   .side{width:100%;position:static;max-height:none;flex-direction:row;flex-wrap:wrap;align-items:center;gap:12px}
   .side .brand{width:100%}.phcard,.block{flex:1;min-width:210px}.foot{width:100%}
-  .toolbar{position:static;height:auto;flex-wrap:wrap;padding:11px 24px}thead th{top:0}
+  .toolbar{flex-wrap:wrap;padding:11px 24px}.wrap{overflow-x:auto}thead th{position:static}
 }
 </style>
 </head>
