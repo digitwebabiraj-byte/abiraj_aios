@@ -59,10 +59,25 @@ via read-only MCP: 19 rows at `version_level=2`, all `html_content` present; sto
 (e.g. Jasmini `a7baa215…`, utharsika `84205a4a…`). Update script `push_frrc_update_v2.py` kept in
 scratchpad (carries credential), NOT committed.
 
+## V3 table redesign (2026-07-14, same run)
+Owner feedback on the live V2: the card view still read as a small area with wasted space at the top
+and duplicated stats between the header tiles and the sidebar. **Rebuilt as a full-width, full-height
+data TABLE** (`build_per_ph.py` V3): columns **Status · Product · Units · Returns · Rate · Reasons
+(mini reason-mix bar) · Likely cause · Recommended action**; **sticky toolbar** (title + count +
+search + flag chips + sort) and **sticky column header** so both persist on scroll; removed the
+redundant top KPI-tile row; trimmed the sidebar to holder identity + window + a single **severity
+strip** (Critical/High/OK/N-A counts) + a reason-bucket legend + footer (dropped the duplicate mini
+stat tiles). Rows flow full-height; the table scrolls horizontally inside its own container on narrow
+widths (no page-level horizontal scroll). Verified locally (utharsika: 21-row full-width table, slim
+toolbar, trimmed sidebar). Published as a guarded in-place **UPDATE** of the same 19 rows (match by
+`task_id`, one txn, md5-verified pre-commit), **`version_level` 2→3**, identity fields unchanged.
+Re-verified via read-only MCP: 19 rows at `version_level=3`; stored md5 matches local (utharsika
+`9c43439c…`, Jasmini `daab1c3c…`).
+
 ## Reversibility
 Rows 216–234 only. Rollback of the whole publish = `DELETE FROM tech_team_outputs.ph_task WHERE
-project_code='frrc'`. No pre-existing (non-frrc) row was ever modified; the V2 change was an in-place
-UPDATE of the 19 frrc rows.
+project_code='frrc'`. No pre-existing (non-frrc) row was ever modified; the V2/V3 changes were in-place
+UPDATEs of the 19 frrc rows.
 
 ## Data integrity
 Each per-PH dashboard is a filtered render of the governed `frrc30.json` (single owner). Row counts per holder reconcile to the dataset; sum = 73 named-owner ASINs. (`length(html_content)` in Postgres counts characters, so it reads a few less than the local byte count where the UI uses multi-byte —/→ glyphs — not a discrepancy; md5 of the exact stored text matched local.)
