@@ -74,10 +74,26 @@ toolbar, trimmed sidebar). Published as a guarded in-place **UPDATE** of the sam
 Re-verified via read-only MCP: 19 rows at `version_level=3`; stored md5 matches local (utharsika
 `9c43439c…`, Jasmini `daab1c3c…`).
 
+## V4 alignment fix + self-describing header (2026-07-14, same run)
+Owner feedback on V3: the sticky column header was mis-aligned (a data row peeked in the gap because
+the sticky `thead` offset didn't match the toolbar height), and the portal's top band (TASK NAME /
+DESCRIPTION from the DB columns) wasted vertical space. Fixes: (1) split the header — a **non-sticky
+report header** inside the page (title `FBA Returns — Root-Cause Report` + `Read-only · run` pill + a
+one-line per-holder description with product/return/critical counts) that scrolls away, and a **clean
+fixed-height (56px) sticky filter toolbar** (search + chips + sort + live count); the sticky `thead`
+now sits flush at `top:56px` — no sliver. (2) Moved the task title/description **into the HTML header**
+and trimmed the DB columns that drive the portal band: **`task_name` shortened** to `FBA Returns —
+Root-Cause Report` (was the long sentence) and **`description` set to NULL** (PC precedent). Published
+as a guarded in-place **UPDATE** of the same 19 rows (match by `task_id`, one txn, md5-verified),
+**`version_level` 3→4**; identity fields (`assigned_user`, `task_id`, `project_code`,
+`assigned_user_team`) unchanged. Re-verified via read-only MCP: 19 rows all `version_level=4`, all
+`task_name='FBA Returns — Root-Cause Report'`, all `description IS NULL`; utharsika md5 `1c5f7bde…`
+matches local.
+
 ## Reversibility
 Rows 216–234 only. Rollback of the whole publish = `DELETE FROM tech_team_outputs.ph_task WHERE
-project_code='frrc'`. No pre-existing (non-frrc) row was ever modified; the V2/V3 changes were in-place
-UPDATEs of the 19 frrc rows.
+project_code='frrc'`. No pre-existing (non-frrc) row was ever modified; the V2/V3/V4 changes were
+in-place UPDATEs of the 19 frrc rows.
 
 ## Data integrity
 Each per-PH dashboard is a filtered render of the governed `frrc30.json` (single owner). Row counts per holder reconcile to the dataset; sum = 73 named-owner ASINs. (`length(html_content)` in Postgres counts characters, so it reads a few less than the local byte count where the UI uses multi-byte —/→ glyphs — not a discrepancy; md5 of the exact stored text matched local.)

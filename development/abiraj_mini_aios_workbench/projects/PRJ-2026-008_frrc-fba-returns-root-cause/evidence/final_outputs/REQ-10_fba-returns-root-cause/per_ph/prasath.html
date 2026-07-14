@@ -15,7 +15,7 @@
   --crit:#d23b31; --crit-bg:#fdecea; --high:#c07d10; --high-bg:#fcf3e0;
   --ok:#2b8a5b; --ok-bg:#e7f5ee; --na:#5c6577; --na-bg:#eceef2;
   --s-lm:#3f6fd1; --s-ql:#d23b31; --s-bp:#8158cc; --s-sh:#159b8a; --s-uk:#98a1b3;
-  --bar:60px;
+  --bar:56px;
 }
 *{box-sizing:border-box}
 html,body{height:auto}
@@ -23,10 +23,10 @@ body{margin:0;background:var(--bg);color:var(--ink);
   font-family:Inter,-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
 .app{display:flex;align-items:flex-start;min-height:100vh}
 
-/* ---------- sidebar (sticky, trimmed) ---------- */
+/* ---------- sidebar ---------- */
 .side{width:250px;flex:none;align-self:stretch;position:sticky;top:0;max-height:100vh;overflow-y:auto;
   background:linear-gradient(185deg,var(--nav),var(--nav2));color:var(--navtx);
-  display:flex;flex-direction:column;gap:16px;padding:22px 18px}
+  display:flex;flex-direction:column;gap:15px;padding:22px 18px}
 .side::-webkit-scrollbar{width:6px}.side::-webkit-scrollbar-thumb{background:#2c3550;border-radius:3px}
 .brand{font-family:Space Grotesk,sans-serif;font-weight:700;font-size:18px;color:#fff;letter-spacing:-.01em;line-height:1.15;display:flex;align-items:center;gap:9px}
 .brand .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(145deg,#4b6ef5,#8a5cf0);display:flex;align-items:center;justify-content:center;flex:none}
@@ -50,17 +50,23 @@ body{margin:0;background:var(--bg);color:var(--ink);
 
 /* ---------- main ---------- */
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
-.toolbar{position:sticky;top:0;z-index:6;background:var(--panel);border-bottom:1px solid var(--line);
-  display:flex;align-items:center;gap:14px;padding:11px 22px;min-height:var(--bar);flex-wrap:wrap}
-.tt{min-width:0}
-.tt h1{font-family:Space Grotesk,sans-serif;font-size:18px;font-weight:600;margin:0;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tt .sub{color:var(--muted);font-size:12px;margin-top:2px}
+.head{background:var(--panel);padding:18px 24px 14px}
+.head .hrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.head h1{font-family:Space Grotesk,sans-serif;font-size:21px;font-weight:600;margin:0;letter-spacing:-.01em}
+.head .pill{font-size:11px;font-weight:600;color:var(--ok);background:var(--ok-bg);padding:4px 10px;border-radius:999px;white-space:nowrap}
+.head .hdesc{color:var(--muted);font-size:13px;margin:7px 0 0;max-width:1000px;line-height:1.5}
+.head .hdesc b{color:var(--ink);font-weight:600}
+
+.toolbar{position:sticky;top:0;z-index:6;background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:12px;padding:0 24px;height:var(--bar);flex-wrap:nowrap;overflow:hidden}
+.toolbar .who{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.toolbar .who b{color:var(--ink);font-weight:600}
 .grow{flex:1}
-.search{position:relative;min-width:190px;flex:1;max-width:360px}
+.search{position:relative;min-width:150px;max-width:320px;flex:1}
 .search input{width:100%;font:inherit;padding:9px 12px 9px 34px;border:1px solid var(--line);border-radius:10px;background:#fff}
 .search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .search svg{position:absolute;left:11px;top:10px;color:var(--muted)}
-.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips{display:flex;gap:6px}
 .chip{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 13px;font-size:12px;font-weight:600;color:var(--muted);user-select:none;transition:.12s;white-space:nowrap}
 .chip:hover{border-color:#c9cfdc}
 .chip.on{color:#fff;border-color:transparent}
@@ -70,27 +76,30 @@ select.sort{font:inherit;padding:9px 11px;border:1px solid var(--line);border-ra
 
 .wrap{width:100%;overflow-x:auto}
 table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
-thead th{position:sticky;top:var(--bar);z-index:4;background:#eef1f6;color:var(--muted);text-align:left;
+thead th{position:sticky;top:var(--bar);z-index:4;background:#e9edf4;color:var(--muted);text-align:left;
   font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;
-  padding:11px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+  padding:10px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
 thead th.num{text-align:right}
-tbody td{padding:14px 16px;border-bottom:1px solid var(--line);vertical-align:middle;background:#fff}
+tbody td{padding:13px 16px;border-bottom:1px solid var(--line);vertical-align:middle;background:#fff}
 tbody tr:hover td{background:#f7f9fc}
+tbody tr:nth-child(even) td{background:#fbfcfe}
+tbody tr:nth-child(even):hover td{background:#f7f9fc}
 tbody td.band{border-left:4px solid transparent;padding-left:14px}
 tr.CRITICAL td.band{border-left-color:var(--crit)}tr.HIGH td.band{border-left-color:var(--high)}
 tr.OK td.band{border-left-color:var(--ok)}tr.NA td.band{border-left-color:var(--na)}
 .badge{font-size:10.5px;font-weight:700;padding:5px 10px;border-radius:8px;white-space:nowrap;display:inline-block}
 .badge.CRITICAL{background:var(--crit-bg);color:var(--crit)}.badge.HIGH{background:var(--high-bg);color:var(--high)}
 .badge.OK{background:var(--ok-bg);color:var(--ok)}.badge.NA{background:var(--na-bg);color:var(--na)}
+td.st{white-space:nowrap}
 td .sku{font-family:Space Grotesk,sans-serif;font-weight:600;font-size:13.5px;line-height:1.25;word-break:break-word}
 td .asin{color:var(--muted);font-size:11px;margin-top:3px}
-td.prod{min-width:210px;max-width:340px}
+td.prod{min-width:210px;max-width:330px}
 td.num{text-align:right;font-family:Space Grotesk,sans-serif;font-weight:600;font-size:15px;white-space:nowrap}
 td.num .u{font-family:Inter;font-weight:400;font-size:11px;color:var(--muted)}
 td.rate.crit{color:var(--crit)}td.rate.high{color:var(--high)}td.rate.ok{color:var(--ok)}td.rate.na{color:var(--na)}
 .mix{display:flex;height:8px;width:120px;border-radius:5px;overflow:hidden;background:#eef0f4}
 .mix span{height:100%}
-td.cause{min-width:170px;font-size:12.5px}
+td.cause{min-width:165px;font-size:12.5px}
 td.act{min-width:230px;font-size:12px;color:var(--ink)}
 td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
 .empty{padding:60px 20px;text-align:center;color:var(--muted);font-size:15px}
@@ -98,7 +107,7 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
   .app{flex-direction:column}
   .side{width:100%;position:static;max-height:none;flex-direction:row;flex-wrap:wrap;align-items:center;gap:12px}
   .side .brand{width:100%}.phcard,.block{flex:1;min-width:210px}.foot{width:100%}
-  .toolbar{position:static}thead th{top:0}
+  .toolbar{position:static;height:auto;flex-wrap:wrap;padding:11px 24px}thead th{top:0}
 }
 </style>
 </head>
@@ -136,8 +145,12 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
   </aside>
 
   <main class="main">
+    <div class="head">
+      <div class="hrow"><h1>FBA Returns — Root-Cause Report</h1><span class="pill">Read-only · run 2026-07-14</span></div>
+      <p class="hdesc"><b>prasath</b> — your Amazon FBA products returned in the last 30 days (2026-06-14 → 2026-07-13): <b>1</b> products, <b>1</b> returns, <b>0</b> critical. Each row shows real Units Sold, Total Returns, Return Rate %, the return split by reason bucket and a recommended action.</p>
+    </div>
     <div class="toolbar">
-      <div class="tt"><h1>prasath · FBA returns</h1><div class="sub" id="sub"></div></div>
+      <span class="who"><b>prasath</b> · <span id="cnt"></span></span>
       <div class="grow"></div>
       <div class="search">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -205,7 +218,7 @@ function row(d){
   const rc=d.flag==='CRITICAL'?'crit':d.flag==='HIGH'?'high':d.flag==='OK'?'ok':'na';
   const note = RARE.includes(d.top)?`<span class="note">Reason “${d.top}” not in the standard map — counted as Unknown (pending confirmation).</span>`:'';
   return `<tr class="${d.flag}">
-    <td class="band"><span class="badge ${d.flag}">${FLABEL[d.flag]}</span></td>
+    <td class="band st"><span class="badge ${d.flag}">${FLABEL[d.flag]}</span></td>
     <td class="prod"><div class="sku">${esc(d.sku)}</div><div class="asin">${d.asin} · filed as ${esc(d.return_sku)}</div></td>
     <td class="num">${d.units}<span class="u"> u</span></td>
     <td class="num">${d.returns}</td>
@@ -225,7 +238,7 @@ function render(){
   const cmp={sev:(a,b)=>SEV[a.flag]-SEV[b.flag]||(b.rate||0)-(a.rate||0),
              rate:(a,b)=>(b.rate||0)-(a.rate||0), ret:(a,b)=>b.returns-a.returns||(b.rate||0)-(a.rate||0)};
   rows.sort(cmp[sort]);
-  document.getElementById('sub').textContent = `${rows.length} of ${DATA.length} shown · window 2026-06-14 → 2026-07-13`;
+  document.getElementById('cnt').textContent = `${rows.length} of ${DATA.length} shown`;
   document.getElementById('rows').innerHTML = rows.length? rows.map(row).join('')
     : '<tr><td colspan="8"><div class="empty">No products match this filter.</div></td></tr>';
 }
