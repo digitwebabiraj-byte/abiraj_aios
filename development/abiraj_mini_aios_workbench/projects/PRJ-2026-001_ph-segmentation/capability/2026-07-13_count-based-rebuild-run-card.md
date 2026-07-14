@@ -1,5 +1,10 @@
 # Count-based July rebuild — RUN CARD (for the authorised DB session)
 
+> ✅ **DONE — published live 2026-07-13.** All 31 rows updated (leader id 5 md5 → `a3043461`). Executed
+> from this session via direct psycopg2 (`temp_user`), backup-first + md5-verified. Full before→after
+> record: `evidence/final_outputs/REQ-05_ph-asin-segmentation/2026-07-13_countbased_publish_record.md`.
+> This run card is kept as the repeatable procedure for future cycles.
+
 **Goal:** regenerate the **2026-07** PH dashboards with the **count-based conversion rule**
 (Bietrick-approved 2026-07-10) and publish. **Same window, same roster, same UI — only the segment
 data changes.** This is the "update those HTMLs" ask from 2026-07-13.
