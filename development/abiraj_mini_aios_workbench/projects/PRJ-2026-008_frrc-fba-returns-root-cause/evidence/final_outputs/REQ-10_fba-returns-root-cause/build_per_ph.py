@@ -4,9 +4,9 @@ description carried IN the page, so the portal's top band can be minimal), a cle
 sticky filter toolbar with a sticky column header aligned flush under it (fixes the header sliver),
 full-width data table. Input = frrc30.json. Output = per_ph/<PH>.html + manifest."""
 import json, os, hashlib, re
-SRC = "files5_extract/frrc30.json"
+SRC = "frrc_refresh_2026-07-15.json"
 OUT = "per_ph"
-WIN_START, WIN_END, RUN = "2026-06-14", "2026-07-13", "2026-07-14"
+WIN_START, WIN_END, RUN = "2026-06-14", "2026-07-13", "2026-07-15"
 TH = {"crit":0.20,"high":0.10,"minret":2,"listing":0.40,"quality":0.40,"buyer":0.50}
 data = json.load(open(SRC))
 rows_all = [{
@@ -14,7 +14,7 @@ rows_all = [{
   "units": d["units_sold"], "returns": d["total_returns"],
   "lm": d["listing_qty"], "ql": d["quality_qty"], "bp": d["buyer_qty"],
   "sh": d["shipping_qty"], "uk": d["unknown_qty"],
-  "top": d["top_reason"], "ph": d["responsible_ph"] or "",
+  "top": d["top_reason"], "ph": d["responsible_ph"] or "", "acc": d["account"],
 } for d in data]
 owners = sorted({r["ph"] for r in rows_all if r["ph"]}, key=str.lower)
 
@@ -108,6 +108,10 @@ tbody td.band{border-left:4px solid transparent;padding-left:12px}
 tr.CRITICAL td.band{border-left-color:var(--crit)}tr.HIGH td.band{border-left-color:var(--high)}
 tr.OK td.band{border-left-color:var(--ok)}tr.NA td.band{border-left-color:var(--na)}
 .badge{font-size:10.5px;font-weight:700;padding:5px 10px;border-radius:8px;white-space:nowrap;display:inline-block}
+.acct{font-size:10.5px;font-weight:700;padding:4px 8px;border-radius:6px;white-space:nowrap;display:inline-block;border:1px solid}
+.acct.LEDSone{color:#2b5fb8;background:#e8f0fd;border-color:#cfe0fa}
+.acct.DCVoltage{color:#8a4bbf;background:#f3ebfb;border-color:#e6d8f6}
+td.acc{white-space:nowrap}
 .badge.CRITICAL{background:var(--crit-bg);color:var(--crit)}.badge.HIGH{background:var(--high-bg);color:var(--high)}
 .badge.OK{background:var(--ok-bg);color:var(--ok)}.badge.NA{background:var(--na-bg);color:var(--na)}
 td.st{white-space:nowrap}
@@ -153,6 +157,13 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
       </div>
     </div>
     <div class="block">
+      <div class="lab">Account</div>
+      <div class="keys">
+        <span><i style="background:#3f6fd1"></i>LEDSone<b>__NLED__</b></span>
+        <span><i style="background:#8158cc"></i>DCVoltage<b>__NDCV__</b></span>
+      </div>
+    </div>
+    <div class="block">
       <div class="lab">Reason buckets</div>
       <div class="keys">
         <span><i style="background:var(--s-lm)"></i>Listing mismatch</span>
@@ -162,7 +173,7 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
         <span><i style="background:var(--s-uk)"></i>Unknown</span>
       </div>
     </div>
-    <div class="foot">Live Postgres · amazon_returns (FBA) + order_transaction (FBA-UK Completed) · run __RUN__. Shows only your ASINs.</div>
+    <div class="foot">Live Postgres · amazon_returns (FBA) + order_transaction (FBA-UK Completed) · data as of __RUN__. Shows only your ASINs, across both Amazon accounts.</div>
   </aside>
 
   <main class="main">
@@ -184,6 +195,11 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
         <span class="chip" data-f="OK">OK</span>
         <span class="chip" data-f="NA">N/A</span>
       </div>
+      <select class="sort" id="acct">
+        <option value="ALL">All accounts</option>
+        <option value="LEDSone">LEDSone</option>
+        <option value="DCVoltage">DCVoltage</option>
+      </select>
       <select class="sort" id="sort">
         <option value="sev">Worst first</option>
         <option value="rate">Highest return rate</option>
@@ -193,7 +209,7 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
     <div class="wrap">
       <table>
         <thead><tr>
-          <th>Status</th><th>Product</th><th class="num">Units</th><th class="num">Returns</th>
+          <th>Status</th><th>Product</th><th>Account</th><th class="num">Units</th><th class="num">Returns</th>
           <th class="num">Rate</th><th>Reasons</th><th>Likely cause</th><th>Recommended action</th>
         </tr></thead>
         <tbody id="rows"></tbody>
@@ -223,7 +239,7 @@ const RARE=['MISSING_PARTS','SWITCHEROO','MISSED_ESTIMATED_DELIVERY','POOR_FIT',
 const FLABEL={CRITICAL:'Critical',HIGH:'High',OK:'OK',NA:'N/A'};
 const SEV={CRITICAL:0,HIGH:1,OK:2,NA:3};
 DATA.forEach(d=>{d.flag=flagOf(d);d.root=rootOf(d);d.rate=d.units>0?d.returns/d.units:null;});
-let flag='ALL', q='', sort='sev';
+let flag='ALL', q='', sort='sev', acct='ALL';
 const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 (function sev(){
   const c={CRITICAL:0,HIGH:0,OK:0,NA:0}; DATA.forEach(d=>c[d.flag]++);
@@ -241,6 +257,7 @@ function row(d){
   return `<tr class="${d.flag}">
     <td class="band st"><span class="badge ${d.flag}">${FLABEL[d.flag]}</span></td>
     <td class="prod"><div class="sku">${esc(d.sku)}</div><div class="asin">${d.asin} · filed as ${esc(d.return_sku)}</div></td>
+    <td class="acc"><span class="acct ${d.acc}">${d.acc}</span></td>
     <td class="num">${d.units}<span class="u"> u</span></td>
     <td class="num">${d.returns}</td>
     <td class="num rate ${rc}">${rate}</td>
@@ -253,6 +270,7 @@ function render(){
   const qq=q.toLowerCase();
   let rows=DATA.filter(d=>{
     if(flag!=='ALL'&&d.flag!==flag) return false;
+    if(acct!=='ALL'&&d.acc!==acct) return false;
     if(qq&&!(d.sku.toLowerCase().includes(qq)||d.asin.toLowerCase().includes(qq))) return false;
     return true;
   });
@@ -261,10 +279,11 @@ function render(){
   rows.sort(cmp[sort]);
   document.getElementById('cnt').textContent = `${rows.length} of ${DATA.length} shown`;
   document.getElementById('rows').innerHTML = rows.length? rows.map(row).join('')
-    : '<tr><td colspan="8"><div class="empty">No products match this filter.</div></td></tr>';
+    : '<tr><td colspan="9"><div class="empty">No products match this filter.</div></td></tr>';
 }
 document.getElementById('q').oninput=e=>{q=e.target.value;render();};
 document.getElementById('sort').onchange=e=>{sort=e.target.value;render();};
+document.getElementById('acct').onchange=e=>{acct=e.target.value;render();};
 document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
   document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
   c.classList.add('on'); flag=c.dataset.f; render();
@@ -296,7 +315,9 @@ for ph in owners:
              .replace("__NCRIT__", str(cnt["CRITICAL"]))
              .replace("__NHIGH__", str(cnt["HIGH"]))
              .replace("__NOK__", str(cnt["OK"]))
-             .replace("__NNA__", str(cnt["NA"])))
+             .replace("__NNA__", str(cnt["NA"]))
+             .replace("__NLED__", str(sum(1 for r in rws if r["acc"]=="LEDSone")))
+             .replace("__NDCV__", str(sum(1 for r in rws if r["acc"]=="DCVoltage"))))
     safe=re.sub(r"[^A-Za-z0-9()]+","_",ph)
     path=os.path.join(OUT, f"{safe}.html")
     open(path,"w",encoding="utf-8").write(html)
@@ -305,6 +326,6 @@ for ph in owners:
                      "returns":sum(r["returns"] for r in rws),"crit":cnt["CRITICAL"],
                      "bytes":len(html.encode("utf-8")),"md5":md5})
 json.dump(manifest, open(os.path.join(OUT,"_manifest.json"),"w"), indent=1)
-print(f"built {len(manifest)} per-PH dashboards (V4 header + aligned table)")
-print("total rows across PHs:", sum(m["rows"] for m in manifest), "(expect 73)")
+print(f"built {len(manifest)} per-PH dashboards (V6: refreshed data + account split)")
+print("total rows across PHs:", sum(m["rows"] for m in manifest), f"(expect {sum(1 for r in rows_all if r['ph'])} owned of {len(rows_all)})")
 for m in manifest: print(f"  {m['ph']:20} rows={m['rows']:>2} ret={m['returns']:>2} crit={m['crit']:>2} {m['bytes']:>6}B md5={m['md5'][:8]}")

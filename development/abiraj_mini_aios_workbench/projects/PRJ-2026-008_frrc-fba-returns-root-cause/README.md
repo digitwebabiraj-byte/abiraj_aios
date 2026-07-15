@@ -10,7 +10,12 @@ reason buckets (Listing Mismatch / Quality / Buyer Preference / Shipping / Unkno
 tracker `_Amazon_FBA_Returns_Tracker_-_Rebecca.xlsx` into live data.
 **Task:** REQ-10_fba-returns-root-cause (req `REQ-10-D01`, project_code `frrc`). **Dev:** Abiraj.
 
-## Run 2026-07-14 (fixed window 2026-06-14 → 2026-07-13)
+## Run — window 2026-06-14 → 2026-07-13 · **data refreshed 2026-07-15 (D02)**
+- **101** returning ASINs · **118** return units · **CRIT 50 · HIGH 24 · OK 9 · N/A 18** · 83 owned / 18 unassigned.
+- **Account split (display only):** DCVoltage 49 ASINs / 61 units · LEDSone 52 / 57 — report is **not** account-filtered.
+- Refreshed because the FBA returns feed back-fills: the D01 (2026-07-14) snapshot was ~12% short. Published **V6**.
+
+### D01 original (2026-07-14)
 - **91** returning Amazon FBA ASINs · **105** return units · per-row bucket sum = total_returns (0 failures).
 - Flag distribution: **CRITICAL 44 · HIGH 20 · OK 9 · N/A 18** · **19** named owners + 18 unassigned.
 - Reproduces the source tracker on cross-check (Returns 95/101, Units 65/101 exact; misses 1–3 higher

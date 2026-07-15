@@ -88,6 +88,10 @@ tbody td.band{border-left:4px solid transparent;padding-left:12px}
 tr.CRITICAL td.band{border-left-color:var(--crit)}tr.HIGH td.band{border-left-color:var(--high)}
 tr.OK td.band{border-left-color:var(--ok)}tr.NA td.band{border-left-color:var(--na)}
 .badge{font-size:10.5px;font-weight:700;padding:5px 10px;border-radius:8px;white-space:nowrap;display:inline-block}
+.acct{font-size:10.5px;font-weight:700;padding:4px 8px;border-radius:6px;white-space:nowrap;display:inline-block;border:1px solid}
+.acct.LEDSone{color:#2b5fb8;background:#e8f0fd;border-color:#cfe0fa}
+.acct.DCVoltage{color:#8a4bbf;background:#f3ebfb;border-color:#e6d8f6}
+td.acc{white-space:nowrap}
 .badge.CRITICAL{background:var(--crit-bg);color:var(--crit)}.badge.HIGH{background:var(--high-bg);color:var(--high)}
 .badge.OK{background:var(--ok-bg);color:var(--ok)}.badge.NA{background:var(--na-bg);color:var(--na)}
 td.st{white-space:nowrap}
@@ -133,6 +137,13 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
       </div>
     </div>
     <div class="block">
+      <div class="lab">Account</div>
+      <div class="keys">
+        <span><i style="background:#3f6fd1"></i>LEDSone<b>2</b></span>
+        <span><i style="background:#8158cc"></i>DCVoltage<b>2</b></span>
+      </div>
+    </div>
+    <div class="block">
       <div class="lab">Reason buckets</div>
       <div class="keys">
         <span><i style="background:var(--s-lm)"></i>Listing mismatch</span>
@@ -142,12 +153,12 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
         <span><i style="background:var(--s-uk)"></i>Unknown</span>
       </div>
     </div>
-    <div class="foot">Live Postgres · amazon_returns (FBA) + order_transaction (FBA-UK Completed) · run 2026-07-14. Shows only your ASINs.</div>
+    <div class="foot">Live Postgres · amazon_returns (FBA) + order_transaction (FBA-UK Completed) · data as of 2026-07-15. Shows only your ASINs, across both Amazon accounts.</div>
   </aside>
 
   <main class="main">
     <div class="head">
-      <div class="hrow"><h1>FBA Returns — Root-Cause Report</h1><span class="pill">Read-only · run 2026-07-14</span></div>
+      <div class="hrow"><h1>FBA Returns — Root-Cause Report</h1><span class="pill">Read-only · run 2026-07-15</span></div>
       <p class="hdesc"><b>Theepana</b> — your Amazon FBA products returned in the last 30 days (2026-06-14 → 2026-07-13): <b>4</b> products, <b>4</b> returns, <b>1</b> critical. Each row shows real Units Sold, Total Returns, Return Rate %, the return split by reason bucket and a recommended action.</p>
     </div>
     <div class="toolbar">
@@ -164,6 +175,11 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
         <span class="chip" data-f="OK">OK</span>
         <span class="chip" data-f="NA">N/A</span>
       </div>
+      <select class="sort" id="acct">
+        <option value="ALL">All accounts</option>
+        <option value="LEDSone">LEDSone</option>
+        <option value="DCVoltage">DCVoltage</option>
+      </select>
       <select class="sort" id="sort">
         <option value="sev">Worst first</option>
         <option value="rate">Highest return rate</option>
@@ -173,7 +189,7 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
     <div class="wrap">
       <table>
         <thead><tr>
-          <th>Status</th><th>Product</th><th class="num">Units</th><th class="num">Returns</th>
+          <th>Status</th><th>Product</th><th>Account</th><th class="num">Units</th><th class="num">Returns</th>
           <th class="num">Rate</th><th>Reasons</th><th>Likely cause</th><th>Recommended action</th>
         </tr></thead>
         <tbody id="rows"></tbody>
@@ -182,7 +198,7 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
   </main>
 </div>
 <script>
-const DATA = [{"sku": "PLPYBC", "asin": "B07RWJR1D2", "return_sku": "PLPYBC_AMD", "units": 2, "returns": 1, "lm": 0, "ql": 1, "bp": 0, "sh": 0, "uk": 0, "top": "DAMAGED_BY_FC", "ph": "Theepana"}, {"sku": "CRSF100YB+PHCHPCRYB+LSCY290YB", "asin": "B0CHW3Q9VG", "return_sku": "CRSF100YB+PHCHPCRYB+LSCY290YB_AML", "units": 6, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_COMPATIBLE", "ph": "Theepana"}, {"sku": "ENC685", "asin": "B096FPKPNQ", "return_sku": "ENC685 AM", "units": 13, "returns": 1, "lm": 0, "ql": 1, "bp": 0, "sh": 0, "uk": 0, "top": "DEFECTIVE", "ph": "Theepana"}, {"sku": "PLADBM F", "asin": "B094R3M2DC", "return_sku": "PLADBM F", "units": 19, "returns": 1, "lm": 0, "ql": 0, "bp": 0, "sh": 0, "uk": 1, "top": "NO_REASON_GIVEN", "ph": "Theepana"}], TH = {"crit": 0.2, "high": 0.1, "minret": 2, "listing": 0.4, "quality": 0.4, "buyer": 0.5};
+const DATA = [{"sku": "PLPYBC", "asin": "B07RWJR1D2", "return_sku": "PLPYBC_AMD", "units": 2, "returns": 1, "lm": 0, "ql": 1, "bp": 0, "sh": 0, "uk": 0, "top": "DAMAGED_BY_FC", "ph": "Theepana", "acc": "DCVoltage"}, {"sku": "CRSF100YB+PHCHPCRYB+LSCY290YB", "asin": "B0CHW3Q9VG", "return_sku": "CRSF100YB+PHCHPCRYB+LSCY290YB_AML", "units": 6, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_COMPATIBLE", "ph": "Theepana", "acc": "LEDSone"}, {"sku": "ENC685", "asin": "B096FPKPNQ", "return_sku": "ENC685 AM", "units": 13, "returns": 1, "lm": 0, "ql": 1, "bp": 0, "sh": 0, "uk": 0, "top": "DEFECTIVE", "ph": "Theepana", "acc": "DCVoltage"}, {"sku": "PLADBM F", "asin": "B094R3M2DC", "return_sku": "PLADBM F", "units": 24, "returns": 1, "lm": 0, "ql": 0, "bp": 0, "sh": 0, "uk": 1, "top": "NO_REASON_GIVEN", "ph": "Theepana", "acc": "LEDSone"}], TH = {"crit": 0.2, "high": 0.1, "minret": 2, "listing": 0.4, "quality": 0.4, "buyer": 0.5};
 function flagOf(d){ if(d.units<=0) return 'NA'; const r=d.returns/d.units; return r>TH.crit?'CRITICAL':r>TH.high?'HIGH':'OK'; }
 function rootOf(d){
   if(d.returns<TH.minret) return 'Too few returns to evaluate';
@@ -203,7 +219,7 @@ const RARE=['MISSING_PARTS','SWITCHEROO','MISSED_ESTIMATED_DELIVERY','POOR_FIT',
 const FLABEL={CRITICAL:'Critical',HIGH:'High',OK:'OK',NA:'N/A'};
 const SEV={CRITICAL:0,HIGH:1,OK:2,NA:3};
 DATA.forEach(d=>{d.flag=flagOf(d);d.root=rootOf(d);d.rate=d.units>0?d.returns/d.units:null;});
-let flag='ALL', q='', sort='sev';
+let flag='ALL', q='', sort='sev', acct='ALL';
 const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 (function sev(){
   const c={CRITICAL:0,HIGH:0,OK:0,NA:0}; DATA.forEach(d=>c[d.flag]++);
@@ -221,6 +237,7 @@ function row(d){
   return `<tr class="${d.flag}">
     <td class="band st"><span class="badge ${d.flag}">${FLABEL[d.flag]}</span></td>
     <td class="prod"><div class="sku">${esc(d.sku)}</div><div class="asin">${d.asin} · filed as ${esc(d.return_sku)}</div></td>
+    <td class="acc"><span class="acct ${d.acc}">${d.acc}</span></td>
     <td class="num">${d.units}<span class="u"> u</span></td>
     <td class="num">${d.returns}</td>
     <td class="num rate ${rc}">${rate}</td>
@@ -233,6 +250,7 @@ function render(){
   const qq=q.toLowerCase();
   let rows=DATA.filter(d=>{
     if(flag!=='ALL'&&d.flag!==flag) return false;
+    if(acct!=='ALL'&&d.acc!==acct) return false;
     if(qq&&!(d.sku.toLowerCase().includes(qq)||d.asin.toLowerCase().includes(qq))) return false;
     return true;
   });
@@ -241,10 +259,11 @@ function render(){
   rows.sort(cmp[sort]);
   document.getElementById('cnt').textContent = `${rows.length} of ${DATA.length} shown`;
   document.getElementById('rows').innerHTML = rows.length? rows.map(row).join('')
-    : '<tr><td colspan="8"><div class="empty">No products match this filter.</div></td></tr>';
+    : '<tr><td colspan="9"><div class="empty">No products match this filter.</div></td></tr>';
 }
 document.getElementById('q').oninput=e=>{q=e.target.value;render();};
 document.getElementById('sort').onchange=e=>{sort=e.target.value;render();};
+document.getElementById('acct').onchange=e=>{acct=e.target.value;render();};
 document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
   document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
   c.classList.add('on'); flag=c.dataset.f; render();

@@ -99,7 +99,16 @@ Under Task `REQ-10_fba-returns-root-cause` (COPY-only import; Downloads original
   scripts. `build_console.py` / the console load Google Fonts (CDN) but embed all report data — no
   network call fetches data.
 
-## Run Snapshot (fixed window 2026-06-14 → 2026-07-13, run 2026-07-14)
+## Run Snapshot — REFRESHED (same window 2026-06-14 → 2026-07-13, data as of 2026-07-15)
+- **101** returning Amazon FBA ASINs · **118** return units · 0 bucket-arithmetic failures.
+- Flags: **CRITICAL 50 · HIGH 24 · OK 9 · N/A 18** · **83 owned** (19 PHs, roster unchanged) + **18 unassigned**.
+- **Account split (new, display-only):** DCVoltage **49 ASINs / 61 units** · LEDSone **52 / 57**. The report is **not** account-filtered.
+- **Why refreshed:** the FBA returns feed back-fills — the D01 snapshot (2026-07-14) read 91/105 for this
+  same window and was ~12% short. See `validation/REQ-10_.../2026-07-15_D02_refresh_and_account_validation.md`.
+- **Only 15 of 101 ASINs reach the ≥2-returns gate**, so 85% resolve to "Too few returns to evaluate" —
+  the driver behind the D02 window-length recommendation (60–90 days). Open item C.
+
+## Run Snapshot — D01 original (fixed window 2026-06-14 → 2026-07-13, run 2026-07-14)
 - **91** returning Amazon FBA ASINs · **105** return units · bucket-sum = total_returns on every row
   (0 arithmetic failures).
 - Flag distribution: **CRITICAL 44 · HIGH 20 · OK 9 · N/A 18**. The 18 N/A rows had a return but no

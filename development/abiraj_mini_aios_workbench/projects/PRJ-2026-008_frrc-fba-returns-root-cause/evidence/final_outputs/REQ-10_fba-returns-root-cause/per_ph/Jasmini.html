@@ -88,6 +88,10 @@ tbody td.band{border-left:4px solid transparent;padding-left:12px}
 tr.CRITICAL td.band{border-left-color:var(--crit)}tr.HIGH td.band{border-left-color:var(--high)}
 tr.OK td.band{border-left-color:var(--ok)}tr.NA td.band{border-left-color:var(--na)}
 .badge{font-size:10.5px;font-weight:700;padding:5px 10px;border-radius:8px;white-space:nowrap;display:inline-block}
+.acct{font-size:10.5px;font-weight:700;padding:4px 8px;border-radius:6px;white-space:nowrap;display:inline-block;border:1px solid}
+.acct.LEDSone{color:#2b5fb8;background:#e8f0fd;border-color:#cfe0fa}
+.acct.DCVoltage{color:#8a4bbf;background:#f3ebfb;border-color:#e6d8f6}
+td.acc{white-space:nowrap}
 .badge.CRITICAL{background:var(--crit-bg);color:var(--crit)}.badge.HIGH{background:var(--high-bg);color:var(--high)}
 .badge.OK{background:var(--ok-bg);color:var(--ok)}.badge.NA{background:var(--na-bg);color:var(--na)}
 td.st{white-space:nowrap}
@@ -123,13 +127,20 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
       <div class="win">Last 30 days<br><b>2026-06-14 → 2026-07-13</b></div>
     </div>
     <div class="block">
-      <div class="lab">Severity · 14 products · 15 returns</div>
+      <div class="lab">Severity · 16 products · 18 returns</div>
       <div class="sevbar" id="sevbar"></div>
       <div class="keys">
-        <span><i style="background:var(--crit)"></i>Critical<b>6</b></span>
-        <span><i style="background:var(--high)"></i>High<b>6</b></span>
+        <span><i style="background:var(--crit)"></i>Critical<b>9</b></span>
+        <span><i style="background:var(--high)"></i>High<b>5</b></span>
         <span><i style="background:var(--ok)"></i>OK<b>2</b></span>
         <span><i style="background:var(--na)"></i>N/A — no sales<b>0</b></span>
+      </div>
+    </div>
+    <div class="block">
+      <div class="lab">Account</div>
+      <div class="keys">
+        <span><i style="background:#3f6fd1"></i>LEDSone<b>12</b></span>
+        <span><i style="background:#8158cc"></i>DCVoltage<b>4</b></span>
       </div>
     </div>
     <div class="block">
@@ -142,13 +153,13 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
         <span><i style="background:var(--s-uk)"></i>Unknown</span>
       </div>
     </div>
-    <div class="foot">Live Postgres · amazon_returns (FBA) + order_transaction (FBA-UK Completed) · run 2026-07-14. Shows only your ASINs.</div>
+    <div class="foot">Live Postgres · amazon_returns (FBA) + order_transaction (FBA-UK Completed) · data as of 2026-07-15. Shows only your ASINs, across both Amazon accounts.</div>
   </aside>
 
   <main class="main">
     <div class="head">
-      <div class="hrow"><h1>FBA Returns — Root-Cause Report</h1><span class="pill">Read-only · run 2026-07-14</span></div>
-      <p class="hdesc"><b>Jasmini</b> — your Amazon FBA products returned in the last 30 days (2026-06-14 → 2026-07-13): <b>14</b> products, <b>15</b> returns, <b>6</b> critical. Each row shows real Units Sold, Total Returns, Return Rate %, the return split by reason bucket and a recommended action.</p>
+      <div class="hrow"><h1>FBA Returns — Root-Cause Report</h1><span class="pill">Read-only · run 2026-07-15</span></div>
+      <p class="hdesc"><b>Jasmini</b> — your Amazon FBA products returned in the last 30 days (2026-06-14 → 2026-07-13): <b>16</b> products, <b>18</b> returns, <b>9</b> critical. Each row shows real Units Sold, Total Returns, Return Rate %, the return split by reason bucket and a recommended action.</p>
     </div>
     <div class="toolbar">
       <span class="who"><b>Jasmini</b> · <span id="cnt"></span></span>
@@ -164,6 +175,11 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
         <span class="chip" data-f="OK">OK</span>
         <span class="chip" data-f="NA">N/A</span>
       </div>
+      <select class="sort" id="acct">
+        <option value="ALL">All accounts</option>
+        <option value="LEDSone">LEDSone</option>
+        <option value="DCVoltage">DCVoltage</option>
+      </select>
       <select class="sort" id="sort">
         <option value="sev">Worst first</option>
         <option value="rate">Highest return rate</option>
@@ -173,7 +189,7 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
     <div class="wrap">
       <table>
         <thead><tr>
-          <th>Status</th><th>Product</th><th class="num">Units</th><th class="num">Returns</th>
+          <th>Status</th><th>Product</th><th>Account</th><th class="num">Units</th><th class="num">Returns</th>
           <th class="num">Rate</th><th>Reasons</th><th>Likely cause</th><th>Recommended action</th>
         </tr></thead>
         <tbody id="rows"></tbody>
@@ -182,7 +198,7 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
   </main>
 </div>
 <script>
-const DATA = [{"sku": "CL3TGD5PK", "asin": "B07L8HQG6Y", "return_sku": "CL3TGD5PK-AMD", "units": 14, "returns": 2, "lm": 0, "ql": 0, "bp": 0, "sh": 0, "uk": 2, "top": "MISSED_ESTIMATED_DELIVERY", "ph": "Jasmini"}, {"sku": "CL3TGDAPK", "asin": "B07PFMPYD4", "return_sku": "CL3TGDAPK AM", "units": 1, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_AS_DESCRIBED", "ph": "Jasmini"}, {"sku": "CL2TROAPK_J4", "asin": "B093DKVKM7", "return_sku": "CL2TROAPK AM", "units": 1, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_COMPATIBLE", "ph": "Jasmini"}, {"sku": "CL2TBD5PK", "asin": "B09HS85K42", "return_sku": "CL2TBD5PK AM", "units": 1, "returns": 1, "lm": 0, "ql": 0, "bp": 1, "sh": 0, "uk": 0, "top": "UNWANTED_ITEM", "ph": "Jasmini"}, {"sku": "CL2TRO5PK", "asin": "B09HSBKLHK", "return_sku": "CL2TRO5PK AMZ", "units": 1, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_COMPATIBLE", "ph": "Jasmini"}, {"sku": "CL3RSI5PK", "asin": "B0F1N8D5PR", "return_sku": "CL3RSI5PK_AMN", "units": 1, "returns": 1, "lm": 0, "ql": 0, "bp": 0, "sh": 0, "uk": 1, "top": "NO_REASON_GIVEN", "ph": "Jasmini"}, {"sku": "CL3RGY5PK", "asin": "B0BBB4H59J", "return_sku": "CL3RGY5PK_AMN", "units": 3, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_COMPATIBLE", "ph": "Jasmini"}, {"sku": "CL3THEAPK", "asin": "B0BBS1VR82", "return_sku": "CL3THEAPK-AM", "units": 6, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_COMPATIBLE", "ph": "Jasmini"}, {"sku": "CL3TBMAPK", "asin": "B0BBS6B82P", "return_sku": "CL3TBMAPK_AMN", "units": 6, "returns": 1, "lm": 0, "ql": 0, "bp": 1, "sh": 0, "uk": 0, "top": "UNWANTED_ITEM", "ph": "Jasmini"}, {"sku": "CL3TIV5PK AM", "asin": "B0B9Y9F73N", "return_sku": "CL3TIV5PK AM", "units": 7, "returns": 1, "lm": 0, "ql": 0, "bp": 1, "sh": 0, "uk": 0, "top": "UNWANTED_ITEM", "ph": "Jasmini"}, {"sku": "CL3THE5PK", "asin": "B08KGJT4DP", "return_sku": "CL3THE5PK AM", "units": 9, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_COMPATIBLE", "ph": "Jasmini"}, {"sku": "CL3TGL5PK", "asin": "B0DH9CY29Z", "return_sku": "CL3TGL5PK_AMD1", "units": 9, "returns": 1, "lm": 0, "ql": 0, "bp": 1, "sh": 0, "uk": 0, "top": "UNWANTED_ITEM", "ph": "Jasmini"}, {"sku": "CL3THEAPK", "asin": "B08XC1QT69", "return_sku": "CL3THEAPK_AMD", "units": 18, "returns": 1, "lm": 0, "ql": 0, "bp": 0, "sh": 0, "uk": 1, "top": "NO_REASON_GIVEN", "ph": "Jasmini"}, {"sku": "CL3RBM5PK", "asin": "B0CHRVWSBM", "return_sku": "CL3RBM5PK FBA", "units": 26, "returns": 1, "lm": 0, "ql": 0, "bp": 1, "sh": 0, "uk": 0, "top": "ORDERED_WRONG_ITEM", "ph": "Jasmini"}], TH = {"crit": 0.2, "high": 0.1, "minret": 2, "listing": 0.4, "quality": 0.4, "buyer": 0.5};
+const DATA = [{"sku": "CL3TIV5PK AM", "asin": "B0B9Y9F73N", "return_sku": "CL3TIV5PK AM", "units": 7, "returns": 2, "lm": 0, "ql": 0, "bp": 1, "sh": 0, "uk": 1, "top": "NO_REASON_GIVEN", "ph": "Jasmini", "acc": "LEDSone"}, {"sku": "CL3TGD5PK", "asin": "B07L8HQG6Y", "return_sku": "CL3TGD5PK-AMD", "units": 14, "returns": 2, "lm": 0, "ql": 0, "bp": 0, "sh": 0, "uk": 2, "top": "MISSED_ESTIMATED_DELIVERY", "ph": "Jasmini", "acc": "DCVoltage"}, {"sku": "CL3TGDAPK", "asin": "B07PFMPYD4", "return_sku": "CL3TGDAPK AM", "units": 1, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_AS_DESCRIBED", "ph": "Jasmini", "acc": "LEDSone"}, {"sku": "CL2TROAPK_J4", "asin": "B093DKVKM7", "return_sku": "CL2TROAPK AM", "units": 1, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_COMPATIBLE", "ph": "Jasmini", "acc": "LEDSone"}, {"sku": "CL2TBD5PK", "asin": "B09HS85K42", "return_sku": "CL2TBD5PK AM", "units": 1, "returns": 1, "lm": 0, "ql": 0, "bp": 1, "sh": 0, "uk": 0, "top": "UNWANTED_ITEM", "ph": "Jasmini", "acc": "LEDSone"}, {"sku": "CL2TRO5PK", "asin": "B09HSBKLHK", "return_sku": "CL2TRO5PK AMZ", "units": 1, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_COMPATIBLE", "ph": "Jasmini", "acc": "LEDSone"}, {"sku": "CL2RBK5PK", "asin": "B0BB34G298", "return_sku": "CL2RBK5PK AM", "units": 1, "returns": 1, "lm": 0, "ql": 0, "bp": 0, "sh": 0, "uk": 1, "top": "NO_REASON_GIVEN", "ph": "Jasmini", "acc": "LEDSone"}, {"sku": "CL2RBM5PK", "asin": "B0BB371NGW", "return_sku": "CL2RBM5PK AM", "units": 1, "returns": 1, "lm": 0, "ql": 0, "bp": 0, "sh": 0, "uk": 1, "top": "NO_REASON_GIVEN", "ph": "Jasmini", "acc": "LEDSone"}, {"sku": "CL3RSI5PK", "asin": "B0F1N8D5PR", "return_sku": "CL3RSI5PK_AMN", "units": 2, "returns": 1, "lm": 0, "ql": 0, "bp": 0, "sh": 0, "uk": 1, "top": "NO_REASON_GIVEN", "ph": "Jasmini", "acc": "LEDSone"}, {"sku": "CL3RGY5PK", "asin": "B0BBB4H59J", "return_sku": "CL3RGY5PK_AMN", "units": 3, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_COMPATIBLE", "ph": "Jasmini", "acc": "LEDSone"}, {"sku": "CL3THEAPK", "asin": "B0BBS1VR82", "return_sku": "CL3THEAPK-AM", "units": 6, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_COMPATIBLE", "ph": "Jasmini", "acc": "LEDSone"}, {"sku": "CL3TBMAPK", "asin": "B0BBS6B82P", "return_sku": "CL3TBMAPK_AMN", "units": 6, "returns": 1, "lm": 0, "ql": 0, "bp": 1, "sh": 0, "uk": 0, "top": "UNWANTED_ITEM", "ph": "Jasmini", "acc": "LEDSone"}, {"sku": "CL3THE5PK", "asin": "B08KGJT4DP", "return_sku": "CL3THE5PK AM", "units": 9, "returns": 1, "lm": 1, "ql": 0, "bp": 0, "sh": 0, "uk": 0, "top": "NOT_COMPATIBLE", "ph": "Jasmini", "acc": "DCVoltage"}, {"sku": "CL3TGL5PK", "asin": "B0DH9CY29Z", "return_sku": "CL3TGL5PK_AMD1", "units": 9, "returns": 1, "lm": 0, "ql": 0, "bp": 1, "sh": 0, "uk": 0, "top": "UNWANTED_ITEM", "ph": "Jasmini", "acc": "DCVoltage"}, {"sku": "CL3THEAPK", "asin": "B08XC1QT69", "return_sku": "CL3THEAPK_AMD", "units": 19, "returns": 1, "lm": 0, "ql": 0, "bp": 0, "sh": 0, "uk": 1, "top": "NO_REASON_GIVEN", "ph": "Jasmini", "acc": "DCVoltage"}, {"sku": "CL3RBM5PK", "asin": "B0CHRVWSBM", "return_sku": "CL3RBM5PK FBA", "units": 26, "returns": 1, "lm": 0, "ql": 0, "bp": 1, "sh": 0, "uk": 0, "top": "ORDERED_WRONG_ITEM", "ph": "Jasmini", "acc": "LEDSone"}], TH = {"crit": 0.2, "high": 0.1, "minret": 2, "listing": 0.4, "quality": 0.4, "buyer": 0.5};
 function flagOf(d){ if(d.units<=0) return 'NA'; const r=d.returns/d.units; return r>TH.crit?'CRITICAL':r>TH.high?'HIGH':'OK'; }
 function rootOf(d){
   if(d.returns<TH.minret) return 'Too few returns to evaluate';
@@ -203,7 +219,7 @@ const RARE=['MISSING_PARTS','SWITCHEROO','MISSED_ESTIMATED_DELIVERY','POOR_FIT',
 const FLABEL={CRITICAL:'Critical',HIGH:'High',OK:'OK',NA:'N/A'};
 const SEV={CRITICAL:0,HIGH:1,OK:2,NA:3};
 DATA.forEach(d=>{d.flag=flagOf(d);d.root=rootOf(d);d.rate=d.units>0?d.returns/d.units:null;});
-let flag='ALL', q='', sort='sev';
+let flag='ALL', q='', sort='sev', acct='ALL';
 const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 (function sev(){
   const c={CRITICAL:0,HIGH:0,OK:0,NA:0}; DATA.forEach(d=>c[d.flag]++);
@@ -221,6 +237,7 @@ function row(d){
   return `<tr class="${d.flag}">
     <td class="band st"><span class="badge ${d.flag}">${FLABEL[d.flag]}</span></td>
     <td class="prod"><div class="sku">${esc(d.sku)}</div><div class="asin">${d.asin} · filed as ${esc(d.return_sku)}</div></td>
+    <td class="acc"><span class="acct ${d.acc}">${d.acc}</span></td>
     <td class="num">${d.units}<span class="u"> u</span></td>
     <td class="num">${d.returns}</td>
     <td class="num rate ${rc}">${rate}</td>
@@ -233,6 +250,7 @@ function render(){
   const qq=q.toLowerCase();
   let rows=DATA.filter(d=>{
     if(flag!=='ALL'&&d.flag!==flag) return false;
+    if(acct!=='ALL'&&d.acc!==acct) return false;
     if(qq&&!(d.sku.toLowerCase().includes(qq)||d.asin.toLowerCase().includes(qq))) return false;
     return true;
   });
@@ -241,10 +259,11 @@ function render(){
   rows.sort(cmp[sort]);
   document.getElementById('cnt').textContent = `${rows.length} of ${DATA.length} shown`;
   document.getElementById('rows').innerHTML = rows.length? rows.map(row).join('')
-    : '<tr><td colspan="8"><div class="empty">No products match this filter.</div></td></tr>';
+    : '<tr><td colspan="9"><div class="empty">No products match this filter.</div></td></tr>';
 }
 document.getElementById('q').oninput=e=>{q=e.target.value;render();};
 document.getElementById('sort').onchange=e=>{sort=e.target.value;render();};
+document.getElementById('acct').onchange=e=>{acct=e.target.value;render();};
 document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
   document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
   c.classList.add('on'); flag=c.dataset.f; render();

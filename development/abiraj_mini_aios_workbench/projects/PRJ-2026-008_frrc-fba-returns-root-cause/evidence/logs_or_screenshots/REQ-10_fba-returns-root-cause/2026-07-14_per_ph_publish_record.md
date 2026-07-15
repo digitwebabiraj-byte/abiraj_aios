@@ -106,6 +106,27 @@ in the table (no page scroll). Published as a guarded in-place **UPDATE** of the
 `task_id`, one txn, md5-verified), **`version_level` 4→5**; identity fields unchanged. Re-verified via
 read-only MCP (19 rows `version_level=5`; utharsika md5 `9852ec78…` == local).
 
+## V6 — REQ-10-D02: data refresh + account split (2026-07-15)
+Two changes, both published as a guarded in-place UPDATE of the same 19 rows (`version_level` 5→6,
+identity fields unchanged, md5-verified pre-commit, MCP re-verified):
+1. **Data refreshed** for the *same* window (2026-06-14 → 2026-07-13). The Amazon FBA returns feed
+   back-fills, so the D01 (2026-07-14) snapshot was ~12% short: **91 ASINs / 105 units → 101 / 118**.
+   Proven late inserts (highest ids 92907–92914 LEDSone, 93635–93639 DCVoltage; all `request_date` in
+   the 07-09→07-13 tail; id rises monotonically with request_date ⇒ append-only). Rules unchanged.
+   New flags: **CRIT 50 · HIGH 24 · OK 9 · N/A 18**; owned 83 / unassigned 18; roster identical (19 PHs,
+   so no INSERTs). Verified on **two independent connections** (MCP `postgres@10.8.0.3` and psycopg2
+   `temp_user@149.28.134.54`) — both 101/118.
+2. **Account split added** — LEDSone / DCVoltage badge column, an account filter, and a sidebar split,
+   resolved read-only from `amazon_returns.sub_source_name`. **Display only, no numbers change.**
+   0 ASINs span both accounts. Split: **DCVoltage 49 ASINs / 61 units · LEDSone 52 / 57**.
+   The report stays **account-agnostic** (no filter applied) — the scope question is a new item for Satheesvaran.
+
+**D01 system-of-record preserved:** `frrc30.json` is byte-identical (SHA-256 `2cbfe13d0a5e…` per
+`SOURCE_MANIFEST.md`). The refresh is a separate asset `frrc_refresh_2026-07-15.json`; its query is
+`sql/REQ-10_.../generate_report_with_account.sql`. Validation: `validation/REQ-10_.../2026-07-15_D02_refresh_and_account_validation.md`.
+UI re-verified in-browser at 1360px: 0 page h-scroll, table fills width (1095), header pinned, account
+filter pure and additive (7 LEDSone + 16 DCVoltage = 23 for utharsika).
+
 ## Reversibility
 Rows 216–234 only. Rollback of the whole publish = `DELETE FROM tech_team_outputs.ph_task WHERE
 project_code='frrc'`. No pre-existing (non-frrc) row was ever modified; the V2–V5 changes were in-place
