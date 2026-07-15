@@ -127,6 +127,30 @@ identity fields unchanged, md5-verified pre-commit, MCP re-verified):
 UI re-verified in-browser at 1360px: 0 page h-scroll, table fills width (1095), header pinned, account
 filter pure and additive (7 LEDSone + 16 DCVoltage = 23 for utharsika).
 
+## V7 — readability: colour removed, words instead (2026-07-15)
+Owner feedback on V6: the colours forced a legend lookup and were **ambiguous — the same colour carried
+two meanings**. Red = "Critical" (severity) *and* "Quality" (reason); blue = "Listing mismatch" *and*
+"LEDSone" (account); purple = "Buyer preference" *and* "DCVoltage"; green = "OK" *and* "Shipping".
+Compounding it, **85% of rows have a single return**, so the reason-mix bar rendered as one solid colour
+that conveyed nothing yet still demanded a lookup — and appeared to contradict the adjacent "Likely
+cause" column.
+
+**Fix — colour now means exactly one thing (severity), everything else is plain words:**
+- **Return reasons** column: the colour bar is replaced by text — "Listing mismatch", "Quality",
+  "Buyer preference ×2", or, when mixed, "Listing mismatch 1 · Buyer preference 2". (86/101 rows resolve
+  to a single plain phrase; only 15 are mixed.)
+- **Account**: plain text (LEDSone / DCVoltage) — coloured pill removed.
+- **Sidebar**: the 5-colour "Reason buckets" legend **deleted** (nothing left to decode); Account shown
+  as plain numbers. Sidebar is now 3 blocks: Portfolio holder · Severity · Account.
+- **Kept**: the Status badge and the sidebar Severity strip (Critical/High/OK/N-A) — the single,
+  universally-understood red/amber/green scale.
+
+Display-only — **no number changed**. A row now reads as a sentence: *Critical · LSSS300RE2PK+RPR44WH2PK ·
+DCVoltage · 1 u · 1 · 100% · Buyer preference · Too few returns to evaluate · Monitor.* Verified in-browser
+at 1360px: **0 colour bars, 0 colour pills**, sidebar 3 blocks, table fills width (1095), header pinned,
+0 page h-scroll. Published as a guarded in-place UPDATE of rows 216–234, **`version_level` 6→7**, identity
+fields unchanged, md5-verified; MCP re-verified (19 rows V7, utharsika md5 `136666a3…`).
+
 ## Reversibility
 Rows 216–234 only. Rollback of the whole publish = `DELETE FROM tech_team_outputs.ph_task WHERE
 project_code='frrc'`. No pre-existing (non-frrc) row was ever modified; the V2–V5 changes were in-place
