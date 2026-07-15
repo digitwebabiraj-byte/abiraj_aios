@@ -97,8 +97,12 @@ pull  ->  validate (FAIL CLOSED)  ->  render  ->  guarded publish  ->  log
 - **Windows Task Scheduler is an interim host.** Needs the PC on and logged on; **no alerting** on
   failure. **n8n / OpenFlow** is the correct long-term home for production schedules.
 - **Credential at rest** in a user env var needs **Sajeesan's** approval.
-- **Provisional parameters** (window length, settle buffer) must be labelled as such and routed to the
-  Business Validator — never presented as locked.
+- **Provisional parameters** (e.g. a settle buffer) must be labelled as such and routed to the Business
+  Validator — never presented as locked.
+- **And the converse — never re-open a CONFIRMED rule on the strength of a metric.** If two source
+  documents disagree on whether a rule is LOCKED or HELD, that is a **source-of-truth conflict = STOP**:
+  flag it and ask. (FRRC: the handoff said the 30-day window was user-confirmed/LOCKED while the morning
+  doc called it a held item; it was wrongly re-opened for most of a day.)
 
 ## 6. Reference: what FRRC's automation looks like
 `run_frrc_monthly.py` (runner) · `frrc_per_ph_template.html` (single UI source of truth) ·

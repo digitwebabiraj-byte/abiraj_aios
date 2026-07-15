@@ -29,7 +29,9 @@ from datetime import date, timedelta, datetime
 # ----------------------------------------------------------------------------- CONFIG
 # Cadence: Task Scheduler fires on RUN_DAY each month (see register_scheduled_task.ps1).
 RUN_DAY      = 8    # day of month the scheduler fires, 09:00 (before the 15th, as required)
-WINDOW_DAYS  = 30   # "last 30 days" report window                       (D01 locked rule)
+WINDOW_DAYS  = 30   # "last 30 days" - LOCKED, user-confirmed (HANDOFF 2/4). Do not change
+                    # without the user. NOTE: with the >=2-returns gate this diagnoses ~15%
+                    # of products; that is the expected behaviour of the confirmed rules.
 SETTLE_DAYS  = 7    # end the window this many days BEFORE the run date. WHY: Amazon's FBA
                     # returns feed back-fills - a T+1 window is ~12% short (measured
                     # 2026-07-15: the same window read 105 units on the 14th, 118 on the 15th).

@@ -67,7 +67,7 @@ Dry-run on 2026-07-15 against the D01 window reproduced the published figures **
 
 ## ⚠ Known limits — read before relying on this
 1. **`SETTLE_DAYS=7` is an evidence-based default, not a confirmed rule.** D01's literal rule was 1 day. The change is **open item C for Satheesvaran**. The exact settle time was **not measurable** — `amazon_returns` has no ingestion timestamp and its `id` timeline is contaminated by a bulk load. To prove it: snapshot a fixed window's counts daily for ~10 days and see when they stop moving.
-2. **A 30-day window starves the root-cause engine.** Root Cause needs ≥2 returns/ASIN; at 30 days only **15 of 101** ASINs qualify → **~85% read "Too few returns to evaluate"**. Coverage by window: 30 d → 15/99 · 60 d → 45/180 · 90 d → 76/234. The source workbook's own example used ~62 days. **Recommend 60–90 days** — item C, Satheesvaran. Change `WINDOW_DAYS` when he rules.
+2. **`WINDOW_DAYS = 30` is LOCKED (user-confirmed)** per `HANDOFF_FRRC_REQ-10-D01.md` §2/§4 — **do not change it without the user.** For awareness only: with the Thresholds tab's ≥2-returns gate, 15 of 101 products get a root cause and 86 correctly read "Too few returns to evaluate". That is the expected behaviour of the confirmed rules, **not** a defect.
 3. **Windows Task Scheduler is an interim host.** The PC must be on (the task uses `-WakeToRun` + `-StartWhenAvailable`, but a powered-off machine still misses the slot and there is **no alerting** on failure). The company's **n8n / OpenFlow** is the correct long-term home for a production schedule.
 4. **Credential at rest.** The password lives in a user env var so an unattended task can read it. **Sajeesan should approve** this; a secret store would be better.
 5. **Account scope.** The report still **combines LEDSone + DCVoltage** (shown and filterable, not filtered). Open item for Satheesvaran.
@@ -76,6 +76,6 @@ Dry-run on 2026-07-15 against the D01 window reproduced the published figures **
 Edit the CONFIG block at the top of `run_frrc_monthly.py`:
 ```python
 RUN_DAY     = 8    # also update register_scheduled_task.ps1 (-DaysOfMonth)
-WINDOW_DAYS = 30   # -> 60 or 90 when Satheesvaran rules on item C
+WINDOW_DAYS = 30   # LOCKED (user-confirmed) - do not change without the user
 SETTLE_DAYS = 7    # -> whatever the 10-day measurement proves
 ```

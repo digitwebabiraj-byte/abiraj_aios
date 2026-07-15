@@ -105,8 +105,9 @@ Under Task `REQ-10_fba-returns-root-cause` (COPY-only import; Downloads original
 - **Account split (new, display-only):** DCVoltage **49 ASINs / 61 units** · LEDSone **52 / 57**. The report is **not** account-filtered.
 - **Why refreshed:** the FBA returns feed back-fills — the D01 snapshot (2026-07-14) read 91/105 for this
   same window and was ~12% short. See `validation/REQ-10_.../2026-07-15_D02_refresh_and_account_validation.md`.
-- **Only 15 of 101 ASINs reach the ≥2-returns gate**, so 85% resolve to "Too few returns to evaluate" —
-  the driver behind the D02 window-length recommendation (60–90 days). Open item C.
+- **15 of 101 ASINs reach the ≥2-returns gate**; the other 86 have exactly 1 return and correctly read
+  "Too few returns to evaluate". This is the **expected behaviour of the confirmed rules** (30-day window
+  + min-2-returns threshold) — **the window is LOCKED (user-confirmed); this is not an open item.**
 
 ## Run Snapshot — D01 original (fixed window 2026-06-14 → 2026-07-13, run 2026-07-14)
 - **91** returning Amazon FBA ASINs · **105** return units · bucket-sum = total_returns on every row
@@ -121,8 +122,7 @@ Under Task `REQ-10_fba-returns-root-cause` (COPY-only import; Downloads original
 - **A. Order-status set** counting as a "sale" for Units Sold — working assumption **FBA-UK Completed
   only** (Cancelled/Pending excluded). Confirm whether Deleted/Hold/Refunded are also excluded.
 - **B. Marketplace scope** — UK-only (current) vs all Amazon marketplaces.
-- **C. Window length / cadence** — the source spec does not fix it; **last 30 days** is the working
-  choice (the workbook's own example was ~62 days).
+- **C. Window length — CLOSED, NOT OPEN.** The **30-day window is **LOCKED (user-confirmed)** per `HANDOFF_FRRC_REQ-10-D01.md` §2/§4 ("CONFIRMED with the user (LOCKED) — window = last 30 days"). NOT an open decision. The morning requirement doc's "held item" wording was a source-of-truth conflict, resolved in favour of the handoff on 2026-07-15. Coverage note (information, not a defect): 15 of 101 products reach the ≥2-returns gate; 86 have exactly 1 return. Only the **run date / settle buffer** remains open (see the D02 findings).
 - **D. Returns ↔ sales window alignment** — `request_date`-based (current) vs align returns to their
   order's `order_date` via `order_id`.
 - **E. Rare reason codes** — bucket for `MISSING_PARTS`, `SWITCHEROO`, `MISSED_ESTIMATED_DELIVERY`,

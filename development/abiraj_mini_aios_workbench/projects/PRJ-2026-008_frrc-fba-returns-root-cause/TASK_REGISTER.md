@@ -17,10 +17,10 @@ Canonical index of tasks in this project. One requirement = one Task ID.
   0 ASINs span accounts. DCVoltage 49/61 · LEDSone 52/57.
 - **Assets:** `frrc_refresh_2026-07-15.json`, `sql/REQ-10_.../generate_report_with_account.sql`, `per_ph/` (V6).
 - **Validation:** `validation/REQ-10_.../2026-07-15_D02_refresh_and_account_validation.md` — 8/8 checks GREEN.
-- **Evidence for the cadence decision (item C):** root-cause coverage 30 d → **15/99** · 60 d → 45/180 ·
-  90 d → 76/234 · 120 d → 108/292. Recommendation: run **monthly on the 8th** (~7-day settle buffer) over a
-  **rolling 60–90 days**. **NOT locked — Satheesvaran.** Settle lag not yet precisely measured (no ingestion
-  timestamp; id timeline bulk-load contaminated) → 10-day snapshot measurement still to run.
+- **Gate coverage on the confirmed window (information only):** 15 of 101 products reach the ≥2-returns
+  gate; 86 have exactly 1 return. The **30-day window is LOCKED (user-confirmed)** — recorded, not challenged.
+- **Still open (D02):** the **run date / settle buffer** — `SETTLE_DAYS=7` is provisional; the exact lag is
+  unmeasured (no ingestion timestamp; id timeline bulk-load contaminated) → 10-day snapshot measurement to run.
 - **Schedule: NOT wired** — gated on Satheesvaran confirming the run date + window.
 
 ## D01 — Deliverable detail
@@ -55,7 +55,7 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 ## Open / next (route to Satheesvaran — do NOT decide)
 - **A. Order-status set** for Units Sold — FBA-UK Completed (current) vs also Deleted/Hold/Refunded. **OPEN.**
 - **B. Marketplace scope** — UK-only (current) vs all Amazon. **OPEN.**
-- **C. Window length / cadence** — 30 days (current) vs the workbook's ~62-day example. **OPEN.**
+- **C. Window length — CLOSED.** 30 days is **LOCKED (user-confirmed)** per `HANDOFF` §2/§4. Not open; do not re-raise. (The **run date / settle buffer** is a separate, still-open D02 item.)
 - **D. Returns↔sales alignment** — `request_date`-based (current) vs align to order `order_date`. **OPEN.**
 - **E. Rare reason codes** — MISSING_PARTS / SWITCHEROO / MISSED_ESTIMATED_DELIVERY / POOR_FIT /
   MISORDERED / UNAUTHORIZED_PURCHASE (currently → Unknown). **OPEN.**
