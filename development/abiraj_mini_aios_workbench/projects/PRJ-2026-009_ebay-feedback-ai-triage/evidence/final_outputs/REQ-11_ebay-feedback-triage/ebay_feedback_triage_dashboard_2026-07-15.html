@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<title>eBay Feedback Triage — 30 Days to 2026-07-15</title>
+<style>
+  /* Light only — deliberately does NOT follow the OS dark setting. */
+  :root {
+    color-scheme: light only;
+    --plane:        #f4f4f1;
+    --surface-1:    #ffffff;
+    --text-primary: #0b0b0b;
+    --text-secondary:#4a4946;
+    --text-muted:   #6e6c67;   /* 5.24:1 on white, 4.76:1 on the page plane — clears WCAG AA for small text */
+    --grid:         #e6e5de;
+    --baseline:     #c3c2b7;
+    --border:       #dededa;
+    --series-1:     #2a78d6;
+    --critical:     #d03b3b;
+    --warning:      #fab219;
+    --shadow:       0 1px 2px rgba(11,11,11,.04), 0 3px 12px rgba(11,11,11,.05);
+    --radius:       10px;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    /* full-viewport app shell: the table row (1fr) soaks up all leftover height */
+    display: grid;
+    grid-template-rows: auto auto auto auto 1fr;
+    gap: 8px;
+    padding: 10px 16px 12px;
+    overflow: hidden;
+  }
+
+  /* ---------- header (single compact line) ---------- */
+  header.top { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .title-line { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  h1 { font-size: 17px; font-weight: 650; letter-spacing: -0.02em; margin: 0; white-space: nowrap; }
+  .sub { color: var(--text-secondary); font-size: 12.5px; margin: 0; }
+  .sub b { color: var(--text-primary); }
+  .prov-btn {
+    border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary);
+    border-radius: 999px; padding: 6px 13px; font: inherit; font-size: 12.5px; cursor: pointer; white-space: nowrap;
+  }
+  .prov-btn:hover { border-color: var(--baseline); color: var(--text-primary); }
+
+  /* ---------- KPI strip ---------- */
+  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+  @media (max-width: 900px) { .kpis { grid-template-columns: repeat(3, 1fr); } }
+  /* compact stat tile: value + label on one line (~44px). The accent bar carries identity;
+     the number stays in ink (text wears text tokens, a coloured mark sits beside it). */
+  .kpi {
+    position: relative; overflow: hidden;
+    background: var(--surface-1);
+    border: 1px solid var(--border); border-left: 3px solid var(--accent, var(--baseline));
+    border-radius: var(--radius);
+    padding: 7px 12px; box-shadow: var(--shadow);
+    display: flex; align-items: baseline; gap: 8px;
+    transition: transform .18s cubic-bezier(.4,0,.2,1), box-shadow .18s, border-left-color .18s;
+    animation: kpiIn .42s cubic-bezier(.2,.7,.3,1) backwards;
+  }
+  /* a whisper of the accent, washed left→right; keeps the tile white where the text sits */
+  .kpi::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(90deg, var(--accent, transparent) 0%, transparent 62%);
+    opacity: .07; transition: opacity .18s;
+  }
+  .kpi:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(11,11,11,.05), 0 8px 22px rgba(11,11,11,.10);
+  }
+  .kpi:hover::before { opacity: .13; }
+  .kpi .val {
+    font-size: 21px; font-weight: 650; letter-spacing: -0.03em; line-height: 1.2;
+    position: relative; font-variant-numeric: proportional-nums; /* not tabular — looks loose at size */
+  }
+  .kpi .label {
+    font-size: 10.5px; color: var(--text-secondary); letter-spacing: .01em;
+    font-weight: 550; line-height: 1.25; position: relative;
+  }
+  .kpi .foot { display: none; }
+  /* status tiles: accent + a dot, never colour alone — the label always names the state */
+  .kpi.alert .val { color: var(--critical); }
+  .kpi.alert .label::after {
+    content: ""; display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--critical); margin-left: 5px; vertical-align: middle;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes kpiIn {
+    from { opacity: 0; transform: translateY(6px) scale(.985); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .45; transform: scale(.82); }
+  }
+  /* never animate for people who asked not to */
+  @media (prefers-reduced-motion: reduce) {
+    .kpi { animation: none; transition: none; }
+    .kpi:hover { transform: none; }
+    .kpi.alert .label::after { animation: none; }
+    .bar-fill, .chip .fill, .conf-fill { transition: none; }
+  }
+
+  /* ---------- theme strip: always visible, no click, ~30px so the table keeps its height ---------- */
+  .themestrip {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 5px 10px;
+    display: flex; align-items: center; gap: 4px; overflow-x: auto;
+  }
+  .themestrip > .cap {
+    font-size: 9.5px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--text-muted); white-space: nowrap; padding-right: 6px; flex: none;
+    border-right: 1px solid var(--border); margin-right: 4px; align-self: stretch;
+    display: flex; align-items: center;
+  }
+  .chip { flex: 1 1 0; min-width: 78px; padding: 0 4px; }
+  .chip .top { display: flex; align-items: baseline; justify-content: space-between; gap: 4px; }
+  .chip .lab {
+    font-size: 10px; color: var(--text-secondary); white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .chip .n { font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; flex: none; }
+  .chip .track { height: 3px; background: var(--grid); border-radius: 2px; margin-top: 2px; overflow: hidden; }
+  .chip .fill { height: 100%; background: var(--series-1); border-radius: 2px; transition: width .25s ease; min-width: 1px; }
+  .themestrip .none { font-size: 11px; color: var(--text-muted); padding: 3px 0; }
+
+  /* ---------- filters ---------- */
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  select, input[type=search] {
+    font: inherit; font-size: 13px; padding: 7px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary);
+  }
+  input[type=search] { min-width: 240px; }
+  select:focus, input:focus { outline: 2px solid var(--series-1); outline-offset: 1px; }
+  .reset {
+    border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary);
+    border-radius: 8px; padding: 7px 12px; font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .reset:hover { color: var(--text-primary); border-color: var(--baseline); }
+  .count { font-size: 12.5px; color: var(--text-muted); margin-left: auto; font-variant-numeric: tabular-nums; }
+
+  /* ---------- table: fills the remaining viewport, scrolls internally ---------- */
+  .table-shell {
+    min-height: 0;              /* lets the grid row actually shrink so overflow works */
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: auto;
+  }
+  table { border-collapse: separate; border-spacing: 0; width: 100%; }
+  thead th {
+    background: #f7f7f4; position: sticky; top: 0; z-index: 3;
+    text-align: left; font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: .05em;
+    color: var(--text-muted); padding: 10px 12px; border-bottom: 1px solid var(--baseline);
+    white-space: nowrap; cursor: pointer; user-select: none;
+  }
+  thead th:hover { color: var(--text-primary); background: #f0efeb; }
+  thead th .arrow { opacity: .3; font-size: 9px; margin-left: 3px; }
+  thead th[aria-sort] { color: var(--series-1); }
+  thead th[aria-sort] .arrow { opacity: 1; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid var(--grid); vertical-align: top; font-size: 13.5px; }
+  tbody tr.main { cursor: pointer; }
+  tbody tr.main:hover td { background: #f5f9fe; }
+  tbody tr.main.open td { background: #eef5fd; }
+  tbody tr.neg td:first-child { box-shadow: inset 3px 0 0 var(--critical); }
+  tbody tr.neu td:first-child { box-shadow: inset 3px 0 0 var(--warning); }
+  /* Date column is pinned so it stays anchored while scrolling the 17 columns sideways */
+  .c-date { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--text-secondary);
+            position: sticky; left: 0; z-index: 1; background: var(--surface-1); }
+  tbody tr.main:hover .c-date { background: #f5f9fe; }
+  tbody tr.main.open .c-date { background: #eef5fd; }
+  thead th:first-child { position: sticky; left: 0; z-index: 4; background: #f7f7f4; }
+  .c-sku { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: var(--text-secondary); min-width: 150px; max-width: 200px; }
+  .c-id  { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: var(--text-secondary); white-space: nowrap; }
+  .c-dept { color: var(--text-secondary); font-size: 12.5px; min-width: 130px; }
+  .c-plc  { color: var(--text-muted); font-size: 12.5px; }
+  .c-msg    { min-width: 260px; max-width: 340px; }
+  .c-cat    { min-width: 150px; max-width: 190px; }
+  .c-cause  { min-width: 260px; max-width: 340px; }
+  .c-action { min-width: 260px; max-width: 340px; }
+  /* clamp long text to 2 lines so rows stay uniform; expanding the row un-clamps and shows it all */
+  .c-msg span, .c-cat span, .c-cause span, .c-action span, .c-sku span {
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  tr.main.open .c-msg span, tr.main.open .c-cat span,
+  tr.main.open .c-cause span, tr.main.open .c-action span,
+  tr.main.open .c-sku span { -webkit-line-clamp: unset; }
+  .num { text-align: center; font-variant-numeric: tabular-nums; }
+  .chev { color: var(--text-muted); font-size: 10px; width: 12px; display: inline-block; }
+  tr.main.open .chev { color: var(--series-1); }
+
+  /* ---------- pills ---------- */
+  .pill { display: inline-block; border-radius: 999px; padding: 2px 9px; font-size: 11.5px; font-weight: 620; white-space: nowrap; }
+  .pill.neg  { background: var(--critical); color: #fff; }
+  .pill.neu  { background: var(--warning);  color: #3a2a00; }
+  .pill.p-High   { background: var(--critical); color: #fff; }
+  .pill.p-Medium { background: var(--warning);  color: #3a2a00; }
+  .pill.p-Low    { background: #eceae3; color: var(--text-secondary); }
+
+  .conf { display: flex; align-items: center; gap: 7px; }
+  .conf-track { width: 40px; height: 5px; border-radius: 3px; background: var(--grid); overflow: hidden; flex: none; }
+  .conf-fill { height: 100%; background: var(--series-1); }
+  .conf-fill.low { background: var(--text-muted); }
+  .conf-num { font-size: 12px; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+
+  /* ---------- detail ---------- */
+  tr.detail > td { padding: 0; background: #fbfbf9; border-bottom: 2px solid var(--baseline); }
+  tr.detail .inner { padding: 16px 20px 18px 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 30px; }
+  @media (max-width: 1100px) { tr.detail .inner { grid-template-columns: 1fr; } }
+  .fld .k { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); font-weight: 650; margin-bottom: 3px; }
+  .fld .v { font-size: 13.5px; }
+  .fld.wide { grid-column: 1 / -1; }
+  .fld .v.meta { color: var(--text-secondary); font-size: 12.5px; font-family: ui-monospace, Consolas, monospace; }
+  .flag { grid-column: 1/-1; border-radius: 8px; padding: 10px 13px; font-size: 13px; }
+  .flag.safety { background: #fdf0f0; border: 1px solid #f0c4c4; }
+  .flag.safety b { color: var(--critical); }
+  .flag.link { background: #eff5fd; border: 1px solid #cfe0f7; }
+  .flag.link b { color: var(--series-1); }
+
+  /* ---------- provenance modal ---------- */
+  dialog {
+    border: none; border-radius: 12px; padding: 0; max-width: 720px; width: calc(100% - 40px);
+    box-shadow: 0 12px 48px rgba(0,0,0,.22); color: var(--text-primary);
+  }
+  dialog::backdrop { background: rgba(11,11,11,.42); }
+  dialog .head { padding: 16px 20px 0; font-weight: 650; font-size: 15px; }
+  dialog .body { padding: 10px 20px 4px; font-size: 13px; color: var(--text-secondary); }
+  dialog .body p { margin: 0 0 10px; }
+  dialog .body b { color: var(--text-primary); }
+  dialog .foot { padding: 8px 20px 18px; text-align: right; }
+  dialog button {
+    border: 1px solid var(--border); background: var(--surface-1); border-radius: 8px;
+    padding: 7px 16px; font: inherit; font-size: 13px; cursor: pointer;
+  }
+  dialog button:hover { border-color: var(--baseline); }
+  .empty { padding: 48px; text-align: center; color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+  <header class="top">
+    <div class="title-line">
+      <h1>eBay Feedback Triage</h1>
+      <p class="sub">Negative &amp; Neutral · <b>2026-06-15 → 2026-07-15</b> (last 30 days) · pulled 2026-07-15 · 20 feedbacks</p>
+    </div>
+    <button class="prov-btn" id="provBtn" type="button">⚠︎ What is measured vs inferred</button>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="themestrip" id="bars" title="Complaints by root-cause theme — follows the filters"></div>
+
+  <div class="filters">
+    <input type="search" id="q" placeholder="Search comment, SKU, order, cause…" aria-label="Search">
+    <select id="fType" aria-label="Feedback type"><option value="">All types</option><option>Negative</option><option>Neutral</option></select>
+    <select id="fPrio" aria-label="Priority"><option value="">All priorities</option><option>High</option><option>Medium</option><option>Low</option></select>
+    <select id="fDept" aria-label="Department"><option value="">All departments</option></select>
+    <select id="fAcct" aria-label="Account"><option value="">All accounts</option></select>
+    <button class="reset" id="reset" type="button">Reset</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="table-shell">
+    <table id="tbl">
+      <thead>
+        <!-- all 17 CSV columns, in CSV order -->
+        <tr>
+          <th data-k="date">Date<span class="arrow">▼</span></th>
+          <th data-k="account">Account<span class="arrow">▼</span></th>
+          <th data-k="item">Item ID<span class="arrow">▼</span></th>
+          <th data-k="sku">Listing SKU<span class="arrow">▼</span></th>
+          <th data-k="order">Order ID<span class="arrow">▼</span></th>
+          <th data-k="type">Feedback Type<span class="arrow">▼</span></th>
+          <th data-k="msg">Feedback Message<span class="arrow">▼</span></th>
+          <th data-k="cat">AI Category<span class="arrow">▼</span></th>
+          <th data-k="cause">AI Root Cause<span class="arrow">▼</span></th>
+          <th data-k="conf">AI Conf. %<span class="arrow">▼</span></th>
+          <th data-k="dept">Department<span class="arrow">▼</span></th>
+          <th data-k="prio">Priority<span class="arrow">▼</span></th>
+          <th data-k="impact">Business Impact<span class="arrow">▼</span></th>
+          <th data-k="repeat">Repeat Item Count<span class="arrow">▼</span></th>
+          <th data-k="action">Suggested Action<span class="arrow">▼</span></th>
+          <th data-k="owner">Owner<span class="arrow">▼</span></th>
+          <th data-k="status">Status<span class="arrow">▼</span></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="empty" hidden>No rows match these filters.</div>
+  </div>
+
+<dialog id="provDlg">
+  <div class="head">What is measured vs what is inferred</div>
+  <div class="body">
+    <p><b>Real query results:</b> Date, Account, Item ID, Listing SKU, Order ID and Repeat Item Count come from <code>customer_service.ebay_orders_customer_feedbacks</code> joined to <code>order_management</code>. All 20 rows resolved to a real order.</p>
+    <p><b>Inferred by AI:</b> everything from Feedback Message through Suggested Action is a <b>one-time LLM read</b> of these 20 comments — not an automated or repeatable classifier. Re-running re-classifies from scratch and wording may differ. There is no saved model or rules engine behind it.</p>
+    <p><b>Repeat Item Count counts Negative feedback only</b> for that Item ID (original spec definition, kept so this stays comparable with the earlier negatives-only report). A <b>0</b> on a Neutral row means the item has never drawn a negative — not a missing value.</p>
+    <p><b>The two 2026-06-20 rows are one incident</b> — same buyer, same order 20-14744-96040, feedback left against two items. Do not double-count.</p>
+    <p><b>Owner and Status are fixed placeholders.</b> There is no case-tracking table in this database. Parent SKU and Product Health Score are deliberately absent — no clean definition exists for either.</p>
+  </div>
+  <div class="foot"><button id="provClose" type="button">Close</button></div>
+</dialog>
+
+<script>
+const DATA = [
+ {date:"2026-07-13",account:"huettenlampen",item:"394976085481",sku:"COI9BBM2PK",order:"06-14834-06178",type:"Neutral",
+  msg:"German-language comment: buyer returned the item, saying they had bought it because they misinterpreted the description.",
+  cat:"Listing Accuracy - Ambiguous Description",theme:"Listing accuracy",
+  cause:"Buyer read the German listing description and formed a wrong expectation of what they were buying; the buyer attributes this to their own misreading, which points to ambiguous rather than incorrect wording.",
+  conf:70,dept:"Listing Content",prio:"Low",impact:"Low",repeat:3,
+  action:"Review the German listing description for this item for ambiguity — the return was accepted smoothly, so the cost here is the avoidable return, not the service."},
+ {date:"2026-07-10",account:"dctransformer",item:"124703922577",sku:"24IP20120",order:"15-14841-57662",type:"Neutral",
+  msg:"Unit arrived quickly and works, but the listed length was wrong — stated 13cm, actually 20cm — making installation awkward; buyer kept it but called it not as described.",
+  cat:"Listing Accuracy - Incorrect Specification",theme:"Listing accuracy",
+  cause:"The length attribute published on the listing does not match the physical product, so buyers size their installation space from a wrong figure.",
+  conf:95,dept:"Listing Content",prio:"Medium",impact:"Medium",repeat:2,
+  action:"Correct the length specification on this listing and audit the dimension data for the rest of the PSU range — this is a factual data error with a definite fix."},
+ {date:"2026-07-08",account:"coventrylights",item:"305890478550",sku:"WSFH1BMYB+PSDS2RBR+SCRN70BM+LSFT220YE",order:"04-14786-45454",type:"Neutral",
+  msg:"Buyer is returning the item as too big for the intended spot and not worth the money.",
+  cat:"Listing Accuracy - Size and Value Expectation",theme:"Listing accuracy",
+  cause:"Buyer did not form an accurate sense of the physical size or value from the listing before ordering; the comment mixes a subjective value judgement with a concrete size mismatch, so the listing-side cause is probable rather than certain.",
+  conf:65,dept:"Listing Content",prio:"Low",impact:"Low",repeat:0,
+  action:"Check that dimensions and an in-scale image are prominent on this listing — but treat as weak evidence, since part of this is subjective value perception."},
+ {date:"2026-07-07",account:"led_sone",item:"164216736348",sku:"CO1230ACL",order:"14-14715-73433",type:"Neutral",
+  msg:"Seller could not supply the item and refunded quickly.",
+  cat:"Fulfillment Issue - Stock Availability",theme:"Stock availability",
+  cause:"Item was sold while not actually available to ship, forcing a cancel and refund; the refund was handled well, which is why this landed neutral rather than negative.",
+  conf:80,dept:"Warehouse/Logistics",prio:"Medium",impact:"Medium",repeat:0,
+  action:"Review inventory sync and stock accuracy — same underlying stock-availability cause as the 2026-07-07 and 2026-06-23 negatives, but here fast refund handling contained the damage."},
+ {date:"2026-07-07",account:"coventrylights",item:"306321116499",sku:"LHPOE27BM2PK",order:"13-14831-88656",type:"Negative",
+  msg:"Order was never dispatched and the buyer was only told the item was out of stock on the day delivery was due.",
+  cat:"Fulfillment Issue - Stock Availability",theme:"Stock availability",
+  cause:"Item remained sellable while out of stock, and the unfulfillable order was not flagged to the buyer until the promised delivery date had arrived.",
+  conf:90,dept:"Warehouse/Logistics, Customer Service",prio:"High",impact:"High",repeat:1,
+  action:"Review inventory sync and stock accuracy; add a proactive buyer notification the moment an order is identified as unfulfillable rather than at the delivery date."},
+ {date:"2026-07-06",account:"led_sone",item:"166225683823",sku:"WLHSBMRE12",order:"14-14825-26575",type:"Neutral",
+  msg:"No instructions and no stated 3 year warranty in the box, two people needed to fit it, and only 2 of the 4 grub screws would lock.",
+  cat:"Product Quality and Documentation",theme:"Product defect / design",
+  cause:"Three separate gaps on one order: instructions are not packed, the warranty promised on the listing was not evidenced, and grub screw threads failed to engage on half the fixings.",
+  conf:85,dept:"Product/Quality, Listing Content",prio:"Medium",impact:"Medium",repeat:1,
+  action:"Add instructions to the pack, QA the grub screw thread engagement on this SKU, and verify the 3 year warranty claim on the listing is actually being fulfilled."},
+ {date:"2026-07-06",account:"led_sone",item:"167857142024",sku:"LSTF400GY+RPR44WH",order:"25-14733-31397",type:"Neutral",
+  msg:"Item was delivered late and arrived damaged.",
+  cat:"Shipping Issue - Late and Damaged",theme:"Shipping",
+  cause:"Parcel missed its delivery estimate and sustained damage in transit; the comment gives no detail on the nature of the damage, so carrier handling versus packaging adequacy cannot be separated from the text alone.",
+  conf:70,dept:"Warehouse/Logistics",prio:"Medium",impact:"Medium",repeat:0,
+  action:"Pull the carrier record for this consignment to establish whether this was carrier handling or under-packaging before choosing a fix."},
+ {date:"2026-07-03",account:"led_sone",item:"163783451223",sku:"WCWYRE",order:"02-14728-32208",type:"Negative",
+  msg:"Item arrived much smaller than the listing text led the buyer to expect, and they were told to pay return postage to get a refund.",
+  cat:"Listing Accuracy / Refund Dispute",theme:"Listing accuracy",
+  cause:"Listing text omits the size or scale of the product, creating an expectation mismatch on arrival; the return was then treated as a change-of-mind return with buyer-paid postage rather than a not-as-described case.",
+  conf:90,dept:"Listing Content, Customer Service",prio:"High",impact:"High",repeat:4,
+  action:"Audit listing description accuracy — add explicit dimensions and an in-scale image; review how not-as-described returns are triaged, since charging return postage on these escalated the complaint."},
+ {date:"2026-07-02",account:"led_sone",item:"163441967260",sku:"CRFF108GB+WSSS70GB+SCRN70GB",order:"19-14785-05167",type:"Neutral",
+  msg:"No instructions in the box and the QR code did not lead to instructions for the actual item; buyer had to cut into the side casing because there is no side wire entry, and criticised the fixings.",
+  cat:"Product Design and Documentation",theme:"Product defect / design",
+  cause:"Two design gaps plus a documentation failure: the enclosure offers no side cable entry so the buyer had to modify it, and the scanned QR code resolves to instructions that do not cover this item.",
+  conf:90,dept:"Product/Quality, Listing Content",prio:"High",impact:"Medium",repeat:0,
+  action:"Escalate to the product team for a side cable entry knockout review, and fix the QR code destination so it resolves to the correct item instructions — the phrase “poor fixings as usual” suggests a repeat pattern worth checking across the range."},
+ {date:"2026-06-27",account:"led_sone",item:"166202407547",sku:"CRFF75GB+LHAHE27GB",order:"25-14757-83346",type:"Neutral",
+  msg:"Item arrived in pieces rather than assembled, with extra parts the buyer could not identify.",
+  cat:"Listing Accuracy - Assembly Not Disclosed",theme:"Listing accuracy",
+  cause:"The listing does not tell buyers the product is supplied flat for self-assembly, and no parts list is included to explain the components in the box.",
+  conf:80,dept:"Listing Content, Product/Quality",prio:"Medium",impact:"Medium",repeat:1,
+  action:"State self-assembly explicitly on the listing and include a parts list.",
+  link:"Same Item ID (166202407547) as the 2026-06-23 neutral, with the identical complaint — two separate buyers hit this, so it is a confirmed listing defect rather than a one-off."},
+ {date:"2026-06-27",account:"led_sone",item:"167997767567",sku:"WLHSBMCY18",order:"20-14593-55707",type:"Neutral",
+  msg:"Comment contains only the word “Sorry” — no complaint is stated.",
+  cat:"Unclassifiable - No Detail Given",theme:"Unclassifiable",
+  cause:"Cannot be determined; the comment carries no information about what went wrong.",
+  conf:20,dept:"Customer Service",prio:"Low",impact:"Low",repeat:1,
+  action:"No action can be derived from this text. If this SKU matters, pull the order and any linked return or message thread — do not infer a cause from this row."},
+ {date:"2026-06-23",account:"led_sone",item:"166202407547",sku:"CRFF75BA+LHAHE27BM+ICST64E27",order:"20-14698-70700",type:"Neutral",
+  msg:"Listing said nothing about self-assembly; buyer called the description poor and said they would not buy again.",
+  cat:"Listing Accuracy - Assembly Not Disclosed",theme:"Listing accuracy",
+  cause:"The listing omits that the product requires self-assembly, so buyers expect a ready-built item on arrival.",
+  conf:90,dept:"Listing Content",prio:"Medium",impact:"Medium",repeat:1,
+  action:"Add an explicit self-assembly disclosure to this listing.",
+  link:"Same Item ID (166202407547) as the 2026-06-27 neutral, same root cause — a confirmed repeat, not a one-off."},
+ {date:"2026-06-23",account:"vintageinterior",item:"257495259691",sku:"PHCT1BMRBM+RBPHBA1BMRBM+RBLSYG410YE",order:"06-14782-38373",type:"Negative",
+  msg:"Item advertised for 2-3 day delivery was never handed to the carrier, and the buyer received three conflicting explanations while chasing it.",
+  cat:"Fulfillment Issue - Non-Dispatch with Inconsistent Communication",theme:"Stock availability",
+  cause:"Item was sold against stock that was not physically available so it was never dispatched, and support issued successive contradictory explanations instead of confirming the true dispatch status.",
+  conf:95,dept:"Warehouse/Logistics, Customer Service",prio:"High",impact:"High",repeat:1,
+  action:"Review inventory sync and stock accuracy; give support a single authoritative dispatch/handover status to quote so buyers are not given conflicting reasons."},
+ {date:"2026-06-21",account:"electricalsone",item:"265660307012",sku:"WCB2BM+RPR44WH",order:"02-14730-00922",type:"Neutral",
+  msg:"Shade looks good but is so dense it cuts a 40W bulb down to roughly 1W of usable light.",
+  cat:"Product Design - Light Output",theme:"Product defect / design",
+  cause:"The shade material is too opaque for a product of this size, so the fitting does not deliver usable light output; buyer bought on the basis of the photo with no indication of this.",
+  conf:85,dept:"Product/Quality, Listing Content",prio:"Medium",impact:"Medium",repeat:0,
+  action:"Escalate to the product team to review shade material opacity for this size, and set a light output expectation on the listing in the meantime."},
+ {date:"2026-06-20",account:"electricalsone",item:"267697027029",sku:"LSGLULCL+RPM40WH",order:"20-14744-96040",type:"Neutral",
+  msg:"Three lamps ordered but only 2 adapter rings arrived; the seller asked for photos before replacing one, so the buyer gave up and bought the ring elsewhere.",
+  cat:"Fulfillment Short Shipment and Returns Process",theme:"Short shipment",
+  cause:"A pick or pack error shorted the order by one adapter ring, and the photo-evidence step applied to a low-value missing part cost more buyer effort than the part was worth.",
+  conf:90,dept:"Warehouse/Logistics, Customer Service",prio:"High",impact:"Medium",repeat:0,
+  action:"Check pick accuracy on multi-quantity lamp and ring orders, and set a value threshold below which a missing part is simply reshipped without a photo request.",
+  link:"One incident with the other 2026-06-20 row — same buyer, same order 20-14744-96040, feedback left against two items. Do not double-count."},
+ {date:"2026-06-20",account:"electricalsone",item:"267668468006",sku:"LSGL9015CL2PK+RPM40WH2PK",order:"20-14744-96040",type:"Neutral",
+  msg:"Same buyer and same order as the other 2026-06-20 neutral: praises price and delivery speed but reports the missing adapter ring and the photo request that made them give up.",
+  cat:"Fulfillment Short Shipment and Returns Process",theme:"Short shipment",
+  cause:"Same single incident as the other 2026-06-20 row — one shorted order, feedback left against two separate items on the same order.",
+  conf:90,dept:"Warehouse/Logistics, Customer Service",prio:"High",impact:"Medium",repeat:0,
+  action:"Treat jointly with the other 2026-06-20 row — one incident, not two. Do not double-count when totalling by volume.",
+  link:"One incident with the other 2026-06-20 row — same buyer, same order 20-14744-96040."},
+ {date:"2026-06-18",account:"led_sone",item:"166594959149",sku:"WLHSBMCY18",order:"23-14586-56301",type:"Neutral",
+  msg:"Soldering on the light is substandard and wires detach under the slightest pull; buyer salvaged parts from an old unit to make it work and warns others to be careful when wiring.",
+  cat:"Product Defect - Solder Joint Integrity",theme:"Product defect / design",
+  cause:"Solder joints on the mains wiring connection are failing under minimal mechanical load, leaving live conductors able to detach inside a wired-in fitting.",
+  conf:90,dept:"Product/Quality",prio:"High",impact:"High",repeat:3,
+  action:"Escalate to product/QA for solder joint inspection on this SKU as a priority.",
+  safety:"Detaching mains conductors inside an installed fitting is a potential electrical safety issue, not just a quality complaint. This is the most urgent row in the batch — and it was rated Neutral only because the buyer happened to be able to repair it themselves."},
+ {date:"2026-06-18",account:"led_sone",item:"165397658552",sku:"CRSF100BM+CL3TBM+LHSHE27BA",order:"21-14728-05069",type:"Negative",
+  msg:"Buyer likes the product but cannot open the fitting to wire it up, and requested a refund after slow seller responses.",
+  cat:"Product Defect / Serviceability",theme:"Product defect / design",
+  cause:"The fitting cannot be opened to reach the wiring terminal — either an enclosure design or assembly fault, or missing wiring instructions — and slow support responses turned a fixable issue into a refund request.",
+  conf:75,dept:"Product/Quality, Customer Service",prio:"Medium",impact:"Medium",repeat:2,
+  action:"Escalate to product team for design review of enclosure access on this combo; confirm wiring instructions ship with the unit and check support response times on this account."},
+ {date:"2026-06-17",account:"coventrylights",item:"305715611096",sku:"WCFWROBM+RPR44WH",order:"27-14720-23663",type:"Negative",
+  msg:"Buyer was satisfied except for difficulty with the returns process; no specific detail was given.",
+  cat:"Returns Process",theme:"Returns process",
+  cause:"Some friction in the returns journey was enough to trigger negative feedback, but the comment does not say what went wrong.",
+  conf:55,dept:"Customer Service",prio:"Low",impact:"Low",repeat:2,
+  action:"Pull the return case for this order to identify the specific friction point before drawing any conclusion — the comment alone does not support a fix."},
+ {date:"2026-06-16",account:"electricalsone",item:"267567837254",sku:"CRSF100HBM+PSDS2BPB+WSCH135BM+LSCY210BM",order:"20-14640-09628",type:"Negative",
+  msg:"Buyer reports the parcel was lost in transit.",
+  cat:"Shipping Issue - Lost Parcel",theme:"Shipping",
+  cause:"Parcel did not reach the buyer after dispatch, most likely lost by the carrier, though the comment does not confirm whether a carrier handover actually took place.",
+  conf:65,dept:"Warehouse/Logistics",prio:"Medium",impact:"Medium",repeat:1,
+  action:"Raise a carrier claim and verify a handover scan exists for this consignment — if no scan, this is a non-dispatch case like the 2026-06-23 feedback, not a carrier loss."}
+];
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const RANK = { High:3, Medium:2, Low:1 };
+
+[...new Set(DATA.flatMap(r => r.dept.split(",").map(d => d.trim())))].sort().forEach(d => $("#fDept").add(new Option(d, d)));
+[...new Set(DATA.map(r => r.account))].sort().forEach(a => $("#fAcct").add(new Option(a, a)));
+
+let sortKey = "date", sortDir = -1;
+const openRows = new Set();
+
+function current() {
+  const q = $("#q").value.trim().toLowerCase();
+  const t = $("#fType").value, p = $("#fPrio").value, d = $("#fDept").value, a = $("#fAcct").value;
+  const rows = DATA.filter(r =>
+    (!t || r.type === t) && (!p || r.prio === p) && (!a || r.account === a) &&
+    (!d || r.dept.split(",").map(x => x.trim()).includes(d)) &&
+    (!q || [r.msg, r.cause, r.action, r.sku, r.order, r.cat, r.item, r.account].join(" ").toLowerCase().includes(q))
+  );
+  // owner/status are fixed placeholders, not per-row fields — resolve them so sorting can't yield undefined
+  const val = (r, k) => k === "owner" ? "Unassigned" : k === "status" ? "Open" : r[k];
+  rows.sort((x, y) => {
+    let A = val(x, sortKey), B = val(y, sortKey);
+    if (sortKey === "prio" || sortKey === "impact") { A = RANK[A]; B = RANK[B]; }
+    if (typeof A === "string") return A.localeCompare(B) * sortDir;
+    return (A - B) * sortDir;
+  });
+  return rows;
+}
+
+let kpisAnimated = false;   // count-up runs on first paint only, not on every filter change
+
+function renderKpis(rows) {
+  const f = k => rows.filter(k).length;
+  const avg = rows.length ? Math.round(rows.reduce((s, r) => s + r.conf, 0) / rows.length) : 0;
+  const high = f(r => r.prio === "High");
+  // accent = what the tile means: blue for volume, critical for the bad ones, warning for neutral,
+  // serious for exposure. Status hues are reserved and never reused as decoration.
+  const tiles = [
+    ["Feedbacks",      rows.length,               "var(--series-1)", rows.length === DATA.length ? "All rows in the window" : "of " + DATA.length + " total"],
+    ["Negative",       f(r => r.type === "Negative"), "var(--critical)", "Public rating hit"],
+    ["Neutral",        f(r => r.type === "Neutral"),  "var(--warning)",  "No rating hit"],
+    ["High priority",  high,                      "var(--critical)", "Needs an owner now", high > 0],
+    ["High impact",    f(r => r.impact === "High"), "var(--serious)",  "Business exposure"],
+    ["Avg confidence", avg, "var(--series-1)", "How certain the AI read is", false, "%"]
+  ];
+  // The REAL value is always written into the DOM. The count-up only ever overwrites it from
+  // inside rAF, so if rAF is throttled or never fires (backgrounded tab), the tile still shows
+  // the true number rather than being stranded at 0.
+  $("#kpis").innerHTML = tiles.map(([l, v, accent, ft, alert, suffix], i) =>
+    `<div class="kpi${alert ? " alert" : ""}" style="--accent:${accent};animation-delay:${i * 55}ms" title="${ft}">
+       <div class="val" data-to="${v}" data-suffix="${suffix || ""}">${v}${suffix || ""}</div>
+       <div class="label">${l}</div>
+     </div>`).join("");
+
+  if (kpisAnimated) return;
+  kpisAnimated = true;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  document.querySelectorAll(".kpi .val").forEach((el, i) => {
+    const to = +el.dataset.to, sfx = el.dataset.suffix;
+    if (!to) return;
+    const dur = 620, delay = i * 55;
+    let start = null;
+    const tick = now => {
+      if (start === null) start = now + delay;
+      const t = Math.min(1, Math.max(0, (now - start) / dur));
+      const eased = 1 - Math.pow(1 - t, 3);            // ease-out cubic
+      el.textContent = Math.round(to * eased) + sfx;
+      if (t < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    // belt and braces: whatever happens to rAF, land on the true value
+    setTimeout(() => { el.textContent = to + sfx; }, delay + dur + 120);
+  });
+}
+
+function renderBars(rows) {
+  const c = {};
+  rows.forEach(r => c[r.theme] = (c[r.theme] || 0) + 1);
+  const e = Object.entries(c).sort((a, b) => b[1] - a[1]);
+  const max = Math.max(1, ...e.map(x => x[1]));
+  const cap = `<div class="cap">Root&nbsp;cause</div>`;
+  $("#bars").innerHTML = cap + (e.length ? e.map(([k, v]) =>
+    `<div class="chip" title="${esc(k)}: ${v} of ${rows.length}">
+       <div class="top"><span class="lab">${esc(k)}</span><span class="n">${v}</span></div>
+       <div class="track"><div class="fill" style="width:${(v / max * 100).toFixed(1)}%"></div></div>
+     </div>`).join("") : `<div class="none">Nothing matches these filters.</div>`);
+}
+
+function renderTable(rows) {
+  const tb = $("#tbody");
+  $("#empty").hidden = rows.length > 0;
+  tb.innerHTML = rows.map(r => {
+    const id = r.order + "|" + r.item;
+    const cls = r.type === "Negative" ? "neg" : "neu";
+    const isOpen = openRows.has(id);
+    return `
+    <tr class="main ${cls}${isOpen ? " open" : ""}" data-id="${esc(id)}">
+      <td class="c-date"><span class="chev">${isOpen ? "▼" : "▶"}</span> ${r.date}</td>
+      <td>${esc(r.account)}</td>
+      <td class="c-id">${r.item}</td>
+      <td class="c-sku"><span>${esc(r.sku)}</span></td>
+      <td class="c-id">${esc(r.order)}</td>
+      <td><span class="pill ${cls}">${r.type}</span></td>
+      <td class="c-msg"><span>${esc(r.msg)}</span></td>
+      <td class="c-cat"><span>${esc(r.cat)}</span></td>
+      <td class="c-cause"><span>${esc(r.cause)}</span></td>
+      <td><div class="conf"><div class="conf-track"><div class="conf-fill${r.conf < 60 ? " low" : ""}" style="width:${r.conf}%"></div></div><span class="conf-num">${r.conf}</span></div></td>
+      <td class="c-dept">${esc(r.dept)}</td>
+      <td><span class="pill p-${r.prio}">${r.prio}</span></td>
+      <td><span class="pill p-${r.impact}">${r.impact}</span></td>
+      <td class="num">${r.repeat}</td>
+      <td class="c-action"><span>${esc(r.action)}</span></td>
+      <td class="c-plc">Unassigned</td>
+      <td class="c-plc">Open</td>
+    </tr>
+    <tr class="detail" data-d="${esc(id)}"${isOpen ? "" : " hidden"}><td colspan="17"><div class="inner">
+      ${r.safety ? `<div class="flag safety"><b>⚠ Safety flag.</b> ${esc(r.safety)}</div>` : ""}
+      ${r.link ? `<div class="flag link"><b>↔ Linked incident.</b> ${esc(r.link)}</div>` : ""}
+      <div class="fld wide"><div class="k">Feedback Message</div><div class="v">${esc(r.msg)}</div></div>
+      <div class="fld"><div class="k">AI Root Cause</div><div class="v">${esc(r.cause)}</div></div>
+      <div class="fld"><div class="k">Suggested Action</div><div class="v">${esc(r.action)}</div></div>
+      <div class="fld wide"><div class="k">Identifiers — real query results</div><div class="v meta">Item ID ${r.item} · Order ${r.order} · SKU ${esc(r.sku)} · Repeat negatives on this item: ${r.repeat} · Owner: Unassigned · Status: Open</div></div>
+    </div></td></tr>`;
+  }).join("");
+
+  tb.querySelectorAll("tr.main").forEach(tr => tr.addEventListener("click", () => {
+    const id = tr.dataset.id;
+    openRows.has(id) ? openRows.delete(id) : openRows.add(id);
+    const d = tb.querySelector(`tr.detail[data-d="${CSS.escape(id)}"]`);
+    d.hidden = !openRows.has(id);
+    tr.classList.toggle("open", openRows.has(id));
+    tr.querySelector(".chev").textContent = openRows.has(id) ? "▼" : "▶";
+  }));
+}
+
+function render() {
+  const rows = current();
+  renderKpis(rows); renderBars(rows); renderTable(rows);
+  $("#count").textContent = `${rows.length} of ${DATA.length} shown`;
+  document.querySelectorAll("thead th").forEach(th => {
+    if (th.dataset.k === sortKey) { th.setAttribute("aria-sort", sortDir === 1 ? "ascending" : "descending"); th.querySelector(".arrow").textContent = sortDir === 1 ? "▲" : "▼"; }
+    else { th.removeAttribute("aria-sort"); th.querySelector(".arrow").textContent = "▼"; }
+  });
+}
+
+document.querySelectorAll("thead th").forEach(th => th.addEventListener("click", () => {
+  const k = th.dataset.k;
+  if (k === sortKey) sortDir *= -1;
+  else { sortKey = k; sortDir = ["date","conf","repeat","prio","impact"].includes(k) ? -1 : 1; }
+  render();
+}));
+["q","fType","fPrio","fDept","fAcct"].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener(el.tagName === "SELECT" ? "change" : "input", render);
+});
+$("#reset").addEventListener("click", () => {
+  $("#q").value = ""; ["fType","fPrio","fDept","fAcct"].forEach(i => document.getElementById(i).value = "");
+  sortKey = "date"; sortDir = -1; render();
+});
+$("#provBtn").addEventListener("click", () => $("#provDlg").showModal());
+$("#provClose").addEventListener("click", () => $("#provDlg").close());
+
+render();
+</script>
+</body>
+</html>
