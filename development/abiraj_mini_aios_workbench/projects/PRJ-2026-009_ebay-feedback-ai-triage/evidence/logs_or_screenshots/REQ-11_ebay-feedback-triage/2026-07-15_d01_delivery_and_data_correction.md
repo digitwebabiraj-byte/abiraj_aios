@@ -1,4 +1,4 @@
-# REQ-11-D02 — delivery evidence + CORRECTION to the Step-2 data finding
+# REQ-11-D01 (continued) — delivery evidence + CORRECTION to the Step-2 data finding
 
 **Date:** 2026-07-15 · **Developer:** Abiraj · **Mode:** read-only query + one guarded publish
 **Status:** DELIVERED (read-only scope). No DDL, no sync, no writes to `message_app_logs`.
@@ -44,13 +44,13 @@ true: `message.ebay_msg` **is** support traffic, not feedback, and is not a subs
 - **The project was never data-blocked.** The documented "fastest route" — *Thinesh exports
   feedback from eBay Seller Hub as CSV* — is **unnecessary**. Do not ask him to do it.
 - The **DDL gate (item I) is unaffected**: a *sync* is still not built and Steps 3–9 still want
-  production DDL. But a **populated read-only report needed neither**, which D02 proves.
+  production DDL. But a **populated read-only report needed neither**, which D01 proves.
 - **Lesson for this workbench:** "swept everything" is meaningless without naming the database.
   Sweep **both**, and state which connector produced a negative result.
 
 ---
 
-## 2. What D02 delivered
+## 2. What D01 delivered
 
 **Scope:** a narrow **read-only slice** — Negative + Neutral eBay feedback for the last 30 days.
 Explicitly **not** the Steps 3–9 BUILD, and **not** the full 20-field spec.
@@ -64,7 +64,7 @@ Explicitly **not** the Steps 3–9 BUILD, and **not** the full 20-field spec.
 - **Attribution:** keyed on `item_id` + `transaction_id` (the **order-line** key) — audit item
   **K**'s PASS route (96.07%), **not** the item_id-alone key that fails K's gate at 52.05%.
 
-**Query:** `sql/REQ-11_ebay-feedback-triage/d02_feedback_triage_pull.sql` (read-only, re-runnable).
+**Query:** `sql/REQ-11_ebay-feedback-triage/d01_feedback_triage_pull.sql` (read-only, re-runnable).
 
 **Outputs** — `evidence/final_outputs/REQ-11_ebay-feedback-triage/`:
 
@@ -87,9 +87,9 @@ from `Suggested Action` prose into dedicated callout boxes (content preserved, n
 
 ---
 
-## 3. ⚠ What D02 did NOT settle — read before reusing this
+## 3. ⚠ What D01 did NOT settle — read before reusing this
 
-- **Item N (taxonomy collision) is UNTOUCHED and still a STOP condition for the build.** D02's
+- **Item N (taxonomy collision) is UNTOUCHED and still a STOP condition for the build.** The report's
   categories are **free-text**, deliberately *not* Thinesh's 6-value enum and *not* mapped onto
   the 17 live `message.phrases` (`send_type=4`) categories backed by 969 confirmed eBay rows.
   A one-off human-read report does not create a competing vocabulary; **a system would.** N must

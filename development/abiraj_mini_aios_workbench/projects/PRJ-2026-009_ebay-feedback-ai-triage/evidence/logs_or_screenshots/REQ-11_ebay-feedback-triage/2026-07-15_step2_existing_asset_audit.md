@@ -5,7 +5,7 @@
 > **Do not act on Check 1.** It concludes *"no feedback table exists anywhere… never been synced…
 > build from scratch"*. **The feedback data exists:** `customer_service.ebay_orders_customer_feedbacks`
 > on the **`ledsone`** database (Ledsone-db-mcp) — **311,042 rows, 2015-06-13 → 2026-07-15**, synced from
-> `message_app.feedbacks` (MySQL). **REQ-11-D02 built a populated report from it the same day**
+> `message_app.feedbacks` (MySQL). **REQ-11-D01 built a populated report from it the same day**
 > (`ph_task` id 257).
 >
 > **Why:** the sweep below ran against **`order_management_copy`** and is **correct for that database** —
@@ -16,7 +16,7 @@
 > Check 3's finding is *reinforced*: the real feedback table already carries `transaction_id` and
 > `order_line_item_id`, so item K's correct order-line key is available today.
 >
-> Full correction: `2026-07-15_d02_delivery_and_data_correction.md`.
+> Full correction: `2026-07-15_d01_delivery_and_data_correction.md`.
 
 **Date:** 2026-07-15 · **Task:** REQ-11_ebay-feedback-triage · **Deliverable:** REQ-11-D01 (Step 2 of 9)
 **Method:** read-only queries executed live via the Postgres MCP `execute_sql`. **No DDL, no writes, no LLM call.**

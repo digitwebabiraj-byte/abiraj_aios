@@ -99,7 +99,7 @@ Do not invent business logic. Do not pick a "sensible default" and proceed.
 - > **⚠ SUPERSEDED RULE (audit trail).** This read: *"There is no eBay feedback data in the warehouse —
   > none, in any of the 26 user schemas… It has never been synced. No populated report/xlsx/dashboard can
   > be produced from the DB until either the Step-3 sync is approved and built, or Thinesh supplies a
-  > Seller Hub export."* **False — REQ-11-D02 built one from live DB data on 2026-07-15.
+  > Seller Hub export."* **False — REQ-11-D01 built one from live DB data on 2026-07-15.
   > Do NOT ask Thinesh for a Seller Hub export.**
 - **⚠ THE TRAP THAT CAUSED IT — this estate has ≥2 databases. Always name the one you swept.**
   | Database | Connector | Holds |

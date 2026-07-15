@@ -109,7 +109,7 @@ Under Task `REQ-11_ebay-feedback-triage` (COPY-only; Downloads originals preserv
 
 | # | Question | Executed answer |
 |---|---|---|
-| 1 | Feedback table exists? | ✅ **YES — CORRECTED 2026-07-15. `customer_service.ebay_orders_customer_feedbacks` on the `ledsone` DB (Ledsone-db-mcp): 311,042 rows, 2015-06-13 → 2026-07-15, synced from `message_app.feedbacks` (MySQL).** ⚠ **SUPERSEDED ANSWER (audit trail):** *"NO — none, in any of the 26 user schemas… eBay customer feedback has never been synced… ⇒ Build from scratch."* That sweep covered **`order_management_copy`** (the warehouse) and was **correct for it** — but the estate has **≥2 databases** and the feedback lives in **`ledsone`**. Concluding *"anywhere"* from one DB was the error. **REQ-11-D02 built a populated report from this table the same day** (`ph_task` id 257) ⇒ **do NOT build from scratch, and do NOT request a Seller Hub export.** Still true: `message.ebay_msg` is support traffic (`ResponseToASQQuestion` 40,215 · `ContactTransactionPartner` 17,391 · `AskSellerQuestion` 10,103), messages ≠ feedback, never a substitute. |
+| 1 | Feedback table exists? | ✅ **YES — CORRECTED 2026-07-15. `customer_service.ebay_orders_customer_feedbacks` on the `ledsone` DB (Ledsone-db-mcp): 311,042 rows, 2015-06-13 → 2026-07-15, synced from `message_app.feedbacks` (MySQL).** ⚠ **SUPERSEDED ANSWER (audit trail):** *"NO — none, in any of the 26 user schemas… eBay customer feedback has never been synced… ⇒ Build from scratch."* That sweep covered **`order_management_copy`** (the warehouse) and was **correct for it** — but the estate has **≥2 databases** and the feedback lives in **`ledsone`**. Concluding *"anywhere"* from one DB was the error. **REQ-11-D01 built a populated report from this table the same day** (`ph_task` id 257) ⇒ **do NOT build from scratch, and do NOT request a Seller Hub export.** Still true: `message.ebay_msg` is support traffic (`ResponseToASQQuestion` 40,215 · `ContactTransactionPartner` 17,391 · `AskSellerQuestion` 10,103), messages ≠ feedback, never a substitute. |
 | 2 | Parent SKU source? | **`public.listing_data.parent_sku`** — 139,171 eBay child rows, **118,739 (85.32%) populated**, 5,464 distinct parents. `mapped_sku` is dead on eBay (**31 rows**). |
 | 3 | `item_id` → 1 SKU? | **FAILS.** Via `listing_data`: **2.46%** single-SKU / **97.54% multi** (worst listing = **245 SKUs**). Via real eBay orders (90d, 16,533 lines, 3,347 item_ids): **52.05%** single-SKU (max 42). |
 | 3 | `item_id` + `order_id` → 1 SKU? | **96.07%** — only **3.93%** unattributable. |
@@ -239,7 +239,7 @@ and engage Sajeesan + Tamil Selvan.
 > eBay Seller Hub (CSV…)**."* **False — do not action it.**
 
 The feedback is live in **`customer_service.ebay_orders_customer_feedbacks`** on the **`ledsone`** database
-(311,042 rows, back to 2015). The earlier sweep covered `order_management_copy` only. **REQ-11-D02
+(311,042 rows, back to 2015). The earlier sweep covered `order_management_copy` only. **REQ-11-D01
 (2026-07-15) delivered exactly the "fastest route" deliverable — read-only, no DDL, no approval, no export
 — straight from the DB**: 20 rows (6 Negative / 14 Neutral), 30-day window, CSV + xlsx + dashboard,
 published to `ph_task` **id 257**. The FRRC pattern applied; Thinesh's manual export was never needed.

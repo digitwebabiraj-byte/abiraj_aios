@@ -6,9 +6,9 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 
 | Task ID | Deliverable | Source ref | Status | Evidence | Validation |
 |---|---|---|---|---|---|
-| REQ-11_ebay-feedback-triage | eBay Feedback AI Triage — LLM classification + department routing + SKU repeat/trend analytics for Negative/Neutral eBay feedback. 20 target fields, 4 sprints (Steps 1–9). **D02 read-only report DELIVERED 2026-07-15; the Steps 3–9 BUILD is NOT built.** | `ebay_feedback_task_prompt.md` (method, Steps 1–9, stop-gates) + `Thinesh task.xlsx` (20-field shape, 18 business rules). Task ID **minted with owner approval 2026-07-15** — sources carry no requirement id. | **D02 DELIVERED (read-only) 2026-07-15** — published to `tech_team_outputs.ph_task` **id 257**. **BUILD still BLOCKED**: Step-1 sheet unsigned (**A–F, K–O**) + DDL gate (**I**) closed. | `evidence/final_outputs/REQ-11_ebay-feedback-triage/` (CSV · xlsx · dashboard) + `evidence/logs_or_screenshots/REQ-11_.../2026-07-15_d02_delivery_and_data_correction.md` + `sql/REQ-11_.../d02_feedback_triage_pull.sql` | D02 self-checked: dashboard diffed field-by-field vs the canonical CSV = **336/340 identical** (the 4 = cross-refs relocated into callout boxes). Reviewer + business sign-off **pending**. |
+| REQ-11_ebay-feedback-triage | eBay Feedback AI Triage — LLM classification + department routing + SKU repeat/trend analytics for Negative/Neutral eBay feedback. 20 target fields, 4 sprints (Steps 1–9). **D01 read-only report DELIVERED 2026-07-15; the Steps 3–9 BUILD is NOT built.** | `ebay_feedback_task_prompt.md` (method, Steps 1–9, stop-gates) + `Thinesh task.xlsx` (20-field shape, 18 business rules). Task ID **minted with owner approval 2026-07-15** — sources carry no requirement id. | **D01 DELIVERED (read-only) 2026-07-15** — published to `tech_team_outputs.ph_task` **id 257**. **BUILD still BLOCKED**: Step-1 sheet unsigned (**A–F, K–O**) + DDL gate (**I**) closed. | `evidence/final_outputs/REQ-11_ebay-feedback-triage/` (CSV · xlsx · dashboard) + `evidence/logs_or_screenshots/REQ-11_.../2026-07-15_d01_delivery_and_data_correction.md` + `sql/REQ-11_.../d01_feedback_triage_pull.sql` | D01 self-checked: dashboard diffed field-by-field vs the canonical CSV = **336/340 identical** (the 4 = cross-refs relocated into callout boxes). Reviewer + business sign-off **pending**. |
 
-## ✅ REQ-11-D02 — DELIVERED 2026-07-15 (read-only slice)
+## ✅ REQ-11-D01 (continued) — DELIVERED 2026-07-15 (read-only slice)
 
 **Scope shipped:** Negative + Neutral eBay feedback, 30-day window (2026-06-15 → 2026-07-15) —
 **20 rows (6 Negative / 14 Neutral)** out of 5,069 total feedbacks in the window (negatives ≈ **0.1%**;
@@ -16,14 +16,14 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 (`item_id` + `transaction_id`) = item **K**'s PASS route (96.07%), never item_id-alone (52.05%, fails K).
 
 **Outputs:** `evidence/final_outputs/REQ-11_ebay-feedback-triage/` — canonical CSV (17 cols × 20 rows),
-xlsx, self-contained light-theme HTML dashboard. **Query:** `sql/REQ-11_.../d02_feedback_triage_pull.sql`.
+xlsx, self-contained light-theme HTML dashboard. **Query:** `sql/REQ-11_.../d01_feedback_triage_pull.sql`.
 **Published:** `ph_task` **id 257** (`project_code=ebft`, `task_id=ebft_Thinesh_ebay_feedback_triage-V1`,
 `assigned_user=Thinesh`, `assigned_user_team=ebay_priors`, phase 1 / version 1 / released).
 
-**⚠ What D02 does NOT settle — read before treating this as "the system":**
+**⚠ What this delivery does NOT settle — read before treating this as "the system":**
 - **The AI columns are a one-time LLM read of 20 comments — NOT a classifier.** No model, no rules
   engine; re-running re-classifies from scratch and wording will differ.
-- **Item N (taxonomy collision) is untouched.** D02 used **free-text** categories — deliberately not the
+- **Item N (taxonomy collision) is untouched.** D01 used **free-text** categories — deliberately not the
   6-value enum, and not mapped onto the 17 live `message.phrases` categories. A one-off human read creates
   no competing vocabulary; **a system would.** N still decides what a classifier may output at all.
 - **Owner / Status are hardcoded placeholders** — there is no owner column anywhere in the DB and no
@@ -42,7 +42,7 @@ incident (same buyer, order `20-14744-96040`) — do not double-count.
 
 D01's Check 1 concluded **"NO eBay feedback data exists ANYWHERE — never synced ⇒ no populated
 sheet/report can be produced from the DB today"** and prescribed a **Seller Hub CSV export by Thinesh**.
-**That is false; D02 disproved it the same day.**
+**That is false; the D01 report disproved it the same day.**
 
 The data is live: **`customer_service.ebay_orders_customer_feedbacks`** on the **`ledsone`** database
 (**Ledsone-db-mcp**) — **311,042 rows, 2015-06-13 → 2026-07-15**, from `message_app.feedbacks` (MySQL).
@@ -50,7 +50,7 @@ The 26-schema sweep ran on **`order_management_copy`** and was **correct for tha
 was concluding *"anywhere"* from **one of ≥2 databases**. ⇒ **Do not ask Thinesh for an export.**
 **Lesson: a negative sweep is only valid for the database you name — sweep both, and say which.**
 Unchanged: `message.ebay_msg` is support traffic, not feedback, never a substitute.
-Detail: `evidence/logs_or_screenshots/REQ-11_.../2026-07-15_d02_delivery_and_data_correction.md`.
+Detail: `evidence/logs_or_screenshots/REQ-11_.../2026-07-15_d01_delivery_and_data_correction.md`.
 
 ## Deliverable plan (from the prompt's sprint table — not yet opened)
 
@@ -62,9 +62,19 @@ Detail: `evidence/logs_or_screenshots/REQ-11_.../2026-07-15_d02_delivery_and_dat
 | 4 | 8–9 | Workflow closed + reports shipped | Needs items **D** (lifecycle) + **E** (owner method) |
 
 ## REQ-11-D01 — Deliverable detail (2026-07-15)
-- **Scope:** **Steps 1–2 only** — the Step-1 decision sheet (items A–F, for Thinesh, no code) + the Step-2
-  read-only DB audit (feedback-table existence · Parent-SKU source · `item_id`→SKU resolution rate).
-  **Steps 3–9 explicitly parked** pending the signed sheet + written DDL/automation approval.
+- **⚠ SCOPE WIDENED 2026-07-15 by owner decision — D01 now also covers the delivered read-only report.**
+  As originally written D01 was *"**Steps 1–2 only** — the Step-1 decision sheet (items A–F, for Thinesh,
+  **no code**) + the Step-2 read-only DB audit"*. The report built later the same day was first labelled
+  `REQ-11-D02` **by the executor, without owner confirmation — a breach of the minting rule at the foot of
+  this file** (*"Later deliverable ids are not minted — they follow owner confirmation"*), and with no
+  requirement doc to back it. **The owner resolved it by folding the report into D01** rather than minting
+  D02. **No `REQ-11-D02` exists.** The two `d02_*` files were renamed to `d01_*`.
+- **Scope (current):** Step-1 decision sheet (unsigned, routed to Thinesh) · Step-2 read-only DB audit ·
+  **+ the delivered read-only Negative/Neutral triage report** (see the D01 delivery section above).
+  **Steps 3–9 remain explicitly parked** pending the signed sheet + written DDL/automation approval.
+- **⚠ Requirement doc covers the original scope only.** `2026-07-15_abiraj_REQ-ebft_REQ-11-D01.md`
+  describes the sheet + audit; **it does not describe the report.** Amend it, or record the report's
+  requirement, before D01 is treated as fully documented.
 - **Requirement doc:** `DigitWeb_Works_Abiraj/15_07_2026/2026-07-15_abiraj_REQ-ebft_REQ-11-D01.md`.
 - **project_code:** `ebft` — **newly minted 2026-07-15** (neither source file carries one). Follows the
   `frrc` / `zsfo` / `pc` lowercase-acronym convention. Not yet used in any DB publish, so still cheap to change.
@@ -77,7 +87,7 @@ Detail: `evidence/logs_or_screenshots/REQ-11_.../2026-07-15_d02_delivery_and_dat
     synced ⇒ build from scratch ⇒ no populated deliverable is possible from the DB today — the data lives
     only in eBay's `GetFeedback` API."* **The sweep covered `order_management_copy` only.** The feedback is
     live in **`customer_service.ebay_orders_customer_feedbacks` on the `ledsone` DB** (311,042 rows,
-    2015-06-13→2026-07-15). **D02 built a populated report from it. Do not build from scratch; do not
+    2015-06-13→2026-07-15). **the D01 report was built from live DB data from it. Do not build from scratch; do not
     request an export.** Still true: `message.ebay_msg` is support traffic, not feedback.
   - **Check 2 — Parent SKU = `public.listing_data.parent_sku`**, 85.32% eBay coverage (118,739/139,171),
     5,464 parents. ⚠ `listing_data_1` **does not exist**; `inv_final_stock` has **no parent column**.
@@ -86,7 +96,7 @@ Detail: `evidence/logs_or_screenshots/REQ-11_.../2026-07-15_d02_delivery_and_dat
     the 10% gate. **`item_id` + `order_id` → 96.07%** = **3.93% → PASSES**. SKU analytics are viable
     **only** on the order key.
 
-Later deliverable ids (`REQ-11-D02`, …) are **not** minted — they follow owner confirmation, not this plan.
+Later deliverable ids (`REQ-11-D01`, …) are **not** minted — they follow owner confirmation, not this plan.
 
 ## Onboarding (this session, 2026-07-15)
 - Registered the project; authored the five standing docs (README, PROJECT_HOME, SYSTEM_REFERENCE,
@@ -165,7 +175,7 @@ confirmed eBay rows**, so this project must **align to them, not invent alongsid
 > + dashboard…"* **False — do not action route (a).**
 
 The feedback is live in **`customer_service.ebay_orders_customer_feedbacks`** on the **`ledsone`** DB
-(311,042 rows, back to 2015); Check 1 swept `order_management_copy` only. **D02 (2026-07-15) delivered
+(311,042 rows, back to 2015); Check 1 swept `order_management_copy` only. **D01 (2026-07-15) delivered
 exactly that "route (a)" deliverable straight from the database** — read-only, no DDL, no approval, no
 export: 20 rows, CSV + xlsx + dashboard, published to `ph_task` id 257. The FRRC pattern applied; the
 manual export was never needed. Route **(b)** — approve + build the sync (item **I**) — remains the

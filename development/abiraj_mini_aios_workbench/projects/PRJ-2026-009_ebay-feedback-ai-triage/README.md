@@ -9,7 +9,7 @@ suggested action, **tracked** to closure with an owner and status, and **aggrega
 repeat/trend analytics (worst SKUs, parent-family issues, monthly trend, escalation ladder).
 **Task:** REQ-11_ebay-feedback-triage. **Dev:** Abiraj. **Business Validator:** Thinesh.
 
-## ✅ Status — **REQ-11-D02 DELIVERED 2026-07-15** (read-only report, `ph_task` id 257) · Steps 3–9 BUILD still blocked
+## ✅ Status — **REQ-11-D01 DELIVERED 2026-07-15** (read-only report, `ph_task` id 257) · Steps 3–9 BUILD still blocked
 
 **What is done:** a populated read-only triage report — Negative + Neutral, 30-day window
 (2026-06-15 → 07-15), **20 rows (6 Negative / 14 Neutral)** from live DB data, published to
@@ -17,10 +17,10 @@ repeat/trend analytics (worst SKUs, parent-family issues, monthly trend, escalat
 CSV + xlsx + dashboard in `evidence/final_outputs/REQ-11_ebay-feedback-triage/`.
 
 **What is NOT done:** the Steps 3–9 **BUILD** (production DDL, live `GetFeedback` sync, the LLM
-classifier layer, case tracking). D02's AI columns are a **one-time LLM read of 20 comments — not a
-classifier**. Decision items **A–F, K–O remain open**; the **DDL gate (I) remains closed**.
-**Item N (taxonomy collision) is untouched** — D02 used free-text categories, so it does not create a
-competing vocabulary, but a *system* would. N must be decided before any classifier is built.
+classifier layer, case tracking). The report's AI columns are a **one-time LLM read of 20 comments —
+not a classifier**. Decision items **A–F, K–O remain open**; the **DDL gate (I) remains closed**.
+**Item N (taxonomy collision) is untouched** — the report used free-text categories, so it does not
+create a competing vocabulary, but a *system* would. N must be decided before any classifier is built.
 
 | Gate | What it blocks | Who clears it |
 |---|---|---|
@@ -37,7 +37,7 @@ new production tables, a live API sync, an LLM layer. The root `CLAUDE.md` puts 
 > feedback data. Anywhere… eBay feedback has never been synced into the warehouse… No populated sheet,
 > report or dashboard can be built from the database today… The data exists only inside eBay's
 > `GetFeedback` API. Route 1: Thinesh exports feedback from eBay Seller Hub (CSV)."*
-> **That was false.** REQ-11-D02 disproved it the same day by building a populated report from live DB
+> **That was false.** REQ-11-D01 disproved it the same day by building a populated report from live DB
 > data. **Do not act on it. Do not ask Thinesh for a Seller Hub export — it is not needed.**
 
 | | |
@@ -59,9 +59,9 @@ which connector produced a negative result.**
 `ResponseToASQQuestion`, `ContactTransactionPartner`) — a **different eBay API**, not feedback, never a
 substitute.
 
-⇒ **A populated read-only report needs no DDL, no sync, no approval — D02 shipped one on 2026-07-15.**
+⇒ **A populated read-only report needs no DDL, no sync, no approval — D01 shipped one on 2026-07-15.**
 The Step-3 sync (item **I**) remains unbuilt and gated, but it was never a prerequisite for reporting.
-Detail: `evidence/logs_or_screenshots/REQ-11_.../2026-07-15_d02_delivery_and_data_correction.md`.
+Detail: `evidence/logs_or_screenshots/REQ-11_.../2026-07-15_d01_delivery_and_data_correction.md`.
 
 ## 🔴 SECOND FACT: the spec's SKU attribution is measurably wrong (item K)
 

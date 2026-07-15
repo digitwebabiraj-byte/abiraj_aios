@@ -1,11 +1,11 @@
--- REQ-11-D02 — eBay Negative & Neutral feedback triage pull
+-- REQ-11-D01 — eBay Negative & Neutral feedback triage pull
 -- Run 2026-07-15 (read-only). Re-runnable: the window is relative to CURRENT_DATE.
 --
 -- ⚠ CONNECTOR MATTERS. This runs on the **`ledsone`** database (Ledsone-db-mcp connector),
 --    NOT `order_management_copy`. The Step-2 audit (2026-07-15) swept `order_management_copy`'s
 --    26 schemas and concluded "no eBay feedback data exists anywhere" — that conclusion was
 --    correct for THAT database and wrong for the estate: the feedback lives here, in `ledsone`.
---    See 2026-07-15_d02_delivery_and_data_correction.md.
+--    See 2026-07-15_d01_delivery_and_data_correction.md.
 --
 -- Source table: customer_service.ebay_orders_customer_feedbacks
 --   311,042 rows · 2015-06-13 → 2026-07-15 · types Positive / Neutral / Negative

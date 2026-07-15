@@ -84,11 +84,11 @@ it does not bite a recent-window pull.
 > **no eBay feedback table anywhere** in the database (all 26 user schemas swept by name and by column).
 > eBay feedback has **never been synced**… Every field in §3 therefore depends on data that must first
 > arrive via the `GetFeedback` sync (Step 3, gated) or a Seller Hub **export**."*
-> **False.** The sweep covered `order_management_copy`, not `ledsone`. **REQ-11-D02 (2026-07-15) built a
+> **False.** The sweep covered `order_management_copy`, not `ledsone`. **REQ-11-D01 (2026-07-15) built a
 > populated report straight from this table** — no sync, no export, no DDL. Note `order_line_item_id` and
 > `transaction_id` are **already columns on this table**, so item K's correct attribution key is available
 > today. `message.ebay_msg` is still support traffic, still not a substitute.
-> See `evidence/logs_or_screenshots/REQ-11_.../2026-07-15_d02_delivery_and_data_correction.md`.
+> See `evidence/logs_or_screenshots/REQ-11_.../2026-07-15_d01_delivery_and_data_correction.md`.
 
 Fields in §3 that are **not** in this table (Parent SKU, Product Health Score, Owner, Status, the AI
 columns) still depend on decisions **A/D/E** and the gated build — the data existing does not define them.
