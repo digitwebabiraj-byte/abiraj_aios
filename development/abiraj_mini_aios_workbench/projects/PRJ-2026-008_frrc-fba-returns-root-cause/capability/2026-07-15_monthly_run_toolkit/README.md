@@ -6,7 +6,7 @@ Pull → validate → rebuild every Portfolio Holder's dashboard → publish to 
 ## Cadence (as instructed)
 | Setting | Value | Why |
 |---|---|---|
-| **Runs** | **Day 8 of every month, 07:00** | Monthly, before the 15th |
+| **Runs** | **Day 8 of every month, 09:00** | Monthly, before the 15th |
 | **Window** | **Last 30 days** | D01 locked rule |
 | **Settle buffer** | **7 days** (`SETTLE_DAYS`) | Amazon's FBA returns feed **back-fills**. A T+1 window is **~12% short** — measured 2026-07-15: the identical window read **105 units on the 14th and 118 on the 15th**. Ending the window 7 days before the run lets the tail land. |
 
@@ -22,7 +22,7 @@ pip install psycopg2-binary
 #    and never stored in any file in this repo.
 .\set_credential.ps1
 
-# 3. Register the scheduled task (day 8, 07:00, every month)
+# 3. Register the scheduled task (day 8, 09:00, every month)
 .\register_scheduled_task.ps1
 ```
 
