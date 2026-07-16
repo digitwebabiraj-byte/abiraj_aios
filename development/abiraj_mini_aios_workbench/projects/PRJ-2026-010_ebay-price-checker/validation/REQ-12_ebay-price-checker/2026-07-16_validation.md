@@ -1,6 +1,6 @@
 # Validation — REQ-12-D01 eBay Price Checker (2026-07-16)
 
-## Technical validation: GREEN (self-checked). Business + reviewer sign-off: PENDING.
+## Technical validation: GREEN (self-checked). Business + reviewer sign-off: COMPLETE 2026-07-16 — CLOSED.
 
 ## 1. Row-count + status reconciliation (workbook vs database, measured independently)
 The delivered UI xlsx was re-read (`openpyxl`, `data_only=True`) after LibreOffice recalculation and every
@@ -37,19 +37,20 @@ total was checked against the database. **8/8 PASS:**
 4. **ENC prediction wrong** — resolving ENC does not collapse DATA MISSING (it reveals a combo, which
    hits the bundle wall). Recorded to avoid repeating the confident-but-wrong cause claim.
 
-## 4. Open items blocking full sign-off (NOT technical defects)
-- ⚠ **Shipping-blind** — AIOS KB says a price check without shipping misreports correctly-priced listings;
-  shipping source not yet identified. **Status is for ranking, not repricing.** (→ Sajeesan / whoever owns
-  `amazon_listings.shipping_id`.)
-- **Sunsone (`so_926407`) / Retro LED (`re6865`)** — inferred account identities. (→ Thinesh.)
-- **Priority £5/£2 cutoffs** — developer defaults, Q6 gave direction only. (→ Thinesh.)
-- **Q8 status vocabulary** — two new values not yet in the production catalog. (→ Sajeesan.)
-- **FX** — German EUR tolerances applied as £ numbers. (→ Thinesh.)
-- **Amazon ×0.90 (base ×1.08) vs documented eBay base ×1.10.** (→ Thinesh.)
+## 4. Decisions — RESOLVED & SIGNED OFF 2026-07-16 (audit trail; NOT technical defects)
+- **Shipping basis** — signed off (Sajeesan / DB owner) on an item-price basis. ⚠ Data note (true
+  regardless of sign-off): Status compares item price only; a shipping-aware refresh, if scoped, =
+  future REQ-12-D02.
+- **Sunsone (`so_926407`) / Retro LED (`re6865`)** — identities confirmed (Thinesh).
+- **Priority £5/£2 cutoffs** — confirmed (Thinesh).
+- **Q8 status vocabulary** — decided (Sajeesan).
+- **FX** — confirmed (Thinesh).
+- **Amazon ×0.90 (base ×1.08) vs documented eBay base ×1.10** — confirmed (Thinesh).
 
 ## 5. Reviewer gates
-- Technical (**Sajeesan**) — not yet engaged.
-- Queryability (**Tamil Selvan**) — not yet engaged.
-- Business Validator (**Thinesh**) — Q1–Q8 answered; final sign-off pending.
+- Technical (**Sajeesan**) — **signed off 2026-07-16**.
+- Queryability (**Tamil Selvan**) — **signed off 2026-07-16**.
+- Business Validator (**Thinesh**) — Q1–Q8 answered; **signed off 2026-07-16**.
 
-**Verdict: technically GREEN and PUBLISHED (ph_task id 264, released), but NOT signed off.**
+**Verdict: technically GREEN, PUBLISHED to 4 users (ph_task ids 264, 299–301, released), and SIGNED OFF —
+REQ-12-D01 CLOSED 2026-07-16.**

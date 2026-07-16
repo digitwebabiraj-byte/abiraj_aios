@@ -35,23 +35,40 @@ Amazon/website catalogues are ~half the UK size.
   `task_id`**, so the guard is manual (re-checked `task_id` + `project_code='epc'` inside the committing
   transaction). The dry-run consumed identity id 263 (sequences don't roll back); the committed row is
   **id 264**.
-- **Row (id 264):** `project_code=epc` · `task_id=epc_Thinesh_ebay_price_checker-V1` ·
+- **Initial row (id 264, Thinesh):** `project_code=epc` · `task_id=epc_Thinesh_ebay_price_checker-V1` ·
   `assigned_user=Thinesh` · `assigned_user_team=ebay_priors` · `team=Development` · `developer=Abiraj` ·
-  `phase_level=1` · `version_level=1` · `version_status=released` · `html_content` = 17 MB dashboard.
-- Verified independently via the Postgres MCP: exactly **one** `epc` row; the first attempt failed at
-  `connect` ("too many clients"/"slots reserved for superusers") and wrote nothing.
-- `description` was shortened in-place on 2026-07-16 (289 chars) via a guarded UPDATE, keeping the
-  "⚠ Shipping-blind — rank, don't reprice; not yet signed off" flag.
-- ⚠ 17 MB exceeds the table's historical max (14 MB); avg row is 370 kB. If the ph_task viewer app
-  struggles, publish a lighter summary build via an in-place `UPDATE` (version_level bump).
+  `phase_level=1` · `version_status=released` · `html_content` = 17 MB dashboard. The first attempt failed
+  at `connect` ("too many clients"/"slots reserved for superusers") and wrote nothing; a retry committed.
+  The dry-run consumed identity id 263 (sequences don't roll back).
+- **Dashboard refreshed to version 3** via two guarded in-place `UPDATE`s: V2 = taller-table fix (portal
+  panel gave `100vh` too little height); V3 = the **Export-CSV button** (client-side, exports the current
+  filtered/sorted view, UTF-8 so £/€ render in Excel). `description` also trimmed to 289 chars.
+- **Fan-out publish 2026-07-16 — 3 more users (ids 299–301), same guarded pattern.** After owner
+  confirmation (team `ebay_priors`, full report), verified the names live against `staff.users`
+  (`Jarsini` id 91, `kobiga` id 157, `powsteena` id 162 — all Active; note **`Jarsini` ≠ `Jasmini`**, two
+  different people), pre-flighted all 3 `task_id`s free, dry-ran + rolled back, then inserted 3 rows in one
+  transaction:
 
-## What this delivery does NOT settle (read before treating it as "the system")
-- **Shipping-blind** — Status compares item price only; the AIOS KB warns this misreports correctly-priced
-  listings and the shipping source is not yet identified. **Rank, do not reprice.**
-- **Sunsone (`so_926407`) and Retro LED (`re6865`)** account names are **inferred**, not confirmed by Thinesh.
-- **Amazon ×0.90 = base ×1.08** vs the documented eBay target base ×1.10 — reconcile with Thinesh.
-- **Priority £5/£2 cutoffs** are the developer's (Q6 gave a direction, not numbers).
-- **Q8 two new status values** (`PRICE_TOO_HIGH`, `PRICE_SOURCE_MISSING`) are **not** in the production
-  catalog — needs Sajeesan.
-- **No reviewer sign-off** (Sajeesan / Tamil Selvan) and **no Thinesh final sign-off** yet.
-- **FX** for the German (EUR) accounts is undefined.
+  | id | assigned_user | task_id | team | status |
+  |---|---|---|---|---|
+  | 264 | Thinesh | `epc_Thinesh_ebay_price_checker-V1` | ebay_priors | released |
+  | 299 | Jarsini | `epc_Jarsini_ebay_price_checker-V1` | ebay_priors | released |
+  | 300 | kobiga | `epc_kobiga_ebay_price_checker-V1` | ebay_priors | released |
+  | 301 | powsteena | `epc_powsteena_ebay_price_checker-V1` | ebay_priors | released |
+
+  All four carry the identical 17 MB V3 dashboard. Independently re-verified via the Postgres MCP: exactly
+  **four** `epc` rows, four distinct users, all `ebay_priors` / `released`.
+- ⚠ 17 MB exceeds the table's historical max (14 MB); avg row is 370 kB. The portal viewer rendered it;
+  a lighter summary build can replace it via in-place `UPDATE` if needed.
+
+## Sign-off — COMPLETE 2026-07-16 (audit trail of the previously-open items)
+All items below were resolved and signed off on 2026-07-16 (per owner). REQ-12-D01 is **CLOSED**.
+- **Shipping basis** — signed off (Sajeesan / DB owner). ⚠ **Data note that remains true regardless of
+  sign-off:** Status is computed on **item price only**; a shipping-aware refresh (should one be scoped)
+  is a future REQ-12-D02. The live `ph_task` row descriptions retain the "item-price" note for end users.
+- **Sunsone (`so_926407`) / Retro LED (`re6865`)** — identities confirmed (Thinesh).
+- **Amazon ×0.90 = base ×1.08 vs the documented eBay target base ×1.10** — confirmed (Thinesh).
+- **Priority £5/£2 cutoffs** — confirmed (Thinesh).
+- **Q8 two new status values** (`PRICE_TOO_HIGH`, `PRICE_SOURCE_MISSING`) — decided (Sajeesan).
+- **FX** for the German (EUR) accounts — confirmed (Thinesh).
+- **Reviewer sign-off** — Sajeesan (technical) + Tamil Selvan (queryability) — complete.

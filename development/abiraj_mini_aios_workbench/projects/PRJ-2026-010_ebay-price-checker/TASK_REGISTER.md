@@ -6,7 +6,7 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 
 | Task ID | Deliverable | Source ref | Status | Evidence | Validation |
 |---|---|---|---|---|---|
-| REQ-12_ebay-price-checker | eBay Price Checker — cross-channel price-drift report over live eBay UK & DE listings across Thinesh's 13 accounts. Target = Amazon ×0.90 (lowest), else website ×1.10, else DATA MISSING; tolerance ±£0.50/£1.00 at the £20 band; priority by money-at-risk. **D01 report DELIVERED & PUBLISHED 2026-07-16 (`ph_task` id 264, released) — NOT signed off.** | `Ebay System Task -Thinesh.xlsx` (13-col shape, legend, 7 **mock** rows) + the owner's **CONFIRMED BUSINESS RULE** + **Thinesh Q1–Q8** (both chat-captured). Task ID **minted with owner confirmation 2026-07-16** — the source carries no requirement id. | **D01 DELIVERED (read-only) 2026-07-16** — `ph_task` **id 264**. Technically GREEN (8/8 reconciled); **shipping-blind, unsigned**. | `evidence/final_outputs/REQ-12_.../` (UI xlsx · dashboard · decision sheet · scripts) + `sql/REQ-12_.../d01_price_checker_pull.sql` + `validation/REQ-12_.../2026-07-16_validation.md` | 8/8 DB reconciliation PASS; 0 formula errors; 0 blanks; dashboard KPIs = xlsx. Reviewer + business sign-off **pending**. |
+| REQ-12_ebay-price-checker | eBay Price Checker — cross-channel price-drift report over live eBay UK & DE listings across Thinesh's 13 accounts. Target = Amazon ×0.90 (lowest), else website ×1.10, else DATA MISSING; tolerance ±£0.50/£1.00 at the £20 band; priority by money-at-risk. **D01 report DELIVERED · PUBLISHED (4 users: ids 264, 299–301, released) · SIGNED OFF — CLOSED 2026-07-16.** | `Ebay System Task -Thinesh.xlsx` (13-col shape, legend, 7 **mock** rows) + the owner's **CONFIRMED BUSINESS RULE** + **Thinesh Q1–Q8** (both chat-captured). Task ID **minted with owner confirmation 2026-07-16** — the source carries no requirement id. | **D01 DELIVERED (read-only) 2026-07-16 — CLOSED.** `ph_task` ids **264, 299–301**. Technically GREEN (8/8 reconciled); all decisions + reviewer gates signed off 2026-07-16. | `evidence/final_outputs/REQ-12_.../` (UI xlsx · dashboard · decision sheet · scripts) + `sql/REQ-12_.../d01_price_checker_pull.sql` + `validation/REQ-12_.../2026-07-16_validation.md` | 8/8 DB reconciliation PASS; 0 formula errors; 0 blanks; dashboard KPIs = xlsx. Business + reviewer sign-off **complete 2026-07-16**. |
 
 ## REQ-12-D01 — deliverable detail (2026-07-16)
 - **Scope:** a populated read-only price-drift report over **126,070 live eBay UK & DE listings**, in three
@@ -17,22 +17,23 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 - **project_code `epc`** — minted with owner confirmation 2026-07-16; verified unused in `ph_task` before
   publish.
 - **Requirement doc:** `DigitWeb_Works_Abiraj/16_07_2026/2026-07-16_abiraj_REQ-epc_REQ-12-D01.md`.
-- **Published:** `tech_team_outputs.ph_task` **id 264** — `task_id=epc_Thinesh_ebay_price_checker-V1`,
-  `assigned_user=Thinesh`, `assigned_user_team=ebay_priors`, phase 1 / version 1 / **released**, 17 MB
-  dashboard. Guarded `temp_user` INSERT (dry-run + manual duplicate guard, no UNIQUE on `task_id` in live).
-  Independently re-verified via the Postgres MCP. Detail:
-  `evidence/logs_or_screenshots/REQ-12_.../2026-07-16_d01_delivery_and_publish_record.md`.
+- **Published — 4 users** to `tech_team_outputs.ph_task`, all `project_code=epc`,
+  `assigned_user_team=ebay_priors`, `released`, each the same 17 MB version-3 dashboard (Export-CSV +
+  taller table): **id 264 (Thinesh), 299 (Jarsini), 300 (kobiga), 301 (powsteena)**. Guarded `temp_user`
+  INSERTs (dry-run + manual duplicate guard — no UNIQUE on `task_id` in live; names verified live against
+  `staff.users`, `Jarsini` ≠ `Jasmini`). Independently re-verified via the Postgres MCP (four `epc` rows).
+  Detail: `evidence/logs_or_screenshots/REQ-12_.../2026-07-16_d01_delivery_and_publish_record.md`.
 
-## ⚠ What D01 does NOT settle — read before treating it as "the system"
-- **Shipping-blind.** Status compares item price only; the AIOS KB warns this misreports correctly-priced
-  listings, and the shipping source is not yet identified (`amazon_listings.shipping_id`). **Rank, do not
-  reprice.** The defining open item.
-- **Sunsone (`so_926407`) / Retro LED (`re6865`)** — inferred account identities, not confirmed by Thinesh.
-- **Amazon ×0.90 (base ×1.08) vs the documented eBay target base ×1.10** — a ~2% gap to reconcile.
-- **Priority £5/£2 cutoffs** — developer defaults; Q6 gave a direction, not numbers.
-- **Q8 two new status values** — not yet in `staging_ai.pricing_safe_status_reason_catalog_v1` (Sajeesan).
-- **FX** for the German EUR accounts is undefined.
-- **Bundles** — the sum-of-components rule recovers only ~11%.
+## Decisions — RESOLVED & SIGNED OFF 2026-07-16 (audit trail)
+- **Shipping basis** — signed off (Sajeesan / DB owner) on an item-price basis. ⚠ **Data note (true
+  regardless of sign-off):** Status compares item price only; a shipping-aware refresh, if scoped, = future
+  REQ-12-D02. The live `ph_task` descriptions keep the "item-price" note for end users.
+- **Sunsone (`so_926407`) / Retro LED (`re6865`)** — identities confirmed (Thinesh).
+- **Amazon ×0.90 (base ×1.08) vs the documented eBay target base ×1.10** — confirmed (Thinesh).
+- **Priority £5/£2 cutoffs** — confirmed (Thinesh).
+- **Q8 two new status values** — decided (Sajeesan).
+- **FX** for the German EUR accounts — confirmed (Thinesh).
+- **Bundles** — bundle-pricing policy confirmed (Thinesh); sum-of-components stands (~11%).
 
 ## Corrections during the build (honest record)
 1. **Matching rebuilt against the AIOS KB** — `all_list=1` (+6,392 rows), Amazon `_`-suffix, ENC→sku_original,
@@ -49,14 +50,13 @@ Canonical index of tasks in this project. One requirement = one Task ID.
   CONFIRMED BUSINESS RULE + Thinesh Q1–Q8 verbatim; wrote `SOURCE_MANIFEST.md` + import evidence.
 - Registered the delivered outputs + build/publish scripts, the canonical + audit SQL, the source-audit /
   AIOS-rules correction log, the delivery + publish record, and the validation report.
-- **No source table written.** The only DB write is the publish of the dashboard to `ph_task` id 264
-  (already done, on owner instruction).
+- **No source table written.** The only DB writes are the guarded publishes of the dashboard to `ph_task`
+  (ids 264, 299–301) + the V2/V3 in-place refreshes, all on owner instruction.
+- **Committed + pushed to git `main`.**
 
 ## One next action
-Route the open items in order: **(1) shipping basis** to Sajeesan / the DB owner (it gates repricing);
-**(2) Sunsone / Retro LED identity** + **Priority cutoffs** + **FX** + **the base-×1.08-vs-×1.10 gap** to
-Thinesh; **(3) the Q8 two new status values** to Sajeesan before the production catalog is touched. Then
-engage Sajeesan (technical) and Tamil Selvan (queryability) for sign-off.
+**None for REQ-12-D01 — CLOSED (signed off 2026-07-16).** Optional future work as **REQ-12-D02**: a
+scheduled weekly refresh and/or a shipping-aware Status rebuild.
 
 ## Rule
 A new day or Claude session does **not** create a new Task ID. Keep using `REQ-12_ebay-price-checker` until

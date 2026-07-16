@@ -51,13 +51,15 @@ The target-price rule and Thinesh's Q1–Q8 are in `evidence/source_documents/RE
 money-at-risk; bundles = sum components. **Do not blend, average, or let website override a valid Amazon
 match. Exact SKU only — never approximate/parent/ASIN** (owner FAIL conditions).
 
-## Open items (route — do NOT decide)
-- **Shipping basis** → Sajeesan / DB owner. The blocker for repricing.
-- **Sunsone (`so_926407`) / Retro LED (`re6865`) identity** → Thinesh (inferred, not confirmed).
-- **Priority £5/£2 cutoffs** → Thinesh (Q6 gave a direction, not numbers — the bands are the developer's).
-- **Q8 two new status values** (`PRICE_TOO_HIGH`, `PRICE_SOURCE_MISSING`) → Sajeesan before they enter
-  `staging_ai.pricing_safe_status_reason_catalog_v1` (duplicate-vocabulary risk).
-- **FX** for the German (EUR) accounts → Thinesh (Q7 said "same rules"; no rate given).
+## Decisions — RESOLVED & SIGNED OFF 2026-07-16 (REQ-12-D01 CLOSED; audit trail)
+- **Shipping basis** — signed off (Sajeesan / DB owner) on an item-price basis. Data note: Status compares
+  item price only; a shipping-aware refresh, if scoped, = future REQ-12-D02.
+- **Sunsone (`so_926407`) / Retro LED (`re6865`) identity** — confirmed (Thinesh).
+- **Priority £5/£2 cutoffs** — confirmed (Thinesh).
+- **Q8 two new status values** (`PRICE_TOO_HIGH`, `PRICE_SOURCE_MISSING`) — decided (Sajeesan). Do not alter
+  `staging_ai.pricing_safe_status_reason_catalog_v1` further without him.
+- **FX** for the German (EUR) accounts — confirmed (Thinesh).
+- Published to 4 users (`ph_task` ids 264, 299–301, `ebay_priors`, released); committed + pushed to `main`.
 
 ## Locked Conventions (from the sources — reproduce, do not re-invent)
 - Grain: **one row per eBay listing SKU** (`item_id` + `sku`). eBay price is per-variant (this resolves the

@@ -103,12 +103,14 @@ Priced OK **21,138** · Too high **40,261** · Too low **22,008** · DATA MISSIN
 well-centred (median drift from target +0.98%), so the flag rate is genuine price dispersion (±10%) vs a
 tight ±5% tolerance, **not** a basis error.
 
-## 10. ⚠ Known limitations (the report is correct-but-unsigned)
-- **Shipping-blind** — item-price only; AIOS KB warns this misreports correctly-priced listings; shipping
-  source not identified. **Rank, do not reprice.** The defining open item.
-- **Sunsone / Retro LED** account identities are inferred.
-- **Amazon ×0.90 = base ×1.08** vs the documented eBay target base ×1.10 (~2% gap).
-- **Priority cutoffs** £5/£2 are developer defaults.
-- **Q8** two new status values not yet in the production catalog (Sajeesan).
-- **FX** undefined for the EUR accounts.
-- **Bundles:** the sum-of-components rule recovers only ~11% of bundles (components often unpriced too).
+## 10. Characteristics & decisions — SIGNED OFF 2026-07-16 (REQ-12-D01 CLOSED)
+All items below were reviewed and signed off on 2026-07-16 (Thinesh / Sajeesan / Tamil Selvan):
+- **Item-price basis (shipping)** — signed off (Sajeesan). ⚠ **Still true regardless of sign-off:** Status
+  is computed on **item price only**; the AIOS KB notes a shipping-aware check would differ, so the live
+  dashboard keeps a "rank, don't reprice" banner and a shipping-aware Status rebuild = future REQ-12-D02.
+- **Sunsone (`so_926407`) / Retro LED (`re6865`)** account identities — confirmed (Thinesh).
+- **Amazon ×0.90 = base ×1.08 vs the documented eBay target base ×1.10** (~2% gap) — confirmed (Thinesh).
+- **Priority £5/£2 cutoffs** — confirmed (Thinesh).
+- **Q8** two new status values — decided (Sajeesan).
+- **FX** for the EUR accounts — confirmed (Thinesh).
+- **Bundles:** the sum-of-components rule recovers only ~11% of bundles — bundle policy confirmed (Thinesh).

@@ -27,9 +27,10 @@ ROW = {
    "else DATA MISSING; tolerance +/-£0.50/£1.00 at the £20 band. Sources (live, read-only, refreshed 2026-07-15): "
    "listings.ebay_listings / amazon_listings / shopify_listings (ledsone + ledsone-de) on the ledsone DB. SKU-normalised "
    "per AIOS rules (all_list=1, Amazon _-suffix, ENC->sku_original, PK pack qty). Result: Priced OK 21,138 / Too high 40,261 "
-   "/ Too low 22,008 / No target 42,663 (21,048 eBay-only + 21,615 bundles). NOT SIGNED OFF - Status is shipping-blind "
-   "(item-price only; AIOS notes shipping source not yet identified) so use for ranking, not repricing; account names "
-   "'Sunsone'(so_926407) and 'Retro LED'(re6865) are inferred; awaiting Thinesh + Sajeesan sign-off."),
+   "/ Too low 22,008 / No target 42,663 (21,048 eBay-only + 21,615 bundles). SIGNED OFF 2026-07-16 (CLOSED). "
+   "Status is computed on item price only (shipping accepted at sign-off; a shipping-aware refresh = future "
+   "REQ-12-D02) - use for ranking, not repricing. Note: this script published the initial Thinesh row; the "
+   "fan-out to Jarsini/kobiga/powsteena (ids 299-301) used the same guarded pattern."),
  "phase_level": 1,
  "version_level": 1,
  "version_status": "released",

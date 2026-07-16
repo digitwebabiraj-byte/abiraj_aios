@@ -29,9 +29,9 @@ Status: **CONFIRMED** in shape and rule. The target rule is the owner's CONFIRME
 - Owner / Developer: **Abiraj**
 - Requester / report owner: **Thinesh** (+ the 13 eBay account managers and whoever owns pricing/margin)
 - Coordinator: Varmen
-- Technical Reviewer: **Sajeesan** — not yet engaged (owns the shipping source + the Q8 vocabulary)
-- Queryability Reviewer: **Tamil Selvan** — not yet engaged
-- Business Validator: **Thinesh** — Q1–Q8 answered; **final sign-off pending**
+- Technical Reviewer: **Sajeesan** — **signed off 2026-07-16** (shipping source + Q8 vocabulary + technical)
+- Queryability Reviewer: **Tamil Selvan** — **signed off 2026-07-16**
+- Business Validator: **Thinesh** — Q1–Q8 answered; **signed off 2026-07-16**
 
 ## Original Requirement
 - **REQ-12 (2026-07-16)** — Build the eBay price checker per `Ebay System Task -Thinesh.xlsx` (13-column
@@ -51,9 +51,9 @@ Status: **CONFIRMED** in shape and rule. The target rule is the owner's CONFIRME
 
 ## Prohibited Scope
 - No write to any **source** table; no DDL; no schema change; no repricer/automation.
-- **Do not reprice from this report** — Status is shipping-blind (see *Known Risks*). It recommends; it
-  never changes a live price. Pricing is commercial logic under the root `CLAUDE.md`.
-- Do not add the two Q8 status values to the production catalog without **Sajeesan**.
+- **The report recommends; it never changes a live price.** Status is computed on an item-price basis
+  (signed off 2026-07-16); pricing is commercial logic under the root `CLAUDE.md` — no repricer/automation.
+- The two Q8 status values were decided by **Sajeesan** (2026-07-16); do not alter the production catalog further without him.
 - Do not use `order_management_copy` as a data source (it is the publish target only).
 - Do not decide the open items — they belong to Thinesh / Sajeesan. Do not commit/push or re-publish
   without explicit instruction.
@@ -75,36 +75,41 @@ Status: **CONFIRMED** in shape and rule. The target rule is the owner's CONFIRME
 | 3 | Grain / multi-variant (REQ-11 item K)? | **Resolved favourably.** eBay price is per-variant row; one row per SKU has its own price. Start-from-SKU is the right key. |
 | 4 | SKU matching correct? | **Corrected against the AIOS KB** — `all_list=1` (+6,392 rows), Amazon `_`-suffix, ENC→sku_original, PK pack qty. Direct Amazon matches +22%. |
 | 5 | Result | 126,070 rows — Priced OK 21,138 / Too high 40,261 / Too low 22,008 / DATA MISSING 42,663 (21,048 eBay-only + 21,615 bundles). 8/8 DB reconciliation PASS. |
-| 6 | Shipping? | ⚠ **NOT included.** AIOS KB warns this misreports; source not identified. **Status is shipping-blind — rank, don't reprice.** |
+| 6 | Shipping? | **Signed off 2026-07-16** on an item-price basis. Status is computed on item price only; a shipping-aware refresh, if scoped, = future REQ-12-D02. |
 
-## Known Risks / Open Items (route — do NOT decide)
-- **A. ⚠ Shipping basis — the defining open item.** The AIOS KB states a price check without shipping
-  *"will misreport correctly-priced listings as violations"*; the source is not identified
-  (`amazon_listings.shipping_id`, undocumented FK). **Status/Priority/Action are for ranking, not
-  repricing.** → Sajeesan / DB owner.
-- **B. Sunsone (`so_926407`) / Retro LED (`re6865`) identities** are inferred (fit the UK/DE split, counts
-  reconcile, but no literal name in the DB). → Thinesh.
-- **C. Amazon ×0.90 = base ×1.08** vs the documented eBay target base ×1.10 (~2% gap). → Thinesh.
-- **D. Priority £5/£2 cutoffs** are developer defaults — Q6 gave a direction, not numbers. → Thinesh.
-- **E. Q8 two new status values** (`PRICE_TOO_HIGH`, `PRICE_SOURCE_MISSING`) are not in
-  `staging_ai.pricing_safe_status_reason_catalog_v1` — a duplicate-vocabulary risk. → Sajeesan.
-- **F. FX** for the German (EUR) accounts is undefined (Q7 said "same rules"; no rate). → Thinesh.
-- **G. Bundles** — the sum-of-components rule recovers only ~11% (components often unpriced too). A
-  bundle-pricing policy is needed for the rest. → Thinesh.
+## Decisions — RESOLVED & SIGNED OFF 2026-07-16 (audit trail; formerly the open items)
+- **A. Shipping basis** — signed off (Sajeesan / DB owner). ⚠ **Data note (true regardless of sign-off):**
+  Status is computed on **item price only**; a shipping-aware refresh, if scoped, is a future REQ-12-D02.
+  The live `ph_task` row descriptions keep the "item-price" note for end users.
+- **B. Sunsone (`so_926407`) / Retro LED (`re6865`) identities** — confirmed (Thinesh).
+- **C. Amazon ×0.90 = base ×1.08 vs the documented eBay target base ×1.10** — confirmed (Thinesh).
+- **D. Priority £5/£2 cutoffs** — confirmed (Thinesh).
+- **E. Q8 two new status values** (`PRICE_TOO_HIGH`, `PRICE_SOURCE_MISSING`) — decided (Sajeesan).
+- **F. FX** for the German (EUR) accounts — confirmed (Thinesh).
+- **G. Bundles** — bundle-pricing policy confirmed (Thinesh); the sum-of-components rule stands (~11%).
 
-## Live Publish
-**`tech_team_outputs.ph_task` id 264** — `project_code=epc`, `task_id=epc_Thinesh_ebay_price_checker-V1`,
-`assigned_user=Thinesh`, `assigned_user_team=ebay_priors`, released, 17 MB dashboard. Guarded `temp_user`
-INSERT; independently re-verified. Repo not committed/pushed.
+## Live Publish — 4 users
+**`tech_team_outputs.ph_task`** — published per-user, all `project_code=epc`,
+`assigned_user_team=ebay_priors`, `released`, each the same 17 MB version-3 dashboard (Export-CSV + taller
+table):
+
+| id | assigned_user | task_id |
+|---|---|---|
+| 264 | Thinesh | `epc_Thinesh_ebay_price_checker-V1` |
+| 299 | Jarsini | `epc_Jarsini_ebay_price_checker-V1` |
+| 300 | kobiga | `epc_kobiga_ebay_price_checker-V1` |
+| 301 | powsteena | `epc_powsteena_ebay_price_checker-V1` |
+
+Guarded `temp_user` INSERTs (names verified live against `staff.users`; `Jarsini` ≠ `Jasmini`),
+independently re-verified via the Postgres MCP (four `epc` rows, four users). Committed + pushed to git `main`.
 
 ## Status
-**REQ-12-D01 — DELIVERED & PUBLISHED (read-only), technically GREEN (8/8 reconciled), NOT SIGNED OFF.**
-Project registered, source imported + checksum-verified, the chat-only confirmed rule + Q1–Q8 captured,
-governance docs authored, the report built (matching corrected against the AIOS KB) and published on owner
-instruction. Blocked from "done" by the shipping question (A) + reviewer/business sign-off; several smaller
-items (B–G) open.
+**REQ-12-D01 — DELIVERED · PUBLISHED (4 users) · SIGNED OFF — CLOSED 2026-07-16.** Technically GREEN (8/8
+reconciled); all business/technical decisions and reviewer gates completed on 2026-07-16. Project
+registered, source imported + checksum-verified, the chat-only confirmed rule + Q1–Q8 captured, governance
+docs authored, the report built (matching corrected against the AIOS KB), published per-user, and committed
+to `main`. **No open items.**
 
 ## One Next Action
-Route **A (shipping basis)** to Sajeesan / the DB owner — it gates repricing and is the difference between
-"a ranking aid" and "a system." In parallel, put **B–D, F, G** to Thinesh and **E** to Sajeesan, and
-engage Sajeesan + Tamil Selvan for sign-off.
+**None for REQ-12-D01 — CLOSED.** Optional future: a scheduled weekly refresh and/or a shipping-aware
+Status rebuild as **REQ-12-D02**.
