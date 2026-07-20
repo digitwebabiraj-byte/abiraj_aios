@@ -6,22 +6,39 @@ Runs headless (no MCP, no human): dynamic window -> pulls via psycopg2 -> builds
 Reporting month = the LAST COMPLETE calendar month relative to run date (matches the live dashboard's logic).
 LM = month before it; LY = same month last year.
 
-Connections (env vars; passwords NEVER hardcoded):
+Connections (env vars; passwords NEVER hardcoded — normally the global credential store,
+see 05_documentation/capability/shared_db_credentials/):
   Warehouse (reads + ph_task write):  PGHOST PGPORT PGDATABASE PGUSER PGPASSWORD
   Ledsone (reads: New Listings):      LED_PGHOST LED_PGPORT LED_PGDATABASE LED_PGUSER LED_PGPASSWORD
-If the ledsone vars are unset, New Listings degrade to 0 (everything else still runs).
 
-Flags:  --no-publish  (build only, do not write ph_task)
-Usage:  python ebpd_weekly_run.py [--no-publish]
+FAILS CLOSED: every gate runs BEFORE any write. Any failure -> exit 2, nothing published.
+Missing ledsone credentials are a HARD failure — New Listings must never silently publish as 0,
+because a reader cannot tell a real zero from an absent connection.
+
+Flags:  --no-publish / --dry-run  (build + validate only, write nothing)
+Usage:  python ebpd_weekly_run.py [--dry-run]
 Requires: build_html_v3.py alongside this file (its HTML template is reused verbatim).
 """
-import os, re, sys, json, calendar
+import os, re, sys, json, calendar, hashlib, datetime as _dt
 from datetime import date, timedelta
 import psycopg2
 from psycopg2.extras import execute_values
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PUBLISH = "--no-publish" not in sys.argv
+PUBLISH = not ("--no-publish" in sys.argv or "--dry-run" in sys.argv)
+MIN_ROWS = int(os.getenv("EBPD_MIN_ROWS", "10"))   # catastrophic-failure floor (expect ~22)
+
+def _status(state, msg):
+    try:
+        with open(os.path.join(HERE, "ebpd_status.txt"), "a", encoding="utf-8") as f:
+            f.write("[%s]  %s  |  %s\n" % (_dt.datetime.now().strftime("%Y-%m-%d %H:%M"), state, msg))
+    except Exception:
+        pass
+
+def die(m):
+    print("[EBPD] ABORT: %s  -> nothing published" % m, flush=True)
+    _status("FAILED", m)
+    sys.exit(2)
 
 # ---- connections (env, with the known warehouse defaults; ledsone must be provided) ----
 WH = dict(host=os.getenv("PGHOST","149.28.134.54"), port=os.getenv("PGPORT","5435"),
@@ -30,7 +47,12 @@ WH = dict(host=os.getenv("PGHOST","149.28.134.54"), port=os.getenv("PGPORT","543
 LED = dict(host=os.getenv("LED_PGHOST"), port=os.getenv("LED_PGPORT","5432"),
            dbname=os.getenv("LED_PGDATABASE"), user=os.getenv("LED_PGUSER"),
            password=os.getenv("LED_PGPASSWORD"))
-LED_OK = all([LED["host"], LED["dbname"], LED["user"], LED["password"]])
+# ---- credential gates (fail closed, before any connection) ----
+if not WH["password"]:
+    die("warehouse PGPASSWORD not set - see 05_documentation/capability/shared_db_credentials/")
+if not all([LED["host"], LED["dbname"], LED["user"], LED["password"]]):
+    die("ledsone LED_PG* credentials not set - refusing to publish New Listings as a silent 0")
+LED_OK = True
 
 # ---- reporting window (dynamic) ----
 def mbounds(y,m):
@@ -131,8 +153,6 @@ if LED_OK:
         i=dt.day-1
         if 0<=i<NDAYS: _dd(ss,site)["newl"][i]=int(n)
     led.close(); print(f"[EBPD] New Listings pulled from ledsone: {sum(newl.values())} total")
-else:
-    print("[EBPD] LEDSONE creds not set -> New Listings = 0 (set LED_PG* env to enable)")
 
 # 7) DAILY warehouse pulls (sales / ON_SITE ads / conversion) for the date-range presets
 for ss,mk,dt,od,un,rv in q("""SELECT ss_name,market_place,order_date::date,COUNT(DISTINCT order_id),SUM(quantity),SUM(order_total)
@@ -176,13 +196,57 @@ for (ss,mk) in sorted(jun_active, key=lambda k:-(sales[k]["jun"][0])):
     ls_=liststock.get((ss,mk),[0,0])
     nl=newl.get((ss,mk),0)
     ROWS.append([disp(ss),ss,mk,MLAB.get(mk,mk),rev,od,un,cvA,ad,ls_[0],nl,ls_[1]])
+print(f"[EBPD] assembled {len(ROWS)} account×marketplace rows · reporting revenue={round(sum(r[4][0] or 0 for r in ROWS),2)}")
+
+# ---- VALIDATION GATES (fail closed, BEFORE any write) ----------------------
+if not ROWS:                     die("0 account×marketplace rows - refusing to publish an empty dashboard")
+if len(ROWS) < MIN_ROWS:         die(f"only {len(ROWS)} rows (< floor {MIN_ROWS}) - looks like a broken pull")
+
+grain = [k for k in set((r[1], r[2]) for r in ROWS) if [ (x[1],x[2]) for x in ROWS ].count(k) > 1]
+if grain:                        die(f"grain broken - {len(grain)} duplicated account×marketplace pair(s): {grain[:5]}")
+if any((r[4][0] or 0) < 0 for r in ROWS):
+    die("a row has negative reporting-month revenue")
+
+# control total: the assembled rows must reconcile to a direct DB aggregate over the same window
+rep_rev = round(sum(r[4][0] or 0 for r in ROWS), 2)
+rep_ord = sum(r[5][0] or 0 for r in ROWS)
+db_rev, db_ord = q("""SELECT ROUND(SUM(order_total)::numeric,2), COUNT(DISTINCT order_id)
+    FROM order_transaction WHERE source_name='EBAY' AND order_status='Completed'
+      AND market_place IS NOT NULL AND ss_name = ANY(%s) AND order_date>=%s AND order_date<%s""",
+    (accts, d(js), d(je)))[0]
+if abs(float(db_rev or 0) - rep_rev) > 0.01:
+    die(f"control totals disagree: report revenue {rep_rev} vs DB {db_rev}")
+print(f"[EBPD] control totals reconcile: revenue {rep_rev} | rows {rep_ord} orders vs DB {db_ord} distinct")
+
+# Anchor DRIFT checks — the owner's own live-DB figures for the reference month (project CLAUDE.md).
+# A closed month legitimately restates as refunds/cancellations land (verified 2026-07-20: led_sone UK
+# moved 28,975.37 -> 28,941.61, i.e. -33.76 / -0.12%, matching 45 Refunded + 7 Cancelled June orders).
+# So this is a DRIFT band, not an equality gate: it still catches a broken pull (orders of magnitude),
+# while tolerating normal restatement. The drift is logged every run so erosion is never silent.
+# ⚠ ANCHOR_TOL is a PROVISIONAL developer default — route to the Business Validator (Thinesh) to confirm.
+ANCHOR_TOL = float(os.getenv("EBPD_ANCHOR_TOL", "0.01"))    # 1% of the signed-off value
+if REP_LABEL == "June 2026":
+    anchors = {("led_sone","UK"): ("revenue", 28975.37), ("so_926407","UK"): ("ad_spend", 884.07)}
+    for (ss, mk), (what, want) in anchors.items():
+        row = next((r for r in ROWS if r[1] == ss and r[2] == mk), None)
+        if row is None:              die(f"anchor row {ss}/{mk} missing from the June 2026 rebuild")
+        got = row[4][0] if what == "revenue" else ((row[8] or [None])[0])
+        if got is None:              die(f"anchor {ss}/{mk} {what} is missing from the rebuild")
+        drift = float(got) - want
+        if abs(drift) > want * ANCHOR_TOL:
+            die(f"anchor drift too large: {ss}/{mk} {what} = {got} vs signed-off {want} "
+                f"({drift:+.2f}, {drift/want:+.2%} > {ANCHOR_TOL:.0%}) - investigate before publishing")
+        print(f"[EBPD] anchor {ss}/{mk} {what}: {got} vs signed-off {want} ({drift:+.2f}, {drift/want:+.2%})")
+print("[EBPD] validation: all gates PASSED")
 wh.close()
-print(f"[EBPD] assembled {len(ROWS)} account×marketplace rows · June revenue={round(sum(r[4][0] or 0 for r in ROWS),2)}")
 
 # ---- build HTML via build_html_v3.build() — data pre-rendered as STATIC HTML (works with no JS) ----
 sys.path.insert(0, HERE)
 import build_html_v3
 html=build_html_v3.build(ROWS, REP_LABEL, daily=daily, ndays=NDAYS)   # daily -> in-month date-range presets
+if "__PAYLOAD__" in html:  die("dashboard template did not render (placeholder left)")
+if len(html) < 100_000:    die(f"dashboard only {len(html)} bytes - render looks broken")
+HTML_MD5 = hashlib.md5(html.encode("utf-8")).hexdigest()
 OUT_HTML=os.path.join(HERE,"ebpd_auto_dashboard.html")
 open(OUT_HTML,"w",encoding="utf-8").write(html)
 print(f"[EBPD] HTML written: {OUT_HTML} ({len(html)} bytes)")
@@ -198,17 +262,30 @@ if PUBLISH:
            f"ebpd_{u}_ebay_account_performance_{mtag}","Development","Abiraj",u,"ebay_priors",html,
            f"eBay Account Performance Dashboard ({REP_LABEL}) — auto weekly refresh, all eBay accounts × marketplaces, order_total sales, ON_SITE ad + TACOS.",
            1,1,"released") for u in ASSIGNED]
-    with psycopg2.connect(**WH) as conn:
-        with conn.cursor() as pc:
-            # delete this month's rows (refresh) + any leftover legacy fixed-id rows (dedupe the month)
-            pc.execute("DELETE FROM tech_team_outputs.ph_task WHERE task_id = ANY(%s)",(task_ids+legacy_ids,))
-            execute_values(pc,"""INSERT INTO tech_team_outputs.ph_task
-              (project_name,project_code,task_name,task_id,team,developer,assigned_user,assigned_user_team,
-               html_content,description,phase_level,version_level,version_status,created_at,updated_at)
-              VALUES %s RETURNING id,assigned_user""",rows,
-              template="(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,now(),now())")
-            for r in pc.fetchall(): print(f"  published id={r[0]} user={r[1]}")
-    print("[EBPD] published to ph_task (4 users).")
+    try:
+        with psycopg2.connect(**WH) as conn:      # one transaction; auto-rollback on exception
+            with conn.cursor() as pc:
+                # delete this month's rows (refresh) + any leftover legacy fixed-id rows (dedupe the month)
+                pc.execute("DELETE FROM tech_team_outputs.ph_task WHERE task_id = ANY(%s)",(task_ids+legacy_ids,))
+                execute_values(pc,"""INSERT INTO tech_team_outputs.ph_task
+                  (project_name,project_code,task_name,task_id,team,developer,assigned_user,assigned_user_team,
+                   html_content,description,phase_level,version_level,version_status,created_at,updated_at)
+                  VALUES %s RETURNING id,assigned_user""",rows,
+                  template="(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,now(),now())")
+                pub=pc.fetchall()
+                if len(pub)!=len(ASSIGNED):
+                    raise RuntimeError(f"inserted {len(pub)} rows, expected {len(ASSIGNED)} - rolling back")
+                # md5-verify every stored payload BEFORE the commit
+                bad=[]
+                for rid,user in pub:
+                    pc.execute("SELECT md5(html_content) FROM tech_team_outputs.ph_task WHERE id=%s",(rid,))
+                    if pc.fetchone()[0]!=HTML_MD5: bad.append((rid,user))
+                if bad:
+                    raise RuntimeError(f"md5 verify failed pre-commit {bad} - rolling back")
+                for rid,user in pub: print(f"  published id={rid} user={user} md5={HTML_MD5[:8]}")
+    except Exception as e:
+        die(f"publish failed, transaction rolled back: {e}")
+    print(f"[EBPD] published to ph_task ({len(ASSIGNED)} users), {len(ASSIGNED)} payloads md5-verified.")
 else:
     print("[EBPD] --no-publish: skipped ph_task write.")
 print("[EBPD] done.")
