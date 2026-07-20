@@ -1,0 +1,224 @@
+# -*- coding: utf-8 -*-
+"""Generate the per-marketplace eBay dashboard (order_total sales). Rows = account x marketplace."""
+import json
+
+# name, store, mkt, mktCode, rev[j,m,l], ord[j,m,l], units[j,m,l], conv[j,m,l], ad[sp,sa,od,ck]|None, active, newl, stock
+R = [
+ ["LEDSONE UK","led_sone","UK","UK",[28975.37,33956.80,38047.84],[1517,1677,1896],[2452,3009,3344],[0.0226,0.0236,0.0211],[3495.23,17866.20,1512,18165],2779,48,2592263],
+ ["LEDSONE UK","led_sone","Germany","DE",[7489.41,7350.77,9619.53],[310,358,490],[532,560,741],[0.0202,0.0217,0.0203],[698.81,3178.13,242,3841],1315,24,1302951],
+ ["LEDSONE UK","led_sone","France","FR",[255.15,156.12,86.68],[3,2,2],[9,5,4],[0.0056,0.0021,0.0000],[10.62,115.92,3,62],364,0,569768],
+ ["LEDSONE UK","led_sone","US","US",[167.10,1197.31,477.56],[4,12,9],[5,44,11],[0.0044,0.0093,0.0056],[32.47,95.73,3,145],390,0,539024],
+ ["LEDSONE UK","led_sone","Italy","IT",[128.83,272.97,108.84],[2,1,2],[4,12,3],[None,None,None],None,136,0,349400],
+ ["SUNSONE UK","so_926407","UK","UK",[10252.84,10427.91,7476.43],[510,572,446],[803,889,837],[0.0202,0.0210,None],[884.07,4832.34,434,5612],1138,33,1707855],
+ ["SUNSONE UK","so_926407","Germany","DE",[1864.10,1815.18,2112.85],[82,77,120],[107,114,164],[0.0221,0.0225,None],[226.18,1079.83,59,1308],293,0,320423],
+ ["Electricalsone UK","electricalsone","UK","UK",[12285.07,13982.62,16692.88],[570,750,993],[930,1235,1518],[0.0215,0.0240,0.0269],[744.58,5131.38,314,5410],1490,36,1910861],
+ ["Electricalsone UK","electricalsone","Germany","DE",[1474.31,3138.43,3204.66],[79,192,166],[114,293,294],[0.0215,0.0330,0.0252],[127.79,527.19,40,775],485,0,493928],
+ ["Electricalsone UK","electricalsone","US","US",[463.59,843.21,402.10],[10,25,4],[17,29,9],[0.0111,0.0148,0.0085],None,378,0,420445],
+ ["Electricalsone UK","electricalsone","Canada","CA",[231.84,138.57,None],[2,2,None],[3,3,None],[None,None,None],[3.95,97.62,1,15],154,0,287756],
+ ["Electricalsone UK","electricalsone","France","FR",[62.14,201.96,None],[1,4,None],[2,8,None],[0.0030,0.0106,0.0000],[7.31,0,0,48],165,0,101772],
+ ["LEDSONE DE","ledsonede","Germany","DE",[5715.68,8391.54,6742.58],[259,420,275],[376,585,480],[0.0194,0.0259,None],[652.91,2937.36,209,3811],604,9,824341],
+ ["Huettenlampen DE","huettenlampen","Germany","DE",[11408.15,10289.56,9667.73],[488,475,448],[729,727,656],[0.0320,0.0300,None],[904.83,6239.27,355,4636],535,19,537264],
+ ["Huettenlampen DE","huettenlampen","Italy","IT",[10.52,None,None],[1,None,None],[2,None,None],[None,None,None],None,2,0,178],
+ ["Coventry Lights UK","coventrylights","UK","UK",[7330.82,8149.76,3974.38],[337,426,240],[495,713,362],[0.0233,0.0253,None],None,523,31,1133408],
+ ["Vintage Interior UK","vintageinterior","UK","UK",[3052.92,3383.36,4382.34],[180,215,207],[316,412,359],[0.0231,0.0283,None],None,467,14,970293],
+ ["DC Transformer UK","dctransformer","UK","UK",[1804.58,1801.32,2841.82],[142,130,209],[249,223,331],[0.0251,0.0261,None],None,459,0,727781],
+ ["RE6865 UK","re6865","UK","UK",[1129.70,1648.04,2715.95],[55,52,168],[87,91,243],[0.0180,0.0162,None],None,394,0,811460],
+ ["Neighbour Market US","neighbourmarket","US","US",[203.29,434.64,121.45],[4,8,2],[9,13,3],[None,None,None],None,338,0,416518],
+ ["Lighting Sone UK","lighting_sone","UK","UK",[689.24,1054.08,667.21],[50,58,35],[63,85,47],[0.0240,0.0202,None],None,243,7,642464],
+ ["Homin GmbH DE","homin_gmbh","Germany","DE",[460.53,280.22,257.38],[19,12,13],[26,15,21],[0.0124,0.0082,None],None,147,27,222349],
+]
+keys=["name","store","mkt","mkc","rev","ord","units","conv","ad","active","newl","stock"]
+ROWS=[dict(zip(keys,r)) for r in R]
+DATA=json.dumps(ROWS)
+
+html = r'''<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eBay Account Performance — June 2026</title>
+<style>
+:root{--bg:#eef1f5;--bg2:#e7ebf1;--card:#fff;--ink:#111a2b;--ink2:#28344a;--muted:#5b6a86;--faint:#8592a8;
+--line:#e3e8ef;--line2:#eef1f6;--slate:#1e293b;--slate2:#334155;--teal:#0d9488;--teal2:#14b8a6;--tealbg:#d6f2ee;--teald:#0b7d72;
+--green:#15803d;--greenbg:#dcf5e4;--amber:#b45309;--amberbg:#fceccb;--red:#dc2626;--redbg:#fce1e1;--gold:#d99e00;
+--sh-sm:0 1px 2px rgba(17,26,43,.07);--sh:0 10px 28px -14px rgba(30,41,59,.32);--r:16px;}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;color:var(--ink);background:linear-gradient(180deg,var(--bg),var(--bg2));
+font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Arial,sans-serif;font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{width:100%;max-width:100%;padding:16px clamp(12px,2.2vw,34px) 60px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin:4px 0}
+.kpi{position:relative;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px 13px;box-shadow:var(--sh-sm);overflow:hidden}
+.kpi .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:15px;background:var(--tealbg);margin-bottom:8px}
+.kpi.g .ic{background:var(--greenbg)}.kpi.a .ic{background:var(--amberbg)}.kpi.r .ic{background:var(--redbg)}
+.kpi .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.kpi .val{font-size:20px;font-weight:800;margin-top:3px;color:var(--ink)}
+.kpi .sub{font-size:10.5px;color:var(--faint);margin-top:2px}
+.kpi .rib{position:absolute;top:0;right:0;padding:2px 9px;border-bottom-left-radius:10px;font-size:9px;font-weight:800}
+.kpi.g .rib{background:var(--greenbg);color:var(--green)}.kpi.a .rib{background:var(--amberbg);color:var(--amber)}
+.shead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:18px 0 8px}
+.shead h2{font-size:15.5px;margin:0;display:flex;align-items:center;gap:9px;font-weight:700}
+.shead h2 .d{width:9px;height:9px;border-radius:2px;background:var(--teal);transform:rotate(45deg)}
+.count{font-size:12px;font-weight:700;color:var(--teal);background:var(--tealbg);padding:3px 10px;border-radius:20px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.search{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:5px 11px;box-shadow:var(--sh-sm)}
+.search input{border:none;outline:none;font-size:12.5px;background:transparent;color:var(--ink);width:150px;font-family:inherit}
+.sel{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:6px 10px;font-size:12.5px;color:var(--ink2);box-shadow:var(--sh-sm);cursor:pointer;font-family:inherit;font-weight:600}
+.btn{background:var(--teal);color:#fff;border:none;border-radius:9px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:var(--sh-sm);font-family:inherit}
+.btn:hover{background:var(--teald)}.btn.ghost{background:var(--card);color:var(--slate2);border:1px solid var(--line)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 15px;align-items:center;font-size:11.5px;color:var(--muted);margin:2px 0 9px}
+.legend .lg{display:inline-flex;align-items:center;gap:6px}.sw{width:13px;height:13px;border-radius:4px;display:inline-block;border:1px solid rgba(0,0,0,.05)}
+.tcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.snote{font-size:11.5px;color:var(--faint);padding:9px 16px 0}
+.scroll{overflow-x:auto}
+.mainscroll{overflow:auto;max-height:calc(100vh - 24px)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-variant-numeric:tabular-nums}
+table.main{min-width:1720px;font-size:13px}
+thead th{background:var(--slate2);color:#fff;font-weight:600;padding:10px 11px;white-space:nowrap;position:sticky;top:0;z-index:2;font-size:11.5px;vertical-align:middle}
+thead tr.grp th{background:var(--slate);font-size:11px;text-transform:uppercase;letter-spacing:.9px;text-align:center;border-left:2px solid rgba(255,255,255,.14);padding:8px 10px}
+thead tr.grp th.tealh{background:var(--teal)}
+thead tr.cols th{top:35px;text-align:right;border-left:1px solid rgba(255,255,255,.08)}
+th.acc,td.acc{position:sticky;left:0;text-align:left;min-width:210px}
+thead th.acc{z-index:5;background:var(--slate2)}
+tbody td.acc{background:var(--card);z-index:1}
+tbody td{padding:10px 11px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line2);color:var(--ink2)}
+tbody tr:hover td{background:#f2fbf9}tbody tr:hover td.acc{background:#e9f7f4}
+.sep{border-left:2px solid #dbe2ec}
+.p-jun{background:#fbfdfc}.p-lm{background:#f6f9fb;color:#495569}.p-ly{background:#f8fafc;color:#66728a}
+tbody tr:hover .p-jun,tbody tr:hover .p-lm,tbody tr:hover .p-ly{background:#f2fbf9}
+.aname{font-weight:700;font-size:13px;color:var(--ink)}.store{font-size:10px;color:var(--faint);font-weight:600}
+.flag{display:inline-block;min-width:30px;text-align:center;font-weight:800;color:#fff;background:var(--teal);border-radius:6px;padding:2px 7px;font-size:11px}
+.pill{display:inline-block;padding:3px 9px;border-radius:7px;font-weight:800;font-size:12px}
+.g{background:var(--greenbg);color:var(--green)}.y{background:var(--amberbg);color:var(--amber)}.rr{background:var(--redbg);color:var(--red)}
+.delta{font-size:10px;font-weight:700;display:block;margin-top:2px}.up{color:var(--green)}.down{color:var(--red)}.flat{color:var(--faint)}
+.na{color:var(--faint);font-style:italic;font-weight:600}
+.rk{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;font-weight:800;font-size:11px;color:#fff}
+.rk1{background:linear-gradient(145deg,#f3ca3e,#d99e00)}.rk2{background:linear-gradient(145deg,#c4cfdd,#94a3b8)}.rk3{background:linear-gradient(145deg,#e0a366,#c07b3a)}.rkn{background:#e4e9f0;color:#67728a}
+.noads{display:inline-block;font-size:9px;font-weight:800;color:#7c8aa2;background:#eef1f6;border:1px solid #e0e6ef;border-radius:5px;padding:1px 6px;margin-left:6px}
+tr.tot td{background:#eef4f3!important;font-weight:800;border-top:2px solid var(--teal);border-bottom:none;font-size:13px;color:var(--ink)}
+tr.tot td.acc{background:#eef4f3!important}.nores td{padding:20px;text-align:center;color:var(--faint);font-style:italic}
+table.mkt{min-width:760px;font-size:12.8px}table.mkt td.mk{text-align:left;font-weight:700;color:var(--slate2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px}@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh-sm);overflow:hidden}
+.panel h3{margin:0;padding:14px 18px;font-size:13.5px;background:var(--tealbg);color:#0b5f57;border-bottom:1px solid var(--line)}
+.mini{width:100%;border-collapse:collapse;font-size:12.6px}.mini td,.mini th{padding:9px 14px;text-align:left;border-bottom:1px solid var(--line2)}
+.mini th{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase}.mini td.rt{text-align:right}
+details.notes{margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh-sm);overflow:hidden}
+details.notes summary{cursor:pointer;padding:15px 18px;font-weight:700;color:#0b5f57;background:var(--tealbg)}
+details.notes .nb{padding:14px 22px;font-size:12.8px}details.notes ul{margin:0;padding-left:18px}details.notes li{margin:6px 0}
+.foot{margin-top:26px;text-align:center;font-size:11.5px;color:var(--faint)}
+@media print{.btn,.toolbar .search,.sel{display:none!important}.mainscroll{max-height:none;overflow:visible}table.main{min-width:0;font-size:9px}thead th{position:static}}
+</style></head><body><div class="wrap">
+<div class="kpis" id="kpis"></div>
+<div class="shead"><h2><span class="d"></span> Account &times; Marketplace Performance <span class="count" id="rc"></span></h2>
+<div class="toolbar">
+<div class="search">&#128269;<input id="q" placeholder="Search account/store&hellip;" autocomplete="off"></div>
+<select id="fAcc" class="sel"></select><select id="fMkt" class="sel"></select>
+<select id="fSort" class="sel"><option value="revenue">Sort: Revenue</option><option value="orders">Sort: Orders</option><option value="units">Sort: Units</option><option value="aov">Sort: AOV</option><option value="conv">Sort: Conversion</option><option value="acos">Sort: ACOS (best)</option><option value="roas">Sort: ROAS</option><option value="active">Sort: Active Listings</option></select>
+<button class="btn" id="expCsv">&#10515; Export CSV</button><button class="btn ghost" id="expPrint">&#128424; Print / PDF</button>
+</div></div>
+<div class="legend"><span class="lg"><span class="sw" style="background:var(--greenbg)"></span> On target</span><span class="lg"><span class="sw" style="background:var(--amberbg)"></span> Watch</span><span class="lg"><span class="sw" style="background:var(--redbg)"></span> Action</span><span class="lg">&#9650;/&#9660; vs Last Month</span><span class="lg">&#129351; rank</span><span class="lg">&mdash; n/a</span></div>
+<div class="tcard"><div class="snote">&#8596; Scroll for all columns &middot; Account + Market stay pinned &middot; headers stay fixed. Sales = order_total (product + postage actually paid), completed orders.</div>
+<div class="scroll mainscroll"><table class="main"><thead>
+<tr class="grp"><th class="acc" rowspan="2">Account &amp; Marketplace</th><th colspan="15">Sales</th><th colspan="5" class="tealh">Advertising</th><th colspan="4">Listings &amp; Stock</th></tr>
+<tr class="cols"><th class="sep">Revenue</th><th>LM</th><th>LY</th><th class="sep">Orders</th><th>LM</th><th>LY</th><th class="sep">Units</th><th>LM</th><th>LY</th><th class="sep">AOV</th><th>LM</th><th>LY</th><th class="sep">Conv.</th><th>LM</th><th>LY</th><th class="sep">Ad Spend</th><th>Ad Sales</th><th>TACOS</th><th>Return</th><th>PPC Rk</th><th class="sep">Active</th><th>New</th><th>Sales Rk</th><th>Stock</th></tr>
+</thead><tbody id="tb"></tbody></table></div></div>
+<div class="shead"><h2><span class="d"></span> By Marketplace &mdash; all accounts combined <span class="count">7 markets</span></h2></div>
+<div class="tcard"><div class="scroll"><table class="mkt"><thead><tr><th class="acc" style="min-width:150px">Marketplace</th><th style="text-align:right">Revenue</th><th style="text-align:right">Orders</th><th style="text-align:right">Units</th><th style="text-align:right">Ad Spend</th><th style="text-align:right">TACOS</th><th style="text-align:right">Return</th><th style="text-align:right">Rows</th></tr></thead><tbody id="ms"></tbody></table></div></div>
+<div class="grid2"><div class="panel"><h3>&#127919; KPI Thresholds</h3><table class="mini" id="thr"></table></div><div class="panel"><h3>&#9889; Automation Impact</h3><table class="mini" id="auto"></table></div></div>
+<details class="notes"><summary>Definitions, data sources &amp; notes</summary><div class="nb"><ul>
+<li><b>Rows = account &times; marketplace.</b> "LEDSONE UK &middot; UK" = led_sone sold to UK buyers (&pound;28,975.37); its German/FR/US/IT sales are their own rows. Nothing aggregated, nothing double-counted.</li>
+<li><b>Sales = SUM(order_total)</b> &mdash; eBay's actual order value (product + postage actually paid), completed orders only. (This corrects the earlier product+template-postage method.)</li>
+<li><b>Ad Spend / Ad Sales</b> = eBay Promoted Listings <b>Priority / ON_SITE</b> campaigns only (record_subtype=ON_SITE; Standard COST_PER_SALE excluded per Thinesh). <b>Ad Sales</b> is eBay-attributed at ON_SITE level (stays under real revenue at this scope) &middot; <b>TACOS</b> = Ad Spend &divide; total revenue &middot; <b>Return</b> = total revenue &divide; Ad Spend &middot; <b>PPC Rank</b> = by spend. ACOS/ROAS on attributed sales are not shown (attribution overlaps across campaigns); TACOS is spend against real total revenue.</li>
+<li><b>Conversion</b> = account conversions &divide; page-views (whole-account traffic, per marketplace) &middot; <b>Active</b> = distinct eBay listings on that site &middot; <b>New</b> = listings created in June (ledsone listings.ebay_listings.created_at) &middot; <b>Sales Rank</b> = rows ranked by revenue.</li>
+<li><b>Stock</b> = warehouse units for that site's SKUs &mdash; physical stock is shared across sites, so it overlaps between rows.</li>
+<li>Conversion RAG threshold (green &gt;4.5%) predates whole-account conversion (~2-3%) &mdash; recalibration pending.</li>
+</ul></div></details>
+<div class="foot">EBPD &middot; REQ-13-D01 &middot; per-marketplace view &middot; sales = order_total &middot; read-only reporting from live warehouse.</div>
+</div>
+<script>
+const ROWS=__DATA__;
+const MKTS=["UK","Germany","France","Italy","Ireland","US","Canada"],MLAB={UK:"UK",Germany:"DE",France:"FR",Italy:"IT",Ireland:"IE",US:"US",Canada:"CA"};
+const gbp=n=>n==null?"&mdash;":"&pound;"+Math.round(n).toLocaleString();
+const gbp2=n=>n==null?"&mdash;":"&pound;"+n.toFixed(2);
+const num=n=>n==null?"&mdash;":Math.round(n).toLocaleString();
+const pct=n=>n==null?"&mdash;":(n*100).toFixed(2)+"%";
+const aov=(r,o)=>o?r/o:null;
+const cCls=c=>c==null?"":c>0.045?"g":c>=0.03?"y":"rr",aCls=a=>a<0.12?"g":a<=0.18?"y":"rr",rCls=r=>r>8?"g":r>=5?"y":"rr",gCls=g=>g>0.10?"g":g>=0?"y":"rr";
+const dash='<span class="na">&mdash;</span>';
+function rankBadge(n){if(!n)return dash;const c=n===1?"rk1":n===2?"rk2":n===3?"rk3":"rkn";return '<span class="rk '+c+'">'+n+'</span>';}
+function arrow(c,p){if(p==null||c==null)return"";const g=(c-p)/p,cl=g>0.001?"up":g<-0.001?"down":"flat",a=g>0.001?"&#9650;":g<-0.001?"&#9660;":"&ndash;";return '<span class="delta '+cl+'">'+a+' '+(Math.abs(g)*100).toFixed(0)+'%</span>';}
+// ranks
+const salesRank={},ppcRank={};
+[...ROWS].map((d,i)=>({i,v:d.rev[0]})).sort((a,b)=>b.v-a.v).forEach((o,k)=>salesRank[o.i]=k+1);
+[...ROWS].map((d,i)=>({i,v:d.ad?d.ad[0]:-1})).filter(o=>o.v>=0).sort((a,b)=>b.v-a.v).forEach((o,k)=>ppcRank[o.i]=k+1);
+const maxRev=Math.max(...ROWS.map(d=>d.rev[0]));
+// totals
+let T={rev:0,ord:0,units:0,sp:0,sa:0,active:0,newl:0,stock:0};
+ROWS.forEach(d=>{T.rev+=d.rev[0];T.ord+=d.ord[0];T.units+=d.units[0];if(d.ad){T.sp+=d.ad[0];T.sa+=d.ad[1];}T.active+=d.active;T.newl+=d.newl;T.stock+=d.stock;});
+const tAov=T.rev/T.ord,tAcos=T.sp/T.sa,tRoas=T.sa/T.sp;
+function fmt(k,v){return k=='gbp'?gbp(v):k=='num'?num(v):k=='gbp2'?gbp2(v):k=='pct'?pct(v):k=='dec'?v.toFixed(2):Math.round(v);}
+const KP=[["&#128183;","Total Revenue",T.rev,"gbp","","order_total, completed"],["&#129534;","Total Orders",T.ord,"num","",num(T.units)+" units"],["&#127919;","Overall AOV",tAov,"gbp2","",""],["&#127978;","Rows (acct&times;mkt)",ROWS.length,"int","","12 accounts &middot; 7 markets"],["&#128227;","Ad Spend",T.sp,"gbp","","TACOS "+pct(T.sp/T.rev)],["&#128201;","Overall TACOS",T.sp/T.rev,"pct",(T.sp/T.rev)<0.12?"g":"a","spend&divide;total revenue"],["&#128200;","Total Return",T.rev/T.sp,"dec",(T.rev/T.sp)>8?"g":"a","revenue&divide;ad spend"],["&#127991;&#65039;","Active Listings",T.active,"num","","new "+num(T.newl)]];
+document.getElementById('kpis').innerHTML=KP.map(k=>'<div class="kpi '+(k[4]||'')+'">'+(k[4]?'<span class="rib">'+(k[4]=='g'?'GOOD':'WATCH')+'</span>':'')+'<div class="ic">'+k[0]+'</div><div class="lbl">'+k[1]+'</div><div class="val">'+fmt(k[3],k[2])+'</div><div class="sub">'+k[5]+'</div></div>').join("");
+// filters
+document.getElementById('fAcc').innerHTML='<option value="ALL">Account: All</option>'+[...new Map(ROWS.map(d=>[d.store,d.name])).entries()].map(e=>'<option value="'+e[0]+'">Account: '+e[1]+'</option>').join("");
+document.getElementById('fMkt').innerHTML='<option value="ALL">Marketplace: All</option>'+MKTS.map(m=>'<option value="'+m+'">Marketplace: '+MLAB[m]+' &mdash; '+m+'</option>').join("");
+function sv(d,k){if(k=='revenue')return d.rev[0];if(k=='orders')return d.ord[0];if(k=='units')return d.units[0];if(k=='aov')return aov(d.rev[0],d.ord[0])||0;if(k=='conv')return d.conv[0]==null?-1:d.conv[0];if(k=='acos')return d.ad?d.ad[0]/d.ad[1]:Infinity;if(k=='roas')return d.ad?d.ad[1]/d.ad[0]:-1;if(k=='active')return d.active;return d.rev[0];}
+const tb=document.getElementById('tb');
+function render(){
+ const q=document.getElementById('q').value.trim().toLowerCase(),acc=document.getElementById('fAcc').value,mkt=document.getElementById('fMkt').value,sort=document.getElementById('fSort').value;
+ let rows=ROWS.map((d,i)=>({d,i})).filter(o=>acc=='ALL'||o.d.store==acc).filter(o=>mkt=='ALL'||o.d.mkt==mkt).filter(o=>!q||o.d.name.toLowerCase().includes(q)||o.d.store.toLowerCase().includes(q));
+ rows.sort((a,b)=>sort=='acos'?sv(a.d,sort)-sv(b.d,sort):sv(b.d,sort)-sv(a.d,sort));
+ window.__rows=rows;
+ tb.innerHTML="";
+ if(!rows.length){tb.innerHTML='<tr class="nores"><td colspan="25">No rows match.</td></tr>';document.getElementById('rc').textContent="0 rows";return;}
+ let X={rev:0,ord:0,units:0,sp:0,sa:0,active:0,newl:0,stock:0,ad:false};
+ rows.forEach(o=>{const d=o.d;X.rev+=d.rev[0];X.ord+=d.ord[0];X.units+=d.units[0];if(d.ad){X.sp+=d.ad[0];X.sa+=d.ad[1];X.ad=true;}X.active+=d.active;X.newl+=d.newl;X.stock+=d.stock;
+  const AOV=[0,1,2].map(i=>aov(d.rev[i],d.ord[i])),tacos=d.ad?d.ad[0]/d.rev[0]:null,ret=d.ad?d.rev[0]/d.ad[0]:null,grow=d.rev[1]!=null?(d.rev[0]-d.rev[1])/d.rev[1]:null;
+  const revC=grow!=null?'<span class="pill '+gCls(grow)+'">'+gbp(d.rev[0])+'</span>'+arrow(d.rev[0],d.rev[1]):'<b>'+gbp(d.rev[0])+'</b>';
+  tb.insertAdjacentHTML('beforeend','<tr>'+
+   '<td class="acc"><span class="flag">'+MLAB[d.mkt]+'</span> <span class="aname">'+d.name+'</span><div class="store">'+d.store+(d.ad?'':' <span class="noads">No ads</span>')+'</div></td>'+
+   '<td class="sep p-jun">'+revC+'</td><td class="p-lm">'+gbp(d.rev[1])+'</td><td class="p-ly">'+gbp(d.rev[2])+'</td>'+
+   '<td class="sep p-jun">'+num(d.ord[0])+arrow(d.ord[0],d.ord[1])+'</td><td class="p-lm">'+num(d.ord[1])+'</td><td class="p-ly">'+num(d.ord[2])+'</td>'+
+   '<td class="sep p-jun">'+num(d.units[0])+'</td><td class="p-lm">'+num(d.units[1])+'</td><td class="p-ly">'+num(d.units[2])+'</td>'+
+   '<td class="sep p-jun">'+gbp2(AOV[0])+'</td><td class="p-lm">'+gbp2(AOV[1])+'</td><td class="p-ly">'+gbp2(AOV[2])+'</td>'+
+   '<td class="sep p-jun">'+(d.conv[0]==null?dash:'<span class="pill '+cCls(d.conv[0])+'">'+pct(d.conv[0])+'</span>')+'</td><td class="p-lm">'+pct(d.conv[1])+'</td><td class="p-ly">'+pct(d.conv[2])+'</td>'+
+   '<td class="sep p-jun">'+gbp(d.ad?d.ad[0]:null)+'</td><td class="p-jun">'+gbp(d.ad?d.ad[1]:null)+'</td>'+
+   '<td class="p-jun">'+(tacos==null?dash:'<span class="pill '+aCls(tacos)+'">'+pct(tacos)+'</span>')+'</td><td class="p-jun">'+(ret==null?dash:'<span class="pill '+rCls(ret)+'">'+ret.toFixed(2)+'</span>')+'</td><td class="p-jun">'+rankBadge(ppcRank[o.i])+'</td>'+
+   '<td class="sep p-jun">'+num(d.active)+'</td><td class="p-jun">'+(d.newl?num(d.newl):'<span class="na">0</span>')+'</td><td class="p-jun">'+rankBadge(salesRank[o.i])+'</td><td class="p-jun">'+num(d.stock)+'</td></tr>');});
+ const xa=X.ord?X.rev/X.ord:0,xtac=X.sp?X.sp/X.rev:null,xret=X.sp?X.rev/X.sp:null;
+ tb.insertAdjacentHTML('beforeend','<tr class="tot"><td class="acc">TOTAL &mdash; '+rows.length+' rows</td>'+
+  '<td class="sep">'+gbp(X.rev)+'</td><td>&mdash;</td><td>&mdash;</td><td class="sep">'+num(X.ord)+'</td><td>&mdash;</td><td>&mdash;</td><td class="sep">'+num(X.units)+'</td><td>&mdash;</td><td>&mdash;</td>'+
+  '<td class="sep">'+gbp2(xa)+'</td><td>&mdash;</td><td>&mdash;</td><td class="sep">&mdash;</td><td>&mdash;</td><td>&mdash;</td>'+
+  '<td class="sep">'+(X.ad?gbp(X.sp):dash)+'</td><td>'+(X.ad?gbp(X.sa):dash)+'</td><td>'+(xtac==null?dash:pct(xtac))+'</td><td>'+(xret==null?dash:xret.toFixed(2))+'</td><td>&mdash;</td>'+
+  '<td class="sep">'+num(X.active)+'</td><td>'+num(X.newl)+'</td><td>&mdash;</td><td>'+num(X.stock)+'</td></tr>');
+ document.getElementById('rc').textContent=rows.length+" rows";
+}
+// marketplace summary
+const MS={};MKTS.forEach(m=>MS[m]={rev:0,ord:0,units:0,sp:0,sa:0,n:0});
+ROWS.forEach(d=>{const m=MS[d.mkt];m.rev+=d.rev[0];m.ord+=d.ord[0];m.units+=d.units[0];if(d.ad){m.sp+=d.ad[0];m.sa+=d.ad[1];}m.n++;});
+document.getElementById('ms').innerHTML=MKTS.map(m=>{const s=MS[m],ac=s.sp?s.sp/s.rev:null,ro=s.sp?s.rev/s.sp:null,dim=s.rev==0?'style="opacity:.5"':'';
+ return '<tr '+dim+'><td class="mk"><span class="flag">'+MLAB[m]+'</span> '+m+'</td><td style="text-align:right">'+gbp(s.rev)+'</td><td style="text-align:right">'+num(s.ord)+'</td><td style="text-align:right">'+num(s.units)+'</td><td style="text-align:right">'+(s.sp?gbp(s.sp):'&mdash;')+'</td><td style="text-align:right">'+(ac?'<span class="pill '+aCls(ac)+'">'+pct(ac)+'</span>':'&mdash;')+'</td><td style="text-align:right">'+(ro?'<span class="pill '+rCls(ro)+'">'+ro.toFixed(2)+'</span>':'&mdash;')+'</td><td style="text-align:right">'+s.n+'</td></tr>';}).join("");
+// thresholds + automation
+document.getElementById('thr').innerHTML='<tr><th>KPI</th><th>&#128994; Green</th><th>&#128993; Yellow</th><th>&#128308; Red</th></tr>'+[["Revenue Growth (MoM)",">10%","0-10%","<0%"],["Conversion Rate",">4.5%","3-4.5%","<3%"],["TACOS (ad&divide;total sales)","<12%","12-18%",">18%"],["Total Return",">8","5-8","<5"],["Stock",">30 Days","15-30 Days","<15 Days"],["Active Listings","Increasing","Stable","Decreasing"]].map(t=>'<tr><td>'+t[0]+'</td><td><span class="pill g">'+t[1]+'</span></td><td><span class="pill y">'+t[2]+'</span></td><td><span class="pill rr">'+t[3]+'</span></td></tr>').join("");
+document.getElementById('auto').innerHTML='<tr><th>Process</th><th>Before</th><th>After</th><th>Saved</th></tr>'+[["Account Health Check",15,2],["Sales Report",25,3],["PPC Performance Review",30,5],["Listing Performance Analysis",90,8],["Stock Monitoring",50,4],["Return Analysis",40,3],["SKU Performance Report",70,5]].map(a=>'<tr><td>'+a[0]+'</td><td class="rt">'+a[1]+'m</td><td class="rt">'+a[2]+'m</td><td class="rt up"><b>'+(a[1]-a[2])+'m</b></td></tr>').join("");
+// CSV
+function csv(){const H=["Account","Store","Marketplace","Revenue","LM Rev","LY Rev","Orders","LM","LY","Units","LM","LY","AOV","LM","LY","Conversion","LM","LY","Ad Spend","Ad Sales (ON_SITE)","TACOS","Return","PPC Rank","Active","New","Sales Rank","Stock"];
+ const nv=x=>x==null?"":x,pv=x=>x==null?"":(x*100).toFixed(2)+"%";const L=[H.join(",")];
+ window.__rows.forEach(o=>{const d=o.d,A=[0,1,2].map(i=>aov(d.rev[i],d.ord[i])),ac=d.ad?d.ad[0]/d.rev[0]:null,ro=d.ad?d.rev[0]/d.ad[0]:null;
+  L.push(['"'+d.name+'"',d.store,d.mkt,nv(d.rev[0]),nv(d.rev[1]),nv(d.rev[2]),nv(d.ord[0]),nv(d.ord[1]),nv(d.ord[2]),nv(d.units[0]),nv(d.units[1]),nv(d.units[2]),nv(A[0]?A[0].toFixed(2):""),nv(A[1]?A[1].toFixed(2):""),nv(A[2]?A[2].toFixed(2):""),pv(d.conv[0]),pv(d.conv[1]),pv(d.conv[2]),nv(d.ad?d.ad[0]:""),nv(d.ad?d.ad[1]:""),pv(ac),nv(ro!=null?ro.toFixed(2):""),nv(ppcRank[o.i]||""),nv(d.active),nv(d.newl),nv(salesRank[o.i]||""),nv(d.stock)].join(","));});
+ const b=new Blob([L.join("\n")],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="eBay_AccountxMarketplace_June2026.csv";a.click();}
+document.getElementById('q').addEventListener('input',render);
+document.getElementById('fAcc').addEventListener('change',render);
+document.getElementById('fMkt').addEventListener('change',render);
+document.getElementById('fSort').addEventListener('change',render);
+document.getElementById('expCsv').addEventListener('click',csv);
+document.getElementById('expPrint').addEventListener('click',()=>window.print());
+render();
+</script></body></html>'''
+
+html = html.replace("__DATA__", DATA)
+out=r"C:\Users\digit\Downloads\eBay Account Performance Dashboard - June 2026 - FINAL.html"
+open(out,"w",encoding="utf-8").write(html)
+# quick reconciliations
+tot_rev=sum(d['rev'][0] for d in ROWS)
+tot_ord=sum(d['ord'][0] for d in ROWS)
+tot_new=sum(d['newl'] for d in ROWS)
+led_uk=[d for d in ROWS if d['store']=='led_sone' and d['mkt']=='UK'][0]['rev'][0]
+print("rows:",len(ROWS),"| June revenue:",round(tot_rev,2),"| orders:",tot_ord,"| new listings:",tot_new,"| led_sone UK:",led_uk)

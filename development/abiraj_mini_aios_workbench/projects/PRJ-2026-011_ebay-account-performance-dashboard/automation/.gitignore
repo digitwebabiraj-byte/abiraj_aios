@@ -1,0 +1,5 @@
+# never commit real credentials or run logs
+ebpd_secrets.bat
+ebpd_run.log
+ebpd_status.txt
+ebpd_auto_dashboard.html
