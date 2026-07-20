@@ -55,7 +55,7 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 - **Committed + pushed to git `main`.**
 
 ## Automation — WEEKLY AUTO-REFRESH BUILT 2026-07-16 (part of REQ-12, not a separate task)
-`automation/` — unattended weekly run via Windows Task Scheduler (**Monday 07:00**), following the
+`automation/` — unattended weekly run via Windows Task Scheduler (**Monday 10:30**), following the
 **PRJ-2026-011 (EBPD)** pattern: pull live prices from `ledsone` → validate → rebuild the dashboard →
 guarded UPSERT of all 4 `ph_task` rows (264, 299–301) in place, `version_level` bumping each run.
 Files: `epc_weekly_run.py` (runner) · `epc_build_html.py` (**single source of truth for the UI**) ·
@@ -64,13 +64,18 @@ Files: `epc_weekly_run.py` (runner) · `epc_build_html.py` (**single source of t
 row-count floor, non-reconciling counts, a bad render or missing credentials all abort *before* any write,
 so the last good dashboard stays live. No credential in any tracked file (`epc_secrets.bat` is git-ignored).
 `--dry-run` builds and validates without publishing. See `automation/AUTOMATION_README.md`.
-**Switch-on step (yours):** copy `epc_secrets.template.bat` → `epc_secrets.bat`, fill in the `ledsone`
-login (same one EBPD uses) + warehouse password, then run `register_scheduled_task.ps1`.
+
+**✅ SWITCHED ON 2026-07-20.** `EPC_Weekly_Price_Checker` is registered in Windows Task Scheduler; the
+DB-connected `--dry-run` passed (published nothing, as designed). Credentials come from the **shared
+global store** (`05_documentation/capability/shared_db_credentials/`) — no `epc_secrets.bat` on this
+machine. **Next run: Monday 2026-07-27 10:30.** The time was moved from 07:00 to **10:30** so it never
+overlaps the other jobs on the same restricted `temp_user` account, whose pool intermittently returns
+*"too many clients"*: FRRC 09:00 (day 8) · ERA 09:30 (5th) · **EBPD 09:30 Monday** (same weekday as EPC).
 
 ## One next action
-**Fill in `automation/epc_secrets.bat` and run `.\run_epc_weekly.bat --dry-run`** to prove the
-DB-connected path end-to-end, then `.\register_scheduled_task.ps1` to switch on the Monday schedule.
-(Optional later: a shipping-aware Status rebuild.)
+**None required — it runs itself weekly.** Optional: `Start-ScheduledTask -TaskName
+"EPC_Weekly_Price_Checker"` to refresh the four dashboards now instead of waiting for 27 July (they
+currently show 16-July prices). Optional later: a shipping-aware Status rebuild (REQ-12-D02).
 
 ## Rule
 A new day or Claude session does **not** create a new Task ID. Keep using `REQ-12_ebay-price-checker` until

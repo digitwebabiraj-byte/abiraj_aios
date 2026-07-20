@@ -1,5 +1,13 @@
-# Registers/updates the EPC weekly run: every Monday 07:00.
+# Registers/updates the EPC weekly run: every Monday 10:30.
 # Run once, in PowerShell, from this folder.  Re-running safely updates the task.
+#
+# Why 10:30 - it must not collide with the other scheduled jobs on this machine, because they
+# share the same restricted warehouse account (temp_user), whose pool intermittently returns
+# "too many clients":
+#     FRRC_Monthly_FBA_Returns_Report  09:00 (day 8)
+#     EBPD_Weekly_Dashboard            09:30 MONDAY  <- same day as EPC
+#     ERA_Monthly_Dashboard            09:30 (5th)
+# 10:30 leaves a full hour after EBPD even if it runs long.
 $ErrorActionPreference = 'Stop'
 $Dir  = $PSScriptRoot
 $Bat  = Join-Path $Dir 'run_epc_weekly.bat'
@@ -18,11 +26,11 @@ else {
                  "05_documentation\capability\shared_db_credentials\promote_project_secrets_to_global.ps1")
 }
 $action  = New-ScheduledTaskAction  -Execute $Bat -WorkingDirectory $Dir
-$trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 07:00
+$trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 10:30
 $set     = New-ScheduledTaskSettingsSet -StartWhenAvailable -RunOnlyIfNetworkAvailable `
              -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Hours 2)
 Register-ScheduledTask -TaskName $Name -Action $action -Trigger $trigger -Settings $set `
   -Description 'EPC - eBay Price Checker: weekly refresh of the 4 ph_task dashboards (REQ-12).' -Force | Out-Null
-Write-Host "Registered '$Name' - every Monday 07:00." -ForegroundColor Green
+Write-Host "Registered '$Name' - every Monday 10:30 (clear of EBPD 09:30 / FRRC 09:00 / ERA 09:30)." -ForegroundColor Green
 Write-Host "Next run: $((Get-ScheduledTask -TaskName $Name | Get-ScheduledTaskInfo).NextRunTime)"
 Write-Host "Test safely now:  .\run_epc_weekly.bat --dry-run"

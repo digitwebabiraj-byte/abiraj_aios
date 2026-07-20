@@ -7,7 +7,7 @@ Pull live prices → validate → rebuild the dashboard → publish to all 4 use
 ## Cadence
 | Setting | Value | Why |
 |---|---|---|
-| **Runs** | **Every Monday, 07:00** | Prices move daily (competitor repricing + manual changes); a week-old "Too high" flag is often wrong. Monday morning = fresh list for the week. |
+| **Runs** | **Every Monday, 10:30** | Prices move daily (competitor repricing + manual changes); a week-old "Too high" flag is often wrong. Monday morning = fresh list for the week. **10:30 avoids the other jobs on this machine** — they share the same restricted `temp_user` account, whose pool intermittently returns *"too many clients"*: FRRC 09:00 (day 8) · ERA 09:30 (5th) · **EBPD 09:30 Monday** (same day as EPC). 10:30 leaves a full hour after EBPD even if it runs long. |
 | **Window** | **Live / current state** | This is a "what is mispriced right now" report — no reporting period, no settle buffer needed (unlike FRRC/ERA). |
 | **Publishes to** | `ph_task` ids **264 (Thinesh), 299 (Jarsini), 300 (kobiga), 301 (powsteena)** | Updated **in place** — same ids, same links; `version_level` bumps each run. |
 
@@ -24,7 +24,7 @@ pip install psycopg2-binary
 #    Nothing else to do here — this runner reads the environment.
 #    (Only if THIS project needs a different login: copy epc_secrets.template.bat -> epc_secrets.bat.)
 
-# 3. Register the weekly task (Monday 07:00)
+# 3. Register the weekly task (Monday 10:30)
 .\register_scheduled_task.ps1
 ```
 
@@ -107,8 +107,10 @@ AIOS KB: `all_list=1`, Amazon `_` suffix, `ENC`→`sku_original`, `<char>PK` pac
 Row counts drift week to week — that is the point (the catalogue moved 130,336 → 130,850 within one day
 on 2026-07-16).
 
-## Status
+## Status — **LIVE** (registered 2026-07-20)
 Scripts written, syntax-checked, fail-closed path tested, the SQL validated live against `ledsone`
-(130,850 rows / 16 account×site pairs) and the dashboard renderer verified. **The DB-connected end-to-end
-run is untested until `epc_secrets.bat` exists** — the first `--dry-run` after filling it in is the real
-proof. It cannot publish anything until then (it aborts on missing credentials).
+(130,850 rows / 16 account×site pairs) and the dashboard renderer verified. `--dry-run` passed
+DB-connected end to end (built + validated, published nothing).
+
+`EPC_Weekly_Price_Checker` is **registered in Windows Task Scheduler** and reads the **shared global
+credential store** — no `epc_secrets.bat` needed. **Next run: Monday 2026-07-27 10:30.**

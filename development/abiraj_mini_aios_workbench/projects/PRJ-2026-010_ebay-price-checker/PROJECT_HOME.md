@@ -111,14 +111,20 @@ docs authored, the report built (matching corrected against the AIOS KB), publis
 to `main`. **No open items.**
 
 ## Automation — weekly auto-refresh (built 2026-07-16, part of REQ-12)
-`automation/` runs unattended every **Monday 07:00** via Windows Task Scheduler (PRJ-2026-011 / EBPD
+`automation/` runs unattended every **Monday 10:30** via Windows Task Scheduler (PRJ-2026-011 / EBPD
 pattern): pull live prices from `ledsone` → validate → rebuild the dashboard → guarded UPSERT of all four
 `ph_task` rows in place (`version_level` bumps each run). **Fails closed** — 0 rows, a row-count floor,
 non-reconciling counts, a bad render or missing credentials abort *before* any write, so the last good
 dashboard stays live. Desktop alert on failure (auto-clears on success); `--dry-run` validates without
 publishing; no credential in any tracked file. Detail: `automation/AUTOMATION_README.md`.
 
+**✅ LIVE since 2026-07-20.** `EPC_Weekly_Price_Checker` is registered in Windows Task Scheduler and draws
+its logins from the **shared global credential store**
+(`05_documentation/capability/shared_db_credentials/`) — no per-project secrets file. **Next run: Monday
+2026-07-27 10:30.** 10:30 was chosen so it clears the other jobs sharing the `temp_user` account
+(FRRC 09:00 day 8 · ERA 09:30 on the 5th · **EBPD 09:30 Monday**, the same day as EPC).
+
 ## One Next Action
-**Switch the schedule on:** copy `automation/epc_secrets.template.bat` → `epc_secrets.bat`, fill in the
-`ledsone` login (the same one EBPD uses) + warehouse password, run `.\run_epc_weekly.bat --dry-run` to
-prove the DB path, then `.\register_scheduled_task.ps1`. (Optional later: a shipping-aware Status rebuild.)
+**None required — the schedule runs itself.** Optional: `Start-ScheduledTask -TaskName
+"EPC_Weekly_Price_Checker"` to refresh the four dashboards now rather than waiting for 27 July
+(they currently show 16-July prices). Optional later: a shipping-aware Status rebuild (REQ-12-D02).
