@@ -5,8 +5,17 @@ $Dir  = $PSScriptRoot
 $Bat  = Join-Path $Dir 'run_epc_weekly.bat'
 $Name = 'EPC_Weekly_Price_Checker'
 if (-not (Test-Path $Bat)) { throw "run_epc_weekly.bat not found in $Dir" }
-if (-not (Test-Path (Join-Path $Dir 'epc_secrets.bat'))) {
-  Write-Warning "epc_secrets.bat is missing - copy epc_secrets.template.bat to epc_secrets.bat and fill it in, or the run will abort (safely)."
+# Credentials may come from EITHER this project's secrets file OR the shared global store.
+# Only warn when NEITHER is present - that is the only case where a run would abort.
+$hasFile   = Test-Path (Join-Path $Dir 'epc_secrets.bat')
+$hasGlobal = [bool][Environment]::GetEnvironmentVariable('LED_PGPASSWORD','User') -and
+             [bool][Environment]::GetEnvironmentVariable('PGPASSWORD','User')
+if     ($hasFile)   { Write-Host "Credentials: this project's epc_secrets.bat (overrides the global store)." -ForegroundColor Cyan }
+elseif ($hasGlobal) { Write-Host "Credentials: shared GLOBAL store (user environment variables)." -ForegroundColor Cyan }
+else {
+  Write-Warning ("No credentials found - neither epc_secrets.bat nor the global store is set. The task will " +
+                 "register, but every run aborts safely (publishing nothing) until you set them. Fix: " +
+                 "05_documentation\capability\shared_db_credentials\promote_project_secrets_to_global.ps1")
 }
 $action  = New-ScheduledTaskAction  -Execute $Bat -WorkingDirectory $Dir
 $trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 07:00
