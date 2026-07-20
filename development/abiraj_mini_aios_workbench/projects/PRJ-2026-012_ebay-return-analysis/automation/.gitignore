@@ -1,0 +1,9 @@
+# never commit secrets or run artifacts
+era_secrets.bat
+era_run.log
+era_status.txt
+era_auto_dashboard.html
+ERA_ALERT_FAILED.txt
+preview_ebra.html
+returns_windows_*.json
+__pycache__/
