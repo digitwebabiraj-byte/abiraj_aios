@@ -54,9 +54,23 @@ Canonical index of tasks in this project. One requirement = one Task ID.
   (ids 264, 299–301) + the V2/V3 in-place refreshes, all on owner instruction.
 - **Committed + pushed to git `main`.**
 
+## Automation — WEEKLY AUTO-REFRESH BUILT 2026-07-16 (part of REQ-12, not a separate task)
+`automation/` — unattended weekly run via Windows Task Scheduler (**Monday 07:00**), following the
+**PRJ-2026-011 (EBPD)** pattern: pull live prices from `ledsone` → validate → rebuild the dashboard →
+guarded UPSERT of all 4 `ph_task` rows (264, 299–301) in place, `version_level` bumping each run.
+Files: `epc_weekly_run.py` (runner) · `epc_build_html.py` (**single source of truth for the UI**) ·
+`run_epc_weekly.bat` · `register_scheduled_task.ps1` · `epc_secrets.template.bat` · `epc_alert.ps1`
+(desktop alert on failure, auto-clears on success) · `check_status.bat`. **Fails closed** — 0 rows, a
+row-count floor, non-reconciling counts, a bad render or missing credentials all abort *before* any write,
+so the last good dashboard stays live. No credential in any tracked file (`epc_secrets.bat` is git-ignored).
+`--dry-run` builds and validates without publishing. See `automation/AUTOMATION_README.md`.
+**Switch-on step (yours):** copy `epc_secrets.template.bat` → `epc_secrets.bat`, fill in the `ledsone`
+login (same one EBPD uses) + warehouse password, then run `register_scheduled_task.ps1`.
+
 ## One next action
-**None for REQ-12-D01 — CLOSED (signed off 2026-07-16).** Optional future work as **REQ-12-D02**: a
-scheduled weekly refresh and/or a shipping-aware Status rebuild.
+**Fill in `automation/epc_secrets.bat` and run `.\run_epc_weekly.bat --dry-run`** to prove the
+DB-connected path end-to-end, then `.\register_scheduled_task.ps1` to switch on the Monday schedule.
+(Optional later: a shipping-aware Status rebuild.)
 
 ## Rule
 A new day or Claude session does **not** create a new Task ID. Keep using `REQ-12_ebay-price-checker` until

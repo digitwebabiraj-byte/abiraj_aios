@@ -22,6 +22,14 @@ at sign-off); a shipping-aware refresh, if scoped, is a future REQ-12-D02.
 **Result:** Priced OK 21,138 · Too high 40,261 · Too low 22,008 · No target 42,663
 (21,048 eBay-only + 21,615 bundles).
 
+## 🔁 Weekly automation (built 2026-07-16) — `automation/`
+Runs unattended every **Monday 07:00** (Windows Task Scheduler), following the **PRJ-2026-011 (EBPD)**
+pattern: pull live prices from `ledsone` → validate → rebuild the dashboard → refresh all 4 `ph_task` rows
+in place. **Fails closed** (a bad pull publishes nothing — the last good dashboard stays live), alerts on
+your Desktop if a run fails, and keeps no credential in any tracked file.
+Test safely: `run_epc_weekly.bat --dry-run` · Health: `check_status.bat` · Setup: `automation/AUTOMATION_README.md`.
+**To switch on:** copy `epc_secrets.template.bat` → `epc_secrets.bat`, fill it in, run `register_scheduled_task.ps1`.
+
 ## The rule (owner CONFIRMED BUSINESS RULE, 2026-07-16 + Thinesh Q1–Q8)
 `Target = Amazon (amazon Ledsone, sub_source 8, LOWEST price) × 0.90`; else `website (Shopify ledsone /
 ledsone-de) × 1.10`; else **DATA MISSING**. `ROUND(raw, 2)`. Tolerance ±£0.50 / ±£1.00 at the **£20** band.

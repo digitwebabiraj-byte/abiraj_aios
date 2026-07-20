@@ -110,6 +110,15 @@ registered, source imported + checksum-verified, the chat-only confirmed rule + 
 docs authored, the report built (matching corrected against the AIOS KB), published per-user, and committed
 to `main`. **No open items.**
 
+## Automation — weekly auto-refresh (built 2026-07-16, part of REQ-12)
+`automation/` runs unattended every **Monday 07:00** via Windows Task Scheduler (PRJ-2026-011 / EBPD
+pattern): pull live prices from `ledsone` → validate → rebuild the dashboard → guarded UPSERT of all four
+`ph_task` rows in place (`version_level` bumps each run). **Fails closed** — 0 rows, a row-count floor,
+non-reconciling counts, a bad render or missing credentials abort *before* any write, so the last good
+dashboard stays live. Desktop alert on failure (auto-clears on success); `--dry-run` validates without
+publishing; no credential in any tracked file. Detail: `automation/AUTOMATION_README.md`.
+
 ## One Next Action
-**None for REQ-12-D01 — CLOSED.** Optional future: a scheduled weekly refresh and/or a shipping-aware
-Status rebuild as **REQ-12-D02**.
+**Switch the schedule on:** copy `automation/epc_secrets.template.bat` → `epc_secrets.bat`, fill in the
+`ledsone` login (the same one EBPD uses) + warehouse password, run `.\run_epc_weekly.bat --dry-run` to
+prove the DB path, then `.\register_scheduled_task.ps1`. (Optional later: a shipping-aware Status rebuild.)

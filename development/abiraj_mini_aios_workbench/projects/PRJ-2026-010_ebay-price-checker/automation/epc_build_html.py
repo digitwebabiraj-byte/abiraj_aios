@@ -1,71 +1,10 @@
 # -*- coding: utf-8 -*-
-"""REQ-12-D01 - eBay Price Checker - full-screen dashboard, all 126,070 rows, 13 task columns."""
-import json, io, os, collections
-
-TR = r"C:\Users\digit\.claude\projects\C--Users-digit-OneDrive-Desktop-Abiraj-AIOS--claude-worktrees-project-structure-overview-2e1c41\935865a0-efe8-4d55-b8e9-aaf3b50f7d83\tool-results"
-OUT = r"C:/Users/digit/OneDrive/Desktop/DigitWeb_Works_Abiraj/16_07_2026/2026-07-16_abiraj_REQ-epc_REQ-12-D01_price-checker_dashboard.html"
-CH = ["1784185487529","1784185514984","1784185525493","1784185542565","1784185570946",
-      "1784185581243","1784185595968","1784185623333","1784185633137"]
-THRESHOLD, TOL_LO, TOL_HI = 20.0, 0.50, 1.00
-PRIO_HIGH, PRIO_MED = 5.00, 2.00
-LABEL = {
-    ("led_sone","UK"):"LEDSone UK",("electricalsone","UK"):"Electricalsone UK",("so_926407","UK"):"Sunsone UK",
-    ("vintageinterior","UK"):"Vintageinterior UK",("coventrylights","UK"):"Coventrylight UK",
-    ("lighting_sone","UK"):"Lightingsone UK",("re6865","UK"):"Retro LED UK",
-    ("huettenlampen","Germany"):"HUETTEN LAMP DE",("ledsonede","Germany"):"Ledsone DE Reg DE",
-    ("homin_gmbh","Germany"):"Homin DE",("led_sone","Germany"):"LEDSone UK Reg DE",
-    ("electricalsone","Germany"):"ElectricalSone DE",("so_926407","Germany"):"Sunsone DE",
-}
-IMG_PREFIX = "https://i.ebayimg.com/"
-
-rows = []
-for t in CH:
-    b = json.loads(io.open(os.path.join(TR,"mcp-Ledsone-db-mcp-execute_sql-%s.txt"%t),encoding="utf-8").read())["data"]["rows"][0]["blob"]
-    rows += [l.split("|") for l in b.split("\n") if l.strip()]
-
-accounts = sorted(set(LABEL.values()))
-acc_idx = {a:i for i,a in enumerate(accounts)}
-
-data = []
-kpi = collections.Counter(); by_acc = collections.Counter()
-for r in rows:
-    item, sku, img, acct, wp, ap, tgt, ebay, site = r
-    label = LABEL.get((acct, site))
-    if label is None: continue
-    wp = float(wp) if wp else None
-    ap = float(ap) if ap else None
-    tgt = float(tgt) if tgt else None
-    ebay = float(ebay)
-    if tgt is None:
-        diff = pct = None; pc = 0; kpi["Miss"]+=1
-        sc = 4 if "+" in sku else 3
-        kpi["MissBundle" if sc==4 else "MissNoComp"] += 1
-    else:
-        diff = round(ebay - tgt, 2); pct = round(diff/tgt, 4) if tgt else None
-        tol = TOL_LO if ebay < THRESHOLD else TOL_HI
-        if abs(diff) <= tol: sc = 0; kpi["Normal"]+=1
-        elif diff > 0: sc = 1; kpi["High"]+=1
-        else: sc = 2; kpi["Low"]+=1
-        m = abs(diff); pc = 3 if m>=PRIO_HIGH else (2 if m>=PRIO_MED else 1)
-    by_acc[label]+=1
-    im = img[len(IMG_PREFIX):] if img.startswith(IMG_PREFIX) else ("!"+img if img else "")
-    data.append([item, sku, im, acc_idx[label], wp, ap, tgt, ebay, diff, pct, sc, pc, 0 if site=="UK" else 1])
-
-total = len(data)
-acc_order = [a for a,_ in by_acc.most_common()]
-acc_stack = {a:[0,0,0,0] for a in accounts}
-for d in data:
-    acc_stack[accounts[d[3]]][min(d[10],3)] += 1
-print("rows:", total, "| kpi:", dict(kpi))
-
-payload = {
-    "accounts": accounts, "accOrder": acc_order,
-    "accStack": [ [a]+acc_stack[a] for a in acc_order ],
-    "kpi": {"total": total, "normal": kpi["Normal"], "high": kpi["High"], "low": kpi["Low"],
-            "miss": kpi["Miss"], "missNoComp": kpi["MissNoComp"], "missBundle": kpi["MissBundle"]},
-    "imgPrefix": IMG_PREFIX, "rows": data,
-}
-J = json.dumps(payload, separators=(",",":"), ensure_ascii=False)
+"""EPC dashboard UI - SINGLE SOURCE OF TRUTH for the rendered dashboard.
+Extracted verbatim from the D01 builder (V3: Export-CSV button + taller bounded table).
+Used by epc_weekly_run.py. Edit the template HERE only - never fork it.
+    build(payload) -> html   (payload keys: accounts accOrder accStack kpi imgPrefix rows)
+"""
+import json
 
 HTML = u"""<!doctype html>
 <html lang="en"><head>
@@ -449,5 +388,6 @@ setTimeout(()=>document.getElementById("splash").classList.add("hidden"),350);
 </script>
 </body></html>"""
 
-io.open(OUT, "w", encoding="utf-8").write(HTML.replace("__PAYLOAD__", J))
-print("SAVED:", OUT, "| bytes:", os.path.getsize(OUT))
+def build(payload):
+    """Render the dashboard HTML from the payload dict."""
+    return HTML.replace("__PAYLOAD__", json.dumps(payload, separators=(",", ":"), ensure_ascii=False))
