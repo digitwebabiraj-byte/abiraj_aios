@@ -13,7 +13,7 @@ if not defined PGPORT     set "PGPORT=5435"
 if not defined PGDATABASE set "PGDATABASE=order_management_copy"
 if not defined PGUSER     set "PGUSER=temp_user"
 REM No password default anywhere: if PGPASSWORD / LED_* are unset the run ABORTS before writing.
-python "%~dp0era_monthly_run.py" >> "%~dp0era_run.log" 2>&1
+python "%~dp0era_monthly_run.py" %* >> "%~dp0era_run.log" 2>&1
 set RC=%ERRORLEVEL%
 REM On success the Python already wrote an OK line; on any crash, record a FAILED line so a gap is never silent.
 if not "%RC%"=="0" echo [%DATE% %TIME%]  FAILED (exit %RC%)  ^|  see era_run.log for the error >> "%~dp0era_status.txt"
