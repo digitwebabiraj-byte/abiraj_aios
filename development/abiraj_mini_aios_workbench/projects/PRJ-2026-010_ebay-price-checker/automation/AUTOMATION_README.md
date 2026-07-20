@@ -17,16 +17,22 @@ Pull live prices → validate → rebuild the dashboard → publish to all 4 use
 # 1. Install the DB driver (once)
 pip install psycopg2-binary
 
-# 2. Store the credentials (once). YOU do this — no password is ever written by Claude
-#    or committed. Copy the template, fill it in, save as epc_secrets.bat:
-copy epc_secrets.template.bat epc_secrets.bat
-notepad epc_secrets.bat      # fill LED_* (ledsone) + PGPASSWORD (warehouse)
+# 2. Credentials — use the SHARED GLOBAL store (set up ONCE for ALL projects):
+#      cd ..\..\..\05_documentation\capability\shared_db_credentials
+#      .\promote_project_secrets_to_global.ps1    # copies project 11's working logins to user env vars
+#      python verify_global_credentials.py        # run in a NEW terminal
+#    Nothing else to do here — this runner reads the environment.
+#    (Only if THIS project needs a different login: copy epc_secrets.template.bat -> epc_secrets.bat.)
 
 # 3. Register the weekly task (Monday 07:00)
 .\register_scheduled_task.ps1
 ```
 
-> The `ledsone` login is the same one **project 11 (EBPD)** already uses — see its `ebpd_secrets.bat`.
+> **Credentials are global by default.** `run_epc_weekly.bat` resolves them in this order:
+> project `epc_secrets.bat` (optional override) → **global user environment variables** → non-secret
+> host/port/db/user defaults. There is **no password default anywhere** — if none is set, the run aborts
+> before writing. Shared setup lives in
+> `05_documentation/capability/shared_db_credentials/` and is used by EPC, EBPD, ERA and FRRC.
 
 **Test it any time — safe, publishes nothing:**
 ```powershell
