@@ -1830,8 +1830,8 @@
    "reason": "Campaign is already ENDED. No pause action taken — the rules are not evaluated against a campaign that is not running."
   },
   {
-   "campaign_id": "157961601012",
-   "campaign": "AK | PH | Pipe Lights | Theepana | Manual",
+   "campaign_id": "161412023012",
+   "campaign": "PH | MH | Table Lamp | Ilakkiya | Manual",
    "type": "Manual",
    "status": "ENDED",
    "listings": 0,
@@ -1892,8 +1892,8 @@
    "reason": "Campaign is already ENDED. No pause action taken — the rules are not evaluated against a campaign that is not running."
   },
   {
-   "campaign_id": "161412023012",
-   "campaign": "PH | MH | Table Lamp | Ilakkiya | Manual",
+   "campaign_id": "157961601012",
+   "campaign": "AK | PH | Pipe Lights | Theepana | Manual",
    "type": "Manual",
    "status": "ENDED",
    "listings": 0,

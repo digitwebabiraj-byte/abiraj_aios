@@ -4,3 +4,4 @@ t7_run.log
 t7_status.txt
 t7_auto_dashboard.html
 __pycache__/
+t7_last_good.json

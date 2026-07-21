@@ -7,3 +7,4 @@ ERA_ALERT_FAILED.txt
 preview_ebra.html
 returns_windows_*.json
 __pycache__/
+era_last_good.json

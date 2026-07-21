@@ -3,3 +3,4 @@ ebpd_secrets.bat
 ebpd_run.log
 ebpd_status.txt
 ebpd_auto_dashboard.html
+ebpd_last_good.json

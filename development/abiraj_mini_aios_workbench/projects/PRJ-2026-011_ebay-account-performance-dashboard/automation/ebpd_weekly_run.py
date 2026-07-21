@@ -40,6 +40,33 @@ def die(m):
     _status("FAILED", m)
     sys.exit(2)
 
+# ---- collapse guard (borrowed from PRJ-2026-013 / EPPA) ----
+# MIN_ROWS only catches a total wipe-out. A feed that silently HALF-empties still clears it and
+# publishes a confidently wrong dashboard. This compares against the last GOOD run instead.
+MAX_DROP  = float(os.getenv("EBPD_MAX_DROP", "0.40"))
+LAST_GOOD = os.path.join(HERE, "ebpd_last_good.json")
+
+def collapse_guard(count, label):
+    if not os.path.exists(LAST_GOOD):
+        return
+    try:
+        prev = json.load(open(LAST_GOOD, encoding="utf-8")).get(label)
+    except (ValueError, OSError):
+        print("[EBPD] WARN: %s unreadable - skipping the collapse check" % LAST_GOOD)
+        return
+    if prev and count < prev * (1 - MAX_DROP):
+        die("%s collapsed %d -> %d (>%.0f%% drop vs last good run) - refusing to publish"
+            % (label, prev, count, MAX_DROP * 100))
+    if prev:
+        print("[EBPD] collapse guard OK: %s %d vs last good %d" % (label, count, prev))
+
+def record_good(**counts):
+    """Called only after a successful PUBLISH, so a dry-run cannot poison the baseline."""
+    try:
+        json.dump(counts, open(LAST_GOOD, "w", encoding="utf-8"), indent=1)
+    except OSError as e:
+        print("[EBPD] WARN: could not write %s (%s)" % (LAST_GOOD, e))
+
 # ---- connections (env, with the known warehouse defaults; ledsone must be provided) ----
 WH = dict(host=os.getenv("PGHOST","149.28.134.54"), port=os.getenv("PGPORT","5435"),
           dbname=os.getenv("PGDATABASE","order_management_copy"),
@@ -201,6 +228,7 @@ print(f"[EBPD] assembled {len(ROWS)} account×marketplace rows · reporting reve
 # ---- VALIDATION GATES (fail closed, BEFORE any write) ----------------------
 if not ROWS:                     die("0 account×marketplace rows - refusing to publish an empty dashboard")
 if len(ROWS) < MIN_ROWS:         die(f"only {len(ROWS)} rows (< floor {MIN_ROWS}) - looks like a broken pull")
+collapse_guard(len(ROWS), "rows")
 
 grain = [k for k in set((r[1], r[2]) for r in ROWS) if [ (x[1],x[2]) for x in ROWS ].count(k) > 1]
 if grain:                        die(f"grain broken - {len(grain)} duplicated account×marketplace pair(s): {grain[:5]}")
@@ -286,6 +314,7 @@ if PUBLISH:
     except Exception as e:
         die(f"publish failed, transaction rolled back: {e}")
     print(f"[EBPD] published to ph_task ({len(ASSIGNED)} users), {len(ASSIGNED)} payloads md5-verified.")
+    record_good(rows=len(ROWS))          # new baseline for next week's collapse guard
 else:
     print("[EBPD] --no-publish: skipped ph_task write.")
 print("[EBPD] done.")

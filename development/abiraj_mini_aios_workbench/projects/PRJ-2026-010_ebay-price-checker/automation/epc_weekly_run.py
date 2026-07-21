@@ -21,7 +21,7 @@ Flags:  --no-publish / --dry-run   (build + validate only, write nothing)
 Usage:  python epc_weekly_run.py [--dry-run]
 Requires: epc_build_html.py alongside this file (the dashboard UI, single source of truth).
 """
-import os, sys, time, datetime, hashlib
+import os, sys, time, datetime, hashlib, json
 import psycopg2
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -66,6 +66,36 @@ def _status(state, msg):
             f.write("[%s]  %s  |  %s\n" % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), state, msg))
     except Exception:
         pass
+
+# ---- collapse guard (borrowed from PRJ-2026-013 / EPPA) ----
+# The floor above only catches a total wipe-out. A feed that silently HALF-empties still clears
+# it and publishes a confidently wrong report. This compares against the last GOOD run.
+MAX_DROP  = float(os.getenv("EPC_MAX_DROP", "0.40"))
+LAST_GOOD = os.path.join(HERE, "epc_last_good.json")
+
+
+def collapse_guard(count, label):
+    if not os.path.exists(LAST_GOOD):
+        return
+    try:
+        prev = json.load(open(LAST_GOOD, encoding="utf-8")).get(label)
+    except (ValueError, OSError):
+        log("WARN: %s unreadable - skipping the collapse check" % LAST_GOOD)
+        return
+    if prev and count < prev * (1 - MAX_DROP):
+        die("%s collapsed %d -> %d (>%.0f%% drop vs last good run) - refusing to publish"
+            % (label, prev, count, MAX_DROP * 100))
+    if prev:
+        log("collapse guard OK: %s %d vs last good %d" % (label, count, prev))
+
+
+def record_good(**counts):
+    """Called only after a successful PUBLISH, so a dry-run cannot poison the baseline."""
+    try:
+        json.dump(counts, open(LAST_GOOD, "w", encoding="utf-8"), indent=1)
+    except OSError as e:
+        log("WARN: could not write %s (%s)" % (LAST_GOOD, e))
+
 
 def connect(cfg, what):
     """Connect with retry - the temp_user pool hits 'too many clients' intermittently."""
@@ -197,6 +227,7 @@ def main():
     # ---- 3. VALIDATION GATES (fail closed, BEFORE any write) ---------------
     if total == 0:                       die("0 rows - refusing to publish an empty report")
     if total < MIN_ROWS:                 die("only %d rows (< floor %d) - looks like a broken pull" % (total, MIN_ROWS))
+    collapse_guard(total, "listings")
     if unknown:                          log("  note: unnamed accounts skipped: %s" % sorted(unknown)[:5])
     s = kpi["normal"] + kpi["high"] + kpi["low"] + kpi["miss"]
     if s != total:                       die("status counts %d != rows %d" % (s, total))
@@ -297,6 +328,7 @@ def main():
     finally:
         wh.close()
     log("published to ph_task for %d users: ids %s" % (len(ASSIGNED), touched))
+    record_good(listings=total)          # new baseline for next week's collapse guard
     _status("OK", "%s rows | OK %s / high %s / low %s / none %s | published to %d users"
             % (f"{total:,}", f"{kpi['normal']:,}", f"{kpi['high']:,}", f"{kpi['low']:,}",
                f"{kpi['miss']:,}", len(ASSIGNED)))

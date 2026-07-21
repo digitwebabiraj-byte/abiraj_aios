@@ -28,6 +28,12 @@ MARKETPLACE, SUB_SOURCE, CAMPAIGN_TYPE = "EBAY_GB", 1, "ON_SITE"
 MIN_CAMPAIGNS = 20          # fail-closed floor: fewer than this means a broken pull, not a quiet week
 MAX_DROP = 0.40             # fail-closed: reject a >40% collapse in campaign count vs last good run
 
+# --dry-run / --no-publish: run every gate and rebuild the files, but do NOT touch ph_task.
+# The automation pattern requires this on every job. Without it EPPA could not be tested or
+# proven at all without a live publish - which is exactly what happened on 2026-07-21
+# (ph_task id 405 -> 407) while verifying the credential migration.
+PUBLISH = not ("--dry-run" in sys.argv or "--no-publish" in sys.argv)
+
 
 def log(msg):
     line = "%s  %s" % (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), msg)
@@ -207,7 +213,9 @@ def main():
     # Same task_id every week, so this REPLACES the row rather than adding one (no unique on
     # task_id -> delete+insert in one transaction, see eppa_publish_ph_task.publish).
     published = None
-    if os.environ.get("PGPASSWORD"):
+    if not PUBLISH:
+        log("--dry-run: every gate passed and the files were rebuilt; ph_task NOT touched")
+    elif os.environ.get("PGPASSWORD"):
         sys.path.insert(0, HERE)
         from eppa_publish_ph_task import publish          # noqa: E402
         row_id, version, md5 = publish(quiet=True)

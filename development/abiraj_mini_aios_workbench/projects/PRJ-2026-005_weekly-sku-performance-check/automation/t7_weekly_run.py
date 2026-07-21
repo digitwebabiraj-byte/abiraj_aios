@@ -89,6 +89,37 @@ def die(code, m):
     sys.exit(code)
 
 
+# ---- collapse guard (borrowed from PRJ-2026-013 / EPPA, the only job that had one) ----
+# An absolute floor only catches a total wipe-out. A feed that silently HALF-empties still
+# clears the floor and publishes a confidently wrong report. This compares against the last
+# GOOD run instead, so gradual erosion is caught too.
+MAX_DROP  = float(os.getenv("T7_MAX_DROP", "0.40"))   # reject a >40% collapse vs last good run
+LAST_GOOD = os.path.join(HERE, "t7_last_good.json")   # git-ignored baseline
+
+
+def collapse_guard(count, label):
+    if not os.path.exists(LAST_GOOD):
+        return
+    try:
+        prev = json.load(open(LAST_GOOD, encoding="utf-8")).get(label)
+    except (ValueError, OSError):
+        log("WARN: %s unreadable - skipping the collapse check" % LAST_GOOD)
+        return
+    if prev and count < prev * (1 - MAX_DROP):
+        die(2, "%s collapsed %d -> %d (>%.0f%% drop vs last good run) - refusing to publish"
+               % (label, prev, count, MAX_DROP * 100))
+    if prev:
+        log("collapse guard OK: %s %d vs last good %d" % (label, count, prev))
+
+
+def record_good(**counts):
+    """Called only after a successful PUBLISH, so a dry-run cannot poison the baseline."""
+    try:
+        json.dump(counts, open(LAST_GOOD, "w", encoding="utf-8"), indent=1)
+    except OSError as e:
+        log("WARN: could not write %s (%s)" % (LAST_GOOD, e))
+
+
 def connect():
     """Connect with retry - the shared temp_user pool intermittently returns 'too many clients'."""
     last = None
@@ -225,6 +256,7 @@ def main():
     if not rows:                    die(2, "0 listing rows - refusing to publish an empty report")
     if len(rows) < MIN_ROWS:        die(2, "only %d rows (< floor %d) - looks like a broken pull"
                                            % (len(rows), MIN_ROWS))
+    collapse_guard(len(rows), "listings")
     bad_platform = sorted({r["p"] for r in rows} - set(PLATFORMS))
     if bad_platform:                die(2, "unexpected platform(s) in the pull: %s" % bad_platform)
     if any(r["o"] < 0 for r in rows):
@@ -347,6 +379,7 @@ def main():
         conn.close()
 
     log("PUBLISHED + COMMITTED to ph_task, md5-verified.")
+    record_good(listings=len(rows))      # new baseline for next week's collapse guard
     _status("OK", summary + " | PUBLISHED")
     log("done.")
 

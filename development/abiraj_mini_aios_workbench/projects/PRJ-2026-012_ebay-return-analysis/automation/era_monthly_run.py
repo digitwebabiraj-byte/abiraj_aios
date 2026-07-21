@@ -24,7 +24,7 @@ Flags:  --no-publish / --dry-run   (build + validate only; do NOT write ph_task)
 Usage:  python era_monthly_run.py [--dry-run] [YYYY-MM]
 Requires: build_returns_live_html.py + build_returns_html.py + the mockup xlsx (in evidence/final_outputs).
 """
-import os, sys, calendar, hashlib
+import os, sys, calendar, hashlib, json
 from datetime import date, timedelta, datetime
 import psycopg2
 from psycopg2.extras import execute_values
@@ -43,6 +43,35 @@ def die(m):
     print("[ERA] ABORT: %s  -> nothing published" % m, flush=True)
     _status("FAILED", m)
     sys.exit(2)
+
+# ---- collapse guard (borrowed from PRJ-2026-013 / EPPA) ----
+# MIN_SKUS only catches a total wipe-out. A feed that silently HALF-empties still clears it and
+# publishes a confidently wrong dashboard. This compares against the last GOOD run instead.
+# NOTE: returns are genuinely seasonal, so this is deliberately generous (40%).
+MAX_DROP  = float(os.getenv("ERA_MAX_DROP", "0.40"))
+LAST_GOOD = os.path.join(HERE, "era_last_good.json")
+
+def collapse_guard(count, label):
+    if not os.path.exists(LAST_GOOD):
+        return
+    try:
+        prev = json.load(open(LAST_GOOD, encoding="utf-8")).get(label)
+    except (ValueError, OSError):
+        print("[ERA] WARN: %s unreadable - skipping the collapse check" % LAST_GOOD)
+        return
+    if prev and count < prev * (1 - MAX_DROP):
+        die("%s collapsed %d -> %d (>%.0f%% drop vs last good run) - refusing to publish"
+            % (label, prev, count, MAX_DROP * 100))
+    if prev:
+        print("[ERA] collapse guard OK: %s %d vs last good %d" % (label, count, prev))
+
+def record_good(**counts):
+    """Called only after a successful PUBLISH, so a dry-run cannot poison the baseline."""
+    try:
+        json.dump(counts, open(LAST_GOOD, "w", encoding="utf-8"), indent=1)
+    except OSError as e:
+        print("[ERA] WARN: could not write %s (%s)" % (LAST_GOOD, e))
+
 PROJECT = os.path.dirname(HERE)
 FINAL_DIR = os.path.join(PROJECT, "evidence", "final_outputs", "REQ-14_ebay-return-analysis")
 MOCKUP = os.path.join(FINAL_DIR, "eBay_Return_Analysis_June2026.xlsx")
@@ -100,6 +129,7 @@ def main():
     if not stats["n"]:              die("0 SKU rows - refusing to publish an empty dashboard")
     if stats["n"] < MIN_SKUS:       die("only %d SKU rows (< floor %d) - looks like a broken pull"
                                         % (stats["n"], MIN_SKUS))
+    collapse_guard(stats["n"], "skus")
     if stats["returns"] < stats["n"]:
         die("%d returns across %d SKUs - every listed SKU must have >= 1 return"
             % (stats["returns"], stats["n"]))
@@ -158,6 +188,7 @@ def main():
             die("publish failed, transaction rolled back: %s" % e)
         log("published to ph_task (%d users) as project_code=%s, %d payloads md5-verified."
             % (len(ASSIGNED), PROJECT_CODE, len(ASSIGNED)))
+        record_good(skus=stats["n"])     # new baseline for next month's collapse guard
     else:
         log("--no-publish: skipped ph_task write.")
 

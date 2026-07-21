@@ -4,3 +4,4 @@ epc_run.log
 epc_status.txt
 epc_auto_dashboard.html
 __pycache__/
+epc_last_good.json
