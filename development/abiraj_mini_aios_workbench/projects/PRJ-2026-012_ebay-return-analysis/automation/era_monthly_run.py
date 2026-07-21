@@ -24,7 +24,7 @@ Flags:  --no-publish / --dry-run   (build + validate only; do NOT write ph_task)
 Usage:  python era_monthly_run.py [--dry-run] [YYYY-MM]
 Requires: build_returns_live_html.py + build_returns_html.py + the mockup xlsx (in evidence/final_outputs).
 """
-import os, sys, calendar, hashlib, json
+import os, sys, time, calendar, hashlib, json
 from datetime import date, timedelta, datetime
 import psycopg2
 from psycopg2.extras import execute_values
@@ -72,6 +72,23 @@ def record_good(**counts):
     except OSError as e:
         print("[ERA] WARN: could not write %s (%s)" % (LAST_GOOD, e))
 
+def connect(cfg, what):
+    """Connect with retry - the shared temp_user pool intermittently refuses connections
+    ('too many clients', or the server closing the connection outright, as on 2026-07-21).
+    A single refusal on the 5th is not a reason to skip a whole month."""
+    last = None
+    for attempt in range(1, 6):
+        try:
+            c = psycopg2.connect(connect_timeout=20, **cfg)
+            c.set_client_encoding("UTF8")
+            return c
+        except Exception as e:
+            last = e
+            print("[ERA]   %s connect attempt %d failed: %s"
+                  % (what, attempt, str(e).strip().splitlines()[0]), flush=True)
+            time.sleep(8)
+    die("cannot connect to %s after 5 attempts: %s" % (what, str(last).strip().splitlines()[0]))
+
 PROJECT = os.path.dirname(HERE)
 FINAL_DIR = os.path.join(PROJECT, "evidence", "final_outputs", "REQ-14_ebay-return-analysis")
 MOCKUP = os.path.join(FINAL_DIR, "eBay_Return_Analysis_June2026.xlsx")
@@ -118,7 +135,7 @@ def main():
     if PUBLISH and not WH["password"]:
         die("warehouse PGPASSWORD not set - cannot publish")
 
-    led = psycopg2.connect(**LED); led.set_session(readonly=True, autocommit=True)
+    led = connect(LED, 'ledsone'); led.set_session(readonly=True, autocommit=True)
     html, views_data, cache, stats = BL.generate(month, led, MOCKUP)
     led.close()
     log("built %s: %d SKUs / %d returns / £%.2f refund / £%.2f ad spend / ACOS %.1f%% / ROAS %.2fx"
@@ -162,7 +179,7 @@ def main():
                  ASSIGNED_USER_TEAM, html, desc, 1, 1, "released")
                 for u, tid in zip(ASSIGNED, task_ids)]
         try:
-            with psycopg2.connect(**WH) as conn:      # one transaction; auto-rollback on exception
+            with connect(WH, 'warehouse') as conn:    # one transaction; auto-rollback on exception
                 with conn.cursor() as pc:
                     pc.execute("DELETE FROM tech_team_outputs.ph_task WHERE task_id = ANY(%s)", (task_ids + legacy_ids,))
                     if pc.rowcount:

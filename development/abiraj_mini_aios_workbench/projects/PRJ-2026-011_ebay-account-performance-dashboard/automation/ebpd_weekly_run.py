@@ -19,7 +19,7 @@ Flags:  --no-publish / --dry-run  (build + validate only, write nothing)
 Usage:  python ebpd_weekly_run.py [--dry-run]
 Requires: build_html_v3.py alongside this file (its HTML template is reused verbatim).
 """
-import os, re, sys, json, calendar, hashlib, datetime as _dt
+import os, re, sys, json, time, calendar, hashlib, datetime as _dt
 from datetime import date, timedelta
 import psycopg2
 from psycopg2.extras import execute_values
@@ -67,6 +67,23 @@ def record_good(**counts):
     except OSError as e:
         print("[EBPD] WARN: could not write %s (%s)" % (LAST_GOOD, e))
 
+def connect(cfg, what):
+    """Connect with retry - the shared temp_user pool intermittently refuses connections
+    ('too many clients', or the server closing the connection outright, as on 2026-07-21).
+    A single refusal at 09:30 on a Monday is not a reason to skip a whole week."""
+    last = None
+    for attempt in range(1, 6):
+        try:
+            c = psycopg2.connect(connect_timeout=20, **cfg)
+            c.set_client_encoding("UTF8")
+            return c
+        except Exception as e:
+            last = e
+            print("[EBPD]   %s connect attempt %d failed: %s"
+                  % (what, attempt, str(e).strip().splitlines()[0]), flush=True)
+            time.sleep(8)
+    die("cannot connect to %s after 5 attempts: %s" % (what, str(last).strip().splitlines()[0]))
+
 # ---- connections (env, with the known warehouse defaults; ledsone must be provided) ----
 WH = dict(host=os.getenv("PGHOST","149.28.134.54"), port=os.getenv("PGPORT","5435"),
           dbname=os.getenv("PGDATABASE","order_management_copy"),
@@ -110,7 +127,7 @@ def disp(store): return NAME_MAP.get(store, store.replace("_"," ").title())
 MLAB={"UK":"UK","Germany":"DE","France":"FR","Italy":"IT","Ireland":"IE","US":"US","Canada":"CA"}
 MKTS=["UK","Germany","France","Italy","Ireland","US","Canada"]
 
-wh=psycopg2.connect(**WH); cur=wh.cursor()
+wh=connect(WH, 'warehouse'); cur=wh.cursor()
 def q(sql,args=None):
     cur.execute(sql,args or ()); return cur.fetchall()
 
@@ -165,7 +182,7 @@ for ss,mk,ac,stk in q("""WITH la AS (SELECT sub_source_name a,market_place m,COU
 # 6) New Listings (ledsone DB, reporting month) — degrade to {} if ledsone creds absent
 newl={}
 if LED_OK:
-    led=psycopg2.connect(**LED); lc=led.cursor()
+    led=connect(LED, 'ledsone'); lc=led.cursor()
     lc.execute("""SELECT ss.name, el.site, COUNT(DISTINCT el.item_id)
       FROM listings.ebay_listings el JOIN order_management.sub_source ss ON ss.id=el.sub_source
       WHERE el.created_at>=%s AND el.created_at<%s AND ss.name = ANY(%s)
@@ -291,7 +308,7 @@ if PUBLISH:
            f"eBay Account Performance Dashboard ({REP_LABEL}) — auto weekly refresh, all eBay accounts × marketplaces, order_total sales, ON_SITE ad + TACOS.",
            1,1,"released") for u in ASSIGNED]
     try:
-        with psycopg2.connect(**WH) as conn:      # one transaction; auto-rollback on exception
+        with connect(WH, 'warehouse') as conn:    # one transaction; auto-rollback on exception
             with conn.cursor() as pc:
                 # delete this month's rows (refresh) + any leftover legacy fixed-id rows (dedupe the month)
                 pc.execute("DELETE FROM tech_team_outputs.ph_task WHERE task_id = ANY(%s)",(task_ids+legacy_ids,))
