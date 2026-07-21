@@ -100,3 +100,41 @@ Evidence: `evidence/logs_or_screenshots/REQ-15_.../2026-07-21_field_by_field_sou
 - Corrected a workbench knowledge-base error: the `ppc-stock-lookup` reference claims eBay `ad`-grain
   rows exist only for `COST_PER_SALE`; live data shows **ON_SITE MANUAL also has them** (610
   item_ids) while **ON_SITE SMART does not**. The reference should be split by `bidding_strategy`.
+
+---
+
+## 2026-07-21 — fleet alignment (no scope change)
+
+EPPA was audited against the other five automated projects the same day it went live. The report
+logic, thresholds and rule engine are **unchanged**.
+
+**What EPPA gave the fleet.** Its **collapse guard** — rejecting a >40% fall in count against the
+*last good run* rather than only an absolute floor — was the one gate no other job had, and it has
+been **backported to T7, EPC, EBPD and ERA**. An absolute floor only catches a total wipe-out; a
+feed that silently half-empties clears it and publishes a confidently wrong report. (FRRC is
+deliberately excluded: its row count is return-driven and legitimately volatile month to month, so
+the guard would produce false aborts.)
+
+**What EPPA took from the fleet.**
+
+1. **Credentials via the global store**
+   (`05_documentation/capability/shared_db_credentials/`). It previously *required* a plaintext
+   `eppa_secrets.bat` and refused to start without one; a local file still wins as an override, but
+   is no longer needed. Proven by running with the file moved away: exit 0.
+2. **`--dry-run` / `--no-publish` added.** It had **none** — meaning the job could not be tested or
+   proven at all without a live publish, contrary to the automation pattern's "always ship a
+   dry-run" rule. Proven to leave `ph_task` untouched.
+3. **`AUTOMATION_README.md` written**, carrying the data traps that cost real debugging: the
+   warehouse hides SMART campaigns (use the RAW `ledsone` DB); CPS campaigns log £0 spend; 89% of
+   listings are multi-SKU; `ebay_listings.status` is 99.4% NULL; unbridged ≠ zero stock.
+
+⚠ **Disclosure — a live publish during verification.** Because no dry-run existed at the time,
+confirming the credential migration required a real run. It refreshed `ph_task` **id 405 → 407
+(version 3)**. Content identical — same anchor 2026-07-20, 45 campaigns, 15 pause recommendations,
+£1,403.54 spend-at-risk — so this was a version bump, not a data change, and the row count stayed
+at exactly 1 (no duplicate). The dry-run flag now makes this unnecessary.
+
+✅ EPPA correctly does **not** assert `version_status` after publishing — see PRJ-2026-010's note on
+why asserting `'released'` would roll back every future run. Do not add it.
+
+Git `04b6ed0`.

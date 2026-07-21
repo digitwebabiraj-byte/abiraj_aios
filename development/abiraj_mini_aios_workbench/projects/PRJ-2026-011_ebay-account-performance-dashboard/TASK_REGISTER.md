@@ -70,3 +70,33 @@ Delivered same day, after D01 acceptance, as the recurring/automated evolution o
 A new day or Claude session does **not** create a new Task ID. Keep using
 `REQ-13_ebay-account-performance-dashboard` until a genuinely new requirement (with owner confirmation)
 earns a new deliverable/task id.
+
+---
+
+## 2026-07-21 — post-delivery hardening (no scope change)
+
+D02 shipped without the fail-closed half of the automation pattern: it went straight from pull to
+`DELETE`+`INSERT` with **no validation at all**. A mid-reload source table would have deleted four
+good `ph_task` rows and published an empty dashboard over them, every Monday, silently. Closed:
+
+1. **Six gates before any write** — zero-row, floor (`EBPD_MIN_ROWS`), grain (no duplicated
+   account×marketplace), control totals vs a direct DB aggregate, render/placeholder, and a
+   **collapse guard** (>40% fall vs the last good run, from PRJ-2026-013 / EPPA).
+2. **md5-verified publish**, rolled back on mismatch.
+3. **No more silent degradation.** Absent `LED_*` credentials were publishing New Listings as a
+   real-looking `0`; a reader could not tell that from a genuine zero. Now a hard abort.
+4. **Credentials via the global store** — the plaintext `ebpd_secrets.bat` is no longer required.
+
+⚠ **June anchors are a DRIFT band, not equality.** The first run aborted correctly: `led_sone`/UK
+restated **£28,975.37 → £28,941.61** (−£33.76, −0.12%) as 45 Refunded + 7 Cancelled June orders
+landed after sign-off. A closed month legitimately restates, so the check now tolerates drift within
+`EBPD_ANCHOR_TOL` and logs it every run. **`ANCHOR_TOL = 1%` is a PROVISIONAL developer default —
+open for Thinesh**, along with whether £28,975.37 should be restated in this project's `CLAUDE.md`.
+
+⚠ **Open:** the pre-DELETE + INSERT refresh hardcodes `version_status='released'`, so an in-month
+re-run resets a user's `'completed'` back to unread. (A new month is a new `task_id`, so starting
+`released` there is correct.) FRRC/EPC/T7 use UPDATE and preserve it. **Owner's call, not decided.**
+
+Proven: control totals reconcile (£95,347.92 / 4,621 orders); Task Scheduler dry-run
+`LastTaskResult = 0`; forced floor, stripped credentials and a forced 100→22 collapse each abort.
+Git `539bf1b`, `e9460cc`, `04b6ed0`.

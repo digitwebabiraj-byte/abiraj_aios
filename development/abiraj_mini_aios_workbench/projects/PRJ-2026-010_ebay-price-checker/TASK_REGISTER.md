@@ -81,3 +81,23 @@ currently show 16-July prices). Optional later: a shipping-aware Status rebuild 
 A new day or Claude session does **not** create a new Task ID. Keep using `REQ-12_ebay-price-checker` until
 it is formally closed; only a genuinely new requirement (with owner confirmation) gets a new
 deliverable/task id.
+
+---
+
+## 2026-07-21 — post-delivery hardening (no scope change)
+
+1. **md5 verify before commit.** EPC published inside a transaction but never read back what it
+   stored, so a truncated or re-encoded write would have committed silently. It was the only job in
+   the fleet missing this. The publish now re-reads each row's `md5(html_content)` and rolls back on
+   any mismatch.
+2. **Collapse guard** (from PRJ-2026-013 / EPPA): rejects a >40% fall in listing count against the
+   last good run, which an absolute floor cannot catch.
+
+⚠ **`version_status` is deliberately NOT asserted.** The first version of the verify checked for
+`'released'` and would have **rolled back every publish from 27 July onward** — live already had
+`epc` id 300 (kobiga) at `'completed'`, because recipients marking their own task complete is normal
+workflow, not corruption. Only `assigned_user_team` is asserted; the status is logged. Do not
+"restore" that check.
+
+Proven: md5 technique verified against all four live `epc` rows; dry-run passes every gate;
+forced 500,000→126,655 collapse aborts. Git `d29bff5`, `04b6ed0`.

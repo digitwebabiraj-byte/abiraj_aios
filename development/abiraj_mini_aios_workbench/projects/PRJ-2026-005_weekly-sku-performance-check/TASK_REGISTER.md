@@ -28,3 +28,27 @@ REQ-07-D01 is **VALIDATED & CLOSED**; the items below are resolved or moved to a
    window are live (see the D02 row above). **Multi-PH parameterisation was NOT delivered** — the
    runner is still Thuwaraga-only (`PH_USER`); that remains open for a future deliverable.
 6. **Postgres MCP reconnect** required before any future live re-pull (connector GUID rotates per session).
+
+---
+
+## 2026-07-21 — post-delivery hardening (no scope change)
+
+Two corrections to REQ-07-D02, both proven before commit. Neither alters the signed-off method.
+
+1. **One canonical query.** The runner carried its own paste of `generate_dataset.sql`. Both copies
+   were identical, so nothing was wrong — but the `.sql` could be corrected later and this job would
+   keep running the old logic unnoticed, against the workbench rule that each SQL asset has exactly
+   one canonical location. `generate_dataset.sql` now binds the window (`%(ws)s` / `%(we)s`) — the
+   substitution its own header always prescribed — and the runner reads that file at startup.
+   A guard aborts (exit 1) if the file goes missing, stops binding the window, or regains a
+   hard-coded `DATE` literal: that failure is invisible to every other gate, because the report
+   would look perfectly healthy while describing **the wrong seven days**.
+2. **Collapse guard** (borrowed from PRJ-2026-013 / EPPA). `MIN_ROWS` only catches a total wipe-out;
+   a drop from 2,166 to 600 listings would have cleared the floor of 500 and published. The runner
+   now also rejects a >40% fall against the last good run (`t7_last_good.json`, git-ignored, written
+   only after a successful publish so a dry-run cannot poison it).
+
+Re-proven after both changes, byte-identical: regression `--window 2026-07-02` reproduces all 2,140
+signed-off listings (0 lost); live window 179 orders, control total 179 == 179. Negative tests:
+re-hardcoded query, missing file, and a forced 10,000→2,166 collapse each abort with nothing
+published. Git `6680498`, `04b6ed0`.

@@ -90,3 +90,29 @@ before any publish.
 A new day or Claude session does **not** create a new Task ID. Keep using
 `REQ-14_ebay-return-analysis` until D01 is closed; a genuinely new requirement (with owner confirmation)
 earns a new deliverable/task id.
+
+---
+
+## 2026-07-21 — post-delivery hardening (no scope change)
+
+Like EBPD, D02 shipped with no validation between the pull and the `DELETE`+`INSERT`. Closed:
+
+1. **Seven gates before any write** — zero-SKU, floor (`ERA_MIN_SKUS`), `returns >= SKUs`,
+   non-negative money, the **June 2026 anchor** (144 SKUs / 153 returns), render/placeholder, and a
+   **collapse guard** (>40% fall vs the last good run, from PRJ-2026-013 / EPPA; deliberately
+   generous because returns are seasonal).
+2. **md5-verified publish**, rolled back on mismatch.
+3. **Credentials via the global store**; `--dry-run` alias added.
+4. **`AUTOMATION_README.md` written** — it was the only automated project with no runbook.
+
+⚠ **UNRESOLVED — source-of-truth conflict (a STOP condition under the automation pattern).**
+This project's `CLAUDE.md` still says `REQ-14`/`ERA` are *"working defaults, minted with owner
+confirmation PENDING"* and *"do not publish to `ph_task` without explicit owner instruction"*, and
+the "One next action" above still describes D01 as not yet run. Meanwhile a scheduled task publishes
+monthly, unattended, as `version_status='released'`, and the delivery record says all three
+reviewers signed off 2026-07-20. The automation is very likely the correct state and this paperwork
+is stale — **but that must be reconciled by the owner, not assumed.**
+
+Proven: reproduces the signed-off June reference exactly (144 SKUs / 153 returns / £2,937.37 refund
+/ £1,387.96 ad spend / ACOS 14.9% / ROAS 6.73x); forced floor and a forced 500→144 collapse abort
+with nothing published. Git `539bf1b`, `d29bff5`, `04b6ed0`.
