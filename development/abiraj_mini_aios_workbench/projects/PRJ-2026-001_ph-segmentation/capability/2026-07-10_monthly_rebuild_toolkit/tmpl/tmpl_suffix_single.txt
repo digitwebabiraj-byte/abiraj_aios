@@ -119,7 +119,7 @@ function render(){
   asinHead();
   asinBody(ar);
   document.getElementById("asinHint").textContent=`— ${fmt(ar.length)} shown${catFilter?` · category: ${catFilter} (click it again to clear)`:""}${segFilter?` · segment ${segFilter}`:""}${movFilter?` · ${movFilter}`:""}`;
-  document.getElementById("foot").textContent=`Source: analytics.ph_segment_report (read-only). Segments, movement and benchmarks are the production engine's output — this view only reorganises them per portfolio holder.`;
+  document.getElementById("foot").textContent=`Source: recomputed READ-ONLY from public.traffic_data, public.order_transaction and public.ph_categories for the stated window — not from analytics.ph_segment_report, which is a separate engine build and may lag. Segments, movement and benchmarks follow the production engine's rules; this view reorganises them per portfolio holder.`;
 }
 
 /* ---- category table ---- */

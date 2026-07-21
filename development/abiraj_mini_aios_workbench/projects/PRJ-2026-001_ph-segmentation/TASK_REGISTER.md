@@ -27,3 +27,41 @@ Project: PRJ-2026-001_ph-segmentation
 > HTML snapshots but the **source table needs the engine re-run** (authorised DB session); Bietrick
 > **roster sign-off** (30 PHs). This **supersedes** the earlier "update SYSTEM_REFERENCE §1/§7 to 8,149"
 > next-step — current build is **9,947 / 30**.
+
+---
+
+## 2026-07-21 — correction: what this report actually reads, and how automatable it is
+
+Raised by the owner, verified against the toolkit's own SQL. Two errors in the record are corrected
+here; **no method, figure or deliverable changes.**
+
+**1. The dashboards do NOT read `analytics.ph_segment_report`.** The 2026-07-10 rebuild recomputes
+entirely from source: **22 queries across `public.traffic_data` (13), `public.order_transaction` (7)
+and `public.ph_categories` (2)**. The engine table is never selected from. The HTML footer
+nevertheless told every reader *"Source: analytics.ph_segment_report (read-only)"* — inaccurate, and
+inaccurate in the direction that matters, since that table is still the old **8,149 / 24** build
+while the dashboards are the corrected **9,947 / 30**.
+
+Corrected in `capability/2026-07-10_monthly_rebuild_toolkit/tmpl/tmpl_suffix.txt` and
+`tmpl_suffix_single.txt`, which generate all future dashboards. **The 55 published HTML files under
+`evidence/` were deliberately left untouched** — they are the record of what was actually shown to
+people, and rewriting evidence to match a later understanding would falsify it. Anyone reading an
+old dashboard should use this entry, not the caption, to know where the figures came from.
+
+**2. The stale engine table is NOT a blocker for the monthly report.** It was previously treated as
+one. Because the recompute is read-only from source, the report is the same shape as every automated
+job in this workbench: read source tables → build HTML → guarded publish to `ph_task`. The stale
+`analytics.ph_segment_report` matters only to consumers querying **that table directly** — a real
+but separate open item, unchanged by this entry.
+
+**Remaining blockers to automating the monthly run** (this is the accurate list):
+- **Bietrick's roster sign-off** on the 30-PH set — the same class of gate as ZSFO / Paused Campaign.
+- **HTML BLOCK 1 still builds the old UI** — flagged for swap before 3 Aug.
+- The **MCP `execute_sql` timeout above ~1,300 ASINs** shaped the per-PH/category-split method. An
+  automated runner uses direct `psycopg2` with no MCP, so this limit may not apply — **worth
+  re-testing before assuming the split is still necessary.**
+- Automation was aimed at a **Cloud Routine on the Postgres platform**, not Windows Task Scheduler,
+  and is paused mid-setup ("Run now" deliberately never clicked). That target is *more* correct than
+  Task Scheduler, not less — it is where the rest of the fleet should eventually move.
+
+Git: see the commit carrying this entry.
