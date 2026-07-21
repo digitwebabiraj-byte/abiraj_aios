@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eBay PPC Automation — ACOS Pause Rules</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1B2A44;--paper:#EEF1F5;--card:#FFFFFF;--line:#DBE1EA;--line2:#EDF0F4;
+  --navy:#16243F;--navy2:#22406B;--accent:#2E5C97;--accent-soft:#E7EEF7;--accent-bd:#C4D5EA;
+  --stop:#C0392B;--go:#1E7B4F;--warn:#C77C1B;--dim:#6B7688;
+  --stop-bg:#FBEAE8;--stop-bd:#EBC6C1;
+  --go-bg:#E7F4EC;--go-bd:#BEE3CC;
+  --warn-bg:#FBF1DF;--warn-bd:#EAD6AE;
+  --blue:#2E5C97;--blue-bg:#E7EEF7;--blue-bd:#C4D5EA;
+  --soft:#EEF0F3;
+  --shadow-sm:0 1px 2px rgba(20,35,60,.06);
+  --shadow:0 1px 3px rgba(20,35,60,.08),0 8px 22px rgba(20,35,60,.07);
+  --radius:10px;
+  --f-display:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --f-body:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--f-body);color:var(--ink);background:var(--paper);
+  padding:22px;min-height:100vh;-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--f-mono)}
+.dim{color:var(--dim)}
+
+/* header console */
+.top{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;
+  background:linear-gradient(120deg,#182B49 0%,#22406B 100%);
+  border-radius:14px;padding:22px 24px;margin-bottom:18px;color:#fff;position:relative;overflow:hidden;
+  box-shadow:0 8px 24px rgba(20,35,60,.24)}
+h1{margin:0;font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:-.01em;color:#fff}
+h1 .crumb{font-weight:500;color:rgba(255,255,255,.70)}
+.sub{margin:6px 0 0;font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#9FC0E6}
+.switchers{display:flex;flex-direction:column;align-items:center;gap:8px}
+.accts,.mkts{display:flex;gap:6px;flex-wrap:wrap}
+.acct{border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.10);color:#fff;cursor:pointer;
+  padding:7px 13px;text-align:left;font-family:var(--f-body);font-size:13px;font-weight:700;line-height:1.2;
+  border-radius:8px;transition:background .12s}
+.acct:hover{background:rgba(255,255,255,.20)}
+.acct[data-on="1"]{background:#fff;color:var(--navy2);border-color:#fff}
+.acct .mcount{display:block;font-family:var(--f-mono);font-size:9px;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;color:rgba(255,255,255,.65);margin-top:2px}
+.acct[data-on="1"] .mcount{color:var(--accent)}
+.mkt{font-family:var(--f-mono);font-size:12px;font-weight:600;padding:7px 12px;border:1px solid rgba(255,255,255,.28);
+  background:rgba(255,255,255,.10);color:#fff;cursor:pointer;position:relative;border-radius:8px;transition:background .12s}
+.mkt:hover{background:rgba(255,255,255,.20)}
+.mkt[data-on="1"]{background:#0F1B30;color:#fff;border-color:#0F1B30}
+.mkt sup{color:#F4C752;font-size:9px;position:absolute;top:2px;right:4px}
+
+/* nav — underline tabs */
+.nav{display:flex;gap:2px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:18px}
+.nav button{border:0;background:transparent;padding:12px 16px;font-size:12px;font-weight:700;cursor:pointer;
+  font-family:var(--f-mono);letter-spacing:.04em;color:var(--dim);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .12s,border-color .12s}
+.nav button:hover{color:var(--ink)}
+.nav button[data-on="1"]{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* info strip */
+.win{font-family:var(--f-mono);font-size:12px;display:flex;gap:9px;align-items:center;color:var(--dim);
+  flex-wrap:wrap;margin-bottom:16px}
+.win b{color:var(--ink);font-weight:700}
+
+/* stat cards */
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 16px 14px;
+  min-width:122px;position:relative;overflow:hidden;box-shadow:var(--shadow-sm)}
+.stat::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--accent)}
+.stat b{display:block;font-family:var(--f-mono);font-size:27px;font-weight:700;line-height:1.15;
+  letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.stat span{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);
+  font-family:var(--f-mono);font-weight:600}
+
+/* filter bar */
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.f{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.03em;padding:8px 12px;
+  border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;border-radius:7px;
+  box-shadow:var(--shadow-sm);transition:border-color .12s,background .12s,color .12s}
+.f:hover{border-color:var(--accent)}
+.f[data-on="1"]{background:var(--navy2);color:#fff;border-color:var(--navy2)}
+.spacer{flex:1}
+.search{border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 12px;font-size:12px;
+  width:230px;outline:0;font-family:var(--f-mono);border-radius:7px;box-shadow:var(--shadow-sm)}
+.search::placeholder{color:var(--dim)}
+.search:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(46,92,151,.15)}
+
+/* table */
+.tbl{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow-x:auto;box-shadow:var(--shadow)}
+table.log{width:100%;border-collapse:collapse;font-size:13px;min-width:1360px}
+.log th{text-align:left;font-family:var(--f-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+  color:#fff;font-weight:600;padding:12px 14px;border-bottom:1px solid var(--navy);white-space:nowrap;background:var(--navy2)}
+.log td{padding:12px 14px;border-bottom:1px solid var(--line2);vertical-align:top}
+.log tr.r{cursor:pointer;transition:background .1s}
+.log tr.r:hover td{background:#F5F8FC}
+.camp{font-weight:600}
+.ag{font-size:11px;color:var(--dim);margin-top:2px;font-family:var(--f-mono)}
+.id{font-family:var(--f-mono);font-size:12px}
+.id .s{display:block;color:var(--dim);font-size:11px;margin-top:2px}
+.tag{font-family:var(--f-mono);font-size:10px;font-weight:700;color:#fff;padding:4px 8px;letter-spacing:.05em;
+  display:inline-block;border-radius:5px}
+.cond{font-family:var(--f-mono);font-size:10px;color:var(--dim);margin-top:5px}
+.why{max-width:400px;line-height:1.5;font-size:12.5px;color:var(--ink)}
+.log th.gh{background:var(--accent);color:#fff;text-align:center;letter-spacing:.09em;font-size:10px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.18)}
+.log th.cppc,.log td.cppc{border-left:2px solid var(--line)}
+.log th.gh.cppc{border-left:2px solid rgba(255,255,255,.28)}
+.rev-dec{font-family:var(--f-body);font-style:italic;font-weight:600;font-size:12px;min-width:118px;
+  background:#F4F6F9;border:1px solid var(--line);border-radius:6px;padding:8px 9px}
+.rev-note{border:1px solid var(--line);border-radius:6px;background:#FCFBF0;color:var(--ink);font-family:var(--f-body);
+  font-size:12px;line-height:1.4;padding:7px 9px;width:170px;min-height:40px;resize:vertical;outline:0;display:block}
+.rev-note::placeholder{color:#B8B394;font-style:italic}
+.rev-note:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(46,92,151,.15)}
+.rev-dec:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px rgba(46,92,151,.15)}
+.st{font-family:var(--f-mono);font-size:10px;font-weight:700;padding:5px 9px;white-space:nowrap;color:var(--stop);
+  background:var(--stop-bg);border:1px solid var(--stop-bd);display:inline-block;border-radius:20px}
+.st.ok{color:var(--go);background:var(--go-bg);border-color:var(--go-bd)}
+.st.off{color:var(--dim);background:var(--soft);border-color:var(--line)}
+tr.detail td{background:#F6F8FB;padding:0 14px 16px}
+.trace{border-left:2px solid var(--line);padding-left:14px;margin-top:2px}
+.t{display:flex;gap:9px;padding:5px 0;font-size:12px;align-items:flex-start}
+.dot{width:9px;height:9px;border-radius:50%;background:#C7D0DC;margin-top:4px;flex:none}
+.dot.on{background:var(--stop);box-shadow:0 0 0 3px rgba(192,57,43,.14)}
+.t .d{color:var(--dim);font-family:var(--f-mono);font-size:11px}
+.mets{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0 4px;font-family:var(--f-mono);font-size:11px;color:var(--dim)}
+.mets b{color:var(--ink);font-weight:700}
+.prio{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:11px;font-weight:700;
+  padding:5px 9px;border:1px solid;white-space:nowrap;border-radius:20px}
+.pbars{display:inline-flex;align-items:flex-end;gap:1.5px;height:9px}
+.pbars i{width:3px;background:currentColor;opacity:.28;border-radius:1px}
+.pbars i:nth-child(1){height:4px}.pbars i:nth-child(2){height:7px}.pbars i:nth-child(3){height:10px}
+.prio.high{color:var(--stop);background:var(--stop-bg);border-color:var(--stop-bd)}
+.prio.high .pbars i{opacity:1}
+.prio.medium{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-bd)}
+.prio.medium .pbars i:nth-child(1),.prio.medium .pbars i:nth-child(2){opacity:1}
+.prio.low{color:var(--dim);background:var(--soft);border-color:var(--line)}
+.prio.low .pbars i:nth-child(1){opacity:1}
+
+/* rule cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:14px;
+  box-shadow:var(--shadow-sm);overflow:hidden}
+.rhead{display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;transition:background .1s}
+.rhead:hover{background:#F5F8FC}
+.rtag{font-family:var(--f-mono);font-size:11px;font-weight:700;color:#fff;padding:5px 9px;letter-spacing:.05em;border-radius:6px}
+.rtitle{font-family:var(--f-display);font-weight:700;font-size:16px}
+.rsub{font-size:12px;color:var(--dim);font-family:var(--f-mono);margin-top:1px}
+.stk{display:flex;gap:8px;align-items:flex-start;font-family:var(--f-mono);font-size:12px;white-space:nowrap}
+.stk .pip{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:none}
+.stk .u{color:var(--dim);font-size:11px}
+.stk .lbl{font-size:10px;letter-spacing:.05em;text-transform:uppercase;margin-top:2px;font-weight:600}
+.stk.in .pip{background:var(--go);box-shadow:0 0 0 4px rgba(30,123,79,.14)}
+.stk.in .lbl{color:var(--go)}
+.stk.low .pip{background:var(--warn);box-shadow:0 0 0 4px rgba(199,124,27,.16);animation:pulse 1.8s ease-in-out infinite}
+.stk.low .lbl,.stk.low b{color:var(--warn)}
+.stk.out .pip{background:var(--stop);box-shadow:0 0 0 4px rgba(192,57,43,.14)}
+.stk.out .lbl,.stk.out b{color:var(--stop)}
+.stk.na .pip{background:#C7D0DC}
+.stk.na .lbl,.stk.na b{color:var(--dim)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.freq{font-family:var(--f-mono);font-size:10px;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-bd);
+  padding:4px 9px;white-space:nowrap;border-radius:20px;font-weight:600}
+.live{font-family:var(--f-mono);font-size:11px;color:var(--stop);background:var(--stop-bg);border:1px solid var(--stop-bd);
+  padding:5px 10px;border-radius:20px;font-weight:600}
+.sw{width:42px;height:23px;border-radius:12px;border:1px solid var(--line);background:#D5DBE4;position:relative;
+  cursor:pointer;flex:none;transition:background .16s}
+.sw i{position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .16s}
+.sw[data-on="1"]{background:var(--go);border-color:var(--go)}
+.sw[data-on="1"] i{left:21px}
+.rbody{border-top:1px solid var(--line);padding:18px;background:#F8FAFC}
+.grp{border:1px solid var(--line);border-radius:9px;padding:14px;margin-bottom:10px;background:#fff}
+.grp h4{margin:0 0 6px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-family:var(--f-mono);
+  color:var(--accent);font-weight:700}
+.grp p{margin:0 0 8px;font-size:12px;color:var(--dim);line-height:1.55}
+.cnum{font-family:var(--f-mono);color:var(--dim);font-size:12px}
+.chip{font-family:var(--f-mono);font-size:11px;padding:5px 9px;border:1px solid var(--line);background:#F4F6F9;border-radius:6px}
+.hit{font-family:var(--f-mono);font-size:10px;font-weight:600;color:var(--stop);background:var(--stop-bg);
+  border:1px solid var(--stop-bd);padding:3px 7px;white-space:nowrap;border-radius:5px}
+.inputwrap{display:inline-flex;align-items:center;border:1px solid var(--line);background:#fff;border-radius:7px;overflow:hidden}
+.inputwrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(46,92,151,.15)}
+.cursym{font-family:var(--f-mono);font-size:12px;color:var(--dim);padding-left:9px}
+.cursym.after{padding:0 9px 0 0}
+input.cell{border:0;outline:0;width:60px;padding:8px;font-family:var(--f-mono);font-size:13px;font-weight:600;
+  background:transparent;color:var(--ink)}
+.rf{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;padding:6px 0}
+.rf span{color:var(--dim)}
+.rf input{border:1px solid var(--line);width:66px;border-radius:6px}
+.btn{border:1px solid var(--navy2);background:var(--navy2);color:#fff;padding:9px 14px;font-size:12px;
+  font-weight:700;cursor:pointer;font-family:var(--f-mono);border-radius:7px;box-shadow:var(--shadow-sm);transition:background .12s,border-color .12s}
+.btn:hover{background:#182B49;border-color:#182B49}
+.btn.dngr{border-color:var(--stop-bd);color:var(--stop);background:#fff}
+.btn.dngr:hover{background:var(--stop);border-color:var(--stop);color:#fff}
+.cnd{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+select{border:1px solid var(--line);padding:8px;font-size:12px;background:#fff;color:var(--ink);font-family:var(--f-mono);border-radius:6px}
+input.txt{border:1px solid var(--line);padding:8px 10px;font-weight:700;font-size:14px;font-family:var(--f-display);
+  background:#fff;color:var(--ink);border-radius:7px}
+.note{font-size:12px;color:var(--dim);line-height:1.6;margin:0 0 12px}
+.empty{padding:40px;text-align:center;color:var(--dim);font-size:13px}
+.foot{margin-top:14px;font-size:11px;color:var(--dim);font-family:var(--f-mono)}
+.hide{display:none}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{opacity:.5}
+@media (max-width:640px){body{padding:14px}h1{font-size:21px}.top{padding:18px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ===================== configuration ===================== */
+const CURRENCY = {UK:"£",US:"$",DE:"€"};
+const ACCOUNTS = [
+  {name:"LEDSone", markets:["UK","US","DE"]},
+];
+const ACOS_UK = {
+  r1_acosWinMin: 40,     // Rule 1 — pause when 30D ACOS ≥ this
+  r1_acos7RescueMax: 20, // Rule 1 — do NOT pause if 7D ACOS is below this (improving trend)
+  r2_clicksMin: 20,      // Rule 2 — pause scope needs 14D clicks ≥ this
+  r2_spendMin: 2.5,      // Rule 2 — do NOT pause if 14D spend is below this (cheap organic-ranking clicks)
+  stockMin: 5,           // Stock rule — pause when available units are BELOW this floor
+  prioHigh: 40, prioMed: 15,
+};
+const RULE_COLOR = {Stock:"#C0392B","Rule 1":"#2E5C97","Rule 2":"#C77C1B",Custom:"#1E7B4F"};
+const PRIO_ORDER = {High:0,Medium:1,Low:2};
+const METRICS = [
+  {key:"acosWin",label:"30D ACOS %"},{key:"acos7",label:"7D ACOS %"},
+  {key:"ordWin",label:"30D orders"},{key:"ord14",label:"14D orders"},
+  {key:"clicks14",label:"14D clicks"},{key:"spend14",label:"14D spend"},
+  {key:"spendWin",label:"30D spend"},{key:"price",label:"Listing price"},
+  {key:"stock",label:"Units in stock"},
+];
+const OPS = [">","≥","<","≤","=","≠"];
+const DECISIONS = ["Pending","Approved","Rejected","On hold"];
+
+function seedConfig(){
+  const cfg = {};
+  ACCOUNTS.forEach(a=>{
+    cfg[a.name] = {};
+    a.markets.forEach(m=>{
+      cfg[a.name][m] = {currency:CURRENCY[m], inherited: m!=="UK", acos:{...ACOS_UK}};
+    });
+  });
+  return cfg;
+}
+
+/* ============ LIVE IMPORT — LEDSone · eBay Promoted Listings · campaign export ============
+   Source: uploaded eBay Promoted Listings campaign report, 01 Jul 2026 – 07 Jul 2026 (7 days only).
+   This export has ONE 7-day window per campaign — no separate 30D pull and no 14D pull, and it is
+   campaign-level (no item ID / SKU / price / stock, so those show as "—"/n/a here).
+   Mapping used below: acosWin = acos7 = this 7-day ACOS (ad fees ÷ sales); ord14/clicks14/spend14
+   reuse the same 7-day sold qty/clicks/ad fees as a stand-in for the 14-day figures Rule 2 needs.
+   Because acosWin and acos7 are forced equal, Rule 1's "improving trend" rescue can never fire
+   (a value can't be both ≥40% and <20% at once) — re-import separate 30D and 14D exports to unlock
+   accurate trend detection. Everything below is still fully editable in the Input Data tab. */
+const LISTINGS = [
+  {account:"LEDSone", mkt:"UK", campaign:"JD | LJ | Lighting Parts | Thojika | Manual", itemId:"161735955012", sku:"\u2014", product:"JD | LJ | Lighting Parts | Thojika | Manual", type:"Manual", price:0, stock:142, ordWin:8, acosWin:32.8, acos7:32.8, ord14:8, clicks14:227, spend14:31.44, spendWin:31.44, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Cables | Video | Manual", itemId:"165065723012", sku:"\u2014", product:"JD | Cables | Video | Manual", type:"Manual", price:0, stock:3, ordWin:23, acosWin:6.9, acos7:6.9, ord14:23, clicks14:39, spend14:7.67, spendWin:7.67, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | MH | Lighting Accessories & Hardware | Tharsika.T | Manual", itemId:"159997785012", sku:"\u2014", product:"JD | MH | Lighting Accessories & Hardware | Tharsika.T | Manual", type:"Manual", price:0, stock:0, ordWin:3, acosWin:42.5, acos7:42.5, ord14:3, clicks14:51, spend14:8.48, spendWin:8.48, campaignState:"OFF", listingState:"OFF"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PH | PSU 4 types | Transformer | Manual", itemId:"34199100012", sku:"\u2014", product:"JD | PH | PSU 4 types | Transformer | Manual", type:"Manual", price:0, stock:128, ordWin:15, acosWin:18.3, acos7:18.3, ord14:15, clicks14:202, spend14:45.76, spendWin:45.76, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | MH | Cables | Jasmini | Smart", itemId:"28863417012", sku:"\u2014", product:"JD | MH | Cables | Jasmini | Smart", type:"Smart", price:0, stock:64, ordWin:15, acosWin:16.6, acos7:16.6, ord14:15, clicks14:92, spend14:19.54, spendWin:19.54, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | MH | Wall lights | Shimee | Manual", itemId:"38338866012", sku:"\u2014", product:"JD | MH | Wall lights | Shimee | Manual", type:"Manual", price:0, stock:47, ordWin:0, acosWin:999, acos7:999, ord14:0, clicks14:57, spend14:10.45, spendWin:10.45, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Mixed Product | Manual", itemId:"85734687012", sku:"\u2014", product:"JD | Mixed Product | Manual", type:"Manual", price:0, stock:12, ordWin:2, acosWin:76.8, acos7:76.8, ord14:2, clicks14:175, spend14:36.25, spendWin:36.25, campaignState:"OFF", listingState:"OFF"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PH | 3 head pendant light | Manual", itemId:"164421244012", sku:"\u2014", product:"JD | PH | 3 head pendant light | Manual", type:"Manual", price:0, stock:2, ordWin:2, acosWin:17.7, acos7:17.7, ord14:2, clicks14:79, spend14:14.34, spendWin:14.34, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Sm wall | smart", itemId:"17371404012", sku:"\u2014", product:"JD | Sm wall | smart", type:"Smart", price:0, stock:210, ordWin:5, acosWin:13.7, acos7:13.7, ord14:5, clicks14:199, spend14:33.17, spendWin:33.17, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD  | Shade+video campaign", itemId:"163710397012", sku:"\u2014", product:"JD  | Shade+video campaign", type:"Smart", price:0, stock:88, ordWin:3, acosWin:83.5, acos7:83.5, ord14:3, clicks14:122, spend14:32.39, spendWin:32.39, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PH | Tharsika | Lamp Holders | Manual", itemId:"14841895012", sku:"\u2014", product:"JD | PH | Tharsika | Lamp Holders | Manual", type:"Manual", price:0, stock:55, ordWin:10, acosWin:70.6, acos7:70.6, ord14:10, clicks14:228, spend14:50.51, spendWin:50.51, campaignState:"OFF", listingState:"OFF"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PH | power supply (fast moving) | Transformer  | smart", itemId:"28863466012", sku:"\u2014", product:"JD | PH | power supply (fast moving) | Transformer  | smart", type:"Smart", price:0, stock:176, ordWin:12, acosWin:33.4, acos7:33.4, ord14:12, clicks14:224, spend14:45.39, spendWin:45.39, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | MH | 3 head Pendent | Smart", itemId:"135730419012", sku:"\u2014", product:"JD | MH | 3 head Pendent | Smart", type:"Smart", price:0, stock:31, ordWin:2, acosWin:86.1, acos7:86.1, ord14:2, clicks14:159, spend14:36.75, spendWin:36.75, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Wall lights | New | Manual", itemId:"164195009012", sku:"\u2014", product:"JD | Wall lights | New | Manual", type:"Manual", price:0, stock:0, ordWin:8, acosWin:20.5, acos7:20.5, ord14:8, clicks14:197, spend14:31.91, spendWin:31.91, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Promotion Dec 2025  | smart", itemId:"156649526012", sku:"\u2014", product:"JD | Promotion Dec 2025  | smart", type:"Smart", price:0, stock:9, ordWin:7, acosWin:39.6, acos7:39.6, ord14:7, clicks14:230, spend14:41.94, spendWin:41.94, campaignState:"OFF", listingState:"OFF"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PH | PLA | Power Supply | Transformer | Manual", itemId:"15603840012", sku:"\u2014", product:"JD | PH | PLA | Power Supply | Transformer | Manual", type:"Manual", price:0, stock:240, ordWin:12, acosWin:25.2, acos7:25.2, ord14:12, clicks14:207, spend14:47.0, spendWin:47.0, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | MH | Wire Cage | Paulroshan | Manual", itemId:"159695736012", sku:"\u2014", product:"JD | MH | Wire Cage | Paulroshan | Manual", type:"Manual", price:0, stock:18, ordWin:7, acosWin:44.5, acos7:44.5, ord14:7, clicks14:191, spend14:28.93, spendWin:28.93, campaignState:"OFF", listingState:"OFF"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Target Transformer | Manual", itemId:"161245031012", sku:"\u2014", product:"JD | Target Transformer | Manual", type:"Manual", price:0, stock:96, ordWin:16, acosWin:11.0, acos7:11.0, ord14:16, clicks14:133, spend14:24.96, spendWin:24.96, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PH | BULB | TUWA | MANUAL", itemId:"155338191012", sku:"\u2014", product:"JD | PH | BULB | TUWA | MANUAL", type:"Manual", price:0, stock:512, ordWin:23, acosWin:22.4, acos7:22.4, ord14:23, clicks14:206, spend14:46.7, spendWin:46.7, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Without general | Manual", itemId:"144201913012", sku:"\u2014", product:"JD | Without general | Manual", type:"Manual", price:0, stock:73, ordWin:18, acosWin:40.6, acos7:40.6, ord14:18, clicks14:165, spend14:40.56, spendWin:40.56, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PSU+Bulbs | Transformer | Manual", itemId:"153333633012", sku:"\u2014", product:"JD | PSU+Bulbs | Transformer | Manual", type:"Manual", price:0, stock:4, ordWin:16, acosWin:14.5, acos7:14.5, ord14:16, clicks14:175, spend14:37.51, spendWin:37.51, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Wall light + video campaign", itemId:"163055118012", sku:"\u2014", product:"JD | Wall light + video campaign", type:"Manual", price:0, stock:150, ordWin:10, acosWin:12.3, acos7:12.3, ord14:10, clicks14:95, spend14:18.7, spendWin:18.7, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PLA | Pendent Lights | Smart", itemId:"15405839012", sku:"\u2014", product:"JD | PLA | Pendent Lights | Smart", type:"Smart", price:0, stock:38, ordWin:10, acosWin:32.6, acos7:32.6, ord14:10, clicks14:193, spend14:44.24, spendWin:44.24, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PH | Abinayaa | Light Fittings | Manual", itemId:"155945896012", sku:"\u2014", product:"JD | PH | Abinayaa | Light Fittings | Manual", type:"Manual", price:0, stock:61, ordWin:14, acosWin:20.6, acos7:20.6, ord14:14, clicks14:172, spend14:34.92, spendWin:34.92, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PLA | Light Product | Smart", itemId:"15405904012", sku:"\u2014", product:"JD | PLA | Light Product | Smart", type:"Smart", price:0, stock:105, ordWin:12, acosWin:28.7, acos7:28.7, ord14:12, clicks14:217, spend14:34.12, spendWin:34.12, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PH | Pendant - II | Manual", itemId:"162961217012", sku:"\u2014", product:"JD | PH | Pendant - II | Manual", type:"Manual", price:0, stock:27, ordWin:4, acosWin:22.5, acos7:22.5, ord14:4, clicks14:108, spend14:17.81, spendWin:17.81, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Ceiling Lights | Manual", itemId:"163193938012", sku:"\u2014", product:"JD | Ceiling Lights | Manual", type:"Manual", price:0, stock:44, ordWin:3, acosWin:51.4, acos7:51.4, ord14:3, clicks14:167, spend14:26.85, spendWin:26.85, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PH | Flush light | Manual", itemId:"26896653012", sku:"\u2014", product:"JD | PH | Flush light | Manual", type:"Manual", price:0, stock:1, ordWin:4, acosWin:28.7, acos7:28.7, ord14:4, clicks14:73, spend14:13.86, spendWin:13.86, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Target Mixed | New | ST | smart", itemId:"164113429012", sku:"\u2014", product:"JD | Target Mixed | New | ST | smart", type:"Smart", price:0, stock:82, ordWin:9, acosWin:46.7, acos7:46.7, ord14:9, clicks14:201, spend14:42.77, spendWin:42.77, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PH |  All type | Transformer | Manual", itemId:"129690774012", sku:"\u2014", product:"JD | PH |  All type | Transformer | Manual", type:"Manual", price:0, stock:190, ordWin:14, acosWin:23.0, acos7:23.0, ord14:14, clicks14:211, spend14:46.61, spendWin:46.61, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Target product | Manual", itemId:"22831214012", sku:"\u2014", product:"JD | Target product | Manual", type:"Manual", price:0, stock:118, ordWin:12, acosWin:25.4, acos7:25.4, ord14:12, clicks14:198, spend14:40.27, spendWin:40.27, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PH | Pendant Light Fitting  | Tharshana | Manual", itemId:"160677049012", sku:"\u2014", product:"JD | PH | Pendant Light Fitting  | Tharshana | Manual", type:"Manual", price:0, stock:0, ordWin:4, acosWin:23.3, acos7:23.3, ord14:4, clicks14:71, spend14:14.22, spendWin:14.22, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | stock clearance products | Smart", itemId:"28863477012", sku:"\u2014", product:"JD | stock clearance products | Smart", type:"Smart", price:0, stock:6, ordWin:9, acosWin:47.7, acos7:47.7, ord14:9, clicks14:198, spend14:36.9, spendWin:36.9, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Spider Light | Manual", itemId:"17109990012", sku:"\u2014", product:"JD | Spider Light | Manual", type:"Manual", price:0, stock:23, ordWin:1, acosWin:30.2, acos7:30.2, ord14:1, clicks14:58, spend14:11.75, spendWin:11.75, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | MH | LEDSONE Cable | Manual", itemId:"13950665012", sku:"\u2014", product:"JD | MH | LEDSONE Cable | Manual", type:"Manual", price:0, stock:330, ordWin:21, acosWin:10.9, acos7:10.9, ord14:21, clicks14:81, spend14:13.93, spendWin:13.93, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | MH | Ceiling rose & Tapes | Prasath | Manual", itemId:"161303270012", sku:"\u2014", product:"JD | MH | Ceiling rose & Tapes | Prasath | Manual", type:"Manual", price:0, stock:71, ordWin:10, acosWin:35.9, acos7:35.9, ord14:10, clicks14:126, spend14:25.24, spendWin:25.24, campaignState:"OFF", listingState:"OFF"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Plug in light | Manual", itemId:"164267739012", sku:"\u2014", product:"JD | Plug in light | Manual", type:"Manual", price:0, stock:3, ordWin:8, acosWin:13.9, acos7:13.9, ord14:8, clicks14:145, spend14:19.32, spendWin:19.32, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Flush light | Smart", itemId:"149867100012", sku:"\u2014", product:"JD | Flush light | Smart", type:"Smart", price:0, stock:0, ordWin:2, acosWin:127.5, acos7:127.5, ord14:2, clicks14:152, spend14:35.56, spendWin:35.56, campaignState:"OFF", listingState:"OFF"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | PH | Lampshade  | Utharsika | Manual", itemId:"129690966012", sku:"\u2014", product:"JD | PH | Lampshade  | Utharsika | Manual", type:"Manual", price:0, stock:156, ordWin:8, acosWin:49.0, acos7:49.0, ord14:8, clicks14:249, spend14:40.28, spendWin:40.28, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | Cables | Target | Manual", itemId:"161244718012", sku:"\u2014", product:"JD | Cables | Target | Manual", type:"Manual", price:0, stock:92, ordWin:26, acosWin:14.3, acos7:14.3, ord14:26, clicks14:135, spend14:24.29, spendWin:24.29, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | MH | Flush Light & Lamp Shade | Shanthini | Manual", itemId:"159902435012", sku:"\u2014", product:"JD | MH | Flush Light & Lamp Shade | Shanthini | Manual", type:"Manual", price:0, stock:2, ordWin:4, acosWin:32.1, acos7:32.1, ord14:4, clicks14:73, spend14:11.16, spendWin:11.16, campaignState:"ON", listingState:"ON"},
+  {account:"LEDSone", mkt:"UK", campaign:"JD | MH | Hemp Lights | Renuha | Manual", itemId:"155212621012", sku:"\u2014", product:"JD | MH | Hemp Lights | Renuha | Manual", type:"Manual", price:0, stock:34, ordWin:3, acosWin:29.2, acos7:29.2, ord14:3, clicks14:83, spend14:18.64, spendWin:18.64, campaignState:"ON", listingState:"ON"},
+];
+
+/* ===================== state ===================== */
+const S = {
+  view:"rules", pane:"log",
+  account:"LEDSone", market:"UK",
+  config: seedConfig(),
+  enabled:{stock:true, r1:true, r2:true},
+  customRules:[],
+  openRule:"stock", openRow:null,
+  filter:"All", q:"",
+  review:{},
+  data: LISTINGS.map(p=>({...p})),
+};
+
+/* ===================== helpers ===================== */
+const N = v => (v===""||v==null) ? 0 : Number(v);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const acctMarkets = () => ACCOUNTS.find(a=>a.name===S.account).markets;
+const mkt = () => acctMarkets().includes(S.market) ? S.market : acctMarkets()[0];
+const mc = () => S.config[S.account][mkt()];
+const cur = () => mc().currency;
+const money = n => cur() + Number(n).toFixed(2);
+const priceCell = p => p>0 ? money(p) : '<span class="dim">n/a</span>';
+const stockCell2 = u => {
+  if(u===null||u===undefined||u==="") return '<div class="stk na"><span class="pip"></span><span><b>—</b><div class="lbl">No data</div></span></div>';
+  const n = N(u), floor = N(mc().acos.stockMin);
+  const st = n<=0 ? "out" : n<floor ? "low" : "in";
+  const lbl = st==="out" ? "Out of stock" : st==="low" ? "Low stock" : "In stock";
+  return '<div class="stk '+st+'"><span class="pip"></span><span><b>'+n+'</b> <span class="u">units</span>'
+    + '<div class="lbl">'+lbl+'</div></span></div>';
+};
+
+/* ===================== rule engine ===================== */
+function offAt(p){
+  if(p.campaignState==="OFF") return "Campaign";
+  if(p.listingState==="OFF") return "Listing";
+  return null;
+}
+
+function evaluate(p){
+  const m = mc(), R = m.acos, c = m.currency;
+  const mny = n => c + Number(n).toFixed(2);
+  const {acosWin, acos7, ordWin, ord14, clicks14, spend14} = p;
+  const trace = [];
+  const T = (label,pass,detail) => trace.push({label,pass,detail});
+
+  const off = offAt(p);
+  if(off){
+    T("State check — campaign and listing both live", false, off+" is OFF — rules not evaluated");
+    return {paused:false, alreadyOff:true, offAt:off, rule:"—", cond:"—", trace,
+      reason: off+" is already OFF. No pause action taken — the rules are not evaluated against an entity that is not running."};
+  }
+  T("State check — campaign and listing both live", true, "eligible for pause rules");
+
+  /* Stock rule — availability beats performance, so it runs before any ACOS rule */
+  if(S.enabled.stock){
+    const stock = N(p.stock), floor = N(R.stockMin);
+    const low = stock < floor;
+    T("Stock rule — units in stock &lt; "+floor+" (pause floor)", low, stock+" unit"+(stock===1?"":"s")+" in stock");
+    if(low) return {paused:true, rule:"Stock", cond: stock<=0 ? "Out of stock" : "Low stock", trace,
+      reason: stock<=0
+        ? "Out of stock — 0 units available. Ads are paused so spend does not keep running on an item that cannot be bought."
+        : "Low stock — only "+stock+" unit"+(stock===1?"":"s")+" left, below the "+floor+"-unit floor. Ads are paused to protect the last units and avoid paying for clicks that cannot all be fulfilled."};
+  }
+
+  /* Rule 1 — High ACOS auto-pause, 30D lookback, weekly (Monday) run */
+  if(S.enabled.r1){
+    const inScope = ordWin > 0;
+    T("Rule 1 scope — 30D orders &gt; 0 (ACOS is meaningful)", inScope, ordWin+" orders in 30D");
+    if(inScope){
+      const hi = acosWin >= N(R.r1_acosWinMin);
+      T("Condition — 30D ACOS ≥ "+R.r1_acosWinMin+"%", hi, "30D ACOS "+acosWin+"%");
+      if(hi){
+        const rescue = acos7 < N(R.r1_acos7RescueMax);
+        T("Do-not-pause — 7D ACOS &lt; "+R.r1_acos7RescueMax+"% (improving trend)", rescue, "7D ACOS "+acos7+"%");
+        if(!rescue) return {paused:true, rule:"Rule 1", cond:"High ACOS", trace,
+          reason:"30-day ACOS is "+acosWin+"%, over the "+R.r1_acosWinMin+"% ceiling. The last 7 days are still at "+acos7+"% ACOS — not below the "+R.r1_acos7RescueMax+"% needed to count as an improving trend, so the listing is paused."};
+      }
+    }
+  }
+
+  /* Rule 2 — 14D no sales + 20+ clicks pause, keeps cheap organic-ranking clicks alive */
+  if(S.enabled.r2){
+    const inScope = ord14 === 0;
+    T("Rule 2 scope — 14D orders = 0", inScope, ord14+" orders in 14D");
+    if(inScope){
+      const enough = clicks14 >= N(R.r2_clicksMin);
+      T("Condition — 14D clicks ≥ "+R.r2_clicksMin, enough, clicks14+" clicks");
+      if(enough){
+        const cheap = spend14 < N(R.r2_spendMin);
+        T("Do-not-pause — 14D spend &lt; "+mny(R.r2_spendMin)+" (organic ranking boost, low cost)", cheap, mny(spend14));
+        if(!cheap) return {paused:true, rule:"Rule 2", cond:"No sales + clicks", trace,
+          reason: clicks14+" clicks over 14 days produced zero orders, and spend of "+mny(spend14)+" is at or above the "+mny(R.r2_spendMin)+" floor — no longer cheap enough to justify keeping it live for the organic-ranking signal."};
+      }
+    }
+  }
+
+  /* Custom rules — run after the two base rules */
+  const metrics = {...p};
+  for(const r of S.customRules){
+    if(!r.enabled || !r.conditions.length) continue;
+    const ok = r.conditions.every(cd=>{
+      const a=N(metrics[cd.metric]), b=N(cd.value);
+      return cd.op===">"?a>b:cd.op==="≥"?a>=b:cd.op==="<"?a<b:cd.op==="≤"?a<=b:cd.op==="="?a===b:a!==b;
+    });
+    const desc = r.conditions.map(cd=>(METRICS.find(mm=>mm.key===cd.metric)||{}).label+" "+cd.op+" "+cd.value).join(" AND ");
+    T(r.name+" — "+desc, ok, "");
+    if(ok) return {paused:true, rule:"Custom", cond:r.name, trace,
+      reason:'Custom rule "'+r.name+'" matched: '+desc+"."};
+  }
+
+  return {paused:false, rule:"—", cond:"—", trace, reason:"No rule matched — the listing keeps running."};
+}
+
+function priorityFor(row){
+  if(!row.paused) return null;
+  const R = mc().acos;
+  if(row.rule==="Stock" && N(row.stock)<=0) return "High";
+  const atRisk = N(row.spendWin);
+  if(atRisk >= N(R.prioHigh)) return "High";
+  if(atRisk >= N(R.prioMed)) return "Medium";
+  return "Low";
+}
+
+function evaluated(){
+  return S.data
+    .filter(p => p.account===S.account && p.mkt===mkt())
+    .map(p => { const r = {...p, ...evaluate(p)}; r.priority = priorityFor(r); return r; });
+}
+
+/* ===================== render ===================== */
+function stateCell(r){
+  const lv = (k,v) => '<span class="lvl '+(v==="OFF"?"off":"on")+'" style="display:flex;align-items:center;gap:6px;font-family:\'IBM Plex Mono\',monospace;font-size:10px;white-space:nowrap">'
+    + '<span style="color:var(--dim);width:52px">'+k+'</span><span style="font-weight:600;padding:2px 7px;border:1px solid;border-radius:6px;'
+    + (v==="OFF" ? 'color:var(--stop);background:#FBEAE8;border-color:#EBC6C1' : 'color:var(--go);background:#E7F4EC;border-color:#BEE3CC')+'">'+v+'</span></span>';
+  return '<div style="display:flex;flex-direction:column;gap:2px">'+lv("Campaign",r.campaignState)+lv("Listing",r.listingState)+'</div>';
+}
+const prioCell = p => p
+  ? '<span class="prio '+p.toLowerCase()+'"><span class="pbars"><i></i><i></i><i></i></span>'+p+'</span>'
+  : '<span class="dim mono" style="font-size:12px">—</span>';
+
+function render(){
+  const rowsAll = evaluated();
+  const paused = rowsAll.filter(r=>r.paused);
+  const alreadyOff = rowsAll.filter(r=>r.alreadyOff);
+  const kept = rowsAll.filter(r=>!r.paused && !r.alreadyOff);
+  const count = rule => paused.filter(r=>r.rule===rule).length;
+  const prio = p => paused.filter(r=>r.priority===p).length;
+  const m = mc(), c = cur();
+
+  const rows = rowsAll.slice()
+    .sort((a,b)=>((PRIO_ORDER[a.priority]??3)-(PRIO_ORDER[b.priority]??3)) || (b.spendWin-a.spendWin))
+    .filter(r=>{
+      const f = S.filter==="All" ? (r.paused || r.alreadyOff)
+        : S.filter==="Still running" ? (!r.paused && !r.alreadyOff)
+        : S.filter==="Already off" ? r.alreadyOff
+        : ["High","Medium","Low"].includes(S.filter) ? r.priority===S.filter
+        : r.paused && (r.rule===S.filter);
+      const q = S.q==="" || [r.campaign,r.itemId,r.sku,r.product].join(" ").toLowerCase().includes(S.q.toLowerCase());
+      return f && q;
+    });
+
+  const title = S.view==="data" ? "Input Data"
+    : S.pane==="log" ? "Pause Log" : S.pane==="custom" ? "Custom Rules" : "Pause Rules";
+
+  let h = '';
+
+  /* header */
+  h += '<div class="top"><div>'
+    + '<h1>eBay PPC Product Pause Automation</h1>'
+    + '<p class="sub">'+esc(S.account)+' · eBay '+mkt()+' · Promoted Listings ACOS / Stock governance</p>'
+    + '</div><div class="switchers"><div class="mkts">'
+    + acctMarkets().map(mm=>'<button class="mkt" data-on="'+(mkt()===mm?1:0)+'" data-act="mkt" data-v="'+mm+'">'
+        + mm + (S.config[S.account][mm].inherited?'<sup>●</sup>':'') + '</button>').join('')
+    + '</div></div></div>';
+
+  /* nav — single flat tab bar */
+  const onLog = S.view==="rules" && S.pane==="log";
+  const onData = S.view==="data";
+  const onBase = S.view==="rules" && S.pane==="base";
+  const onCust = S.view==="rules" && S.pane==="custom";
+  h += '<div class="nav">'
+    + '<button data-on="'+(onLog?1:0)+'" data-act="tab" data-v="log">PAUSE LOG ('+paused.length+')</button>'
+    + '<button data-on="'+(onData?1:0)+'" data-act="tab" data-v="data">INPUT DATA</button>'
+    + '<button data-on="'+(onBase?1:0)+'" data-act="tab" data-v="base">PAUSE RULES</button>'
+    + '<button data-on="'+(onCust?1:0)+'" data-act="tab" data-v="custom">CUSTOM RULES ('+S.customRules.length+')</button>'
+    + '</div>';
+
+  /* info strip */
+  h += '<div class="win"><span><b>'+paused.length+'</b> of '+rowsAll.length+' listings would pause on the next run</span>'
+    + '<span>·</span><span>Base rules execute <b>weekly, every Monday</b></span>'
+    + '<span>·</span><span><b>'+esc(S.account)+'</b> · '+mkt()+'</span>'
+    + (m.inherited ? '<span style="color:var(--warn)">● '+esc(S.account)+' '+mkt()+' still runs the UK base values</span>' : '')
+    + '</div>';
+
+  /* ---------- PAUSE LOG ---------- */
+  if(S.view==="rules" && S.pane==="log"){
+    h += '<div class="stats">'
+      + '<div class="stat"><b>'+paused.length+'</b><span>Listings paused</span></div>'
+      + '<div class="stat"><b style="color:var(--stop)">'+prio("High")+'</b><span>High priority</span></div>'
+      + '<div class="stat"><b style="color:'+RULE_COLOR["Stock"]+'">'+count("Stock")+'</b><span>Stock · below '+m.acos.stockMin+'</span></div>'
+      + '<div class="stat"><b style="color:'+RULE_COLOR["Rule 1"]+'">'+count("Rule 1")+'</b><span>Rule 1 · high ACOS</span></div>'
+      + '<div class="stat"><b style="color:'+RULE_COLOR["Rule 2"]+'">'+count("Rule 2")+'</b><span>Rule 2 · no sales + clicks</span></div>'
+      + '<div class="stat"><b style="color:var(--go)">'+kept.length+'</b><span>Still running</span></div>'
+      + '</div>';
+
+    h += '<div class="bar">'
+      + ["All","High","Medium","Low","Stock","Rule 1","Rule 2","Already off","Still running"]
+        .map(f=>'<button class="f" data-on="'+(S.filter===f?1:0)+'" data-act="filter" data-v="'+f+'">'+f.toUpperCase()+'</button>').join('')
+      + '<span class="spacer"></span>'
+      + '<input class="search" placeholder="Search item ID, SKU, campaign…" value="'+esc(S.q)+'" data-act="q"></div>';
+
+    h += '<div class="tbl"><table class="log"><thead>'
+      + '<tr class="ghrow">'
+      + '<th class="gh" colspan="3">Listing</th>'
+      + '<th class="gh" colspan="5">Auto-pause decision</th>'
+      + '<th class="gh cppc" colspan="2">CPPC review</th></tr>'
+      + '<tr>'
+      + '<th>Campaign / Listing</th><th>Item ID / SKU</th><th>Stock</th>'
+      + '<th>State</th><th>Rule</th><th>Priority</th><th>Reason</th><th>Status</th>'
+      + '<th class="cppc">Decision</th><th>Note</th></tr></thead><tbody>';
+
+    if(!rows.length){
+      h += '<tr><td colspan="10"><div class="empty">Nothing matches that filter. Clear the search or pick another rule.</div></td></tr>';
+    }
+    rows.forEach(r=>{
+      h += '<tr class="r" data-act="row" data-v="'+r.itemId+'">'
+        + '<td><div class="camp">'+esc(r.campaign)+'</div><div class="ag">'+r.type+'</div></td>'
+        + '<td class="id">'+r.itemId+'<span class="s">'+esc(r.sku)+'</span></td>'
+        + '<td>'+stockCell2(r.stock)+'</td>'
+        + '<td>'+stateCell(r)+'</td>'
+        + '<td>'+(r.paused
+            ? '<span class="tag" style="background:'+RULE_COLOR[r.rule]+'">'+r.rule.toUpperCase()+'</span><div class="cond">'+esc(r.cond)+'</div>'
+            : '<span class="dim mono" style="font-size:12px">—</span>')+'</td>'
+        + '<td>'+prioCell(r.priority)+(r.priority?'<div class="cond">'+money(r.spendWin)+' at risk</div>':'')+'</td>'
+        + '<td class="why">'+esc(r.reason)+'</td>'
+        + '<td><span class="st'+(r.paused?'':(r.alreadyOff?' off':' ok'))+'">'
+          + (r.paused?'⛔ PAUSED':(r.alreadyOff?'◦ ALREADY OFF':'✓ RUNNING'))+'</span>'
+          + (r.alreadyOff ? '<div class="cond">'+r.offAt+' OFF · no action</div>' : '')+'</td>'
+          + (()=>{ const rv=S.review[r.itemId]||{}, dec=rv.decision||"Pending";
+              const dc=dec==="Approved"?"var(--go)":dec==="Rejected"?"var(--stop)":dec==="On hold"?"var(--warn)":"var(--dim)";
+              return '<td class="cppc"><select class="rev-dec" style="color:'+dc+'" data-act="decision" data-item="'+r.itemId+'">'
+                + DECISIONS.map(d=>'<option'+(dec===d?' selected':'')+'>'+d+'</option>').join('')+'</select></td>'
+                + '<td><textarea class="rev-note" rows="2" placeholder="Add note…" data-act="note" data-item="'+r.itemId+'">'+esc(rv.note||"")+'</textarea></td>';
+            })()
+          + '</tr>';
+
+      if(S.openRow===r.itemId){
+        h += '<tr class="detail"><td colspan="10">'
+          + '<div class="mets">'
+          + '<span>Listing <b>'+esc(r.product)+'</b></span>'
+          + '<span>30D ACOS <b>'+r.acosWin+'%</b></span><span>7D ACOS <b>'+r.acos7+'%</b></span>'
+          + '<span>30D orders <b>'+r.ordWin+'</b></span><span>14D orders <b>'+r.ord14+'</b></span>'
+          + '<span>14D clicks <b>'+r.clicks14+'</b></span><span>14D spend <b>'+money(r.spend14)+'</b></span>'
+          + '<span>30D spend <b>'+money(r.spendWin)+'</b></span><span>Stock <b>'+N(r.stock)+' units</b></span>'
+          + '<span>Price <b>'+(r.price>0?money(r.price):"n/a")+'</b></span>'
+          + '</div><div class="trace">'
+          + r.trace.map(t=>'<div class="t"><span class="dot'+(t.pass?' on':'')+'"></span><span><div>'+t.label+'</div>'
+              + (t.detail?'<div class="d">'+esc(t.detail)+'</div>':'')+'</span></div>').join('')
+          + '</div></td></tr>';
+      }
+    });
+    h += '</tbody></table></div><p class="foot">Click a row for its condition trace. Sorted by priority — highest money at risk first.</p>';
+  }
+
+  /* ---------- PAUSE RULES ---------- */
+  if(S.view==="rules" && S.pane==="base"){
+    const rf = (k,label) => '<label class="rf"><span>'+label+'</span>'
+      + '<input class="cell" data-act="acos" data-v="'+k+'" value="'+m.acos[k]+'"></label>';
+
+    const card = (key, tag, colour, title, sub, live, body, toggleKey) =>
+      '<div class="card"><div class="rhead" data-act="openrule" data-v="'+key+'">'
+      + '<span class="rtag" style="background:'+colour+'">'+tag+'</span>'
+      + '<span><div class="rtitle">'+title+'</div><div class="rsub">'+sub+'</div></span>'
+      + '<span class="freq">WEEKLY · MON</span>'
+      + '<span class="spacer"></span><span class="live">'+live+'</span>'
+      + (toggleKey ? '<span class="sw" data-on="'+(S.enabled[toggleKey]?1:0)+'" data-act="toggle" data-v="'+toggleKey+'"><i></i></span>' : '')
+      + '</div>' + (S.openRule===key ? '<div class="rbody">'+body+'</div>' : '') + '</div>';
+
+    h += card("stock","STOCK",RULE_COLOR["Stock"],"Low Stock Pause Rule","runs first · availability beats performance",
+      count("Stock")+" paused",
+      '<div class="grp"><h4>Condition — pause</h4>'
+      + '<p>Pause the listing as soon as available units drop below this floor, whatever the ACOS is. '
+      + 'A listing that cannot be fulfilled should not be paying for clicks — and the last few units usually sell organically anyway.</p>'
+      + rf("stockMin","Units in stock below")+'</div>'
+      + '<div class="grp"><h4>Priority</h4>'
+      + '<p>0 units is always <b>High</b> priority — spend is burning on an item nobody can buy. '
+      + '1 to '+(N(m.acos.stockMin)-1)+' units is ranked by money at risk like every other rule.</p></div>'
+      + '<p class="note" style="margin:0">This rule is evaluated before Rule 1 and Rule 2, so a low-stock listing is paused even if its ACOS is excellent.</p>', "stock");
+
+    h += card("r1","RULE 1",RULE_COLOR["Rule 1"],"High ACOS Pause Rule","30D orders &gt; 0 · lookback 30 days",
+      count("Rule 1")+" paused",
+      '<div class="grp"><h4>Condition — pause</h4>'
+      + '<p>Pause the listing when 30-day ACOS reaches or exceeds this ceiling.</p>'
+      + rf("r1_acosWinMin","30D ACOS at or above (%)")+'</div>'
+      + '<div class="grp"><h4>Do NOT pause — improving trend</h4>'
+      + '<p>Even if the 30-day ACOS is over the ceiling, keep the listing running if the last 7 days have come back down below this — the listing is treated as recovering.</p>'
+      + rf("r1_acos7RescueMax","7D ACOS below (%)")+'</div>'
+      + '<p class="note" style="margin:0">Runs weekly, every Monday, against the trailing 30-day window.</p>', "r1");
+
+    h += card("r2","RULE 2",RULE_COLOR["Rule 2"],"14 Days — No Sales, 20+ Clicks Pause","14D orders = 0 · lookback 14 days",
+      count("Rule 2")+" paused",
+      '<div class="grp"><h4>Conditions — pause (all must be true)</h4>'
+      + '<p>Pause the listing when it has taken this many clicks or more over the last 14 days with zero orders.</p>'
+      + rf("r2_clicksMin","14D clicks at or above")+'</div>'
+      + '<div class="grp"><h4>Do NOT pause — organic ranking boost</h4>'
+      + '<p>Even with zero orders and enough clicks, keep the listing running if 14-day spend is still below this floor — small clicks can lift the item\u2019s organic search ranking (engagement signal) while spend stays negligible on a low bid.</p>'
+      + rf("r2_spendMin","14D spend below ("+c+")")+'</div>'
+      + '<p class="note" style="margin:0">Runs weekly, every Monday, against the trailing 14-day window.</p>', "r2");
+
+    h += '<button class="btn" data-act="export">COPY CONFIG AS JSON</button>';
+  }
+
+  /* ---------- CUSTOM RULES ---------- */
+  if(S.view==="rules" && S.pane==="custom"){
+    h += '<p class="note">Custom rules run after the two base rules and pause any listing that matches every condition.</p>';
+    if(!S.customRules.length){
+      h += '<div class="card" style="padding:26px;text-align:center"><p class="note">No custom rules yet.</p>'
+        + '<button class="btn" data-act="addrule">NEW RULE</button></div>';
+    }
+    S.customRules.forEach(r=>{
+      h += '<div class="card"><div class="rhead" style="cursor:default">'
+        + '<span class="rtag" style="background:'+RULE_COLOR.Custom+'">CUSTOM</span>'
+        + '<input class="txt" value="'+esc(r.name)+'" data-act="rulename" data-id="'+r.id+'">'
+        + '<span class="spacer"></span>'
+        + '<span class="live">'+paused.filter(p=>p.cond===r.name).length+' paused</span>'
+        + '<span class="sw" data-on="'+(r.enabled?1:0)+'" data-act="ruletoggle" data-id="'+r.id+'"><i></i></span></div>'
+        + '<div class="rbody">';
+      r.conditions.forEach((cd,i)=>{
+        h += '<div class="cnd"><span class="mono dim" style="width:32px;font-size:11px">'+(i===0?"IF":"AND")+'</span>'
+          + '<select data-act="cmetric" data-id="'+r.id+'" data-i="'+i+'">'
+          + METRICS.map(mm=>'<option value="'+mm.key+'"'+(cd.metric===mm.key?' selected':'')+'>'+mm.label+'</option>').join('')
+          + '</select><select data-act="cop" data-id="'+r.id+'" data-i="'+i+'">'
+          + OPS.map(o=>'<option'+(cd.op===o?' selected':'')+'>'+o+'</option>').join('')
+          + '</select><span class="inputwrap"><input class="cell" value="'+cd.value+'" data-act="cval" data-id="'+r.id+'" data-i="'+i+'"></span>'
+          + '<button class="btn dngr" style="padding:5px 8px" data-act="delcond" data-id="'+r.id+'" data-i="'+i+'">✕</button></div>';
+      });
+      h += '<div style="display:flex;gap:8px;margin-top:10px">'
+        + '<button class="btn" data-act="addcond" data-id="'+r.id+'">ADD CONDITION</button>'
+        + '<button class="btn dngr" data-act="delrule" data-id="'+r.id+'">DELETE RULE</button></div></div></div>';
+    });
+    if(S.customRules.length) h += '<button class="btn" data-act="addrule">NEW RULE</button>';
+  }
+
+  /* ---------- INPUT DATA ---------- */
+  if(S.view==="data"){
+    h += '<p class="note">This is the metric feed the rules run against — in production it is your eBay Promoted Listings / Terapeak pull. '
+      + 'Edit any cell and the status on the right updates immediately.</p>';
+    h += '<div class="bar"><span class="mono dim" style="font-size:11px;letter-spacing:.08em">SCENARIO</span>'
+      + ["ACOS spike","Demand slump","Stock drain","Reset"].map(s=>'<button class="f" data-act="scenario" data-v="'+s+'">'+s.toUpperCase()+'</button>').join('')
+      + '<span class="spacer"></span><button class="btn" data-act="addproduct">ADD LISTING</button></div>';
+
+    const flds = [["price",0.01,c],["acosWin",0.1,""],["acos7",0.1,""],["ordWin",1,""],
+      ["ord14",1,""],["clicks14",1,""],["spend14",0.01,c],["spendWin",0.01,c],["stock",1,""]];
+    h += '<div class="tbl"><table class="log" style="min-width:1140px"><thead><tr>'
+      + '<th>Item ID / SKU</th><th>Price</th>'
+      + '<th>30D ACOS</th><th>7D ACOS</th><th>30D orders</th><th>14D orders</th><th>14D clicks</th>'
+      + '<th>14D spend</th><th>30D spend</th><th>Stock</th><th>Status</th><th></th></tr></thead><tbody>';
+    rowsAll.forEach(r=>{
+      h += '<tr><td class="id">'+r.itemId+'<span class="s">'+esc(r.sku)+'</span><span class="s">'+esc(r.product)+'</span></td>';
+      flds.forEach(([k,step,pre])=>{
+        h += '<td><span class="inputwrap">'+(pre?'<span class="cursym">'+pre+'</span>':'')
+          + '<input class="cell" type="number" step="'+step+'" value="'+r[k]+'" data-act="metric" data-item="'+r.itemId+'" data-k="'+k+'"></span></td>';
+      });
+      h += '<td><span class="st'+(r.paused?'':' ok')+'">'+(r.paused?'⛔ PAUSED':'✓ RUNNING')+'</span>'
+        + '<div class="cond">'+(r.paused ? esc(r.rule+" · "+r.cond) : "no rule matched")+'</div></td>'
+        + '<td><button class="btn dngr" style="padding:5px 8px" data-act="delproduct" data-item="'+r.itemId+'">✕</button></td></tr>';
+    });
+    h += '</tbody></table></div><p class="foot">'+paused.length+' paused · '+kept.length
+      + ' running. Rule 2 only ever looks at 14D orders/clicks/spend; Rule 1 only ever looks at 30D/7D ACOS.</p>';
+  }
+
+  document.getElementById("app").innerHTML = h;
+}
+
+/* ===================== events ===================== */
+const SCENARIOS = {
+  "ACOS spike": r=>({...r, acosWin:Math.round(Math.min(99,r.acosWin*1.6)), acos7:Math.round(Math.min(99,r.acos7*1.5))}),
+  "Demand slump": r=>({...r, ordWin:Math.floor(r.ordWin/3), ord14:0, clicks14:Math.round(r.clicks14*1.3)}),
+  "Stock drain": r=>({...r, stock: Math.max(0, Math.floor(N(r.stock)/12))}),
+};
+const dirty = () => { mc().inherited = false; };
+const patchRule = (id,fn) => { const r = S.customRules.find(x=>x.id==id); if(r) fn(r); };
+
+document.addEventListener("click", e=>{
+  const el = e.target.closest("[data-act]");
+  if(!el) return;
+  const act = el.dataset.act, v = el.dataset.v;
+
+  switch(act){
+    case "acct": {
+      const ms = ACCOUNTS.find(a=>a.name===v).markets;
+      S.account = v;
+      if(!ms.includes(S.market)) S.market = ms[0];
+      S.openRow = null;
+      break;
+    }
+    case "mkt": S.market = v; S.openRow = null; break;
+    case "tab":
+      if(v==="data") S.view = "data";
+      else { S.view = "rules"; S.pane = v; }
+      break;
+    case "filter": S.filter = v; break;
+    case "openrule": S.openRule = S.openRule===v ? "" : v; break;
+    case "toggle": S.enabled[v] = !S.enabled[v]; break;
+    case "row": S.openRow = S.openRow===v ? null : v; break;
+    case "addrule":
+      S.customRules.push({id:Date.now(), name:"Custom rule "+(S.customRules.length+1), enabled:true,
+        conditions:[{metric:"acosWin",op:"≥",value:40}]});
+      break;
+    case "delrule": S.customRules = S.customRules.filter(r=>r.id!=el.dataset.id); break;
+    case "ruletoggle": patchRule(el.dataset.id, r=>{r.enabled=!r.enabled;}); break;
+    case "addcond": patchRule(el.dataset.id, r=>r.conditions.push({metric:"clicks14",op:">",value:20})); break;
+    case "delcond": patchRule(el.dataset.id, r=>r.conditions.splice(Number(el.dataset.i),1)); break;
+    case "scenario":
+      S.data = S.data.map(r => (r.account===S.account && r.mkt===mkt()) ? SCENARIOS[v](r) : r);
+      break;
+    case "reset": S.data = LISTINGS.map(p=>({...p})); break;
+    case "addproduct":
+      S.data.push({account:S.account, mkt:mkt(), campaign:"PL | New Campaign | Standard",
+        itemId:"1856240"+Math.floor(Math.random()*90000+10000), sku:"NEW-SKU-"+(S.data.length+1),
+        product:"New listing", type:"PLS", price:19.99, stock:50, ordWin:0, acosWin:0, acos7:0,
+        ord14:0, clicks14:0, spend14:0, spendWin:0, campaignState:"ON", listingState:"ON"});
+      break;
+    case "delproduct": S.data = S.data.filter(r=>r.itemId!==el.dataset.item); break;
+    case "export":
+      navigator.clipboard?.writeText(JSON.stringify(
+        {enabled:S.enabled, accounts:S.config, customRules:S.customRules}, null, 2));
+      el.textContent = "COPIED ✓";
+      setTimeout(()=>{ el.textContent = "COPY CONFIG AS JSON"; }, 1400);
+      return;
+    default: return;
+  }
+  render();
+});
+
+document.addEventListener("input", e=>{
+  const el = e.target.closest("[data-act]");
+  if(!el) return;
+  const act = el.dataset.act, val = el.value;
+  const caret = el.selectionStart;
+
+  switch(act){
+    case "q": S.q = val; break;
+    case "acos": mc().acos[el.dataset.v] = val===""?"":Number(val); dirty(); break;
+    case "metric": {
+      const row = S.data.find(r=>r.itemId===el.dataset.item && r.account===S.account && r.mkt===mkt());
+      if(row) row[el.dataset.k] = val===""?0:Number(val);
+      break;
+    }
+    case "rulename": patchRule(el.dataset.id, r=>{r.name = val;}); break;
+    case "cval": patchRule(el.dataset.id, r=>{r.conditions[Number(el.dataset.i)].value = val;}); break;
+    case "note": {
+      const it = el.dataset.item;
+      (S.review[it] = S.review[it] || {}).note = val;
+      return;
+    }
+    default: return;
+  }
+
+  /* re-render, then put the cursor back where it was */
+  const key = act + (el.dataset.v||"") + (el.dataset.item||"") + (el.dataset.k||"") + (el.dataset.id||"") + (el.dataset.i||"");
+  render();
+  const again = [...document.querySelectorAll("[data-act]")].find(n=>
+    n.dataset.act + (n.dataset.v||"") + (n.dataset.item||"") + (n.dataset.k||"") + (n.dataset.id||"") + (n.dataset.i||"") === key);
+  if(again){ again.focus(); try{ again.setSelectionRange(caret,caret); }catch(_){} }
+});
+
+document.addEventListener("change", e=>{
+  const el = e.target.closest("[data-act]");
+  if(!el) return;
+  if(el.dataset.act==="cmetric") patchRule(el.dataset.id, r=>{r.conditions[Number(el.dataset.i)].metric = el.value;});
+  else if(el.dataset.act==="cop") patchRule(el.dataset.id, r=>{r.conditions[Number(el.dataset.i)].op = el.value;});
+  else if(el.dataset.act==="decision"){ const it=el.dataset.item; (S.review[it]=S.review[it]||{}).decision = el.value; }
+  else return;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

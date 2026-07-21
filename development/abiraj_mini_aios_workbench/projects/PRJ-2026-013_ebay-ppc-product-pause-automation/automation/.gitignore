@@ -1,0 +1,4 @@
+# Never commit credentials or run artefacts.
+eppa_secrets.bat
+eppa_status.json
+eppa_run.log
