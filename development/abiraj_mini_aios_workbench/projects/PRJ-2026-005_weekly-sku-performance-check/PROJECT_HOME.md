@@ -124,8 +124,17 @@ Under Task `T7_weekly-sku-performance-check` (COPY-only import; originals in Dow
 - **Product name quality:** every row resolves a name, but some `listing_data.title` values are
   variant option labels ("Ten", "Paquet de 6") rather than full titles; category fallback fills
   blanks. Acceptable; noted.
-- **Scheduling not yet wired** — window is currently set in `generate_dataset.sql`; the Thursday
-  trigger + dynamic `CURRENT_DATE` window is an open item (see TASK_REGISTER).
+- **Scheduling — WIRED (REQ-07-D02, 2026-07-21).** `T7_Weekly_SKU_Performance` runs every
+  **Thursday 11:00** via `automation/run_t7_weekly.bat`, computing the rolling-7-day window from the
+  DB's `CURRENT_DATE` and refreshing `ph_task` row 135 in place. Fail-closed: any failed gate exits
+  non-zero and publishes nothing, so the last good dashboard stays live. Runbook:
+  `automation/AUTOMATION_README.md`. Still open: **multi-PH parameterisation** (Thuwaraga-only).
+- **⚠ Settle buffer — OPEN, for the Business Validator.** Re-running D01's own window (02→08 Jul)
+  twelve days later yields **+13 orders (7.1%)**, every one an increment on a listing D01 already
+  reported — orders that were still settling when D01 ran at T+1. FRRC hit the same class of issue
+  (~12%) and answered it with a settle buffer. D02 deliberately keeps D01's window **exactly as
+  signed off**; moving it changes the numbers, so it is routed to **Satheewaran / Thuwaraga**,
+  not decided here.
 
 ## Live Publish
 
