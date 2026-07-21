@@ -11,10 +11,17 @@
 --
 -- WINDOW (business rule): runs every Thursday; window = rolling 7 days ending
 -- the day BEFORE the run date.  For a Thursday run this is last Thu .. last Wed.
--- Set it dynamically at run time instead of the hard-coded dates below, e.g.:
---     ws = (CURRENT_DATE - INTERVAL '7 day')::date   -- inclusive start
---     we = (CURRENT_DATE - INTERVAL '1 day')::date   -- inclusive end
--- Snapshot used for the 2026-07-09 run: 2026-07-02 .. 2026-07-08.
+--
+-- The window is now BOUND AT RUN TIME (REQ-07-D02, 2026-07-21) - see the win CTE below.
+-- This file is the ONE canonical copy of the query: automation/t7_weekly_run.py reads it
+-- from disk at startup and binds :ws / :we.  Do not paste a second copy anywhere.
+--   ws = (CURRENT_DATE - INTERVAL '7 day')::date   -- inclusive start
+--   we = (CURRENT_DATE - INTERVAL '1 day')::date   -- inclusive end
+-- computed from the DATABASE's CURRENT_DATE, never the local machine clock.
+--
+-- Snapshot used for the signed-off 2026-07-09 D01 run: 2026-07-02 .. 2026-07-08.
+-- To reproduce that run by hand, bind ws='2026-07-02', we='2026-07-08'
+-- (or: .\run_t7_weekly.bat --dry-run --window 2026-07-02).
 --
 -- LOCKED DATA RULES (verified against live DB - see SYSTEM_REFERENCE.md):
 --   * PH filter  : LOWER(user_name) = LOWER('thuwaraga')  (DB spelling; NOT 'thuwaraka')
@@ -30,7 +37,8 @@
 -- ============================================================================
 
 WITH win AS (
-    SELECT DATE '2026-07-02' AS ws, DATE '2026-07-08' AS we   -- <<< set dynamically each Thursday
+    -- bound at run time by automation/t7_weekly_run.py (D01 ran this as 2026-07-02 .. 2026-07-08)
+    SELECT %(ws)s::date AS ws, %(we)s::date AS we
 ),
 -- Step 1 - universe: every distinct listing Thuwaraga holds on UK Amazon/eBay/B&Q
 universe AS (

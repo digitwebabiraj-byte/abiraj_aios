@@ -106,73 +106,31 @@ def connect():
 
 
 # ---- 1. THE CANONICAL QUERY -------------------------------------------------
-# Copied verbatim from sql/T7_weekly-sku-performance-check/generate_dataset.sql, with the one
-# change that file itself prescribes: the hard-coded win CTE becomes bound parameters.
-SQL = """
-WITH win AS (SELECT %(ws)s::date AS ws, %(we)s::date AS we),
-universe AS (
-    SELECT DISTINCT
-        ot."sku"                                                AS sku,
-        COALESCE(NULLIF(ot."asin",''), NULLIF(ot."item_id",'')) AS ref,
-        ot."source_name"                                        AS platform,
-        ot."ss_name"                                            AS account
-    FROM public.order_transaction ot
-    WHERE LOWER(ot."user_name") = LOWER(%(ph)s)
-      AND ot."market_place" = 'UK'
-      AND ot."source_name" IN ('AMAZON','EBAY','B&Q')
-),
-orders AS (
-    SELECT
-        ot."sku"                                                AS sku,
-        COALESCE(NULLIF(ot."asin",''), NULLIF(ot."item_id",'')) AS ref,
-        ot."source_name"                                        AS platform,
-        ot."ss_name"                                            AS account,
-        COUNT(DISTINCT ot."order_item_info")                    AS orders
-    FROM public.order_transaction ot, win
-    WHERE LOWER(ot."user_name") = LOWER(%(ph)s)
-      AND ot."market_place" = 'UK'
-      AND ot."source_name" IN ('AMAZON','EBAY','B&Q')
-      AND ot."order_status" = 'Completed'
-      AND ot."order_date"::date BETWEEN win.ws AND win.we
-    GROUP BY 1,2,3,4
-),
-ld_agg AS (
-    SELECT ld."sku"                                             AS sku,
-           COALESCE(NULLIF(MAX(NULLIF(ld."mapped_sku",'')),''), ld."sku") AS base_sku,
-           MAX(NULLIF(ld."title",''))                           AS title
-    FROM public.listing_data ld
-    WHERE ld."wrong_sku" = 0
-    GROUP BY ld."sku"
-),
-cat AS (
-    SELECT ot."sku" AS sku,
-           MODE() WITHIN GROUP (ORDER BY ot."category_name") AS category
-    FROM public.order_transaction ot
-    WHERE LOWER(ot."user_name") = LOWER(%(ph)s)
-      AND ot."category_name" IS NOT NULL AND ot."category_name" <> ''
-    GROUP BY ot."sku"
-)
-SELECT
-    u."sku"                                                     AS sku,
-    u."ref"                                                     AS ref_id,
-    u."platform",
-    u."account",
-    COALESCE(la.base_sku, u."sku")                              AS base_sku,
-    CASE WHEN la.base_sku IS NOT NULL AND la.base_sku <> u."sku"
-         THEN 1 ELSE 0 END                                      AS mapped_flag,
-    COALESCE(NULLIF(la.title,''), c.category, '')                AS product_name,
-    COALESCE(o.orders, 0)                                       AS orders
-FROM universe u
-CROSS JOIN win
-LEFT JOIN orders o
-       ON o.sku      IS NOT DISTINCT FROM u."sku"
-      AND o.ref      IS NOT DISTINCT FROM u."ref"
-      AND o.platform =  u."platform"
-      AND o.account  IS NOT DISTINCT FROM u."account"
-LEFT JOIN ld_agg la ON la.sku = u."sku"
-LEFT JOIN cat    c  ON c.sku  = u."sku"
-ORDER BY base_sku, u."platform", u."ref";
-"""
+# There is exactly ONE copy of this query and it is not in this file: it lives in
+# sql/T7_weekly-sku-performance-check/generate_dataset.sql, the asset validated and signed off
+# for D01. This runner reads it from disk at startup and binds the window.
+#
+# Keeping a second copy here would let the two drift silently - the .sql could be corrected and
+# this job would keep running last year's logic for months without anyone noticing.
+SQL_PATH = os.path.join(PROJECT, "sql", "T7_weekly-sku-performance-check", "generate_dataset.sql")
+
+
+def load_canonical_sql():
+    """Read the signed-off query and prove it is still the parameterised one."""
+    if not os.path.exists(SQL_PATH):
+        die(1, "canonical query missing: %s" % SQL_PATH)
+    with open(SQL_PATH, encoding="utf-8") as f:
+        sql = f.read()
+    # If someone re-hardcodes the window, this job would silently report the WRONG WEEK
+    # while looking perfectly healthy. That is the one failure the gates below cannot see,
+    # so it is checked here, before anything runs.
+    for token in ("%(ws)s", "%(we)s"):
+        if token not in sql:
+            die(1, "canonical query no longer binds %s - it may have been re-hardcoded. "
+                   "Refusing to run rather than publish the wrong window. (%s)" % (token, SQL_PATH))
+    if "DATE '2026-" in sql:
+        die(1, "canonical query contains a hard-coded DATE literal - refusing to run (%s)" % SQL_PATH)
+    return sql
 
 # Independent control total: the same window counted straight off the source table, without the
 # universe/join machinery. If the assembled report disagrees with this, the pull drifted.
@@ -212,8 +170,15 @@ def main():
             log("run date %s (DB) | window %s .. %s | publish=%s" % (db_today, ws, we, PUBLISH))
 
             args = {"ph": PH_USER, "ws": ws.isoformat(), "we": we.isoformat()}
-            cur.execute(SQL, args)
-            raw = cur.fetchall()
+            cur.execute(load_canonical_sql(), args)
+            # map by column NAME, so the canonical query can grow/reorder columns without
+            # this runner silently reading the wrong field
+            cols = [d[0] for d in cur.description]
+            missing = [c for c in ("sku", "ref_id", "platform", "account", "base_sku",
+                                   "mapped_flag", "product_name", "orders") if c not in cols]
+            if missing:
+                die(2, "canonical query is missing expected column(s): %s" % missing)
+            raw = [dict(zip(cols, r)) for r in cur.fetchall()]
             cur.execute(SQL_CONTROL, args)
             db_orders = cur.fetchone()[0]
     except SystemExit:
@@ -223,12 +188,12 @@ def main():
 
     # ---- 3. ASSEMBLE the renderer's data contract -------------------------
     rows, names = [], {}
-    for sku, ref, platform, account, base_sku, mapped_flag, product_name, orders in raw:
-        rows.append({"s": sku, "r": ref, "p": platform, "a": account,
-                     "b": base_sku, "m": int(mapped_flag), "o": int(orders)})
-        if product_name:
-            names.setdefault(sku, product_name)
-            names.setdefault(base_sku, product_name)
+    for r in raw:
+        rows.append({"s": r["sku"], "r": r["ref_id"], "p": r["platform"], "a": r["account"],
+                     "b": r["base_sku"], "m": int(r["mapped_flag"]), "o": int(r["orders"])})
+        if r["product_name"]:
+            names.setdefault(r["sku"], r["product_name"])
+            names.setdefault(r["base_sku"], r["product_name"])
     n_amzn_gr = len({r["s"] for r in rows if str(r["s"]).startswith("amzn.gr.")})
     report_orders = sum(r["o"] for r in rows)
     performing = sum(1 for r in rows if r["o"] > 0)
