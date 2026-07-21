@@ -1,0 +1,6 @@
+# never commit real credentials, run logs or generated output
+t7_secrets.bat
+t7_run.log
+t7_status.txt
+t7_auto_dashboard.html
+__pycache__/
