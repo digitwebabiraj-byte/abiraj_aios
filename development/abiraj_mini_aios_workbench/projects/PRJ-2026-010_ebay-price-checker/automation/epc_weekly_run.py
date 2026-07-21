@@ -21,7 +21,7 @@ Flags:  --no-publish / --dry-run   (build + validate only, write nothing)
 Usage:  python epc_weekly_run.py [--dry-run]
 Requires: epc_build_html.py alongside this file (the dashboard UI, single source of truth).
 """
-import os, sys, time, datetime
+import os, sys, time, datetime, hashlib
 import psycopg2
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -223,9 +223,10 @@ def main():
     html = epc_build_html.build(payload)
     if "__PAYLOAD__" in html:            die("dashboard template did not render (placeholder left)")
     if len(html) < 1_000_000:            die("dashboard only %d bytes - render looks broken" % len(html))
+    html_md5 = hashlib.md5(html.encode("utf-8")).hexdigest()
     out = os.path.join(HERE, "epc_auto_dashboard.html")
     open(out, "w", encoding="utf-8").write(html)
-    log("dashboard built: %s (%d bytes)" % (out, len(html)))
+    log("dashboard built: %s (%d bytes, md5 %s)" % (out, len(html), html_md5[:8]))
 
     # ---- 5. PUBLISH (guarded, one transaction, UPSERT the 4 users) ---------
     stamp = datetime.date.today().strftime("%Y-%m-%d")
@@ -268,6 +269,31 @@ def main():
                     touched.append(got[0])
                 if len(touched) != len(ASSIGNED):
                     raise RuntimeError("expected %d rows, touched %d" % (len(ASSIGNED), len(touched)))
+
+                # md5-verify every stored payload BEFORE the commit. A truncated or
+                # re-encoded write is invisible to every check above - the transaction
+                # succeeds and commits a corrupted dashboard. Read it back and compare.
+                # NOTE: version_status is deliberately NOT asserted. A user marking their own
+                # task 'completed' in ph_task is normal workflow, not corruption - kobiga's row
+                # (id 300) was already 'completed' on 2026-07-21. Asserting 'released' here would
+                # roll back every future publish because someone actioned their task. Only
+                # assigned_user_team is a correctness property: wrong tag = a report nobody sees.
+                bad, statuses = [], []
+                for rid in touched:
+                    pc.execute("SELECT md5(html_content), assigned_user_team, version_status "
+                               "FROM tech_team_outputs.ph_task WHERE id=%s", (rid,))
+                    stored_md5, team_tag, ver_status = pc.fetchone()
+                    statuses.append(ver_status)
+                    if stored_md5 != html_md5:
+                        bad.append(("md5", rid))
+                    elif team_tag != "ebay_priors":
+                        bad.append(("routing team=%s" % team_tag, rid))
+                if bad:
+                    raise RuntimeError("pre-commit verify failed %s - rolling back" % bad)
+                log("  verified %d payloads md5=%s, routing ebay_priors intact (statuses: %s)"
+                    % (len(touched), html_md5[:8], ", ".join(sorted(set(statuses)))))
+    except Exception as e:
+        die("publish failed, transaction rolled back: %s" % str(e).strip().splitlines()[-1])
     finally:
         wh.close()
     log("published to ph_task for %d users: ids %s" % (len(ASSIGNED), touched))

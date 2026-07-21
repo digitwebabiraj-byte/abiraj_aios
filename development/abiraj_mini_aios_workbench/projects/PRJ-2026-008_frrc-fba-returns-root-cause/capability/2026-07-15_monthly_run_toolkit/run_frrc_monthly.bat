@@ -13,4 +13,7 @@ if "%FRRC_PGPASSWORD%"=="" (
 python "%~dp0run_frrc_monthly.py" %*
 set RC=%ERRORLEVEL%
 if not "%RC%"=="0" echo [FRRC] run FAILED with exit code %RC% - see logs\ >&2
+REM ---- Desktop alert on failure / auto-clear on success ----
+REM This job runs MONTHLY, so without this a failure stays invisible for ~30 days.
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0frrc_alert.ps1" -Rc %RC%
 exit /b %RC%

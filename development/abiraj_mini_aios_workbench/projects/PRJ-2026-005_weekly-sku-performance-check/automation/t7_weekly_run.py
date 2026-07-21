@@ -331,10 +331,16 @@ def main():
                 stored_md5, team_tag, ver_status = cur.fetchone()
                 if stored_md5 != html_md5:
                     raise RuntimeError("md5 verify failed pre-commit (id=%s) - rolling back" % rid)
-                if team_tag != ASSIGNED_USER_TEAM or ver_status != "released":
-                    raise RuntimeError("routing broken (id=%s team=%s status=%s) - rolling back"
-                                       % (rid, team_tag, ver_status))
-                log("  %s id=%s md5=%s team=%s" % (how, rid, html_md5[:8], team_tag))
+                # version_status is deliberately NOT asserted: a user marking their own task
+                # 'completed' in ph_task is normal workflow, not corruption (observed live on
+                # EPC's kobiga row, id 300). Asserting 'released' would roll back every future
+                # publish because someone actioned their task. The team tag IS a correctness
+                # property - a wrong tag means a report nobody can see.
+                if team_tag != ASSIGNED_USER_TEAM:
+                    raise RuntimeError("routing broken (id=%s team=%s) - rolling back"
+                                       % (rid, team_tag))
+                log("  %s id=%s md5=%s team=%s status=%s"
+                    % (how, rid, html_md5[:8], team_tag, ver_status))
     except Exception as e:
         die(4, "publish failed, transaction rolled back: %s" % str(e).strip().splitlines()[-1])
     finally:
