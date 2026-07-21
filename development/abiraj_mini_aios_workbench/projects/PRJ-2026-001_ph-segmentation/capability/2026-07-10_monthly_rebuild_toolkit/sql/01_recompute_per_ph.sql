@@ -10,9 +10,19 @@
 -- (HLL->HLH, LHL->HHL) UNCHANGED. bv (CVR benchmark) is still computed for DISPLAY only.
 WITH
 sats AS (SELECT date, ROW_NUMBER() OVER (ORDER BY date DESC) rn FROM (SELECT DISTINCT date FROM public.traffic_data WHERE which_channel=1 AND market_place='UK') d),
-cw AS (SELECT date d FROM sats WHERE rn BETWEEN 2 AND 5),
-pw AS (SELECT date d FROM sats WHERE rn BETWEEN 6 AND 9),
-rw AS (SELECT date d FROM sats WHERE rn BETWEEN 10 AND 13),
+-- WINDOW = the NORMAL monthly cycle: the last 4 complete weeks vs the previous 4.
+-- rn 1 = the newest week present in the data, so these offsets SLIDE as new weeks load -
+-- they are not fixed dates. Owner-confirmed 2026-07-21 ("it must take last 4 weeks").
+--
+-- Previously rn 2..5 / 6..9 / 10..13 - the CORRECTION window used on 2026-07-10, which
+-- deliberately dropped the newest week so the rebuild matched an already-published report.
+-- Right for that one job, wrong for a monthly run: it discards the most recent week. It also
+-- left this file disagreeing with 03_validate_counts.sql (rn 1..4), so the validator was
+-- checking a different period from the one the report was built on.
+-- For another correction run, set 2..5 / 6..9 / 10..13 here AND in 03 - never one alone.
+cw AS (SELECT date d FROM sats WHERE rn BETWEEN 1 AND 4),
+pw AS (SELECT date d FROM sats WHERE rn BETWEEN 5 AND 8),
+rw AS (SELECT date d FROM sats WHERE rn BETWEEN 9 AND 12),
 pick AS (SELECT unnest(ARRAY['__PHNAME__']) AS un),
 csig AS (SELECT user_name,ref_id,sub_source_name,SUM(impression) imp,SUM(click) clk,SUM(conversion) conv,CASE WHEN SUM(click)>0 THEN SUM(conversion)::numeric/SUM(click) ELSE 0 END cvr FROM public.traffic_data WHERE which_channel=1 AND market_place='UK' AND user_name IN (SELECT un FROM pick) AND date IN (SELECT d FROM cw) GROUP BY 1,2,3),
 ccat AS (SELECT user_name,ref_id,sub_source_name,category_name,ROW_NUMBER() OVER (PARTITION BY user_name,ref_id,sub_source_name ORDER BY SUM(impression) DESC,category_name) rn FROM public.traffic_data WHERE which_channel=1 AND market_place='UK' AND user_name IN (SELECT un FROM pick) AND date IN (SELECT d FROM cw) GROUP BY 1,2,3,4),
