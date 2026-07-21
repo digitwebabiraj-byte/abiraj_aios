@@ -12,7 +12,7 @@ report is always better than a fresh wrong one that recommends pausing live adve
 
 Credentials come from eppa_secrets.bat (git-ignored) via environment variables — never hardcoded.
 """
-import os, sys, json, runpy, traceback
+import os, sys, json, time, runpy, traceback
 from datetime import datetime, timezone
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -134,11 +134,23 @@ def main():
             raise RuntimeError("missing credential env var %s — is eppa_secrets.bat filled in?" % var)
 
     args = dict(mkt=MARKETPLACE, ss=SUB_SOURCE, ct=CAMPAIGN_TYPE, floor=THRESHOLDS["stock_floor"])
-    conn = psycopg2.connect(
-        host=os.environ["LED_PGHOST"], port=os.environ.get("LED_PGPORT", "5432"),
-        dbname=os.environ["LED_PGDATABASE"], user=os.environ["LED_PGUSER"],
-        password=os.environ["LED_PGPASSWORD"], connect_timeout=30,
-        options="-c statement_timeout=300000", application_name="eppa_weekly")
+    # retry a transient full pool rather than failing the whole run on one bad moment
+    wait, conn = 10, None
+    for attempt in range(1, 6):
+        try:
+            conn = psycopg2.connect(
+                host=os.environ["LED_PGHOST"], port=os.environ.get("LED_PGPORT", "5432"),
+                dbname=os.environ["LED_PGDATABASE"], user=os.environ["LED_PGUSER"],
+                password=os.environ["LED_PGPASSWORD"], connect_timeout=30,
+                options="-c statement_timeout=300000", application_name="eppa_weekly")
+            break
+        except psycopg2.OperationalError as exc:
+            if attempt == 5 or not any(x in str(exc) for x in (
+                    "remaining connection slots", "too many clients",
+                    "server closed the connection unexpectedly")):
+                raise
+            log("ledsone connect attempt %d/5 failed — retrying in %ds" % (attempt, wait))
+            time.sleep(wait); wait *= 2
     conn.set_session(readonly=True, autocommit=True)   # belt and braces — this job never writes
     try:
         with conn.cursor() as cur:

@@ -18,7 +18,7 @@ Two live-schema facts the sample DDL gets wrong — both verified against produc
 
 Credentials come from the environment (PGPASSWORD), never from this file.
 """
-import os, sys, json, argparse, hashlib
+import os, sys, json, time, argparse, hashlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PROJ = os.path.abspath(os.path.join(HERE, ".."))
@@ -80,6 +80,34 @@ def build_row():
     return row
 
 
+def connect(attempts=6, first_wait=10):
+    """Connect, retrying on a transient full connection pool.
+
+    The warehouse runs max_connections=100 and a single pgAdmin desktop client has been observed
+    holding 97 idle slots, leaving nothing for temp_user. That is a capacity condition, not a
+    permission one — waiting is the right response, not escalating to a superuser account (whose
+    reserved slots exist so an admin can rescue exactly this situation).
+
+    Waits 10s, 20s, 40s, 80s, 160s between attempts — about 5 minutes total, which comfortably
+    outlasts a transient spike while still failing closed if the pool is genuinely saturated.
+    """
+    import psycopg2
+    wait = first_wait
+    for i in range(1, attempts + 1):
+        try:
+            return psycopg2.connect(connect_timeout=20, **DB)
+        except psycopg2.OperationalError as exc:
+            transient = any(t in str(exc) for t in (
+                "remaining connection slots", "too many clients",
+                "server closed the connection unexpectedly", "could not connect"))
+            if not transient or i == attempts:
+                raise
+            print("  connect attempt %d/%d failed (%s) — retrying in %ds"
+                  % (i, attempts, str(exc).strip().splitlines()[0][:70], wait), flush=True)
+            time.sleep(wait)
+            wait *= 2
+
+
 def preflight(cur, task_id, user, team):
     print("=" * 78)
     print("PRE-FLIGHT (read-only)")
@@ -120,14 +148,13 @@ def publish(html_path=None, bump_version=True, quiet=False):
     never drift. DELETE-by-task_id + INSERT in one transaction — production has no unique
     constraint on task_id, so ON CONFLICT is unavailable and a plain INSERT would duplicate.
     """
-    import psycopg2
     if not DB["password"]:
         raise RuntimeError("PGPASSWORD is not set")
     path = html_path or HTML
     html = open(path, encoding="utf-8").read()
     md5 = hashlib.md5(html.encode("utf-8")).hexdigest()
 
-    conn = psycopg2.connect(**DB)
+    conn = connect()
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT COALESCE(MAX(version_level),0) FROM tech_team_outputs.ph_task "
@@ -175,8 +202,7 @@ def main():
     html = open(HTML, encoding="utf-8").read()
     md5 = hashlib.md5(html.encode("utf-8")).hexdigest()
 
-    import psycopg2
-    conn = psycopg2.connect(**DB)
+    conn = connect()
     try:
         with conn.cursor() as cur:
             row = build_row()
