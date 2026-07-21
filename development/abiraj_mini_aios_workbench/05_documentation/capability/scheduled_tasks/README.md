@@ -42,6 +42,10 @@ Get-ChildItem *.xml | ForEach-Object {
 
 1. **Set the credentials first** — `05_documentation/capability/shared_db_credentials/`. Without
    them every job aborts before writing (by design), so nothing corrupts, but nothing runs either.
+   **The two passwords come from Abiraj's password manager, never from this repo** — no credential
+   is committed anywhere in the AIOS folder, and that is deliberate. There are two: the `ledsone`
+   read-only login (`dbhub_readonly`) and the warehouse publish login (`temp_user`). If both are
+   ever lost, **Sajeesan or the DB owner can reissue them** — neither is an admin credential.
 2. **Check the paths.** Each XML hard-codes an absolute path to its `run_*.bat`. If the repo lives
    anywhere other than `C:\Users\digit\OneDrive\Desktop\Abiraj_AIOS`, edit the `<Command>` element
    before registering. **Never point a task at a `.claude/worktrees/…` path** — worktrees are
