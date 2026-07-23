@@ -366,7 +366,7 @@ td.num{color:var(--ink);font-weight:560}
 tbody td.stick,thead th.stick{position:sticky;z-index:2}
 thead th.stick{z-index:4}
 tbody td.s0,thead th.s0{left:0}
-tbody td.s1,thead th.s1{left:64px}
+tbody td.s1,thead th.s1{left:var(--stick1,64px)}  /* set from COLS[0].w at init */
 tbody td.s1{border-right:1px solid var(--line)}
 thead th.s1{border-right:1px solid var(--accent-bd)}
 .scroller.scrolled td.s1,.scroller.scrolled th.s1{box-shadow:6px 0 12px -6px rgba(17,24,39,.22)}
@@ -629,6 +629,9 @@ const COLS = [
 const IDX = [0,1,2,3,4,5,6,7,9,10,11,12,26,13,14,15,16,18,19,20];
 
 const $ = s => document.querySelector(s);
+// keep the second frozen column flush against the first - a hardcoded offset drifted
+// the moment the Image column width changed, tearing a gap in the frozen pair
+document.documentElement.style.setProperty('--stick1', COLS[0].w + 'px');
 const fmtInt = n => (n==null?'':Number(n).toLocaleString('en-GB'));
 const money = (v,c) => v==null?'':(c==='EUR'?'€':'£')+v.toFixed(2);
 
