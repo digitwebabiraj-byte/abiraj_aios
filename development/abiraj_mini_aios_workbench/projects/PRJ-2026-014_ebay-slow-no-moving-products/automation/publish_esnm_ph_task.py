@@ -74,8 +74,16 @@ def conn():
         connect_timeout=30)
 
 
+def main_publish():
+    """Publish unconditionally. Entry point for the scheduled job, which has already decided."""
+    return _run(publish=True)
+
+
 def main():
-    publish = "--publish" in sys.argv
+    return _run(publish="--publish" in sys.argv)
+
+
+def _run(publish):
 
     if not os.path.isfile(HTML):
         sys.exit("HTML not found: %s" % HTML)

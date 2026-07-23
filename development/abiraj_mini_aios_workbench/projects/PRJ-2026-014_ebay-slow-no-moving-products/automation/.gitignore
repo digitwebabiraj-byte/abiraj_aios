@@ -1,0 +1,7 @@
+# real credentials never get committed; the template is
+esnm_secrets.bat
+esnm_run.log
+esnm_status.json
+esnm_status.txt
+__pycache__/
+*.pyc

@@ -40,6 +40,31 @@ LY_B = ANCHOR - timedelta(days=365)
 LY_A  = LY_B - timedelta(days=89)   # same 90-day period last year
 LY30_A = LY_B - timedelta(days=29)  # same 30-day period last year (ends on the same day)
 
+
+def set_anchor(d):
+    """Re-point every window at a new anchor date and return it.
+
+    The monthly job calls this with the LAST DAY OF THE PREVIOUS MONTH. That matters for two
+    reasons: a closed calendar month is reproducible (running on the 2nd or the 3rd gives the
+    same answer), and it never anchors on a partially-filled day - the defect recorded as
+    decision H, which makes an ad-hoc rebuild return different counts every time.
+    """
+    global ANCHOR, W7_A, W7_B, W7P_A, W7P_B, W30_A, W90_A, LY_B, LY_A, LY30_A
+    ANCHOR = d
+    W7_A,  W7_B  = d - timedelta(days=6),  d
+    W7P_A, W7P_B = d - timedelta(days=13), d - timedelta(days=7)
+    W30_A = d - timedelta(days=29)
+    W90_A = d - timedelta(days=89)
+    LY_B  = d - timedelta(days=365)
+    LY_A  = LY_B - timedelta(days=89)
+    LY30_A = LY_B - timedelta(days=29)
+    return ANCHOR
+
+
+# allow an override without editing code: ESNM_ANCHOR=YYYY-MM-DD
+if os.getenv("ESNM_ANCHOR"):
+    set_anchor(date(*[int(x) for x in os.environ["ESNM_ANCHOR"].split("-")]))
+
 # in-scope eBay sub_source ids (source_id = 2, have UK/DE active listings)
 SUBS = (1, 2, 3, 4, 21, 22, 23, 24, 27, 28, 41, 222)
 
@@ -294,7 +319,12 @@ def assemble(data):
         row.update(rule_no=n, action=action, priority=prio)
         rows.append(row)
 
-    rows.sort(key=lambda r: (PRIORITY_RANK[r["priority"]], r["s90"], -(r["stock"] or 0)))
+    # item_id is a DETERMINISTIC tiebreaker. 9,222 of 11,176 rows tie on
+    # (priority, 90-day sales, stock), and the listings SELECT has no ORDER BY, so without
+    # this the same data comes out in a different order on every run and the artefact is
+    # not byte-reproducible - two identical-data runs produced different SHA-256s.
+    rows.sort(key=lambda r: (PRIORITY_RANK[r["priority"]], r["s90"], -(r["stock"] or 0),
+                             r["item_id"]))
     return rows
 
 
