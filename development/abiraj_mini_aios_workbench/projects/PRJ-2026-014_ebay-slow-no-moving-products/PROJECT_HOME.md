@@ -5,17 +5,17 @@
 | **Project ID** | `PRJ-2026-014_ebay-slow-no-moving-products` |
 | **Project code** | `esnm` |
 | **Task ID** | `REQ-16_ebay-slow-no-moving-products` |
-| **Status** | **REQ-16-D01 BUILT 2026-07-22 · all 10 PASS/FAIL rules green · read-only, not published, not committed, not automated — awaiting reviewer sign-off** |
+| **Status** | **REQ-16-D01 BUILT + INDEPENDENTLY VERIFIED + PUBLISHED 2026-07-22** (ph_task 411-414, `ebay_priors`, v4) · read-only · **not automated** — awaiting reviewer sign-off |
 | **Opened** | 2026-07-22 |
 | **Owner** | Abiraj |
 | **Coordinator** | Varmen |
 | **Technical Reviewer** | Sajeesan |
 | **Queryability Reviewer** | Tamil Selvan |
-| **Business Validator** | **Thinesh** (requester) — verified live in `public."user"` (id **63**, `user_name` `Thinesh`, status **Active**; single exact match). ⚠ Publish audience not yet named — see decision **E**. |
+| **Business Validator** | **Thinesh** (requester) — verified live in `public."user"` (id **63**, `user_name` `Thinesh`, status **Active**; single exact match). Publish audience **`ebay_priors`** — closed 2026-07-22, see decision ~~E~~. |
 
 > ⚠ **ID approval pending.** The source file carries **no requirement number**. `REQ-16` continues
 > the eBay sequence — REQ-12 (`epc`), REQ-13 (`ebpd`), REQ-14 (`ERA`), REQ-15 (`eppa`) — and
-> `PRJ-2026-014` follows `PRJ-2026-013`. Both need owner confirmation. Nothing is committed.
+> `PRJ-2026-014` follows `PRJ-2026-013`. Both still need owner confirmation.
 
 ## Business question
 
@@ -45,7 +45,6 @@ Resulting universe — **12 accounts · 16 account × marketplace combinations �
 - **Any write to eBay.** The report **recommends**; ending, discounting, bundling or re-pricing a
   listing stays a human action in Seller Hub. Executing any of them is covered by *Never Touch
   Without Written Approval* ("live automation").
-- **Any `ph_task` publish** until decision **E** names the audience and each recipient is verified.
 - Amazon and Shopify — same business question, separate requirement.
 
 ## Sources
@@ -60,8 +59,12 @@ and therefore cannot be used to infer precedence.
 
 ## Current position
 
-**REQ-16-D01 built and self-verified.** Anchor **2026-07-22** (sales complete 91/91 days),
-**11,156 listings**:
+**REQ-16-D01 built, independently verified and published.** Anchor **2026-07-22**,
+**11,156 listings** at the moment of verification.
+
+⚠ **These counts drift between rebuilds** because the anchor is today and today is still
+accumulating orders — a later rebuild produced 11,176 listings / 8,066 Critical. The figures
+below are the **verified baseline**, not a fixed truth. See decision **H**.
 
 | Priority | Rule | Action | Listings |
 |---|---|---|---|
@@ -88,6 +91,29 @@ field-by-field to the live database. All ten PASS/FAIL rules in `TASK_REGISTER.m
 (Views, Conversion Rate) exists **only** in the warehouse `order_management_copy` —
 `public.traffic_data WHERE which_channel = 2`. See `CLAUDE.md` §2.
 
+## Published — REQ-16-D01 is LIVE
+
+**Published to `tech_team_outputs.ph_task` on 2026-07-22 for the `ebay_priors` audience**, one row
+per recipient as the established eBay convention requires:
+
+| ph_task id | assigned_user | task_id | version |
+|---|---|---|---|
+| **411** | Thinesh | `esnm_Thinesh_ebay_slow_no_moving_products_2026-07` | v4 |
+| **412** | Jarsini | `esnm_Jarsini_…` | v4 |
+| **413** | kobiga | `esnm_kobiga_…` | v4 |
+| **414** | powsteena | `esnm_powsteena_…` | v4 |
+
+Publisher: `automation/publish_esnm_ph_task.py` — dry-run by default, artefact sanity guards, and
+SELECT-then-UPDATE because **there is no unique constraint on `task_id`** despite the sample DDL
+claiming one (a blind INSERT would silently duplicate the report). `assigned_user_team` is set
+explicitly; it is absent from the sample DDL but without it the row never reaches the audience.
+
+⚠ `description` is deliberately **NULL** — the portal renders it as a panel above the report and it
+was consuming ~90px of an already short embed. Every caveat it carried is stated on the report.
+
+✅ **Decision E (publish audience) is CLOSED** — `ebay_priors`, on the owner's instruction
+2026-07-22.
+
 ## Known gaps — measured, not assumed
 
 | # | Gap | Effect |
@@ -107,8 +133,9 @@ field-by-field to the live database. All ten PASS/FAIL rules in `TASK_REGISTER.m
 | **B** | **Traffic backfill** — re-run the eBay Analytics pull for the 11 lost days before sign-off, or accept understated Views? | Coordinator + the pipeline owner | Rules 5 and 9 stay measurably degraded until closed. The root cause is outside both databases. |
 | **C** | **Rule precedence** (Critical→High→Medium→Low, first match wins, lower rule number wins within a band) **and the fate of the unreachable Rule 10.** | Thinesh | The source never states precedence. This assumption is what makes 8,067 listings read "End Listing" rather than a softer action. |
 | **D** | **Run cadence** and whether this becomes a scheduled job. | Coordinator | A 7th job must avoid the six existing slots on the shared account. |
-| **E** | **Publish audience** — who receives it in `ph_task`. | Thinesh + Coordinator | No publish until every recipient is verified in the user table. |
+| ~~E~~ | ~~Publish audience~~ | — | **CLOSED 2026-07-22 — `ebay_priors`** (Thinesh · Jarsini · kobiga · powsteena), all four verified present in the audience before writing. Published as ph_task 411-414. |
 | **F** | **Actionability** — 72.3% of rows say "End Listing". Should D01 be ranked or capped (top-N per account, or by stock value at risk)? | Thinesh | An 8,067-row undifferentiated list is not operationally usable as delivered. |
+| **H** | 🔴 **Anchor sits on a partial day.** `ANCHOR = today`, but today is still accumulating orders (11 units against ~230 on a normal day), so the same report run twice gives different counts — observed Rule 1 8,067→8,066, Rule 7 149→153, and the row count 11,156→11,176 across rebuilds. EPPA hit this exact defect and fixed it by anchoring on the last **complete** day. | Coordinator | Fixing it changes the published figures Thinesh is already looking at, so it needs a decision, not a silent edit. |
 | **G** | Confirm **Rule 8's £5.00 / 30-day** spend threshold. | Thinesh | Invented for the build because the source defines "high" nowhere. Currently drives only 2 listings, but it is unvalidated. |
 
 ## Reviewer gates

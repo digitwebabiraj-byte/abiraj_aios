@@ -8,7 +8,7 @@ the canonical source (`Thinesh task (3).xlsx`, rule table rows 20–32) and the 
 |---|---|
 | Project | `PRJ-2026-014_ebay-slow-no-moving-products` · code `esnm` |
 | Task | `REQ-16_ebay-slow-no-moving-products` |
-| Deliverables | **D01** report (built) · **D02** HTML dashboard (not started) · **D03** scheduled refresh (not started) |
+| Deliverables | **D01** the report = HTML dashboard + xlsx workbook + governed JSON (built, verified) · **D02** scheduled refresh (not started) |
 
 ---
 
@@ -166,7 +166,12 @@ Rule 10 still evaluates. Disclosed on the report.
 
 ## 6. Output — REQ-16-D01
 
-Five sheets. Column order and header text are fixed by the source and reproduced exactly.
+D01 is **three artefacts over one dataset**: the HTML reviewer dashboard, the xlsx workbook and
+`esnm_d01_data.json`. Both renderers import the same `fetch()`/`assemble()`, so they cannot drift.
+
+### 6.1 Workbook — five sheets, all 20 source columns
+
+Column order and header text are fixed by the source and reproduced exactly.
 
 | Sheet | Contents |
 |---|---|
@@ -179,11 +184,31 @@ Five sheets. Column order and header text are fixed by the source and reproduced
 **Live formulas:** column N (Sales Trend) `=(L−M)/M`, and column T (Action Required), a nested `IF`
 implementing all eleven evaluable rules against the Rules and Engine Inputs sheets.
 
-### The 20 columns
+### 6.2 Dashboard — 20 columns
+
+Self-contained full-screen console: product thumbnails with hover zoom and click-through to the live
+eBay listing, date-range + quick-range + priority + account + marketplace + action + search filters,
+KPI cards that **recompute from the filtered view**, frozen Image/Account columns, priority edge
+bars, column-group separators, inline stock magnitude bars and a comfortable/compact density
+toggle. Row virtualisation keeps 11,156 rows responsive.
+
+⚠ The dashboard omits **Watchers** (owner instruction, 2026-07-22) since it can never be populated;
+the workbook keeps it blank for literal spec compliance — hence dashboard **20** vs workbook **21**.
+
+⚠ **`Same Period Last Year` is two columns** (owner instruction, 2026-07-22): **LY 30d**
+(2025-06-23 → 2025-07-22) and **LY 90d** (2025-04-24 → 2025-07-22). Compare like with like — the
+30-day column against Last 30 Days, the 90-day column against Last 90 Days. **Sales Trend and
+Rule 4 use the 90-day pair.**
+
+⚠ **Sales Trend never shows a dash.** Where last year is zero the ratio is undefined, so: both
+windows zero → `0%` (no change); zero last year but sales this year → **▲ NEW** (it grew from
+nothing, and `0%` there would report a growing listing as flat).
+
+### The 21 workbook columns
 `Image · Account · Brand · SKU · Item ID · Product Title · Category · Current Price · Stock ·
-Last 7 Days Sales · Last 30 Days Sales · Last 90 Days Sales · Same Period Last Year · Sales Trend ·
-Days Since Last Sale · Views (30 Days) · Watchers · Conversion Rate · Listing Status ·
-Action Required`
+Last 7 Days Sales · Last 30 Days Sales · Last 90 Days Sales · Same Period Last Year (30 Days) ·
+Same Period Last Year (90 Days) · Sales Trend · Days Since Last Sale · Views (30 Days) · Watchers ·
+Conversion Rate · Listing Status · Action Required`
 
 ---
 

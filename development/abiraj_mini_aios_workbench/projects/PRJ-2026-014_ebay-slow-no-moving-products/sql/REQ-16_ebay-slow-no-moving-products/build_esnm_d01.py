@@ -22,8 +22,13 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
-DELIVER_DIR = os.path.join(os.path.expanduser("~"), "Downloads")
-OUT_XLSX = os.path.join(DELIVER_DIR, "2026-07-22_slow-moving-no-moving-products_ebay.xlsx")
+# Canonical location for the artefact is the project evidence tree - one asset, one home
+# (workbench CLAUDE.md, "Do not duplicate canonical assets"). Copies for convenience are made
+# by the caller, never written here.
+_PROJ = os.path.abspath(os.path.join(OUT_DIR, "..", ".."))
+DELIVER_DIR = os.path.join(_PROJ, "evidence", "final_outputs",
+                           "REQ-16_ebay-slow-no-moving-products")
+OUT_XLSX = os.path.join(DELIVER_DIR, "REQ-16-D01_slow_no_moving_products.xlsx")
 
 # ---------------------------------------------------------------- anchor & windows
 ANCHOR = date(2026, 7, 22)          # latest complete SALES day (sales verified 91/91 days)
@@ -32,7 +37,8 @@ W7P_A, W7P_B = ANCHOR - timedelta(days=13), ANCHOR - timedelta(days=7)   # prior
 W30_A = ANCHOR - timedelta(days=29)
 W90_A = ANCHOR - timedelta(days=89)
 LY_B = ANCHOR - timedelta(days=365)
-LY_A = LY_B - timedelta(days=89)    # same 90-day period last year
+LY_A  = LY_B - timedelta(days=89)   # same 90-day period last year
+LY30_A = LY_B - timedelta(days=29)  # same 30-day period last year (ends on the same day)
 
 # in-scope eBay sub_source ids (source_id = 2, have UK/DE active listings)
 SUBS = (1, 2, 3, 4, 21, 22, 23, 24, 27, 28, 41, 222)
@@ -95,6 +101,7 @@ SELECT item_id,
        COALESCE(SUM(qty) FILTER (WHERE d BETWEEN %(w7pa)s AND %(w7pb)s),0) AS s7_prev,
        COALESCE(SUM(qty) FILTER (WHERE d BETWEEN %(w30a)s AND %(anchor)s),0) AS s30,
        COALESCE(SUM(qty) FILTER (WHERE d BETWEEN %(w90a)s AND %(anchor)s),0) AS s90,
+       COALESCE(SUM(qty) FILTER (WHERE d BETWEEN %(ly30a)s AND %(lyb)s ),0) AS s30_ly,
        COALESCE(SUM(qty) FILTER (WHERE d BETWEEN %(lya)s  AND %(lyb)s ),0) AS s90_ly,
        MAX(d) AS last_sale
 FROM base GROUP BY item_id
@@ -131,7 +138,7 @@ WHERE which_channel = 2 AND market_place IN ('UK','Germany')
 
 def fetch():
     p = dict(subs=SUBS, w7a=W7_A, w7b=W7_B, w7pa=W7P_A, w7pb=W7P_B,
-             w30a=W30_A, w90a=W90_A, lya=LY_A, lyb=LY_B, anchor=ANCHOR)
+             w30a=W30_A, w90a=W90_A, lya=LY_A, ly30a=LY30_A, lyb=LY_B, anchor=ANCHOR)
     out = {}
     print("connecting to ledsone ...", flush=True)
     with led_conn() as c:
@@ -244,9 +251,9 @@ def assemble(data):
     for (item_id, sku, title, price, currency, qty, ptype, cat_id, img, url,
          site, status, created_at, account) in data["listings"]:
         s = data["sales"].get(item_id)
-        s7, s7p, s30, s90, sly, last_sale = (
-            (float(s[0]), float(s[1]), float(s[2]), float(s[3]), float(s[4]), s[5])
-            if s else (0.0, 0.0, 0.0, 0.0, 0.0, None))
+        s7, s7p, s30, s90, sly30, sly, last_sale = (
+            (float(s[0]), float(s[1]), float(s[2]), float(s[3]), float(s[4]), float(s[5]), s[6])
+            if s else (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, None))
         t = data["traffic"].get(item_id)
         has_traffic = t is not None
         views = float(t[0]) if t else None
@@ -273,8 +280,12 @@ def assemble(data):
             stock=int(qty) if qty is not None else 0,
             category=(ptype or (str(cat_id) if cat_id else "")),
             image=img or url or "",
+            # img_only: the real image URL and nothing else. `image` above falls back to the
+            # listing URL for the workbook hyperlink, which is NOT renderable as a thumbnail.
+            img_only=img or "",
+            listing_url=url or "",
             status=(status or "Active"),
-            s7=s7, s7_prev=s7p, s30=s30, s90=s90, s90_ly=sly,
+            s7=s7, s7_prev=s7p, s30=s30, s90=s90, s30_ly=sly30, s90_ly=sly,
             trend=trend, idle_days=idle, idle_is_proxy=idle_is_proxy,
             age_days=age_days, views=views, cvr=cvr, has_traffic=has_traffic,
             ppc_spend=ppc_spend, ppc_sales=ppc_sales,
@@ -304,10 +315,11 @@ PRIO_FILL = {
 
 HEADERS = ["Image", "Account", "Brand", "SKU", "Item ID", "Product Title", "Category",
            "Current Price", "Stock", "Last 7 Days Sales", "Last 30 Days Sales",
-           "Last 90 Days Sales", "Same Period Last Year", "Sales Trend",
+           "Last 90 Days Sales", "Same Period Last Year (30 Days)",
+           "Same Period Last Year (90 Days)", "Sales Trend",
            "Days Since Last Sale", "Views (30 Days)", "Watchers", "Conversion Rate",
            "Listing Status", "Action Required"]
-WIDTHS = [8, 20, 16, 22, 15, 52, 30, 13, 8, 11, 12, 12, 14, 12, 13, 12, 10, 12, 12, 30]
+WIDTHS = [8, 20, 16, 22, 15, 52, 30, 13, 8, 11, 12, 12, 15, 15, 12, 13, 12, 10, 12, 12, 30]
 TREND_FMT = '"▲ "0%;"▼ -"0%;"→ "0%'
 
 
@@ -421,22 +433,28 @@ def build(rows, cov):
         ws.cell(row=n, column=10, value=r["s7"])
         ws.cell(row=n, column=11, value=r["s30"])
         ws.cell(row=n, column=12, value=r["s90"])
-        ws.cell(row=n, column=13, value=r["s90_ly"])
-        ct = ws.cell(row=n, column=14, value="=IF(M%d=0,\"\",(L%d-M%d)/M%d)" % (n, n, n, n))
+        ws.cell(row=n, column=13, value=r["s30_ly"])
+        ws.cell(row=n, column=14, value=r["s90_ly"])
+        # Trend stays on the 90-day comparator (col L vs col N) - see module docstring
+        # N=0 means no sales in the same window last year, so the ratio is undefined.
+        # Both windows zero -> 0% (no change). Zero last year but sales this year -> "NEW",
+        # because 0% there would read as flat and understate a listing that grew from nothing.
+        ct = ws.cell(row=n, column=15,
+                     value="=IF(N%d=0,IF(L%d>0,\"NEW\",0),(L%d-N%d)/N%d)" % (n, n, n, n, n))
         ct.number_format = TREND_FMT
-        ws.cell(row=n, column=15, value=r["idle_days"])
-        ws.cell(row=n, column=16, value=r["views"] if r["has_traffic"] else None)
-        ws.cell(row=n, column=17, value=None)                      # Watchers — no source
-        cr = ws.cell(row=n, column=18, value=r["cvr"] if r["has_traffic"] else None)
+        ws.cell(row=n, column=16, value=r["idle_days"])
+        ws.cell(row=n, column=17, value=r["views"] if r["has_traffic"] else None)
+        ws.cell(row=n, column=18, value=None)                      # Watchers — no source
+        cr = ws.cell(row=n, column=19, value=r["cvr"] if r["has_traffic"] else None)
         cr.number_format = '0.0%'
-        ws.cell(row=n, column=19, value=r["status"])
-        ws.cell(row=n, column=20, value=action_formula(n))
-        for cc in range(1, 21):
+        ws.cell(row=n, column=20, value=r["status"])
+        ws.cell(row=n, column=21, value=action_formula(n))
+        for cc in range(1, 22):
             cell = ws.cell(row=n, column=cc)
             cell.border = BORDER
             if cc != 1:
                 cell.font = BASE_FONT
-        ws.cell(row=n, column=20).fill = PRIO_FILL[r["priority"]]
+        ws.cell(row=n, column=21).fill = PRIO_FILL[r["priority"]]
 
         ei.cell(row=n, column=1, value=r["item_id"])
         ei.cell(row=n, column=2, value=r["s7_prev"])
@@ -448,7 +466,7 @@ def build(rows, cov):
         ei.cell(row=n, column=8, value=r["priority"])
 
     last = len(rows) + 1
-    ws.auto_filter.ref = "A1:T%d" % last
+    ws.auto_filter.ref = "A1:U%d" % last
 
     build_summary(wb, rows, cov, last)
     build_notes(wb, rows, cov)
@@ -465,12 +483,12 @@ def action_formula(n):
         ("L{n}<={R}$E$4", "{R}$C$4"),                                              # 1
         ("AND(K{n}<={R}$E$5,I{n}>{R}$F$5)", "{R}$C$5"),                            # 2
         ("AND(J{n}<={R}$E$6,K{n}<={R}$F$6,L{n}<={R}$G$6)", "{R}$C$6"),             # 3
-        ("AND(M{n}>0,N{n}<={R}$E$7)", "{R}$C$7"),                                  # 4
-        ("AND({E}$F{n}=1,P{n}>{R}$E$8,R{n}<{R}$F$8)", "{R}$C$8"),                  # 5
+        ("AND(N{n}>0,O{n}<={R}$E$7)", "{R}$C$7"),                                  # 4
+        ("AND({E}$F{n}=1,Q{n}>{R}$E$8,S{n}<{R}$F$8)", "{R}$C$8"),                  # 5
         ("AND(I{n}>{R}$E$10,L{n}<{R}$F$10)", "{R}$C$10"),                          # 7
         ("AND({E}$D{n}>{R}$E$11,K{n}<=0)", "{R}$C$11"),                            # 8
-        ("AND({E}$F{n}=1,P{n}<{R}$E$12)", "{R}$C$12"),                             # 9
-        ("AND({E}$C{n}>{R}$E$13,O{n}>{R}$F$13)", "{R}$C$13"),                      # 10
+        ("AND({E}$F{n}=1,Q{n}<{R}$E$12)", "{R}$C$12"),                             # 9
+        ("AND({E}$C{n}>{R}$E$13,P{n}>{R}$F$13)", "{R}$C$13"),                      # 10
         ("K{n}>={R}$E$14", "{R}$C$14"),                                            # 11
         ("AND(J{n}>{E}$B{n},J{n}>0)", "{R}$C$15"),                                 # 12
     ]
@@ -570,9 +588,13 @@ def build_notes(wb, rows, cov):
          "Units = real_qty (falls back to item_quantity). Orders with status 'Cancelled' are "
          "EXCLUDED; 'Refunded' and 'Inprogress' are INCLUDED because they still evidence demand."),
         ("Sales windows", "7 / 30 / 90 days ending on the anchor",
-         "Same Period Last Year = the same 90-day window one year earlier (%s to %s)."
-         % (LY_A.isoformat(), LY_B.isoformat())),
-        ("Sales Trend", "(Last 90 Days - Same Period Last Year) / Same Period Last Year",
+         "TWO last-year comparators, both ending on the same day one year back: "
+         "Same Period Last Year (30 Days) = %s to %s; "
+         "Same Period Last Year (90 Days) = %s to %s. "
+         "Compare like with like - the 30-day column against Last 30 Days, the 90-day column "
+         "against Last 90 Days."
+         % (LY30_A.isoformat(), LY_B.isoformat(), LY_A.isoformat(), LY_B.isoformat())),
+        ("Sales Trend", "(Last 90 Days - Same Period Last Year (90 Days)) / same",
          "Blank where last year's sales were zero (division undefined). Live formula in column N."),
         ("Views + Conversion source", "warehouse / public.traffic_data (which_channel = 2)",
          "Views = SUM(click) = listing page views. Conversion Rate = SUM(conversion)/SUM(click). "

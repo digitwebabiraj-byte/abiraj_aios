@@ -5,10 +5,10 @@ moving at all — and what should be done with each one?**
 
 | | |
 |---|---|
-| Status | **REQ-16-D01 BUILT + SELF-VERIFIED 2026-07-22** — read-only, not published, not automated, awaiting sign-off |
+| Status | **REQ-16-D01 BUILT · VERIFIED · PUBLISHED 2026-07-22** (dashboard + workbook + dataset · ph_task 411-414 `ebay_priors` v4) — read-only, **not automated**, awaiting sign-off |
 | Code | `esnm` · Task `REQ-16_ebay-slow-no-moving-products` |
 | Scope | **All active eBay accounts** · **UK + Germany only** · sellable rows (`is_ended=0`, `is_child=0`) |
-| Output | Read-only **recommendation** report — 20 columns + a 12-rule action engine. **Never writes to eBay.** |
+| Output | Read-only **recommendation** report — 12-rule action engine. Workbook 21 cols · dashboard 20 cols. **Never writes to eBay.** |
 | Opened | 2026-07-22 |
 
 ⚠ **IDs pending owner confirmation** — the source file carries no requirement number. `REQ-16`
@@ -59,8 +59,10 @@ Scope: **12 accounts · 16 account × marketplace combinations** — UK 7,685 / 
 | Execution rules | [CLAUDE.md](CLAUDE.md) |
 | Task index | [TASK_REGISTER.md](TASK_REGISTER.md) |
 | Data audit (the key evidence) | `evidence/logs_or_screenshots/REQ-16_.../2026-07-22_data_availability_audit.md` |
-| Generator | `sql/REQ-16_.../build_esnm_d01.py` |
-| Workbook | `evidence/final_outputs/REQ-16_.../REQ-16-D01_slow_no_moving_products.xlsx` |
+| Generator + renderer | `sql/REQ-16_.../build_esnm_d01.py` · `render_esnm_dashboard.py` |
+| **Dashboard (D01)** | `evidence/final_outputs/REQ-16_.../REQ-16-D01_esnm_dashboard.html` |
+| **Workbook (D01)** | `evidence/final_outputs/REQ-16_.../REQ-16-D01_slow_no_moving_products.xlsx` |
+| **Governed dataset (D01)** | `evidence/final_outputs/REQ-16_.../esnm_d01_data.json` |
 | Source (COPY, SHA-256) | `evidence/source_documents/REQ-16_.../` |
 | Daily requirement document | `DigitWeb_Works_Abiraj/22_07_2026/2026-07-22_abiraj_REQ-esnm_REQ-16-D01.md` |
 
@@ -78,4 +80,5 @@ Requester / end user / Business Validator: **Thinesh** (`public."user"` id 63, A
 3. **Decision F — actionability.** 72.3% of rows carry one Critical action; an 8,067-row flat list
    is not usable as delivered. Rank or cap?
 4. **Decision B — traffic backfill.** 11 ingestion days lost; Views understated ~23% over 30 days.
-5. Confirm the IDs, then `PROJECT_REGISTER.md`, validation record, and (only then) publish/automate.
+5. **Decision H — the anchor sits on a partial day**, so rebuilds drift (row count 11,156 → 11,176). Anchor on the last complete day?
+6. Confirm the IDs; then automation (D02).

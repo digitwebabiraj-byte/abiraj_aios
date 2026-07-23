@@ -1,0 +1,6 @@
+# Python bytecode - regenerated on every run, never an artefact
+__pycache__/
+*.pyc
+
+# Excel lock files, if a workbook is open while the builder runs
+~$*.xlsx
