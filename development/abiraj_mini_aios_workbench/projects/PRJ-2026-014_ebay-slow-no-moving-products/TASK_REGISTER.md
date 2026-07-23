@@ -184,3 +184,10 @@ F (actionability), G (Rule 8 threshold) all open · D02 and D03 not started.
     and zero this year** (Declined) vs 3,761 Dormant and 3,007 Never-sold.
 - Also still open: **A** (Watchers / Rule 6 permanently dark), **G** (£5.00 Rule 8 threshold),
   **B** (11 lost traffic days), ID confirmation, and Sajeesan / Tamil Selvan / Varmen sign-off.
+
+- ✅ **2026-07-23 — decisions C and F CLOSED by Thinesh.** Precedence confirmed as built
+  (Critical → High → Medium → Low, first match wins, lower rule number inside a band); **Rule 10
+  stays shadowed and is accepted as dead**. Actionability accepted as delivered — no ranking or
+  cap applied, 8,065 Critical rows stand. The Declined / Dormant / Never-sold split
+  (1,299 / 3,761 / 3,007) stays available in the data should a sharper queue be wanted later.
+  **Business gate fully closed.**

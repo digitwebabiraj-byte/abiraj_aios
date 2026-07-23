@@ -131,18 +131,18 @@ was consuming ~90px of an already short embed. Every caveat it carried is stated
 |---|---|---|---|
 | **A** | **Watchers** — drop Rule 6 permanently, or keep column 17 blank pending a new Trading-API ingestion? | Thinesh | Decides whether the deliverable is "20 columns, one permanently blank" or "19 columns". |
 | **B** | **Traffic backfill** — re-run the eBay Analytics pull for the 11 lost days before sign-off, or accept understated Views? | Coordinator + the pipeline owner | Rules 5 and 9 stay measurably degraded until closed. The root cause is outside both databases. |
-| **C** | **Rule precedence** (Critical→High→Medium→Low, first match wins, lower rule number wins within a band) **and the fate of the unreachable Rule 10.** | Thinesh | The source never states precedence. This assumption is what makes 8,067 listings read "End Listing" rather than a softer action. |
-| **D** | **Run cadence** and whether this becomes a scheduled job. | Coordinator | A 7th job must avoid the six existing slots on the shared account. |
+| ~~C~~ | ~~Rule precedence and the fate of the unreachable Rule 10~~ | — | **CLOSED 2026-07-23 — CONFIRMED BY THINESH.** Precedence stands as built: Critical → High → Medium → Low, first match wins, lower rule number wins within a band. **Rule 10 stays shadowed and is accepted as dead.** |
+| ~~D~~ | ~~Run cadence and whether this becomes a scheduled job~~ | — | **CLOSED 2026-07-22 — monthly, 2nd at 09:45.** Registered as `ESNM_Monthly_Slow_No_Moving` against the main tree; next run 2026-08-02. 09:45 not 09:30 because EBPD holds Mon 09:30 on the same shared `temp_user` login and the 2nd lands on a Monday often enough to collide. |
 | ~~E~~ | ~~Publish audience~~ | — | **CLOSED 2026-07-22 — `ebay_priors`** (Thinesh · Jarsini · kobiga · powsteena), all four verified present in the audience before writing. Published as ph_task 411-414. |
-| **F** | **Actionability** — 72.3% of rows say "End Listing". Should D01 be ranked or capped (top-N per account, or by stock value at risk)? | Thinesh | An 8,067-row undifferentiated list is not operationally usable as delivered. |
-| **H** | 🔴 **Anchor sits on a partial day.** `ANCHOR = today`, but today is still accumulating orders (11 units against ~230 on a normal day), so the same report run twice gives different counts — observed Rule 1 8,067→8,066, Rule 7 149→153, and the row count 11,156→11,176 across rebuilds. EPPA hit this exact defect and fixed it by anchoring on the last **complete** day. | Coordinator | Fixing it changes the published figures Thinesh is already looking at, so it needs a decision, not a silent edit. |
+| ~~F~~ | ~~Actionability — 72.2% of rows carry one Critical action~~ | — | **CLOSED 2026-07-23 — ACCEPTED AS DELIVERED BY THINESH.** No ranking or cap applied. The Declined / Dormant / Never-sold split (1,299 / 3,761 / 3,007) remains available in the data if a sharper queue is wanted later. |
+| ~~H~~ | ~~Anchor sits on a partial day~~ | — | **CLOSED 2026-07-22.** The scheduled job anchors on the **last day of the previous calendar month**; ad-hoc runs use the last **complete** day. A second cause was also fixed: **9,222 of 11,176 rows tie** on (priority, 90-day sales, stock) and the listings SELECT has no ORDER BY, so identical data came out in a different order each run — `item_id` is now the final sort key. Two consecutive runs now produce a byte-identical payload (`cdcc3d58…`). |
 | **G** | Confirm **Rule 8's £5.00 / 30-day** spend threshold. | Thinesh | Invented for the build because the source defines "high" nowhere. Currently drives only 2 listings, but it is unvalidated. |
 
 ## Reviewer gates
 
 - **Sajeesan (technical)** — ⬜ pending
 - **Tamil Selvan (queryability)** — ⬜ pending
-- **Thinesh (business)** — ✅ **dashboard verified 2026-07-23 ("all ok").** ⚠ This records review of the **artefact**. Following the REQ-15 precedent, it does **not** by itself close decisions **C** (rule precedence) or **F** (actionability), which need explicit confirmation: precedence is what makes **8,065 of 11,176 rows** read "End Listing" and what shadows **7,021 listings** out of Rule 10.
+- **Thinesh (business)** — ✅ **VERIFIED 2026-07-23.** Dashboard accepted, and decisions **C** (rule precedence, incl. Rule 10 staying shadowed) and **F** (72.2% single action accepted as delivered) **explicitly confirmed closed**.
 - **Varmen (coordination / ID approval)** — ⬜ pending
 
 ## Register links
