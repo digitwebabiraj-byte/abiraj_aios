@@ -180,12 +180,38 @@ scheduled job and its **first daily** one — every existing job is weekly or mo
 the same restricted `temp_user` account, and **Monday 11:00 is already taken twice** (EPPA and T7).
 A daily slot must be chosen clear of the existing six.
 
-## Reviewer gates
+## Reviewer gates — ✅ ALL SIGNED OFF 2026-07-23
 
-- **Thinesh (business)** — ⬜ pending. **Owns decisions A–E, G–J.** A is the blocker.
-- **Sajeesan (technical)** — ⬜ pending. Owns K, co-owns F.
-- **Tamil Selvan (queryability)** — ⬜ pending.
-- **Varmen (coordination / ID approval)** — ⬜ pending. Owns L.
+| Gate | Reviewer | Status |
+|---|---|---|
+| Technical | **Sajeesan** | ✅ signed off |
+| Queryability | **Tamil Selvan** | ✅ signed off |
+| Business | **Thinesh** | ✅ signed off |
+| Coordination / ID approval | **Varmen** | ✅ signed off |
+
+Signed off against the delivered state: 30 rows at account × marketplace, 24 columns, money per
+currency, 18/18 verification checks, live on `ph_task` 422-425, daily 09:00 job registered and
+proven end to end (`LastTaskResult 0`).
+
+## Duplicate check — 🟢 GREEN (2026-07-23)
+
+Full record: `validation/REQ-17_daily-sales-track/2026-07-23_duplicate_check_and_signoff.md`
+
+- **Our rows are clean** — exactly 4 `dst` rows, 4 distinct `task_id`, one HTML version, no row
+  missing `assigned_user_team`.
+- **No other report duplicates this one.** The closest, `UDESC` (eBay SALES CHECK UK & DE), is
+  **weekly**, at **item-ID grain**, for **`ph_priors`**. `espd` is monthly SKU-level; `ebpd` is
+  monthly and is the source this project *inherits* from; `ebsr` is daily but reports **stock**;
+  `EBAYAHD` is mislabelled and actually covers Amazon FBA restock.
+
+⚠ **Two findings outside this project**, both raised for Sajeesan:
+1. **`ph_task` holds 30 duplicate rows** across five task_ids — `Overall Asin Datas for utharsika`
+   ×11, `PH-SALES-TRACKER` ×7, and **7 rows with a NULL `task_id`** that can never be updated in
+   place. Caused by the missing UNIQUE constraint the sample DDL wrongly claims exists.
+2. 🔴 **The `0xC000013A` scheduler trap struck `UDESC` on 2026-07-22** — *"fired late at 18:39 and
+   was externally terminated before any work began"*. That is a live risk to this project's own
+   09:00 job, which sits under the same OneDrive path. It presents as a **silent no-run**. Watch
+   `check_status.bat` for the first few mornings; the durable fix is moving the repo off OneDrive.
 
 ## Register links
 
