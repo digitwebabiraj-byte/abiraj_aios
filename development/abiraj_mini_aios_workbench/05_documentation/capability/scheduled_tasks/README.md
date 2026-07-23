@@ -1,13 +1,13 @@
 # Scheduled task definitions — the automation fleet, backed up
 
 **Why this folder exists.** The AIOS repo is the single source of truth for all of this work, but
-until 2026-07-21 the six scheduled jobs existed **only in this machine's Windows Task Store**.
+until 2026-07-21 the scheduled jobs existed **only in this machine's Windows Task Store**.
 Cloning the repo elsewhere restored the code and got you nothing that runs. These exports close
 that gap: rebuilding the fleet on a new machine is now a restore, not a rebuild from memory.
 
 **No secret is in here.** Every task runs as `digit` with `LogonType=InteractiveToken`, which stores
 no Windows password, and the DB passwords live in user environment variables — never in a task
-definition. Verified at export: zero password matches across all six files.
+definition. Verified at export: zero password matches across all seven files.
 
 ## The fleet
 
@@ -19,8 +19,13 @@ definition. Verified at export: zero password matches across all six files.
 | `T7_Weekly_SKU_Performance` | Thursdays 11:00 | PRJ-2026-005 Weekly SKU Performance |
 | `ERA_Monthly_Dashboard` | Day 5, 09:30 | PRJ-2026-012 eBay Return Analysis |
 | `FRRC_Monthly_FBA_Returns_Report` | Day 8, 09:00 | PRJ-2026-008 FBA Returns Root-Cause |
+| **`DST_Daily_Sales_Track`** | **Every day 09:05** | **PRJ-2026-015 Daily Sales Track** |
 
 Times are staggered deliberately — they share one restricted `temp_user` warehouse account.
+
+**DST is the fleet's first DAILY job** (added 2026-07-23). It runs at **09:05, not 09:00**, specifically to clear FRRC, which holds 09:00 on the 8th of each month against that same shared login. The run itself takes about 10 seconds.
+
+⚠ **Known trap, and it has fired.** On 2026-07-22 the `UDESC` job recorded *"fired late at 18:39 and was externally terminated before any work began (exit code 0xC000013A)"*. That is the OneDrive hydration failure described in `NEW_MACHINE_SETUP.md`. It presents as a **silent no-run** — the report simply stays yesterday's and no alert fires, because the failure happens before the runner starts. It affects every job on this path. The durable fix is moving the repo off OneDrive to `C:\dev\`.
 
 ## Restore one task
 
