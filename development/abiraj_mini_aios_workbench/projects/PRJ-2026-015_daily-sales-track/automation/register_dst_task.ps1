@@ -1,4 +1,4 @@
-# Registers REQ-17-D02 with Windows Task Scheduler: every morning at 09:00.
+# Registers REQ-17-D02 with Windows Task Scheduler: every morning at 09:05.
 #
 #   Run this ONCE, from an elevated PowerShell:
 #       .\register_dst_task.ps1
@@ -6,11 +6,11 @@
 #   Preview without registering:
 #       .\register_dst_task.ps1 -WhatIf
 #
-# NOTE ON THE TIME. 09:00 was chosen by the owner. It is the fleet's only DAILY job
-# and its only 09:00 job except FRRC, which fires at 09:00 on the 8th of each month.
-# On that one morning both hit the shared temp_user login at once, so the runner
-# retries the connection four times with a backoff rather than failing the day.
-# Moving to 09:05 would remove the overlap entirely - change $At below if wanted.
+# NOTE ON THE TIME. 09:05, not 09:00. FRRC fires at 09:00 on the 8th of each month
+# against the same shared temp_user login; five minutes removes that overlap outright
+# rather than leaning on the connection retry. The job itself takes ~10 seconds, so
+# nothing else in the fleet comes near it. Data-wise any morning slot works: the
+# reported day (R-1) is settled at midnight and ledsone is live to within ~20 minutes.
 #
 # Fleet slots already taken:
 #   EBPD  Mon 09:30    ERA   day 5  09:30    FRRC  day 8  09:00
@@ -19,7 +19,7 @@
 param([switch]$WhatIf)
 
 $TaskName = "DST_Daily_Sales_Track"
-$At       = "09:00"
+$At       = "09:05"
 $Here     = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Bat      = Join-Path $Here "run_dst_daily.bat"
 

@@ -6,7 +6,7 @@ Rebuilds all three REQ-17-D01 artefacts from live data every morning and refresh
 | | |
 |---|---|
 | Task name | `DST_Daily_Sales_Track` |
-| Runs | **every day at 09:00** |
+| Runs | **every day at 09:05** |
 | Reports | **yesterday** (R−1), compared with R−2 and the same calendar date last year |
 | Publishes to | `tech_team_outputs.ph_task` **ids 422–425**, audience `ebay_priors` |
 | Fails | **closed** — a bad pull publishes nothing and yesterday's report stays live |
@@ -65,11 +65,17 @@ machine it has no baseline and skips itself — by design; it is not a failure.
 
 ## Timing note
 
-09:00 was chosen by the owner. It is the fleet's **only daily job** and the only 09:00 job except
-**FRRC, which fires at 09:00 on the 8th of each month**. On that one morning both hit the shared
-`temp_user` login simultaneously, so the runner retries the connection **four times with a
-backoff** rather than losing the day. Moving to **09:05** would remove the overlap entirely —
-change `$At` in `register_dst_task.ps1`.
+**09:05, not 09:00.** FRRC fires at **09:00 on the 8th of each month** against the same shared
+`temp_user` login; five minutes removes that overlap outright rather than leaning on the connection
+retry. The run itself takes **~10 seconds**, so nothing else in the fleet comes near it.
+
+Data-wise any morning slot would do: the reported day (R−1) is settled at midnight and `ledsone` is
+live to within ~20 minutes. The time is about fleet contention, not data readiness.
+
+⚠ **A far bigger reliability risk than the schedule is the `0xC000013A` trap** — it killed the
+`UDESC` job on 2026-07-22 ("fired late at 18:39 and was externally terminated before any work
+began"). It presents as a **silent no-run**. The durable fix is moving the repo off OneDrive to
+`C:\dev\`, as `NEW_MACHINE_SETUP.md` recommends.
 
 Existing fleet slots: EBPD Mon 09:30 · ERA day 5 09:30 · FRRC day 8 09:00 · EPC Mon 10:30 ·
 EPPA Mon 11:00 · T7 Thu 11:00.
