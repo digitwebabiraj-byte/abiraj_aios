@@ -79,6 +79,18 @@ def log(msg):
         fh.write(line + "\n")
 
 
+def status(state, msg):
+    """One machine-readable verdict per run, so check_status.bat and a human both get an
+    answer without reading the whole log. Fleet pattern, copied from EPC."""
+    log("STATUS {0} | {1}".format(state, msg))
+
+
+def die(msg):
+    """Record the verdict, then abort. Nothing downstream runs."""
+    status("FAILED", msg)
+    raise RuntimeError(msg)
+
+
 def connect(cfg, label, attempts=7):
     """Retry rather than lose the day.
 
