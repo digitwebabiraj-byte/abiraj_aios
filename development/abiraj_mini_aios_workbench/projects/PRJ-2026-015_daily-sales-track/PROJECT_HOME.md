@@ -47,21 +47,27 @@ specifically to stop that returning (V15 row currency, V16 own symbol, V17 no bl
 
 ## Business question
 
-> For each trading account, on each day: what were the sales, orders and units — how do they compare
-> with the previous day and with the same day one year earlier — what was the day's best seller, how
-> many listings are active, and is the account trending up, down or flat?
+> For each trading account and marketplace, on each day: what were the sales, orders and units — how
+> do they compare with the previous day and with the same day one year earlier — how many listings
+> are active, how do they split between the account holder and the portfolio holders, and is the
+> account trending up, down or flat?
 
 ## Scope
 
-**Confirmed:**
-- The output shape — **22 columns, one row per account per day**, plus a **9-KPI summary panel**.
+**As delivered (all confirmed 2026-07-23):**
+- The output shape — **24 columns, one row per account × marketplace**, plus a **9-KPI summary
+  panel**. The source specified 22; `Best Seller` was removed, `AH Holder` added, and `Market` +
+  `Currency` added by the grain and currency corrections.
+- **30 rows** — every eBay account × marketplace with live listings.
 - The **formula layer** — verified against the source sample, 32 of 32 relationships exact.
-- The **measurement definitions** — inherited verbatim from REQ-13 (EBPD), not re-derived.
+- The **measurement definitions** — inherited verbatim from REQ-13 (EBPD), not re-derived, except
+  the status filter, which **deliberately diverges**: this report counts orders **placed**, because
+  `Completed` matures ~2 days late and would understate a daily view by 69%.
 
-**⚠ NOT confirmed — every one of these is an open decision:**
-- **Channel** (decision G). Working assumption eBay; the source never says so.
-- **Accounts** (decision G). The sample names 2 while its own KPI panel states 6.
-- **Marketplaces** (decision G). The source has **no Marketplace column at all**.
+**At intake these were all open (decision G) and are recorded here for provenance:**
+- **Channel.** The source never named one; eBay was the working assumption → **confirmed eBay**.
+- **Accounts.** The sample named 2 while its own KPI panel stated 6 → **confirmed all eBay accounts**.
+- **Marketplaces.** The source had **no Marketplace column at all** → **added; it is now the grain**.
 - **Row grain** (decision F) — account, or account × marketplace.
 - **Anchor day** (decision B) — last complete day, or live intraday.
 - **Last-year comparator** (decision C) — same calendar date, or same weekday.
@@ -101,10 +107,15 @@ Single source, imported COPY-only with SHA-256 verified byte-identical against t
 relationships are canonical** for the formula layer (32/32 verified). **The sample's values are
 fabricated** and can never be a reconciliation baseline.
 
-## Current position
+## Intake position — HISTORICAL, superseded 2026-07-23
 
-**Specification received, read cell-by-cell, and analysed. No build has started and no live query
-has been run for this requirement.**
+> ⚠ **This section records the state at intake, before the build.** It is kept for provenance — it
+> shows what was and was not known when the work started. **For the delivered state see the status
+> block at the top of this file, the README, and the closure record.** Every 🔴 below was closed on
+> the same day.
+
+**As at intake: specification received, read cell-by-cell, and analysed. No build had started and no
+live query had been run for this requirement.**
 
 What the intake established:
 
@@ -161,7 +172,7 @@ account performance · `PRJ-2026-012` (ERA) returns · `PRJ-2026-013` (EPPA) PPC
 | ~~A~~ | ✅ **CLOSED 2026-07-23 — THINESH DEFINED IT.** **AH = Account Holder, and the AH set is the PH remainder:** a listing with **no** PH category assignment belongs to the account's AH. So per account, `AH Listing + PH Listing = total live listings` — they partition, which is why the sheet carries both. **Measured live** (`all_list = 1`, `is_ended = 0`): 13 accounts · **14,607 listings = 2,750 PH + 11,857 AH**. Seven accounts (`coventrylights`, `vintageinterior`, `dctransformer`, `re6865`, `lighting_sone`, `homin_gmbh`, `bestbringer`) have **zero** PH assignments, so AH = 100% of their listings. **The AH *person* is a manual account→staff map supplied by Thinesh — it exists in no database and must ship as editable config.** ⚠ Three follow-ups open — see **P**. | — | Columns 16–21 are now **all buildable**. |
 | ~~B~~ | ~~Anchor — last complete day, or live intraday?~~ | — | ✅ **CLOSED 2026-07-23 — CONFIRMED BY THE OWNER.** This is a **daily automated** report: a run on date **R** reports **R−1** as `Today's Sales`/`Today's Orders`, **R−2** as `Yesterday Sales`/`Yesterday Orders`, and the matching day one year before **R−1** as `Same Day LY`. `Date` (col 2) = **R−1**. A report generated in the morning cannot show that morning's own trading. ⚠ The anchor must be **pinned explicitly** — the warehouse runs on `Asia/Colombo (+05:30)`, so its `CURRENT_DATE` rolls over 4.5 hours before London's. ⚠ Because the headers still read "Today's"/"Yesterday", the reported date must be shown on the face of the report, or every reader will misread it. |
 | ~~C~~ | ✅ **CLOSED 2026-07-23 — SAME CALENDAR DATE.** `Same Day LY` = the same date one year earlier (e.g. R−1 = 22 Jul 2026 → 22 Jul 2025). ⚠ Disclose that the weekday differs, so the comparison carries a day-of-week effect. Accounts younger than a year render **blank, never zero**. | — | |
-| ~~D~~ | ✅ **CLOSED 2026-07-23 — `Best Seller` REMOVED** on Thinesh's instruction ("no need, remove that"). **The report is now 21 columns, not 22.** ⚠ Side effect: this was the only column requiring `listings.ebay_listings.title`. | — | |
+| ~~D~~ | ✅ **CLOSED 2026-07-23 — `Best Seller` REMOVED** on Thinesh's instruction ("no need, remove that"). **This took the report to 21 columns**; `AH Holder` then took it to 22, and the grain and currency corrections added `Market` and `Currency`, so **it shipped at 24.** ⚠ Side effect: this was the only column requiring `listings.ebay_listings.title`. | — | |
 | 🔴 **E** | **Confirm the trend bands.** The sample brackets them — `Up` at **+6.91%**, `Stable` at **+3.89%**, `Down` at **−8.20%** — so the cut lies between 3.89% and 6.91%, making **±5%** the candidate. Also: does the same band apply to all three trend columns? | Thinesh | An inference from six rows. Sets every trend value in the report. |
 | ~~F~~ | ✅ **CLOSED 2026-07-23 — ONE ROW PER ACCOUNT.** No marketplace split. ⚠ Disclose that an account row therefore **combines its marketplaces** (`led_sone` sells to UK, DE, FR, US and IT buyers), so DST rows are **not comparable to EBPD's account × marketplace rows**. | — | |
 | ~~G~~ | ✅ **CLOSED 2026-07-23 — ALL eBay ACCOUNTS.** Channel = eBay only. Universe measured live: **13 accounts with live listings** — `led_sone` 6,510 · `electricalsone` 2,700 · `so_926407` 1,515 · `ledsonede` 636 · `huettenlampen` 543 · `coventrylights` 537 · `vintageinterior` 474 · `dctransformer` 468 · `re6865` 403 · `neighbourmarket` 344 · `lighting_sone` 247 · `homin_gmbh` 165 · `bestbringer` 65. (9 further eBay `sub_source` rows exist with zero live listings.) All marketplaces included, per decision F. | — | |
@@ -190,8 +201,8 @@ A daily slot must be chosen clear of the existing six.
 | Coordination / ID approval | **Varmen** | ✅ signed off |
 
 Signed off against the delivered state: 30 rows at account × marketplace, 24 columns, money per
-currency, 18/18 verification checks, live on `ph_task` 422-425, daily 09:00 job registered and
-proven end to end (`LastTaskResult 0`).
+currency, 18/18 verification checks, live on `ph_task` 422-425 (v9, md5 `642a5a27`), daily **09:05**
+job registered and proven end to end (`LastTaskResult 0`).
 
 ## Duplicate check — 🟢 GREEN (2026-07-23)
 
@@ -210,7 +221,7 @@ Full record: `validation/REQ-17_daily-sales-track/2026-07-23_duplicate_check_and
    place. Caused by the missing UNIQUE constraint the sample DDL wrongly claims exists.
 2. 🔴 **The `0xC000013A` scheduler trap struck `UDESC` on 2026-07-22** — *"fired late at 18:39 and
    was externally terminated before any work began"*. That is a live risk to this project's own
-   09:00 job, which sits under the same OneDrive path. It presents as a **silent no-run**. Watch
+   09:05 job, which sits under the same OneDrive path. It presents as a **silent no-run**. Watch
    `check_status.bat` for the first few mornings; the durable fix is moving the repo off OneDrive.
 
 ## Register links

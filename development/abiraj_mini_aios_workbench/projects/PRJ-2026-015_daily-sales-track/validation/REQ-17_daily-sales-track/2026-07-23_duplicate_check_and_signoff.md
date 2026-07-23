@@ -66,7 +66,7 @@ Sajeesan — it affects the whole registry, not one report.
 That is the **OneDrive hydration trap** named in `NEW_MACHINE_SETUP.md` — and it happened on
 **2026-07-22**, on this machine, to a scheduled job living under the same OneDrive path.
 
-**This is a live risk to REQ-17-D02**, registered today at 09:00 under
+**This is a live risk to REQ-17-D02**, registered today at 09:05 under
 `…\OneDrive\Desktop\Abiraj_AIOS\…`. It would present as a silent no-run: the report simply stays
 yesterday's and nobody is told, because the failure happens *before* the runner starts and so
 before any alert can fire.
@@ -90,8 +90,8 @@ Confirmed by the owner 2026-07-23 — **all reviewer gates signed off**:
 | Coordination / IDs | **Varmen** | ✅ signed off |
 
 Signed off against the delivered state: **30 rows at account × marketplace, 24 columns, money per
-currency and never blended, 18/18 verification checks, live on `ph_task` 422-425, and the daily
-09:00 job registered and proven end to end.**
+currency and never blended, 18/18 verification checks, live on `ph_task` 422-425 (v9, md5
+`642a5a27`), and the daily 09:05 job registered and proven end to end.**
 
 ### Two things the sign-off does not resolve
 

@@ -21,8 +21,12 @@ structural fix for the defect REQ-16 shipped.
 **Live:** `tech_team_outputs.ph_task` ids **422–425**, audience `ebay_priors`
 (Thinesh · Jarsini · kobiga · powsteena).
 
-**Automated:** Windows task `DST_Daily_Sales_Track`, **every day 09:05**, fail-closed on nine gates.
-The fleet's **7th job and its first daily one**.
+**Automated:** Windows task `DST_Daily_Sales_Track`, **every day 09:05**, fail-closed on **eleven**
+gates: row count · orders · money non-zero · every row carries a currency · AH+PH=Active per row ·
+**the reported day must be in the past** · per-currency sums reconcile · listing split reconciles ·
+row collapse vs last good · order collapse vs last good · dashboard ≥ 20 KB. The stored payload's
+md5 and `assigned_user_team` are then re-read **inside the transaction**, and the write is rolled
+back on any mismatch. The fleet's **7th job and its first daily one**.
 
 ## Evidence
 

@@ -16,7 +16,7 @@ Complete functional detail of what this system is specified to do, for a leader 
 |---|---|
 | Project | `PRJ-2026-015_daily-sales-track` · code `dst` |
 | Task | `REQ-17_daily-sales-track` |
-| Deliverables | **D01** the report = dashboard + workbook + governed JSON (not started) · **D02** scheduled daily refresh (not started) |
+| Deliverables | **D01** the report = dashboard + workbook + governed JSON — ✅ **delivered, 18/18, published** (ph_task 422-425, v9) · **D02** scheduled daily refresh — ✅ **delivered**, `DST_Daily_Sales_Track` daily 09:05 |
 
 ---
 
@@ -60,9 +60,15 @@ system's output is intended to accumulate (⚠ decision **I**).
 
 ---
 
-## 2. Output shape — 22 columns
+## 2. Output shape — the source's 22 columns (shipped as 24)
 
-**CONFIRMED** from row 1 of the source. Order and header text are canonical.
+**CONFIRMED** from row 1 of the source. Order and header text are canonical **as received**.
+
+> ⚠ **The delivered report has 24 columns, not these 22.** `Best Seller` (14) was **removed** on
+> Thinesh's instruction; `AH Holder` was **added** at his request; and `Market` + `Currency` were
+> added by the grain and currency corrections. The delivered column list is in the
+> [README](README.md#the-24-columns). The table below is the **source specification**, kept for
+> provenance.
 
 | # | Column | Meaning | Basis |
 |---|---|---|---|
@@ -239,7 +245,14 @@ Two databases, on the pattern REQ-16 established.
 
 ## 10. What the Step-2 audit must establish
 
-Not yet run. It must answer, read-only:
+✅ **RUN 2026-07-23 — feasibility GREEN.** Full record:
+`evidence/logs_or_screenshots/REQ-17_daily-sales-track/2026-07-23_data_availability_audit.md`.
+Headline answers: `order_date` is a **timestamp carrying real clock times** with no gaps in the
+observed series; it is stored in **UK time in both databases** (verified by hour-of-day
+distribution), so daily bucketing agrees — but the two servers' **`CURRENT_DATE` differs by 4.5
+hours** (warehouse `Asia/Colombo`, ledsone `Europe/London`), so the anchor is pinned as a literal.
+
+The questions it was written to answer, read-only:
 
 1. **Does `order_transaction` support a daily grain at all?** Is `order_date` a date or a timestamp,
    and **what timezone does its day boundary fall on?** Every prior project used monthly or rolling
@@ -260,8 +273,8 @@ Not yet run. It must answer, read-only:
 
 | Deliverable | Description | Status |
 |---|---|---|
-| **REQ-17-D01** | The report — three artefacts from one dataset: governed JSON, static-rendered HTML dashboard (22 columns + the 9 KPIs as cards that recompute on the filtered view), and a multi-sheet xlsx (Daily Sales Track · KPI Summary · Config · Data Notes) | ⬜ **NOT STARTED** |
-| REQ-17-D02 | Autonomous scheduled refresh — fail-closed, the fleet's 7th job and its first daily one | ⬜ **NOT STARTED** — blocked on decisions I and J |
+| **REQ-17-D01** | The report — three artefacts from one dataset: governed JSON, static-rendered HTML dashboard (**24 columns** + the 9 KPIs as clickable cards that recompute and re-sort on the filtered view), and a multi-sheet xlsx (Daily Sales Track · KPI Summary · Config · Engine Inputs · Data Notes) | ✅ **DELIVERED · VERIFIED 18/18 · PUBLISHED** — `ph_task` 422-425, `ebay_priors`, v9, md5 `642a5a27` |
+| REQ-17-D02 | Autonomous scheduled refresh — fail-closed on eleven gates, the fleet's 7th job and its first daily one | ✅ **DELIVERED** — Windows task `DST_Daily_Sales_Track`, **daily 09:05**, proven end to end (`LastTaskResult 0`); next run 2026-07-24 |
 
 **Build rule inherited from REQ-16:** one generator module produces all three artefacts. REQ-16 had
 a defect where the workbook and the dashboard were built from separate fetches and drifted; a single

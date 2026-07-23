@@ -1,159 +1,166 @@
 # PRJ-2026-015 — Daily Sales Track (DST)
 
-**For each trading account, what happened yesterday — and is it better or worse than the day before
-and the same day last year?**
+**For each trading account and marketplace, what happened yesterday — and is it better or worse than
+the day before and the same day last year?**
 
 | | |
 |---|---|
-| Status | **REQ-17-D01 DELIVERED · VERIFIED (18/18) · PUBLISHED** — ph_task ids 422-425, audience `ebay_priors`, v4. Not automated; reviewer sign-off pending. |
+| Status | ✅ **CLOSED 2026-07-23** — REQ-17-D01 DELIVERED · VERIFIED (18/18) · PUBLISHED (ph_task 422-425, `ebay_priors`, **v9**, md5 `642a5a27`) · REQ-17-D02 **AUTOMATED** (daily 09:05) · **all four sign-offs received** |
 | Code | `dst` · Task `REQ-17_daily-sales-track` |
 | Scope | eBay, **all accounts**, every marketplace with live listings — **30 account × marketplace rows** |
-| Output | Read-only daily tracker — **24 columns**, money **per currency**, + KPI cards. Changes nothing on any marketplace. |
-| Opened | 2026-07-23 |
+| Output | Read-only daily tracker — **24 columns**, money **per currency**, + 9 KPI cards. Changes nothing on any marketplace. |
+| Opened / closed | 2026-07-23 — same day |
 
-⚠ **IDs pending owner confirmation** — the source file carries no requirement number. `REQ-17`
-continues the sequence REQ-12 (`epc`) → REQ-13 (`ebpd`) → REQ-14 (`ERA`) → REQ-15 (`eppa`) →
-REQ-16 (`esnm`).
-
-⚠ **The project name is deliberately channel-neutral.** The source never names a channel. eBay is
-the working assumption (all five of this requester's prior requirements are eBay, and the sample's
-account names resolve to eBay stores in REQ-13's confirmed map) — but it is an inference, and a
-project ID cannot be renamed later, so the name does not claim one.
-
-## The 22 columns
+## The 24 columns
 
 | # | Column | # | Column |
 |---|---|---|---|
-| 1 | Account | 12 | Units Sold |
-| 2 | Date | 13 | Avg Order Value (£) |
-| 3 | Today's Sales (£) | 14 | Best Seller |
-| 4 | Yesterday Sales (£) | 15 | Active Listing |
-| 5 | Sales Diff (£) | 16 | **AH Listing** 🔴 |
-| 6 | Sales Growth % | 17 | **AH Listing Sales** 🔴 |
-| 7 | Same Day LY Sales (£) | 18 | **AH Sales Trend** 🔴 |
-| 8 | Today's Orders | 19 | **PH Listing** 🔴 |
-| 9 | Yesterday Orders | 20 | **PH Listing Sales** 🔴 |
-| 10 | Order Growth % | 21 | **PH Sales Trend** 🔴 |
-| 11 | Same Day LY Orders | 22 | Account Sales Trend |
+| 1 | Account | 13 | Same Day LY Orders |
+| 2 | **Market** | 14 | Units Sold |
+| 3 | **Currency** | 15 | Avg Order Value |
+| 4 | Date | 16 | Active Listing |
+| 5 | Today's Sales | 17 | AH Listing |
+| 6 | Yesterday Sales | 18 | AH Listing Sales |
+| 7 | Sales Diff | 19 | AH Sales Trend |
+| 8 | Sales Growth % | 20 | PH Listing |
+| 9 | Same Day LY Sales | 21 | PH Listing Sales |
+| 10 | Today's Orders | 22 | PH Sales Trend |
+| 11 | Yesterday Orders | 23 | Account Sales Trend |
+| 12 | Order Growth % | 24 | **AH Holder** |
 
 Plus a **9-KPI summary panel**: Total Accounts · Total Sales Today · Total Sales Yesterday ·
 Overall Growth · Total Orders · Yesterday Orders · Order Growth · Total Units Sold · Average Order
-Value.
+Value. Every KPI card is clickable and re-sorts the table on that column.
 
-🔴 = **no definition and no located source.** See decision **A**.
+**Column history:** the source specified 22. `Best Seller` was **removed** on Thinesh's instruction
+(→ 21); `AH Holder` was **added** on his request (→ 22); `Market` and `Currency` were added by the
+grain and currency corrections (→ **24**).
 
 ## ⚠ Read this before touching the build
 
-**1. The source contains no business logic at all.** Every cell that looks like a formula is a
+**1. 🔴 `orders.total` is in the MARKETPLACE'S OWN currency, not GBP.** `order_management.orders` has
+no currency column at all — the code lives in `order_management.order_info.currency`, and the
+site→currency map is authoritative in `listings.market_place_id_mapping`. The first build rendered
+every figure with a `£` and summed them; **20 of 30 rows were mislabelled and the blended headline
+read "+3.19% up" while GBP had fallen 5.16% and EUR risen 26.23%.** **There is no exchange-rate table
+anywhere in `ledsone`** — money is reported per currency and **never converted, never summed across
+currencies.**
+
+**2. The source contains no business logic at all.** Every cell that looks like a formula is a
 constant typed with a leading `=+` (cell `E2` holds the literal `=+435.3`, not `=C2-D2`). There is
 no rule table — the equivalent of REQ-16's canonical rows 20–32 **does not exist in this file**.
-Every definition must be **inherited** or **decided**; none can be read out of the spreadsheet.
+Every definition was **inherited** or **decided**; none could be read out of the spreadsheet.
 
-**2. Do not re-derive the sales definitions — inherit them from REQ-13.** EBPD's revenue definition
-was corrected **five times** against the owner's own live-DB checks before it settled. Deriving them
-again here produces a daily number that disagrees with the published monthly one.
+**3. Sales count orders PLACED, not completed** — `status <> 'Cancelled'` only. This **deliberately
+diverges from REQ-13 (EBPD)**, which counts `Completed` for a *monthly* view. Orders reach
+`Completed` about **two days** after purchase; at R−1 only **25.4%** had matured, so a
+`Completed`-only filter understates the reported day by **69%** and reads as a crash. The right
+status filter depends on the reporting **period**, not on house style.
 
-| Measure | Definition (from REQ-13) |
+**4. Everything else is inherited from REQ-13 — do not re-derive it.** EBPD's revenue definition was
+corrected **five times** against the owner's own live-DB checks before it settled.
+
+| Measure | Definition |
 |---|---|
-| Sales | `SUM(order_total)` — settled paid value, **not** `item_price × quantity`, **not** plus template postage |
-| Orders | `COUNT(DISTINCT order_id)` — `COUNT(*)` returns order **lines**, ~7% higher |
-| Units | `SUM(quantity)` |
-| AOV | Sales ÷ Orders |
-| Filter | `source_name='EBAY'`, `order_status='Completed'` |
+| Sales | `SUM(orders.total)` — the order grand total, in the marketplace's currency |
+| Orders | `COUNT(DISTINCT orders.id)` — `COUNT(*)` returns order **lines**, ~7% higher |
+| Units | `SUM(CAST(order_item_info.item_quantity AS INT))` |
+| AOV | Sales ÷ Orders, within one currency |
+| Filter | eBay via `sub_source.source_id = 2`; `status <> 'Cancelled'` |
 
-**3. "Today" is a partial day.** Taken literally, a morning run reports a collapse on every account
-every day. This defect has already been found twice in this workbench — REQ-15 (fixed) and REQ-16
-(decision H). Anchor on the **last complete day**.
+**5. "Today" is a partial day.** A run on date **R** reports **R−1** as "Today" and **R−2** as
+"Yesterday". Taken literally, a morning run would report a collapse on every account every day —
+a defect already found twice in this workbench (REQ-15 fixed, REQ-16 decision H).
 
-**4. The daily grain itself is untested here.** Every existing project uses a monthly or rolling
-multi-day window. Whether `order_transaction.order_date` is a date or a timestamp, and **what
-timezone its day boundary falls on**, has never needed to be established. It does now.
+**6. Pin the anchor dates as SQL literals — never `CURRENT_DATE`.** The warehouse runs
+`Asia/Colombo` and rolls over **4.5 hours before** London. The day *buckets* are safe (`order_date`
+is stored in UK time in both databases, verified by hour-of-day distribution); only the anchor
+arithmetic was at risk.
+
+**7. `Active Listing` is understated ~5–6%** — eBay shows 3,033 active on LEDSone UK's UK site
+against 2,843 here. Cause: the listings mirror leaves **stale `is_ended` flags on auto-renewing
+(GTC) listings**. Disclosed on both artefacts; the fix belongs to the listings sync. **Do not quote
+listing counts against Seller Hub.**
+
+**8. AH + PH = Active, on every row.** AH is the **PH remainder** — a live listing with no
+portfolio-holder assignment belongs to the account holder. This is also a control total, and it is
+gated in both the harness and the daily runner.
+
+## The anchor that proves the report
+
+**LEDSone UK / UK = £837.93 for 22 July 2026** — Thinesh's own eBay Seller Hub screen. It is a
+permanent verification gate (V14); **the build fails if it stops matching.** That check is also what
+exposed the original grain error: the account row read £1,144.51 because it combined UK (£837.93)
+with Germany (€306.58).
+
+> A verification harness proves a report is *self-consistent*. It cannot prove it is *right*. Both
+> serious defects here were found by comparing against an external source — the requester's own screen.
 
 ## Sample-data ruling
 
 The 6-row sample is **fabricated** — 2 distinct account names against a stated `Total Accounts = 6`,
-placeholder listing counts (`1212 / 12 / 2222 / 22 / 111`), generic product names.
+placeholder listing counts (`1212 / 12 / 2222 / 22 / 111`), generic product names. It can never be a
+reconciliation baseline.
 
 ✅ **But its arithmetic is sound and was independently re-derived: 32 of 32 relationships reconcile
 exactly** (9 KPIs + 24 per-row derived fields). So the **formula layer of the spec is confirmed** and
-needs no decision. Only the inputs to those formulas are open. See the SOURCE_MANIFEST.
+needed no decision. Only the inputs to those formulas were open. See the SOURCE_MANIFEST.
 
 ## Where things are
 
 | | |
 |---|---|
-| Governance, open decisions | [PROJECT_HOME.md](PROJECT_HOME.md) |
+| Governance, decisions | [PROJECT_HOME.md](PROJECT_HOME.md) |
 | **Full functional detail** | [SYSTEM_REFERENCE.md](SYSTEM_REFERENCE.md) |
 | Execution rules | [CLAUDE.md](CLAUDE.md) |
 | Task index | [TASK_REGISTER.md](TASK_REGISTER.md) |
-| Source (COPY, SHA-256 verified) | `evidence/source_documents/REQ-17_daily-sales-track/` |
-| Data audit | `evidence/logs_or_screenshots/REQ-17_daily-sales-track/` — ⬜ **not yet run** |
-| Generator | `sql/REQ-17_daily-sales-track/` — ⬜ empty |
-| Deliverables | `evidence/final_outputs/REQ-17_daily-sales-track/` — ⬜ empty |
-| Verification harness | `validation/REQ-17_daily-sales-track/` — ⬜ empty |
+| Source (COPY, SHA-256 verified byte-identical) | `evidence/source_documents/REQ-17_daily-sales-track/` |
+| Data audit | `evidence/logs_or_screenshots/REQ-17_.../2026-07-23_data_availability_audit.md` |
+| Generator | `sql/REQ-17_.../` — `dst_d01_rows.py` · `build_dst_d01.py` · `render_dst_dashboard.py` |
+| Deliverables | `evidence/final_outputs/REQ-17_.../` — dashboard `.html` · workbook `.xlsx` · governed `.json` |
+| Verification | `validation/REQ-17_.../` — `verify_dst_d01.py` (18/18) + records |
+| Automation | `automation/` — see [AUTOMATION_README.md](automation/AUTOMATION_README.md) |
 | Daily requirement document | `DigitWeb_Works_Abiraj/23_07_2026/2026-07-23_abiraj_REQ-dst_REQ-17-D01.md` |
+| Closure record | `09_closure/2026-07-23_REQ-17_daily-sales-track_closure.md` |
 
 ## Who
 
-Requester / end user / Business Validator: **Thinesh** (`public."user"` id 63, Active, verified
-2026-07-22 for REQ-16). Coordinator Varmen · Technical Sajeesan · Queryability Tamil Selvan.
+Requester / end user / Business Validator: **Thinesh** (`public."user"` id 63, Active).
+Coordinator Varmen · Technical Sajeesan · Queryability Tamil Selvan. **All four signed off 2026-07-23.**
 
-## Status 2026-07-23 — DECISIONS CLOSED, READY TO BUILD
+Audience `ebay_priors` = Thinesh · **Jarsini** · kobiga · powsteena.
+⚠ **Name trap:** the requester supplied "Jarshini", which matches nobody. `staff.users` holds
+**`Jarsini` (id 91)** *and* **`Jasmini` (id 84)** — two different Active people. He confirmed
+**Jarsini**. Also `powsteena`, not "Powesteena".
 
-**13 of 15 decisions closed by Thinesh on 2026-07-23.** Every one of the **21 columns** (was 22 —
-`Best Seller` removed) now has a confirmed source and definition.
+## Decisions — 13 of 15 closed by Thinesh on 2026-07-23
 
 | Decision | Answer |
 |---|---|
-| **M** status filter | Count orders **placed** (exclude `Cancelled` only) — yesterday = £2,983.35 / 142 orders |
+| **M** status filter | Count orders **placed** (exclude `Cancelled` only) |
 | **B** anchor | Run on **R** reports **R−1** as "Today", **R−2** as "Yesterday" |
-| **A** AH/PH | **AH = the PH remainder** — unassigned listings. 14,607 = 2,750 PH + 11,857 AH |
-| **C** last year | **Same calendar date** |
-| **D** Best Seller | **Removed** → 21 columns |
-| **F** grain | **One row per account** |
-| **G** scope | **All eBay accounts** — 13 with live listings |
+| **A** AH/PH | **AH = the PH remainder** — unassigned listings; AH + PH = Active |
+| **C** last year | **Same calendar date** (weekday therefore differs) |
+| **D** Best Seller | **Removed** |
+| **F** grain | **Account × marketplace** — reversed from account-only after the Seller Hub check |
+| **G** scope | **All eBay accounts** |
 | **H** units | **Yesterday only** |
 | **I** track vs snapshot | **Snapshot — replaces each morning**, no history kept |
 | **K** active listings | **`all_list = 1`** (settled by the AIOS knowledge base) |
 | **N** publish target | Source lock is **data retrieval only** — `ph_task` publishing unaffected |
-| **P** AH names | **Informational only** — no AH-name column exists, so names change no figure |
+| **P** AH names | Displayed as the **AH Holder** column; informational, changes no figure |
+| **J** recipients | `ebay_priors`, published 09:05 daily |
 
-**Still open — neither blocks the build:**
+**Still open — neither blocks anything:**
 
-- **E — trend bands.** Thinesh asked this back. Measured: a *normal* day swings **15–60%** by account
-  size, so at ±10% about **85% of rows would read Up or Down daily**. Recommendation: compare against
-  the **same weekday last week** rather than yesterday. Ships as editable config, default ±5%
-  (matching the source sample), flagged for confirmation.
-- **J — recipients and delivery time.** Blocks publishing only.
+- **E — trend bands.** Ships as editable config, default ±5% (matching the source sample), flagged
+  for confirmation. Measured: a *normal* day swings **15–60%** by account, so at ±5% only **6.5%** of
+  account-days read "Stable". Recommendation: compare against the **same weekday last week** rather
+  than yesterday.
 - **O — `ph_dashboard` duplicate check.** Needs the `ph_pgsql` role to read.
-
-## Superseded — the pre-decision open list
-
-Full table in [PROJECT_HOME.md](PROJECT_HOME.md); evidence in
-`evidence/logs_or_screenshots/REQ-17_.../2026-07-23_data_availability_audit.md`.
-
-1. 🔴 **M — the status filter. NEW, and now the biggest one.** Orders reach `Completed` ~2 days after
-   they are placed: at **R−1 only 26.2%** have matured (£1,102.43 of a true £3,010.04), vs 99.3% at
-   R−2. REQ-13's inherited `Completed`-only filter **cannot be used with the confirmed R−1 anchor** —
-   every report would show a **63% collapse that did not happen.**
-2. 🟠 **A — AH only.** The **PH half is closed** (sourced from ledsone `staff.ph_categories`, 28%
-   coverage). **AH has no source in either database.** Down from 6 blocked columns to 3.
-3. 🔴 **C — Same Day LY: same calendar date, or same weekday?** 2026-07-23 is a Thursday;
-   2025-07-23 is a **Wednesday**.
-4. 🔴 **D — Best Seller ranked by units or revenue?** (Source confirmed — ledsone `ebay_listings.title`.)
-5. 🔴 **E — confirm the ±5% trend bands** (inferred from six sample rows, never stated).
-6. 🔴 **F — row grain: account, or account × marketplace?**
-7. **K — `Active Listing`:** warehouse (REQ-13) or ledsone (REQ-16) definition?
-
-✅ **B is CLOSED** — confirmed by the owner 2026-07-23: a run on date **R** reports **R−1** as
-"Today", **R−2** as "Yesterday", and LY relative to R−1.
-
-✅ **Feasibility is GREEN** — the daily grain works (`order_date` carries real clock times, no gaps
-in the observed series), and both databases store `order_date` in **UK time**, so the daily buckets
-agree. Only `CURRENT_DATE` differs (warehouse is `Asia/Colombo`, ledsone `Europe/London`) — pin the
-anchor explicitly.
 
 ## Next action
 
-Route decisions to Thinesh with the audit attached — **M first** (it sets every money figure), then
-A (AH), C, D, E, F.
+**After 09:05 tomorrow (2026-07-24), run `automation\check_status.bat`** and look for a fresh line
+beginning `STATUS OK`. A *manually triggered* run is proven; an *unattended scheduled fire* is not,
+and that is precisely the distinction the `0xC000013A` trap exploits — it hit `UDESC` on 2026-07-22.
