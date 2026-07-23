@@ -27,7 +27,9 @@ day's report stays live, a line is written to dst_status.txt, and a desktop aler
 
 import argparse
 import datetime as dt
+import hashlib
 import io
+import json
 import os
 import sys
 import time
@@ -77,9 +79,16 @@ def log(msg):
         fh.write(line + "\n")
 
 
-def connect(cfg, label, attempts=4):
-    """Retry rather than fail the whole run - the fleet shares one restricted login and
-    FRRC also fires at 09:00 on the 8th of each month."""
+def connect(cfg, label, attempts=7):
+    """Retry rather than lose the day.
+
+    The warehouse sits behind ONE restricted `temp_user` login shared by the whole fleet,
+    on a server whose max_connections is 100. Observed 2026-07-23: 108 live connections,
+    temp_user holding zero - it simply could not get a slot, and a 60-second retry budget
+    was not enough. Backoff is now 15/30/60/90/120/180s, about 8 minutes total. For a job
+    that runs once a day and takes ten seconds, waiting is far cheaper than losing the day.
+    """
+    delays = [15, 30, 60, 90, 120, 180]
     last = None
     for i in range(attempts):
         try:
@@ -90,8 +99,10 @@ def connect(cfg, label, attempts=4):
         except Exception as exc:          # noqa: BLE001 - retrying any connection error
             last = exc
             if i < attempts - 1:
-                time.sleep(10 * (i + 1))
-    raise RuntimeError("{0}: could not connect after {1} attempts: {2}".format(
+                wait = delays[min(i, len(delays) - 1)]
+                log("  {0}: attempt {1} failed, retrying in {2}s".format(label, i + 1, wait))
+                time.sleep(wait)
+    raise RuntimeError("{0}: could not connect after {1} attempts (~8 min): {2}".format(
         label, attempts, last))
 
 
@@ -196,6 +207,18 @@ def gates(rows, d_r1):
     checks.append(("reported day is in the past",
                    d_r1 < dt.date.today(), d_r1.isoformat()))
 
+    # control totals - the pull must agree with itself
+    ccy_sum = {}
+    for r in rows:
+        ccy_sum[r["currency"]] = round(ccy_sum.get(r["currency"], 0) + r["s_r1"], 2)
+    checks.append(("per-currency sums reconcile to the row total",
+                   abs(sum(ccy_sum.values()) - round(money, 2)) < 0.01,
+                   " · ".join("{0} {1:,.2f}".format(k, v) for k, v in sorted(ccy_sum.items()))))
+    checks.append(("listing split reconciles (sum AH + sum PH = sum Active)",
+                   sum(r["ah_l"] for r in rows) + sum(r["ph_l"] for r in rows)
+                   == sum(r["active"] for r in rows),
+                   "{0:,} listings".format(sum(r["active"] for r in rows))))
+
     prev = None
     if os.path.isfile(LAST_GOOD):
         try:
@@ -253,7 +276,7 @@ def main():
         log("  [{0}] {1}{2}".format("PASS" if ok else "FAIL", name,
                                     "  ({0})".format(extra) if extra else ""))
     if not all(ok for _n, ok, _e in checks):
-        raise RuntimeError("a gate failed - nothing rebuilt, nothing published")
+        die("gate failed: " + "; ".join(n for n, ok, _e in checks if not ok))
 
     # rebuild all three artefacts through the SAME code path D01 used
     import build_dst_d01 as B
@@ -277,13 +300,16 @@ def main():
                                       for k, v in sorted(by_ccy.items()))))
 
     if args.dry_run:
-        log("DRY RUN - nothing published")
+        status("OK(dry-run)", "{0} rows | built only, nothing published".format(len(rows)))
         log("done")
         return 0
 
+    html_md5 = hashlib.md5(html.encode("utf-8")).hexdigest()
+    log("payload md5 {0}".format(html_md5[:8]))
     task_name = ("REQ-17-D01 Daily Sales Track — eBay, account × marketplace "
                  "(trading day {0})".format(d_r1.strftime("%d %b %Y")))
     wh = connect(WAREHOUSE, "warehouse")
+    touched = []
     try:
         with wh:
             with wh.cursor() as cur:
@@ -301,6 +327,7 @@ def main():
                             "updated_at=now() WHERE id=%s",
                             (html, task_name, AUDIENCE, found[0][1] + 1, found[0][0]))
                         log("  updated id={0} v{1} {2}".format(found[0][0], found[0][1] + 1, tid))
+                        touched.append(found[0][0])
                     else:
                         cur.execute(
                             "INSERT INTO tech_team_outputs.ph_task (project_name, project_code, "
@@ -310,14 +337,39 @@ def main():
                             "RETURNING id",
                             ("Daily Sales Track", "dst", task_name, tid, "Development", "Abiraj",
                              user, AUDIENCE, html, 1, 1, "released"))
-                        log("  inserted id={0} {1}".format(cur.fetchone()[0], tid))
+                        rid = cur.fetchone()[0]
+                        touched.append(rid)
+                        log("  inserted id={0} {1}".format(rid, tid))
+
+                # Read every payload back and verify it BEFORE the commit. A truncated or
+                # mangled write is otherwise invisible until a human opens the portal.
+                bad = []
+                for rid in touched:
+                    cur.execute("SELECT md5(html_content), assigned_user_team "
+                                "FROM tech_team_outputs.ph_task WHERE id = %s", (rid,))
+                    stored_md5, team_tag = cur.fetchone()
+                    if stored_md5 != html_md5:
+                        bad.append("id={0} md5".format(rid))
+                    if team_tag != AUDIENCE:
+                        bad.append("id={0} routing={1}".format(rid, team_tag))
+                if bad:
+                    raise RuntimeError(
+                        "pre-commit verify FAILED ({0}) - rolling back, nothing published".format(
+                            ", ".join(bad)))
+                log("  verified {0} payloads md5={1}, routing {2} intact".format(
+                    len(touched), html_md5[:8], AUDIENCE))
     finally:
         wh.close()
 
     json.dump({"rows": len(rows), "orders": sum(r["o_r1"] for r in rows),
                "date": d_r1.isoformat()},
               io.open(LAST_GOOD, "w", encoding="utf-8"))
-    log("published 4 rows - OK")
+    status("OK", "{0} rows | {1} | md5 {2} | published to {3} users".format(
+        len(rows),
+        " · ".join("{0} {1:,.2f}".format(k, v) for k, v in sorted(
+            {r["currency"]: sum(x["s_r1"] for x in rows if x["currency"] == r["currency"])
+             for r in rows}.items())),
+        html_md5[:8], len(RECIPIENTS)))
     log("done")
     return 0
 
@@ -326,7 +378,7 @@ if __name__ == "__main__":
     try:
         sys.exit(main())
     except Exception as exc:                    # noqa: BLE001 - must always fail closed
-        log("FAILED: {0}".format(exc))
+        log("STATUS FAILED | {0}".format(exc))
         log(traceback.format_exc().strip().replace("\n", " | "))
         log("previous report left live and untouched")
         sys.exit(1)

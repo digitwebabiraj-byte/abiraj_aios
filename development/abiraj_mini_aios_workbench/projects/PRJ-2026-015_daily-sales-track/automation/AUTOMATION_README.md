@@ -80,6 +80,34 @@ began"). It presents as a **silent no-run**. The durable fix is moving the repo 
 Existing fleet slots: EBPD Mon 09:30 · ERA day 5 09:30 · FRRC day 8 09:00 · EPC Mon 10:30 ·
 EPPA Mon 11:00 · T7 Thu 11:00.
 
+## 🔴 Known blocker — the warehouse connection pool is exhausted (2026-07-23)
+
+The publish step could not connect for over an hour, through 7 retries across ~8 minutes. **Not a
+code fault, and not fixable from this project.** Measured live:
+
+```
+max_connections            100
+superuser_reserved           3
+current connections        108      <-- over the cap
+  of which IDLE             99      all as user `postgres`
+  longest idle       1 day 3h       a connection nobody has closed for a day
+temp_user connections        0      it cannot get a slot at all
+```
+
+Something connecting as **`postgres` is leaking connections and never closing them**. Because three
+slots are superuser-reserved, `postgres` itself still gets in — which is why an MCP query works
+while the scheduled job does not. **`temp_user` is locked out entirely.**
+
+**This blocks every job in the fleet that publishes to `ph_task`**, not just this one — EBPD, EPC,
+ERA, FRRC, EPPA and T7 all publish through the same login.
+
+**Behaviour when it happens:** the job fails closed exactly as designed — gates pass, artefacts
+rebuild, the publish is refused, `STATUS FAILED` is written, a Desktop alert fires, and **the
+previous day's report stays live and untouched**. Nothing is corrupted; the report goes stale.
+
+**Fix belongs to whoever owns the leaking application** — route to Sajeesan. Killing idle
+connections on a production server is not something this project should do unilaterally.
+
 ## Re-running a specific day
 
 ```
