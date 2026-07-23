@@ -973,10 +973,15 @@ refresh();
 """
 
 
-def main():
-    data = B.fetch()
-    rows = B.assemble(data)
-    payload = encode(rows, data["cov"])
+def main(rows=None, cov=None):
+    """rows/cov may be passed in so the workbook and the dashboard are rendered from ONE
+    live fetch. Fetching twice let them drift apart (workbook 11,156 vs dashboard 11,176)
+    because the anchor is a partial day and orders keep arriving between runs."""
+    if rows is None:
+        data = B.fetch()
+        rows = B.assemble(data)
+        cov = data["cov"]
+    payload = encode(rows, cov)
     if not os.path.isdir(FINAL):
         os.makedirs(FINAL)
     with io.open(OUT_JSON, "w", encoding="utf-8") as fh:

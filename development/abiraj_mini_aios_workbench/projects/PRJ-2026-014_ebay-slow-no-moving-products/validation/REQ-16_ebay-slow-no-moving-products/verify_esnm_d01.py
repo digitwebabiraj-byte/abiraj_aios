@@ -184,7 +184,9 @@ diff = 0
 for r in sample:
     x = xl.get(r[4])
     if not x: diff += 1; continue
-    if DI["action"][r[20]] != x[19]: diff += 1; print("    %s action %r != xlsx %r" % (r[4], DI["action"][r[20]], x[19]))
+    # xlsx action column is index 20 since Same Period Last Year was split into 30d/90d
+    # (it was 19 in the 20-column layout). Getting this wrong compares against Listing Status.
+    if DI["action"][r[20]] != x[20]: diff += 1; print("    %s action %r != xlsx %r" % (r[4], DI["action"][r[20]], x[20]))
     if float(r[12]) != float(x[11] or 0): diff += 1
     if int(r[9]) != int(x[8] or 0): diff += 1
 ok("sample rows identical in xlsx and dashboard") if diff == 0 else \
