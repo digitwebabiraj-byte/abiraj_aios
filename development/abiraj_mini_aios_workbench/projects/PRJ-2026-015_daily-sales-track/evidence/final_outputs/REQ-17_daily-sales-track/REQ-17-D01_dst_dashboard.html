@@ -19,7 +19,7 @@
     --grp-bg:#d9e0f2; --grp-ink:#2f2a8f;
     --foot-bg:#141a2e; --foot-ink:#ffffff;
     --hero:linear-gradient(135deg,#4338ca,#6d28d9); --hero-ink:#e7e3fd; --bar:linear-gradient(90deg,#4338ca,#9333ea);
-    --grp-divider:#9aa3bd;
+    --grp-divider:#9aa3bd; --grp-h:27px; --foot-h:37px;
     --radius:14px; --shadow:0 1px 2px rgba(20,26,46,.05),0 10px 26px -14px rgba(20,26,46,.22);
   }
   html,body{height:100%}
@@ -145,6 +145,8 @@
     cursor:default;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;
     font-weight:800;
   }
+  /* the column-name row must stack UNDER the group row, not on top of it */
+  thead tr:nth-child(2) th{top:var(--grp-h)}
   /* alternate group tint so neighbouring blocks never blur together */
   thead th.grp.alt{background:color-mix(in srgb,var(--grp-bg) 55%,#fff)}
 
@@ -187,13 +189,21 @@
   .bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:4px}
   .bar span{display:block;height:100%;background:var(--bar)}
   td.split em{font-style:normal;font-size:12.5px;color:var(--ink2);font-weight:600}
+  td.ccy{text-align:left;font-weight:700;font-size:12.5px}
   td.mkt{text-align:left;font-weight:600;color:var(--ink2);font-size:13px;padding-right:4px}
   td.holder{text-align:left;font-size:13.5px;white-space:normal;min-width:84px;line-height:1.3}
   td.holder.muted{color:var(--ink3);font-style:italic}
   tfoot th,tfoot td{
-    position:sticky;bottom:0;background:var(--foot-bg);color:var(--foot-ink);font-weight:700;
+    position:sticky;background:var(--foot-bg);color:var(--foot-ink);font-weight:700;
     padding:7px 5px;text-align:right;border-top:2px solid var(--primary);z-index:3;
   }
+  /* one totals row per currency - each must pin ABOVE the one below it, or they
+     all sit at bottom:0 and only the last is ever visible while scrolling */
+  tfoot tr:nth-last-child(1) th,tfoot tr:nth-last-child(1) td{bottom:0}
+  tfoot tr:nth-last-child(2) th,tfoot tr:nth-last-child(2) td{bottom:var(--foot-h)}
+  tfoot tr:nth-last-child(3) th,tfoot tr:nth-last-child(3) td{bottom:calc(var(--foot-h)*2)}
+  tfoot tr:nth-last-child(4) th,tfoot tr:nth-last-child(4) td{bottom:calc(var(--foot-h)*3)}
+  tfoot tr:not(:last-child) th,tfoot tr:not(:last-child) td{border-top:1px solid rgba(255,255,255,.18)}
   tfoot th{text-align:left;left:0;z-index:4}
 
   footer.notes{padding:0 20px 7px;flex:none}
@@ -208,9 +218,28 @@
   footer.notes b{color:var(--ink)}
   footer.notes b{color:var(--ink)}
   .warn{color:#b45309}
+  /* The ph_task portal embeds this page in a ~700px container. Auto-reclaim the chrome
+     so the table gets the space, without breaking position:sticky on the headers. */
+  @media (max-height:820px){
+    .kpis{display:none}
+    footer.notes{display:none}
+    header.top{padding:6px 20px 7px}
+    h1{font-size:17px}
+    .sub{font-size:12.5px;margin:2px 0 0}
+    .tag{padding:3px 9px;font-size:12px}
+    .toolbar{padding:5px 20px 6px}
+    .btn,.search{padding:5px 10px;font-size:13px}
+    thead th{padding:5px 5px}
+    thead th.grp{padding:2px 9px}
+    :root{--grp-h:23px;--foot-h:33px}
+    tbody td,tbody th{padding:4px 5px}
+    tfoot th,tfoot td{padding:5px 5px}
+    .wrap{margin:0 20px 6px}
+  }
   body.dense tbody td,body.dense tbody th{padding:2px 5px;font-size:13.5px}
   body.dense thead th{padding:4px 5px}
   body.dense thead th.grp{padding:2px 9px}
+  body.dense{--grp-h:23px;--foot-h:31px}
   body.dense tfoot th,body.dense tfoot td{padding:4px 5px}
   body.dense header.top .sub{display:none}
   body.dense .bar{display:none}
@@ -238,9 +267,19 @@
 
 <section class="kpis">
         <article class="kpi tone-primary kpi-hero clickable" data-sort="2" tabindex="0" role="button" title="Click to rank rows by today's sales">
-          <p class="k-label">Total Sales Today</p>
-          <p class="k-value">£2,983.35</p>
-          <p class="k-sub"><span class="chip pos">+3.19%</span> vs £2,891.03 yesterday</p>
+          <p class="k-label">Sales Today — GBP</p>
+          <p class="k-value">£1,899.40</p>
+          <p class="k-sub"><span class="chip neg">-5.16%</span> vs £2,002.72 yesterday</p>
+        </article>
+        <article class="kpi tone-teal clickable" data-sort="2" tabindex="0" role="button" title="Click to rank rows by today's sales">
+          <p class="k-label">Sales Today — EUR</p>
+          <p class="k-value">€1,083.95</p>
+          <p class="k-sub"><span class="chip pos">+26.23%</span> vs €858.69 yesterday</p>
+        </article>
+        <article class="kpi tone-violet clickable" data-sort="2" tabindex="0" role="button" title="Click to rank rows by today's sales">
+          <p class="k-label">Sales Today — USD</p>
+          <p class="k-value">$0.00</p>
+          <p class="k-sub"><span class="chip neg">-100.00%</span> vs $29.62 yesterday</p>
         </article>
         <article class="kpi tone-blue clickable" data-sort="7" tabindex="0" role="button" title="Click to rank rows by today's orders">
           <p class="k-label">Total Orders</p>
@@ -253,21 +292,21 @@
           <p class="k-sub">across 142 orders</p>
         </article>
         <article class="kpi tone-amber clickable" data-sort="12" tabindex="0" role="button" title="Click to rank rows by average order value">
-          <p class="k-label">Average Order Value</p>
-          <p class="k-value">£21.01</p>
-          <p class="k-sub">portfolio-wide</p>
+          <p class="k-label">Avg Order Value</p>
+          <p class="k-value">£19.58 · €24.09</p>
+          <p class="k-sub">per currency</p>
         </article>
         <article class="kpi tone-slate clickable" data-sort="6" tabindex="0" role="button" title="Click to rank rows by last-year sales">
           <p class="k-label">Same Day Last Year</p>
-          <p class="k-value">£3,929.06</p>
-          <p class="k-sub">22 Jul 2025 · 223 orders</p>
+          <p class="k-value">£2,529.00 · €1,400.06 · $0.00</p>
+          <p class="k-sub">22 Jul 2025</p>
         </article>
         <article class="kpi tone-teal clickable" data-sort="13" tabindex="0" role="button" title="Click to rank rows by live listing count">
           <p class="k-label">Active Listings</p>
           <p class="k-value">14,606</p>
           <p class="k-sub">2,750 PH (19%) · 11,856 AH</p>
         </article>
-        <article class="kpi tone-green clickable" data-filter="trading" tabindex="0" role="button" title="Click to show only accounts that traded">
+        <article class="kpi tone-green clickable" data-filter="trading" tabindex="0" role="button" title="Click to show only rows that traded">
           <p class="k-label">Rows Trading</p>
           <p class="k-value">12 / 30</p>
           <p class="k-sub">had at least one order</p>
@@ -314,7 +353,7 @@
     </tr>
   </thead>
   <tbody id="tb">
-      <tr data-account="LEDSone UK" data-trend="flat" data-search="ledsone uk uk sharmilan" data-trading="1">
+      <tr data-account="LEDSone UK" data-trend="flat" data-search="ledsone uk uk gbp sharmilan" data-trading="1">
         <th scope="row" class="acct t-flat"><span class="dot"></span>LEDSone UK</th>
         <td class="mkt">UK</td>
         <td class="num strong gs">£837.93</td>
@@ -342,7 +381,7 @@
         <td class="gs"><span class="pill pill-flat"><i>▬</i>Stable</span></td>
         <td class="holder ">Sharmilan</td>
       </tr>
-      <tr data-account="ElectricalSone UK" data-trend="down" data-search="electricalsone uk uk kobiga" data-trading="1">
+      <tr data-account="ElectricalSone UK" data-trend="down" data-search="electricalsone uk uk gbp kobiga" data-trading="1">
         <th scope="row" class="acct t-down"><span class="dot"></span>ElectricalSone UK</th>
         <td class="mkt">UK</td>
         <td class="num strong gs">£397.95</td>
@@ -370,20 +409,20 @@
         <td class="gs"><span class="pill pill-down"><i>▼</i>Down</span></td>
         <td class="holder ">Kobiga</td>
       </tr>
-      <tr data-account="LEDSone UK" data-trend="up" data-search="ledsone uk germany sharmilan" data-trading="1">
+      <tr data-account="LEDSone UK" data-trend="up" data-search="ledsone uk germany eur sharmilan" data-trading="1">
         <th scope="row" class="acct t-up"><span class="dot"></span>LEDSone UK</th>
         <td class="mkt">Germany</td>
-        <td class="num strong gs">£306.58</td>
-        <td class="num dim">£61.33</td>
-        <td class="num"><span class="delta pos">+£245.25</span></td>
+        <td class="num strong gs">€306.58</td>
+        <td class="num dim">€61.33</td>
+        <td class="num"><span class="delta pos">+€245.25</span></td>
         <td class="num"><span class="delta pos">+399.9%</span></td>
-        <td class="num dim">£534.56</td>
+        <td class="num dim">€534.56</td>
         <td class="num strong gs">6</td>
         <td class="num dim">4</td>
         <td class="num"><span class="delta pos">+50.0%</span></td>
         <td class="num dim">22</td>
         <td class="num gs">11</td>
-        <td class="num">£51.10</td>
+        <td class="num">€51.10</td>
         <td class="num gs">1,353</td>
         <td class="split">
           <div class="bar" title="PH 214 of 1,353 (16%)">
@@ -391,14 +430,14 @@
           </div>
           <em>214 PH / 1,139 AH</em>
         </td>
-        <td class="num gs">£298.23</td>
+        <td class="num gs">€298.23</td>
         <td><span class="pill pill-up"><i>▲</i>Up</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-down"><i>▼</i>Down</span></td>
         <td class="gs"><span class="pill pill-up"><i>▲</i>Up</span></td>
         <td class="holder ">Sharmilan</td>
       </tr>
-      <tr data-account="Sunsone" data-trend="up" data-search="sunsone uk powsteena" data-trading="1">
+      <tr data-account="Sunsone" data-trend="up" data-search="sunsone uk gbp powsteena" data-trading="1">
         <th scope="row" class="acct t-up"><span class="dot"></span>Sunsone</th>
         <td class="mkt">UK</td>
         <td class="num strong gs">£261.26</td>
@@ -426,20 +465,20 @@
         <td class="gs"><span class="pill pill-up"><i>▲</i>Up</span></td>
         <td class="holder ">Powsteena</td>
       </tr>
-      <tr data-account="LEDSone DE" data-trend="down" data-search="ledsone de germany jarsini" data-trading="1">
+      <tr data-account="LEDSone DE" data-trend="down" data-search="ledsone de germany eur jarsini" data-trading="1">
         <th scope="row" class="acct t-down"><span class="dot"></span>LEDSone DE</th>
         <td class="mkt">Germany</td>
-        <td class="num strong gs">£149.50</td>
-        <td class="num dim">£241.79</td>
-        <td class="num"><span class="delta neg">−£92.29</span></td>
+        <td class="num strong gs">€149.50</td>
+        <td class="num dim">€241.79</td>
+        <td class="num"><span class="delta neg">−€92.29</span></td>
         <td class="num"><span class="delta neg">-38.2%</span></td>
-        <td class="num dim">£212.66</td>
+        <td class="num dim">€212.66</td>
         <td class="num strong gs">11</td>
         <td class="num dim">10</td>
         <td class="num"><span class="delta pos">+10.0%</span></td>
         <td class="num dim">11</td>
         <td class="num gs">11</td>
-        <td class="num">£13.59</td>
+        <td class="num">€13.59</td>
         <td class="num gs">634</td>
         <td class="split">
           <div class="bar" title="PH 82 of 634 (13%)">
@@ -447,21 +486,21 @@
           </div>
           <em>82 PH / 552 AH</em>
         </td>
-        <td class="num gs">£133.07</td>
+        <td class="num gs">€133.07</td>
         <td><span class="pill pill-down"><i>▼</i>Down</span></td>
-        <td class="num gs">£7.19</td>
+        <td class="num gs">€7.19</td>
         <td><span class="pill pill-down"><i>▼</i>Down</span></td>
         <td class="gs"><span class="pill pill-down"><i>▼</i>Down</span></td>
         <td class="holder ">Jarsini</td>
       </tr>
-      <tr data-account="LEDSone UK" data-trend="down" data-search="ledsone uk ireland sharmilan" data-trading="0">
+      <tr data-account="LEDSone UK" data-trend="down" data-search="ledsone uk ireland eur sharmilan" data-trading="0">
         <th scope="row" class="acct t-down"><span class="dot"></span>LEDSone UK</th>
         <td class="mkt">Ireland</td>
-        <td class="num strong gs">£0.00</td>
-        <td class="num dim">£5.81</td>
-        <td class="num"><span class="delta neg">−£5.81</span></td>
+        <td class="num strong gs">€0.00</td>
+        <td class="num dim">€5.81</td>
+        <td class="num"><span class="delta neg">−€5.81</span></td>
         <td class="num"><span class="delta neg">-100.0%</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">€0.00</td>
         <td class="num strong gs">0</td>
         <td class="num dim">1</td>
         <td class="num"><span class="delta neg">-100.0%</span></td>
@@ -475,21 +514,21 @@
           </div>
           <em>0 PH / 622 AH</em>
         </td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-down"><i>▼</i>Down</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-down"><i>▼</i>Down</span></td>
         <td class="holder ">Sharmilan</td>
       </tr>
-      <tr data-account="LEDSone UK" data-trend="none" data-search="ledsone uk austria sharmilan" data-trading="0">
+      <tr data-account="LEDSone UK" data-trend="none" data-search="ledsone uk austria eur sharmilan" data-trading="0">
         <th scope="row" class="acct t-none"><span class="dot"></span>LEDSone UK</th>
         <td class="mkt">Austria</td>
-        <td class="num strong gs">£0.00</td>
-        <td class="num dim">£0.00</td>
-        <td class="num"><span class="delta zero">£0.00</span></td>
+        <td class="num strong gs">€0.00</td>
+        <td class="num dim">€0.00</td>
+        <td class="num"><span class="delta zero">€0.00</span></td>
         <td class="num"><span class="na">—</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">€0.00</td>
         <td class="num strong gs">0</td>
         <td class="num dim">0</td>
         <td class="num"><span class="na">—</span></td>
@@ -503,27 +542,27 @@
           </div>
           <em>0 PH / 592 AH</em>
         </td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-none">—</span></td>
         <td class="holder ">Sharmilan</td>
       </tr>
-      <tr data-account="Huetten Lampen DE" data-trend="up" data-search="huetten lampen de germany jarsini" data-trading="1">
+      <tr data-account="Huetten Lampen DE" data-trend="up" data-search="huetten lampen de germany eur jarsini" data-trading="1">
         <th scope="row" class="acct t-up"><span class="dot"></span>Huetten Lampen DE</th>
         <td class="mkt">Germany</td>
-        <td class="num strong gs">£397.19</td>
-        <td class="num dim">£256.76</td>
-        <td class="num"><span class="delta pos">+£140.43</span></td>
+        <td class="num strong gs">€397.19</td>
+        <td class="num dim">€256.76</td>
+        <td class="num"><span class="delta pos">+€140.43</span></td>
         <td class="num"><span class="delta pos">+54.7%</span></td>
-        <td class="num dim">£394.90</td>
+        <td class="num dim">€394.90</td>
         <td class="num strong gs">19</td>
         <td class="num dim">11</td>
         <td class="num"><span class="delta pos">+72.7%</span></td>
         <td class="num dim">23</td>
         <td class="num gs">22</td>
-        <td class="num">£20.90</td>
+        <td class="num">€20.90</td>
         <td class="num gs">541</td>
         <td class="split">
           <div class="bar" title="PH 92 of 541 (17%)">
@@ -531,14 +570,14 @@
           </div>
           <em>92 PH / 449 AH</em>
         </td>
-        <td class="num gs">£379.38</td>
+        <td class="num gs">€379.38</td>
         <td><span class="pill pill-up"><i>▲</i>Up</span></td>
-        <td class="num gs">£33.38</td>
+        <td class="num gs">€33.38</td>
         <td><span class="pill pill-down"><i>▼</i>Down</span></td>
         <td class="gs"><span class="pill pill-up"><i>▲</i>Up</span></td>
         <td class="holder ">Jarsini</td>
       </tr>
-      <tr data-account="Coventry Lights" data-trend="down" data-search="coventry lights uk genga" data-trading="1">
+      <tr data-account="Coventry Lights" data-trend="down" data-search="coventry lights uk gbp genga" data-trading="1">
         <th scope="row" class="acct t-down"><span class="dot"></span>Coventry Lights</th>
         <td class="mkt">UK</td>
         <td class="num strong gs">£202.68</td>
@@ -566,20 +605,20 @@
         <td class="gs"><span class="pill pill-down"><i>▼</i>Down</span></td>
         <td class="holder ">Genga</td>
       </tr>
-      <tr data-account="ElectricalSone UK" data-trend="down" data-search="electricalsone uk germany kobiga" data-trading="1">
+      <tr data-account="ElectricalSone UK" data-trend="down" data-search="electricalsone uk germany eur kobiga" data-trading="1">
         <th scope="row" class="acct t-down"><span class="dot"></span>ElectricalSone UK</th>
         <td class="mkt">Germany</td>
-        <td class="num strong gs">£45.48</td>
-        <td class="num dim">£159.54</td>
-        <td class="num"><span class="delta neg">−£114.06</span></td>
+        <td class="num strong gs">€45.48</td>
+        <td class="num dim">€159.54</td>
+        <td class="num"><span class="delta neg">−€114.06</span></td>
         <td class="num"><span class="delta neg">-71.5%</span></td>
-        <td class="num dim">£105.46</td>
+        <td class="num dim">€105.46</td>
         <td class="num strong gs">4</td>
         <td class="num dim">9</td>
         <td class="num"><span class="delta neg">-55.6%</span></td>
         <td class="num dim">6</td>
         <td class="num gs">5</td>
-        <td class="num">£11.37</td>
+        <td class="num">€11.37</td>
         <td class="num gs">486</td>
         <td class="split">
           <div class="bar" title="PH 36 of 486 (7%)">
@@ -587,14 +626,14 @@
           </div>
           <em>36 PH / 450 AH</em>
         </td>
-        <td class="num gs">£26.57</td>
+        <td class="num gs">€26.57</td>
         <td><span class="pill pill-down"><i>▼</i>Down</span></td>
-        <td class="num gs">£6.70</td>
+        <td class="num gs">€6.70</td>
         <td><span class="pill pill-up"><i>▲</i>Up</span></td>
         <td class="gs"><span class="pill pill-down"><i>▼</i>Down</span></td>
         <td class="holder ">Kobiga</td>
       </tr>
-      <tr data-account="Vintage Interior" data-trend="up" data-search="vintage interior uk — not assigned" data-trading="1">
+      <tr data-account="Vintage Interior" data-trend="up" data-search="vintage interior uk gbp — not assigned" data-trading="1">
         <th scope="row" class="acct t-up"><span class="dot"></span>Vintage Interior</th>
         <td class="mkt">UK</td>
         <td class="num strong gs">£157.59</td>
@@ -622,7 +661,7 @@
         <td class="gs"><span class="pill pill-up"><i>▲</i>Up</span></td>
         <td class="holder muted">— not assigned</td>
       </tr>
-      <tr data-account="DC Transformer" data-trend="down" data-search="dc transformer uk — not assigned" data-trading="1">
+      <tr data-account="DC Transformer" data-trend="down" data-search="dc transformer uk gbp — not assigned" data-trading="1">
         <th scope="row" class="acct t-down"><span class="dot"></span>DC Transformer</th>
         <td class="mkt">UK</td>
         <td class="num strong gs">£41.99</td>
@@ -650,7 +689,7 @@
         <td class="gs"><span class="pill pill-down"><i>▼</i>Down</span></td>
         <td class="holder muted">— not assigned</td>
       </tr>
-      <tr data-account="Retro LED" data-trend="down" data-search="retro led uk — not assigned" data-trading="0">
+      <tr data-account="Retro LED" data-trend="down" data-search="retro led uk gbp — not assigned" data-trading="0">
         <th scope="row" class="acct t-down"><span class="dot"></span>Retro LED</th>
         <td class="mkt">UK</td>
         <td class="num strong gs">£0.00</td>
@@ -678,14 +717,14 @@
         <td class="gs"><span class="pill pill-down"><i>▼</i>Down</span></td>
         <td class="holder muted">— not assigned</td>
       </tr>
-      <tr data-account="LEDSone UK" data-trend="none" data-search="ledsone uk us sharmilan" data-trading="0">
+      <tr data-account="LEDSone UK" data-trend="none" data-search="ledsone uk us usd sharmilan" data-trading="0">
         <th scope="row" class="acct t-none"><span class="dot"></span>LEDSone UK</th>
         <td class="mkt">US</td>
-        <td class="num strong gs">£0.00</td>
-        <td class="num dim">£0.00</td>
-        <td class="num"><span class="delta zero">£0.00</span></td>
+        <td class="num strong gs">$0.00</td>
+        <td class="num dim">$0.00</td>
+        <td class="num"><span class="delta zero">$0.00</span></td>
         <td class="num"><span class="na">—</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">$0.00</td>
         <td class="num strong gs">0</td>
         <td class="num dim">0</td>
         <td class="num"><span class="na">—</span></td>
@@ -699,21 +738,21 @@
           </div>
           <em>38 PH / 353 AH</em>
         </td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">$0.00</td>
         <td><span class="pill pill-none">—</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">$0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-none">—</span></td>
         <td class="holder ">Sharmilan</td>
       </tr>
-      <tr data-account="ElectricalSone UK" data-trend="none" data-search="electricalsone uk us kobiga" data-trading="0">
+      <tr data-account="ElectricalSone UK" data-trend="none" data-search="electricalsone uk us usd kobiga" data-trading="0">
         <th scope="row" class="acct t-none"><span class="dot"></span>ElectricalSone UK</th>
         <td class="mkt">US</td>
-        <td class="num strong gs">£0.00</td>
-        <td class="num dim">£0.00</td>
-        <td class="num"><span class="delta zero">£0.00</span></td>
+        <td class="num strong gs">$0.00</td>
+        <td class="num dim">$0.00</td>
+        <td class="num"><span class="delta zero">$0.00</span></td>
         <td class="num"><span class="na">—</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">$0.00</td>
         <td class="num strong gs">0</td>
         <td class="num dim">0</td>
         <td class="num"><span class="na">—</span></td>
@@ -727,21 +766,21 @@
           </div>
           <em>3 PH / 377 AH</em>
         </td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">$0.00</td>
         <td><span class="pill pill-none">—</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">$0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-none">—</span></td>
         <td class="holder ">Kobiga</td>
       </tr>
-      <tr data-account="LEDSone UK" data-trend="down" data-search="ledsone uk france sharmilan" data-trading="0">
+      <tr data-account="LEDSone UK" data-trend="down" data-search="ledsone uk france eur sharmilan" data-trading="0">
         <th scope="row" class="acct t-down"><span class="dot"></span>LEDSone UK</th>
         <td class="mkt">France</td>
-        <td class="num strong gs">£0.00</td>
-        <td class="num dim">£26.33</td>
-        <td class="num"><span class="delta neg">−£26.33</span></td>
+        <td class="num strong gs">€0.00</td>
+        <td class="num dim">€26.33</td>
+        <td class="num"><span class="delta neg">−€26.33</span></td>
         <td class="num"><span class="delta neg">-100.0%</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">€0.00</td>
         <td class="num strong gs">0</td>
         <td class="num dim">1</td>
         <td class="num"><span class="delta neg">-100.0%</span></td>
@@ -755,21 +794,21 @@
           </div>
           <em>0 PH / 368 AH</em>
         </td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-down"><i>▼</i>Down</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-down"><i>▼</i>Down</span></td>
         <td class="holder ">Sharmilan</td>
       </tr>
-      <tr data-account="Neighbour Market" data-trend="down" data-search="neighbour market us — not assigned" data-trading="0">
+      <tr data-account="Neighbour Market" data-trend="down" data-search="neighbour market us usd — not assigned" data-trading="0">
         <th scope="row" class="acct t-down"><span class="dot"></span>Neighbour Market</th>
         <td class="mkt">US</td>
-        <td class="num strong gs">£0.00</td>
-        <td class="num dim">£29.62</td>
-        <td class="num"><span class="delta neg">−£29.62</span></td>
+        <td class="num strong gs">$0.00</td>
+        <td class="num dim">$29.62</td>
+        <td class="num"><span class="delta neg">−$29.62</span></td>
         <td class="num"><span class="delta neg">-100.0%</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">$0.00</td>
         <td class="num strong gs">0</td>
         <td class="num dim">1</td>
         <td class="num"><span class="delta neg">-100.0%</span></td>
@@ -783,27 +822,27 @@
           </div>
           <em>16 PH / 328 AH</em>
         </td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">$0.00</td>
         <td><span class="pill pill-down"><i>▼</i>Down</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">$0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-down"><i>▼</i>Down</span></td>
         <td class="holder muted">— not assigned</td>
       </tr>
-      <tr data-account="Sunsone" data-trend="down" data-search="sunsone germany sivajitha" data-trading="1">
+      <tr data-account="Sunsone" data-trend="down" data-search="sunsone germany eur sivajitha" data-trading="1">
         <th scope="row" class="acct t-down"><span class="dot"></span>Sunsone</th>
         <td class="mkt">Germany</td>
-        <td class="num strong gs">£32.29</td>
-        <td class="num dim">£78.15</td>
-        <td class="num"><span class="delta neg">−£45.86</span></td>
+        <td class="num strong gs">€32.29</td>
+        <td class="num dim">€78.15</td>
+        <td class="num"><span class="delta neg">−€45.86</span></td>
         <td class="num"><span class="delta neg">-58.7%</span></td>
-        <td class="num dim">£152.48</td>
+        <td class="num dim">€152.48</td>
         <td class="num strong gs">2</td>
         <td class="num dim">4</td>
         <td class="num"><span class="delta neg">-50.0%</span></td>
         <td class="num dim">12</td>
         <td class="num gs">2</td>
-        <td class="num">£16.14</td>
+        <td class="num">€16.14</td>
         <td class="num gs">295</td>
         <td class="split">
           <div class="bar" title="PH 0 of 295 (0%)">
@@ -811,14 +850,14 @@
           </div>
           <em>0 PH / 295 AH</em>
         </td>
-        <td class="num gs">£28.84</td>
+        <td class="num gs">€28.84</td>
         <td><span class="pill pill-down"><i>▼</i>Down</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-down"><i>▼</i>Down</span></td>
         <td class="holder ">Sivajitha</td>
       </tr>
-      <tr data-account="Lighting Sone" data-trend="down" data-search="lighting sone uk — not assigned" data-trading="0">
+      <tr data-account="Lighting Sone" data-trend="down" data-search="lighting sone uk gbp — not assigned" data-trading="0">
         <th scope="row" class="acct t-down"><span class="dot"></span>Lighting Sone</th>
         <td class="mkt">UK</td>
         <td class="num strong gs">£0.00</td>
@@ -846,14 +885,14 @@
         <td class="gs"><span class="pill pill-down"><i>▼</i>Down</span></td>
         <td class="holder muted">— not assigned</td>
       </tr>
-      <tr data-account="LEDSone UK" data-trend="none" data-search="ledsone uk canada sharmilan" data-trading="0">
+      <tr data-account="LEDSone UK" data-trend="none" data-search="ledsone uk canada cad sharmilan" data-trading="0">
         <th scope="row" class="acct t-none"><span class="dot"></span>LEDSone UK</th>
         <td class="mkt">Canada</td>
-        <td class="num strong gs">£0.00</td>
-        <td class="num dim">£0.00</td>
-        <td class="num"><span class="delta zero">£0.00</span></td>
+        <td class="num strong gs">CA$0.00</td>
+        <td class="num dim">CA$0.00</td>
+        <td class="num"><span class="delta zero">CA$0.00</span></td>
         <td class="num"><span class="na">—</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">CA$0.00</td>
         <td class="num strong gs">0</td>
         <td class="num dim">0</td>
         <td class="num"><span class="na">—</span></td>
@@ -867,21 +906,21 @@
           </div>
           <em>0 PH / 184 AH</em>
         </td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">CA$0.00</td>
         <td><span class="pill pill-none">—</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">CA$0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-none">—</span></td>
         <td class="holder ">Sharmilan</td>
       </tr>
-      <tr data-account="ElectricalSone UK" data-trend="none" data-search="electricalsone uk france kobiga" data-trading="0">
+      <tr data-account="ElectricalSone UK" data-trend="none" data-search="electricalsone uk france eur kobiga" data-trading="0">
         <th scope="row" class="acct t-none"><span class="dot"></span>ElectricalSone UK</th>
         <td class="mkt">France</td>
-        <td class="num strong gs">£0.00</td>
-        <td class="num dim">£0.00</td>
-        <td class="num"><span class="delta zero">£0.00</span></td>
+        <td class="num strong gs">€0.00</td>
+        <td class="num dim">€0.00</td>
+        <td class="num"><span class="delta zero">€0.00</span></td>
         <td class="num"><span class="na">—</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">€0.00</td>
         <td class="num strong gs">0</td>
         <td class="num dim">0</td>
         <td class="num"><span class="na">—</span></td>
@@ -895,27 +934,27 @@
           </div>
           <em>19 PH / 148 AH</em>
         </td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-none">—</span></td>
         <td class="holder ">Kobiga</td>
       </tr>
-      <tr data-account="Homin GmbH" data-trend="up" data-search="homin gmbh germany — not assigned" data-trading="1">
+      <tr data-account="Homin GmbH" data-trend="up" data-search="homin gmbh germany eur — not assigned" data-trading="1">
         <th scope="row" class="acct t-up"><span class="dot"></span>Homin GmbH</th>
         <td class="mkt">Germany</td>
-        <td class="num strong gs">£152.91</td>
-        <td class="num dim">£28.98</td>
-        <td class="num"><span class="delta pos">+£123.93</span></td>
+        <td class="num strong gs">€152.91</td>
+        <td class="num dim">€28.98</td>
+        <td class="num"><span class="delta pos">+€123.93</span></td>
         <td class="num"><span class="delta pos">+427.6%</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">€0.00</td>
         <td class="num strong gs">3</td>
         <td class="num dim">2</td>
         <td class="num"><span class="delta pos">+50.0%</span></td>
         <td class="num dim">0</td>
         <td class="num gs">9</td>
-        <td class="num">£50.97</td>
+        <td class="num">€50.97</td>
         <td class="num gs">164</td>
         <td class="split">
           <div class="bar" title="PH 0 of 164 (0%)">
@@ -923,21 +962,21 @@
           </div>
           <em>0 PH / 164 AH</em>
         </td>
-        <td class="num gs">£157.69</td>
+        <td class="num gs">€157.69</td>
         <td><span class="pill pill-up"><i>▲</i>Up</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-up"><i>▲</i>Up</span></td>
         <td class="holder muted">— not assigned</td>
       </tr>
-      <tr data-account="ElectricalSone UK" data-trend="none" data-search="electricalsone uk canada kobiga" data-trading="0">
+      <tr data-account="ElectricalSone UK" data-trend="none" data-search="electricalsone uk canada cad kobiga" data-trading="0">
         <th scope="row" class="acct t-none"><span class="dot"></span>ElectricalSone UK</th>
         <td class="mkt">Canada</td>
-        <td class="num strong gs">£0.00</td>
-        <td class="num dim">£0.00</td>
-        <td class="num"><span class="delta zero">£0.00</span></td>
+        <td class="num strong gs">CA$0.00</td>
+        <td class="num dim">CA$0.00</td>
+        <td class="num"><span class="delta zero">CA$0.00</span></td>
         <td class="num"><span class="na">—</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">CA$0.00</td>
         <td class="num strong gs">0</td>
         <td class="num dim">0</td>
         <td class="num"><span class="na">—</span></td>
@@ -951,21 +990,21 @@
           </div>
           <em>0 PH / 154 AH</em>
         </td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">CA$0.00</td>
         <td><span class="pill pill-none">—</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">CA$0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-none">—</span></td>
         <td class="holder ">Kobiga</td>
       </tr>
-      <tr data-account="LEDSone UK" data-trend="none" data-search="ledsone uk italy sharmilan" data-trading="0">
+      <tr data-account="LEDSone UK" data-trend="none" data-search="ledsone uk italy eur sharmilan" data-trading="0">
         <th scope="row" class="acct t-none"><span class="dot"></span>LEDSone UK</th>
         <td class="mkt">Italy</td>
-        <td class="num strong gs">£0.00</td>
-        <td class="num dim">£0.00</td>
-        <td class="num"><span class="delta zero">£0.00</span></td>
+        <td class="num strong gs">€0.00</td>
+        <td class="num dim">€0.00</td>
+        <td class="num"><span class="delta zero">€0.00</span></td>
         <td class="num"><span class="na">—</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">€0.00</td>
         <td class="num strong gs">0</td>
         <td class="num dim">0</td>
         <td class="num"><span class="na">—</span></td>
@@ -979,21 +1018,21 @@
           </div>
           <em>0 PH / 137 AH</em>
         </td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-none">—</span></td>
         <td class="holder ">Sharmilan</td>
       </tr>
-      <tr data-account="Sunsone" data-trend="none" data-search="sunsone france — not assigned" data-trading="0">
+      <tr data-account="Sunsone" data-trend="none" data-search="sunsone france eur — not assigned" data-trading="0">
         <th scope="row" class="acct t-none"><span class="dot"></span>Sunsone</th>
         <td class="mkt">France</td>
-        <td class="num strong gs">£0.00</td>
-        <td class="num dim">£0.00</td>
-        <td class="num"><span class="delta zero">£0.00</span></td>
+        <td class="num strong gs">€0.00</td>
+        <td class="num dim">€0.00</td>
+        <td class="num"><span class="delta zero">€0.00</span></td>
         <td class="num"><span class="na">—</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">€0.00</td>
         <td class="num strong gs">0</td>
         <td class="num dim">0</td>
         <td class="num"><span class="na">—</span></td>
@@ -1007,14 +1046,14 @@
           </div>
           <em>0 PH / 70 AH</em>
         </td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-none">—</span></td>
         <td class="holder muted">— not assigned</td>
       </tr>
-      <tr data-account="Bestbringer" data-trend="none" data-search="bestbringer uk — not assigned" data-trading="0">
+      <tr data-account="Bestbringer" data-trend="none" data-search="bestbringer uk gbp — not assigned" data-trading="0">
         <th scope="row" class="acct t-none"><span class="dot"></span>Bestbringer</th>
         <td class="mkt">UK</td>
         <td class="num strong gs">£0.00</td>
@@ -1042,14 +1081,14 @@
         <td class="gs"><span class="pill pill-none">—</span></td>
         <td class="holder muted">— not assigned</td>
       </tr>
-      <tr data-account="LEDSone UK" data-trend="none" data-search="ledsone uk spain sharmilan" data-trading="0">
+      <tr data-account="LEDSone UK" data-trend="none" data-search="ledsone uk spain eur sharmilan" data-trading="0">
         <th scope="row" class="acct t-none"><span class="dot"></span>LEDSone UK</th>
         <td class="mkt">Spain</td>
-        <td class="num strong gs">£0.00</td>
-        <td class="num dim">£0.00</td>
-        <td class="num"><span class="delta zero">£0.00</span></td>
+        <td class="num strong gs">€0.00</td>
+        <td class="num dim">€0.00</td>
+        <td class="num"><span class="delta zero">€0.00</span></td>
         <td class="num"><span class="na">—</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">€0.00</td>
         <td class="num strong gs">0</td>
         <td class="num dim">0</td>
         <td class="num"><span class="na">—</span></td>
@@ -1063,21 +1102,21 @@
           </div>
           <em>0 PH / 14 AH</em>
         </td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-none">—</span></td>
         <td class="holder ">Sharmilan</td>
       </tr>
-      <tr data-account="LEDSone UK" data-trend="none" data-search="ledsone uk netherlands sharmilan" data-trading="0">
+      <tr data-account="LEDSone UK" data-trend="none" data-search="ledsone uk netherlands eur sharmilan" data-trading="0">
         <th scope="row" class="acct t-none"><span class="dot"></span>LEDSone UK</th>
         <td class="mkt">Netherlands</td>
-        <td class="num strong gs">£0.00</td>
-        <td class="num dim">£0.00</td>
-        <td class="num"><span class="delta zero">£0.00</span></td>
+        <td class="num strong gs">€0.00</td>
+        <td class="num dim">€0.00</td>
+        <td class="num"><span class="delta zero">€0.00</span></td>
         <td class="num"><span class="na">—</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">€0.00</td>
         <td class="num strong gs">0</td>
         <td class="num dim">0</td>
         <td class="num"><span class="na">—</span></td>
@@ -1091,21 +1130,21 @@
           </div>
           <em>0 PH / 6 AH</em>
         </td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-none">—</span></td>
         <td class="holder ">Sharmilan</td>
       </tr>
-      <tr data-account="Huetten Lampen DE" data-trend="none" data-search="huetten lampen de italy jarsini" data-trading="0">
+      <tr data-account="Huetten Lampen DE" data-trend="none" data-search="huetten lampen de italy eur jarsini" data-trading="0">
         <th scope="row" class="acct t-none"><span class="dot"></span>Huetten Lampen DE</th>
         <td class="mkt">Italy</td>
-        <td class="num strong gs">£0.00</td>
-        <td class="num dim">£0.00</td>
-        <td class="num"><span class="delta zero">£0.00</span></td>
+        <td class="num strong gs">€0.00</td>
+        <td class="num dim">€0.00</td>
+        <td class="num"><span class="delta zero">€0.00</span></td>
         <td class="num"><span class="na">—</span></td>
-        <td class="num dim">£0.00</td>
+        <td class="num dim">€0.00</td>
         <td class="num strong gs">0</td>
         <td class="num dim">0</td>
         <td class="num"><span class="na">—</span></td>
@@ -1119,14 +1158,14 @@
           </div>
           <em>0 PH / 2 AH</em>
         </td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
-        <td class="num gs">£0.00</td>
+        <td class="num gs">€0.00</td>
         <td><span class="pill pill-none">—</span></td>
         <td class="gs"><span class="pill pill-none">—</span></td>
         <td class="holder ">Jarsini</td>
       </tr>
-      <tr data-account="LEDSone DE" data-trend="none" data-search="ledsone de uk jarsini" data-trading="0">
+      <tr data-account="LEDSone DE" data-trend="none" data-search="ledsone de uk gbp jarsini" data-trading="0">
         <th scope="row" class="acct t-none"><span class="dot"></span>LEDSone DE</th>
         <td class="mkt">UK</td>
         <td class="num strong gs">£0.00</td>
@@ -1155,16 +1194,7 @@
         <td class="holder ">Jarsini</td>
       </tr>
   </tbody>
-  <tfoot>
-    <tr>
-      <th>All rows</th><td></td>
-      <td class="gs">£2,983.35</td><td>£2,891.03</td><td>—</td><td>—</td><td>£3,929.06</td>
-      <td class="gs">142</td><td>158</td><td>—</td><td>223</td>
-      <td class="gs">223</td><td>£21.01</td>
-      <td class="gs">14,606</td><td style="text-align:left">2,750 PH / 11,856 AH</td>
-      <td class="gs">£2,273.25</td><td>—</td><td class="gs">£735.45</td><td>—</td><td>—</td><td></td>
-    </tr>
-  </tfoot>
+  <tfoot><tr><th>All GBP rows</th><td class="ccy">GBP</td><td class="gs">£1,899.40</td><td>£2,002.72</td><td>—</td><td>—</td><td>£2,529.00</td><td class="gs">97</td><td>115</td><td>—</td><td>—</td><td class="gs">—</td><td>£19.58</td><td class="gs">—</td><td style="text-align:left">—</td><td class="gs">£1,249.47</td><td>—</td><td class="gs">£688.18</td><td>—</td><td class="gs">—</td><td></td></tr><tr><th>All EUR rows</th><td class="ccy">EUR</td><td class="gs">€1,083.95</td><td>€858.69</td><td>—</td><td>—</td><td>€1,400.06</td><td class="gs">45</td><td>42</td><td>—</td><td>—</td><td class="gs">—</td><td>€24.09</td><td class="gs">—</td><td style="text-align:left">—</td><td class="gs">€1,023.78</td><td>—</td><td class="gs">€47.27</td><td>—</td><td class="gs">—</td><td></td></tr><tr><th>All USD rows</th><td class="ccy">USD</td><td class="gs">$0.00</td><td>$29.62</td><td>—</td><td>—</td><td>$0.00</td><td class="gs">0</td><td>1</td><td>—</td><td>—</td><td class="gs">—</td><td>—</td><td class="gs">—</td><td style="text-align:left">—</td><td class="gs">$0.00</td><td>—</td><td class="gs">$0.00</td><td>—</td><td class="gs">—</td><td></td></tr></tfoot>
 </table>
 </div>
 

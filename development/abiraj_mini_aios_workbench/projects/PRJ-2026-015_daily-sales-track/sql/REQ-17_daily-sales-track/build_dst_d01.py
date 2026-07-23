@@ -27,7 +27,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
-from dst_d01_rows import ROWS, UNASSIGNED
+from dst_d01_rows import ROWS, UNASSIGNED, CURRENCY_SYMBOL
 
 # ---------------------------------------------------------------------------
 # Anchor — decision B (owner, 2026-07-23)
@@ -87,10 +87,10 @@ GROUP BY 1,2""",
 }
 
 HEADERS = [
-    "Account", "Market", "Date", "Today's Sales (£)", "Yesterday Sales (£)",
-    "Sales Diff (£)", "Sales Growth %", "Same Day LY Sales (£)",
+    "Account", "Market", "Currency", "Date", "Today's Sales", "Yesterday Sales",
+    "Sales Diff", "Sales Growth %", "Same Day LY Sales",
     "Today's Orders", "Yesterday Orders", "Order Growth %", "Same Day LY Orders",
-    "Units Sold", "Avg Order Value (£)", "Active Listing",
+    "Units Sold", "Avg Order Value", "Active Listing",
     "AH Listing", "AH Listing Sales", "AH Sales Trend",
     "PH Listing", "PH Listing Sales", "PH Sales Trend", "Account Sales Trend",
     "AH Holder",
@@ -137,29 +137,32 @@ def render_workbook(out_path):
         c.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
 
     for r, row in enumerate(ROWS, start=2):
+        sym = CURRENCY_SYMBOL[row["currency"]]
+        money = '"{0}"#,##0.00'.format(sym)   # per-row symbol, never a blanket GBP
         ws.cell(r, 1, row["display"])
         ws.cell(r, 2, row["site"])
-        ws.cell(r, 3, D_R1).number_format = 'd-mmm-yyyy'
-        ws.cell(r, 4, row["s_r1"]).number_format = MONEY
-        ws.cell(r, 5, row["s_r2"]).number_format = MONEY
-        ws.cell(r, 6, "=D{0}-E{0}".format(r)).number_format = MONEY
-        ws.cell(r, 7, '=IF(E{0}=0,"",(D{0}-E{0})/E{0})'.format(r)).number_format = PCT
-        ws.cell(r, 8, row["s_ly"]).number_format = MONEY
-        ws.cell(r, 9, row["o_r1"]).number_format = INT
-        ws.cell(r, 10, row["o_r2"]).number_format = INT
-        ws.cell(r, 11, '=IF(J{0}=0,"",(I{0}-J{0})/J{0})'.format(r)).number_format = PCT
-        ws.cell(r, 12, row["o_ly"]).number_format = INT
-        ws.cell(r, 13, row["units_r1"]).number_format = INT
-        ws.cell(r, 14, '=IF(I{0}=0,"",D{0}/I{0})'.format(r)).number_format = MONEY
-        ws.cell(r, 15, row["active"]).number_format = INT
-        ws.cell(r, 16, row["ah_l"]).number_format = INT
-        ws.cell(r, 17, row["ah_r1"]).number_format = MONEY
-        ws.cell(r, 18, _trend_formula("Q{0}".format(r), "'Engine Inputs'!D{0}".format(r)))
-        ws.cell(r, 19, row["ph_l"]).number_format = INT
-        ws.cell(r, 20, row["ph_r1"]).number_format = MONEY
-        ws.cell(r, 21, _trend_formula("T{0}".format(r), "'Engine Inputs'!C{0}".format(r)))
-        ws.cell(r, 22, _trend_formula("D{0}".format(r), "E{0}".format(r)))
-        c = ws.cell(r, 23, row["holder"])
+        ws.cell(r, 3, row["currency"])
+        ws.cell(r, 4, D_R1).number_format = 'd-mmm-yyyy'
+        ws.cell(r, 5, row["s_r1"]).number_format = money
+        ws.cell(r, 6, row["s_r2"]).number_format = money
+        ws.cell(r, 7, "=E{0}-F{0}".format(r)).number_format = money
+        ws.cell(r, 8, '=IF(F{0}=0,"",(E{0}-F{0})/F{0})'.format(r)).number_format = PCT
+        ws.cell(r, 9, row["s_ly"]).number_format = money
+        ws.cell(r, 10, row["o_r1"]).number_format = INT
+        ws.cell(r, 11, row["o_r2"]).number_format = INT
+        ws.cell(r, 12, '=IF(K{0}=0,"",(J{0}-K{0})/K{0})'.format(r)).number_format = PCT
+        ws.cell(r, 13, row["o_ly"]).number_format = INT
+        ws.cell(r, 14, row["units_r1"]).number_format = INT
+        ws.cell(r, 15, '=IF(J{0}=0,"",E{0}/J{0})'.format(r)).number_format = money
+        ws.cell(r, 16, row["active"]).number_format = INT
+        ws.cell(r, 17, row["ah_l"]).number_format = INT
+        ws.cell(r, 18, row["ah_r1"]).number_format = money
+        ws.cell(r, 19, _trend_formula("R{0}".format(r), "'Engine Inputs'!E{0}".format(r)))
+        ws.cell(r, 20, row["ph_l"]).number_format = INT
+        ws.cell(r, 21, row["ph_r1"]).number_format = money
+        ws.cell(r, 22, _trend_formula("U{0}".format(r), "'Engine Inputs'!D{0}".format(r)))
+        ws.cell(r, 23, _trend_formula("E{0}".format(r), "F{0}".format(r)))
+        c = ws.cell(r, 24, row["holder"])
         if row["holder"] == UNASSIGNED:
             c.font = Font(italic=True, color="808080")
         for col in range(1, N_COLS + 1):
@@ -167,8 +170,8 @@ def render_workbook(out_path):
 
     last = len(ROWS) + 1
     ws.auto_filter.ref = "A1:{0}{1}".format(get_column_letter(N_COLS), last)
-    ws.freeze_panes = "D2"
-    widths = [21, 12, 12, 15, 16, 13, 13, 18, 13, 15, 13, 16, 11, 16, 13, 12, 15, 15, 12, 15, 15, 18, 16]
+    ws.freeze_panes = "E2"
+    widths = [21, 12, 10, 12, 15, 16, 13, 13, 18, 13, 15, 13, 16, 11, 16, 13, 12, 15, 15, 12, 15, 15, 18, 16]
     for i, w in enumerate(widths, start=1):
         ws.column_dimensions[get_column_letter(i)].width = w
     ws.row_dimensions[1].height = 34
@@ -189,22 +192,52 @@ def render_workbook(out_path):
         c.fill, c.font, c.border = HDR_FILL, HDR_FONT, BOX
 
     rng = "'Daily Sales Track'"
-    kpis = [
-        ("Rows (account x marketplace)", "=COUNTA({0}!A2:A{1})".format(rng, last), INT),
-        ("Total Sales Today", "=SUM({0}!D2:D{1})".format(rng, last), MONEY),
-        ("Total Sales Yesterday", "=SUM({0}!E2:E{1})".format(rng, last), MONEY),
-        ("Overall Growth", "=IF(B8=0,\"\",(B7-B8)/B8)", PCT),
-        ("Total Orders", "=SUM({0}!I2:I{1})".format(rng, last), INT),
-        ("Yesterday Orders", "=SUM({0}!J2:J{1})".format(rng, last), INT),
-        ("Order Growth", "=IF(B11=0,\"\",(B10-B11)/B11)", PCT),
-        ("Total Units Sold", "=SUM({0}!M2:M{1})".format(rng, last), INT),
-        ("Average Order Value", "=IF(B10=0,\"\",B7/B10)", MONEY),
-    ]
-    for i, (label, formula, fmt) in enumerate(kpis, start=6):
-        k.cell(i, 1, label).border = BOX
-        c = k.cell(i, 2, formula)
-        c.number_format, c.border = fmt, BOX
-    k.column_dimensions["A"].width = 28
+    # Money is summed PER CURRENCY. orders.total is in the marketplace's own currency and
+    # there is no exchange-rate table anywhere in ledsone, so a single blended figure would
+    # be meaningless - the first build produced exactly that and it hid a 5% UK fall behind
+    # a 26% EUR rise.
+    ccys = []
+    for row in ROWS:
+        if row["currency"] not in ccys:
+            ccys.append(row["currency"])
+
+    r = 6
+    k.cell(r, 1, "Rows (account x marketplace)").border = BOX
+    c = k.cell(r, 2, "=COUNTA({0}!A2:A{1})".format(rng, last))
+    c.number_format, c.border = INT, BOX
+    r += 1
+    for lbl, col in (("Total Sales Today", "E"), ("Total Sales Yesterday", "F"),
+                     ("Same Day LY Sales", "I")):
+        for ccy in ccys:
+            k.cell(r, 1, "{0} — {1}".format(lbl, ccy)).border = BOX
+            c = k.cell(r, 2, '=SUMIF({0}!$C$2:$C${1},"{2}",{0}!${3}$2:${3}${1})'.format(
+                rng, last, ccy, col))
+            c.number_format = '"{0}"#,##0.00'.format(CURRENCY_SYMBOL[ccy])
+            c.border = BOX
+            r += 1
+    for ccy in ccys:
+        k.cell(r, 1, "Sales Growth — {0}".format(ccy)).border = BOX
+        base = 7 + ccys.index(ccy)
+        c = k.cell(r, 2, "=IF(B{1}=0,\"\",(B{0}-B{1})/B{1})".format(
+            base, base + len(ccys)))
+        c.number_format, c.border = PCT, BOX
+        r += 1
+    for lbl, col in (("Total Orders", "J"), ("Yesterday Orders", "K"), ("Total Units Sold", "N")):
+        k.cell(r, 1, lbl).border = BOX
+        c = k.cell(r, 2, "=SUM({0}!{1}2:{1}{2})".format(rng, col, last))
+        c.number_format, c.border = INT, BOX
+        r += 1
+    for ccy in ccys:
+        k.cell(r, 1, "Avg Order Value — {0}".format(ccy)).border = BOX
+        c = k.cell(r, 2, '=IF(SUMIF({0}!$C$2:$C${1},"{2}",{0}!$J$2:$J${1})=0,"",'
+                         'SUMIF({0}!$C$2:$C${1},"{2}",{0}!$E$2:$E${1})/'
+                         'SUMIF({0}!$C$2:$C${1},"{2}",{0}!$J$2:$J${1}))'.format(rng, last, ccy))
+        c.number_format = '"{0}"#,##0.00'.format(CURRENCY_SYMBOL[ccy])
+        c.border = BOX
+        r += 1
+    k.cell(r + 1, 1, "NOTE: money is never summed across currencies. orders.total is in each "
+                     "marketplace's own currency and ledsone holds no exchange rates.")
+    k.column_dimensions["A"].width = 34
     k.column_dimensions["B"].width = 18
 
     # ---------------- Sheet 3 — Config ----------------
@@ -240,17 +273,20 @@ def render_workbook(out_path):
     ei = wb.create_sheet("Engine Inputs")
     # Headers MUST stay on row 1: data rows are referenced POSITIONALLY by the trend formulas and
     # must align 1:1 with 'Daily Sales Track' rows 2..N. Do not sort or insert rows on either sheet.
-    for i, h in enumerate(["Account", "Market",
+    for i, h in enumerate(["Account", "Market", "Currency",
                            "PH Sales {0}".format(D_R2.isoformat()),
                            "AH Sales {0}".format(D_R2.isoformat())], start=1):
         c = ei.cell(1, i, h)
         c.fill, c.font, c.border = HDR_FILL, HDR_FONT, BOX
     for r, row in enumerate(ROWS, start=2):
+        sym = CURRENCY_SYMBOL[row["currency"]]
+        money = '"{0}"#,##0.00'.format(sym)
         ei.cell(r, 1, row["display"]).border = BOX
         ei.cell(r, 2, row["site"]).border = BOX
-        ei.cell(r, 3, row["ph_r2"]).number_format = MONEY
-        ei.cell(r, 4, row["ah_r2"]).number_format = MONEY
-    for col, w in zip("ABCD", [21, 12, 22, 22]):
+        ei.cell(r, 3, row["currency"]).border = BOX
+        ei.cell(r, 4, row["ph_r2"]).number_format = money
+        ei.cell(r, 5, row["ah_r2"]).number_format = money
+    for col, w in zip("ABCDE", [21, 12, 10, 22, 22]):
         ei.column_dimensions[col].width = w
     ei["F1"] = ("Prior-day (R-2) AH / PH sales - these drive the AH Sales Trend and PH Sales Trend "
                 "columns. Rows 2..{0} align 1:1 with 'Daily Sales Track' rows 2..{0}; do not sort "

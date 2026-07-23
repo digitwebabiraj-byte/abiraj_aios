@@ -40,7 +40,8 @@
       "ah_r2": 336.33,
       "active": 2843,
       "ph_l": 1245,
-      "ah_l": 1598
+      "ah_l": 1598,
+      "currency": "GBP"
     },
     {
       "key": "electricalsone",
@@ -60,7 +61,8 @@
       "ah_r2": 166.19,
       "active": 1513,
       "ph_l": 548,
-      "ah_l": 965
+      "ah_l": 965,
+      "currency": "GBP"
     },
     {
       "key": "led_sone",
@@ -80,7 +82,8 @@
       "ah_r2": 33.65,
       "active": 1353,
       "ph_l": 214,
-      "ah_l": 1139
+      "ah_l": 1139,
+      "currency": "EUR"
     },
     {
       "key": "so_926407",
@@ -100,7 +103,8 @@
       "ah_r2": 146.1,
       "active": 1150,
       "ph_l": 457,
-      "ah_l": 693
+      "ah_l": 693,
+      "currency": "GBP"
     },
     {
       "key": "ledsonede",
@@ -120,7 +124,8 @@
       "ah_r2": 208.41,
       "active": 634,
       "ph_l": 82,
-      "ah_l": 552
+      "ah_l": 552,
+      "currency": "EUR"
     },
     {
       "key": "led_sone",
@@ -140,7 +145,8 @@
       "ah_r2": 5.81,
       "active": 622,
       "ph_l": 0,
-      "ah_l": 622
+      "ah_l": 622,
+      "currency": "EUR"
     },
     {
       "key": "led_sone",
@@ -160,7 +166,8 @@
       "ah_r2": 0.0,
       "active": 592,
       "ph_l": 0,
-      "ah_l": 592
+      "ah_l": 592,
+      "currency": "EUR"
     },
     {
       "key": "huettenlampen",
@@ -180,7 +187,8 @@
       "ah_r2": 201.27,
       "active": 541,
       "ph_l": 92,
-      "ah_l": 449
+      "ah_l": 449,
+      "currency": "EUR"
     },
     {
       "key": "coventrylights",
@@ -200,7 +208,8 @@
       "ah_r2": 271.95,
       "active": 537,
       "ph_l": 0,
-      "ah_l": 537
+      "ah_l": 537,
+      "currency": "GBP"
     },
     {
       "key": "electricalsone",
@@ -220,7 +229,8 @@
       "ah_r2": 138.84,
       "active": 486,
       "ph_l": 36,
-      "ah_l": 450
+      "ah_l": 450,
+      "currency": "EUR"
     },
     {
       "key": "vintageinterior",
@@ -240,7 +250,8 @@
       "ah_r2": 77.1,
       "active": 474,
       "ph_l": 0,
-      "ah_l": 474
+      "ah_l": 474,
+      "currency": "GBP"
     },
     {
       "key": "dctransformer",
@@ -260,7 +271,8 @@
       "ah_r2": 60.76,
       "active": 468,
       "ph_l": 0,
-      "ah_l": 468
+      "ah_l": 468,
+      "currency": "GBP"
     },
     {
       "key": "re6865",
@@ -280,7 +292,8 @@
       "ah_r2": 68.78,
       "active": 403,
       "ph_l": 0,
-      "ah_l": 403
+      "ah_l": 403,
+      "currency": "GBP"
     },
     {
       "key": "led_sone",
@@ -300,7 +313,8 @@
       "ah_r2": 0.0,
       "active": 391,
       "ph_l": 38,
-      "ah_l": 353
+      "ah_l": 353,
+      "currency": "USD"
     },
     {
       "key": "electricalsone",
@@ -320,7 +334,8 @@
       "ah_r2": 0.0,
       "active": 380,
       "ph_l": 3,
-      "ah_l": 377
+      "ah_l": 377,
+      "currency": "USD"
     },
     {
       "key": "led_sone",
@@ -340,7 +355,8 @@
       "ah_r2": 9.08,
       "active": 368,
       "ph_l": 0,
-      "ah_l": 368
+      "ah_l": 368,
+      "currency": "EUR"
     },
     {
       "key": "neighbourmarket",
@@ -360,7 +376,8 @@
       "ah_r2": 26.99,
       "active": 344,
       "ph_l": 16,
-      "ah_l": 328
+      "ah_l": 328,
+      "currency": "USD"
     },
     {
       "key": "so_926407",
@@ -380,7 +397,8 @@
       "ah_r2": 68.09,
       "active": 295,
       "ph_l": 0,
-      "ah_l": 295
+      "ah_l": 295,
+      "currency": "EUR"
     },
     {
       "key": "lighting_sone",
@@ -400,7 +418,8 @@
       "ah_r2": 16.58,
       "active": 247,
       "ph_l": 0,
-      "ah_l": 247
+      "ah_l": 247,
+      "currency": "GBP"
     },
     {
       "key": "led_sone",
@@ -420,7 +439,8 @@
       "ah_r2": 0.0,
       "active": 184,
       "ph_l": 0,
-      "ah_l": 184
+      "ah_l": 184,
+      "currency": "CAD"
     },
     {
       "key": "electricalsone",
@@ -440,7 +460,8 @@
       "ah_r2": 0.0,
       "active": 167,
       "ph_l": 19,
-      "ah_l": 148
+      "ah_l": 148,
+      "currency": "EUR"
     },
     {
       "key": "homin_gmbh",
@@ -460,7 +481,8 @@
       "ah_r2": 28.98,
       "active": 164,
       "ph_l": 0,
-      "ah_l": 164
+      "ah_l": 164,
+      "currency": "EUR"
     },
     {
       "key": "electricalsone",
@@ -480,7 +502,8 @@
       "ah_r2": 0.0,
       "active": 154,
       "ph_l": 0,
-      "ah_l": 154
+      "ah_l": 154,
+      "currency": "CAD"
     },
     {
       "key": "led_sone",
@@ -500,7 +523,8 @@
       "ah_r2": 0.0,
       "active": 137,
       "ph_l": 0,
-      "ah_l": 137
+      "ah_l": 137,
+      "currency": "EUR"
     },
     {
       "key": "so_926407",
@@ -520,7 +544,8 @@
       "ah_r2": 0.0,
       "active": 70,
       "ph_l": 0,
-      "ah_l": 70
+      "ah_l": 70,
+      "currency": "EUR"
     },
     {
       "key": "bestbringer",
@@ -540,7 +565,8 @@
       "ah_r2": 0.0,
       "active": 65,
       "ph_l": 0,
-      "ah_l": 65
+      "ah_l": 65,
+      "currency": "GBP"
     },
     {
       "key": "led_sone",
@@ -560,7 +586,8 @@
       "ah_r2": 0.0,
       "active": 14,
       "ph_l": 0,
-      "ah_l": 14
+      "ah_l": 14,
+      "currency": "EUR"
     },
     {
       "key": "led_sone",
@@ -580,7 +607,8 @@
       "ah_r2": 0.0,
       "active": 6,
       "ph_l": 0,
-      "ah_l": 6
+      "ah_l": 6,
+      "currency": "EUR"
     },
     {
       "key": "huettenlampen",
@@ -600,7 +628,8 @@
       "ah_r2": 0.0,
       "active": 2,
       "ph_l": 0,
-      "ah_l": 2
+      "ah_l": 2,
+      "currency": "EUR"
     },
     {
       "key": "ledsonede",
@@ -620,7 +649,8 @@
       "ah_r2": 0.0,
       "active": 2,
       "ph_l": 0,
-      "ah_l": 2
+      "ah_l": 2,
+      "currency": "GBP"
     }
   ]
 }

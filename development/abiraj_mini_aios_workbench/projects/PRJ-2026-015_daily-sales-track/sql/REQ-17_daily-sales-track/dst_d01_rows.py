@@ -143,3 +143,27 @@ ROWS = [
      "units_r1": 0, "ph_r1": 0.00, "ah_r1": 0.00, "ph_r2": 0.00, "ah_r2": 0.00,
      "active": 2, "ph_l": 0, "ah_l": 2},
 ]
+
+# ---------------------------------------------------------------------------
+# CURRENCY. Added 2026-07-23 after a defect: `order_management.orders.total` is
+# stored in the MARKETPLACE'S OWN currency, not GBP. Confirmed by joining
+# order_management.order_info.currency, which matches amount_paid exactly:
+# on 22 Jul the UK rows are GBP 1,899.40 and the German rows EUR 1,083.95.
+# The first build rendered every figure with a GBP sign and summed them, which
+# made all cross-row totals meaningless.
+#
+# Source of truth: listings.market_place_id_mapping (verified 2026-07-23).
+# Currency is 1:1 with marketplace - no order mixes currencies within a site.
+# There is NO exchange-rate table anywhere in ledsone, so nothing is converted;
+# totals are reported per currency instead.
+# ---------------------------------------------------------------------------
+SITE_CURRENCY = {
+    "UK": "GBP",
+    "Germany": "EUR", "France": "EUR", "Ireland": "EUR", "Austria": "EUR",
+    "Italy": "EUR", "Spain": "EUR", "Netherlands": "EUR", "Belgium": "EUR",
+    "US": "USD", "Canada": "CAD",
+}
+CURRENCY_SYMBOL = {"GBP": "£", "EUR": "€", "USD": "$", "CAD": "CA$"}
+
+for _r in ROWS:
+    _r["currency"] = SITE_CURRENCY[_r["site"]]

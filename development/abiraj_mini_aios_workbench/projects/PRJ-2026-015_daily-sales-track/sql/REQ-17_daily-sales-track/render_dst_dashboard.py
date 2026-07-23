@@ -98,8 +98,8 @@ def _pill(t):
     return '<span class="pill pill-{0}"><i>{1}</i>{2}</span>'.format(t, arrow, label)
 
 
-def _money(v):
-    return "£{0:,.2f}".format(v) if v is not None else '<span class="na">—</span>'
+def _money(v, sym="£"):
+    return "{0}{1:,.2f}".format(sym, v) if v is not None else '<span class="na">—</span>'
 
 
 def _pct(cur, prev):
@@ -124,8 +124,12 @@ def render(data, out_path, theme=DEFAULT_THEME):
     d_ly = date.fromisoformat(a["same_day_last_year"])
     generated = date.fromisoformat(data["generated"])
 
-    rows, tot = [], {"s1": 0.0, "s2": 0.0, "sly": 0.0, "o1": 0, "o2": 0, "oly": 0,
-                     "u": 0, "act": 0, "ah": 0, "ph": 0, "ahs": 0.0, "phs": 0.0}
+    rows = []
+    tot = {"o1": 0, "o2": 0, "oly": 0, "u": 0, "act": 0, "ah": 0, "ph": 0}
+    # money is NEVER summed across currencies - orders.total is in the marketplace's own
+    # currency and ledsone holds no exchange rates
+    ccy = {}   # code -> running totals for that currency only
+    SYM = {"GBP": "£", "EUR": "€", "USD": "$", "CAD": "CA$"}
 
     for acc in data["rows"]:
         s1, s2, sly = acc["s_r1"], acc["s_r2"], acc["s_ly"]
@@ -135,9 +139,15 @@ def render(data, out_path, theme=DEFAULT_THEME):
         active, ph_l, ah_l = acc["active"], acc["ph_l"], acc["ah_l"]
         u = acc["units_r1"]
 
+        code = acc["currency"]
+        sym = SYM[code]
+        b = ccy.setdefault(code, {"s1": 0.0, "s2": 0.0, "sly": 0.0, "o1": 0, "o2": 0,
+                                  "ahs": 0.0, "phs": 0.0, "sym": sym})
         for k, v in (("s1", s1), ("s2", s2), ("sly", sly), ("o1", o1), ("o2", o2),
-                     ("oly", oly), ("u", u), ("act", active), ("ah", ah_l),
-                     ("ph", ph_l), ("ahs", ah1), ("phs", ph1)):
+                     ("ahs", ah1), ("phs", ph1)):
+            b[k] += v
+        for k, v in (("o1", o1), ("o2", o2), ("oly", oly), ("u", u),
+                     ("act", active), ("ah", ah_l), ("ph", ph_l)):
             tot[k] += v
 
         t_acc = _trend(s1, s2, band)
@@ -179,23 +189,25 @@ def render(data, out_path, theme=DEFAULT_THEME):
       </tr>""".format(
             disp=acc["display"], site=acc["site"], tkey=(t_acc or "none"),
             trading=("1" if o1 > 0 else "0"),
-            search=(acc["display"] + " " + acc["site"] + " " + holder).lower(),
-            s1=_money(s1), s2=_money(s2),
-            diff='<span class="delta {0}">{1}£{2:,.2f}</span>'.format(
+            search=(acc["display"] + " " + acc["site"] + " " + code + " " + holder).lower(),
+            s1=_money(s1, sym), s2=_money(s2, sym),
+            diff='<span class="delta {0}">{1}{3}{2:,.2f}</span>'.format(
                 "pos" if s1 - s2 > 0 else ("neg" if s1 - s2 < 0 else "zero"),
-                "+" if s1 - s2 > 0 else ("−" if s1 - s2 < 0 else ""), abs(s1 - s2)),
-            grow=_pct(s1, s2), sly=_money(sly),
+                "+" if s1 - s2 > 0 else ("−" if s1 - s2 < 0 else ""), abs(s1 - s2), sym),
+            grow=_pct(s1, s2), sly=_money(sly, sym),
             o1=_num(o1), o2=_num(o2), ogrow=_pct(o1, o2), oly=_num(oly), u=_num(u),
-            aov=(_money(aov) if aov is not None else '<span class="na">—</span>'),
+            aov=(_money(aov, sym) if aov is not None else '<span class="na">—</span>'),
             act=_num(active), ph=_num(ph_l), ah=_num(ah_l), share=share,
-            ahs=_money(ah1), phs=_money(ph1),
+            ahs=_money(ah1, sym), phs=_money(ph1, sym),
             tah=_pill(t_ah), tph=_pill(t_ph), tacc=_pill(t_acc),
             holder=holder, hcls=h_cls))
 
-    ov_g = (tot["s1"] - tot["s2"]) / tot["s2"] if tot["s2"] else 0
     og_g = (tot["o1"] - tot["o2"]) / tot["o2"] if tot["o2"] else 0
-    aov_all = tot["s1"] / tot["o1"] if tot["o1"] else 0
     ph_share = tot["ph"] / tot["act"] * 100 if tot["act"] else 0
+    # order currencies by today's money, biggest first
+    order = sorted(ccy, key=lambda c: -ccy[c]["s1"])
+    money_ccys = [c for c in order
+                  if ccy[c]["s1"] or ccy[c]["s2"] or ccy[c]["sly"]]
 
     def card(label, value, sub="", tone="", big=False, sort=None, filt=None, hint=""):
         act = ""
@@ -217,27 +229,61 @@ def render(data, out_path, theme=DEFAULT_THEME):
         return '<span class="chip {0}">{1}{2:.2f}%</span>'.format(cls, "+" if v > 0 else "", v * 100)
 
     n_trading = sum(1 for x in data["rows"] if x["o_r1"] > 0)
-    kpis = "".join([
-        card("Total Sales Today", "£{0:,.2f}".format(tot["s1"]),
-             "{0} vs £{1:,.2f} yesterday".format(dchip(ov_g), tot["s2"]), "tone-primary", True,
-             sort=2, hint="Click to rank rows by today's sales"),
-        card("Total Orders", _num(tot["o1"]),
-             "{0} vs {1} yesterday".format(dchip(og_g), _num(tot["o2"])), "tone-blue",
-             sort=7, hint="Click to rank rows by today's orders"),
-        card("Units Sold", _num(tot["u"]), "across {0} orders".format(_num(tot["o1"])), "tone-violet",
-             sort=11, hint="Click to rank rows by units sold"),
-        card("Average Order Value", "£{0:,.2f}".format(aov_all), "portfolio-wide", "tone-amber",
-             sort=12, hint="Click to rank rows by average order value"),
-        card("Same Day Last Year", "£{0:,.2f}".format(tot["sly"]),
-             "{0} · {1} orders".format(d_ly.strftime("%d %b %Y"), _num(tot["oly"])), "tone-slate",
-             sort=6, hint="Click to rank rows by last-year sales"),
-        card("Active Listings", _num(tot["act"]),
-             "{0} PH ({1:.0f}%) · {2} AH".format(_num(tot["ph"]), ph_share, _num(tot["ah"])), "tone-teal",
-             sort=13, hint="Click to rank rows by live listing count"),
-        card("Rows Trading", "{0} / {1}".format(n_trading, len(data["rows"])),
-             "had at least one order", "tone-green",
-             filt="trading", hint="Click to show only accounts that traded"),
-    ])
+    tones = ["tone-primary", "tone-teal", "tone-violet", "tone-amber"]
+    cards = []
+    for i, c in enumerate(money_ccys):
+        b = ccy[c]
+        g = (b["s1"] - b["s2"]) / b["s2"] if b["s2"] else 0
+        cards.append(card(
+            "Sales Today — {0}".format(c),
+            "{0}{1:,.2f}".format(b["sym"], b["s1"]),
+            "{0} vs {1}{2:,.2f} yesterday".format(dchip(g), b["sym"], b["s2"]),
+            tones[i % len(tones)], i == 0,
+            sort=2, hint="Click to rank rows by today's sales"))
+    cards.append(card("Total Orders", _num(tot["o1"]),
+                      "{0} vs {1} yesterday".format(dchip(og_g), _num(tot["o2"])), "tone-blue",
+                      sort=7, hint="Click to rank rows by today's orders"))
+    cards.append(card("Units Sold", _num(tot["u"]),
+                      "across {0} orders".format(_num(tot["o1"])), "tone-violet",
+                      sort=11, hint="Click to rank rows by units sold"))
+    cards.append(card("Avg Order Value",
+                      " · ".join("{0}{1:,.2f}".format(ccy[c]["sym"],
+                                 ccy[c]["s1"] / ccy[c]["o1"]) for c in money_ccys
+                                 if ccy[c]["o1"]) or "—",
+                      "per currency", "tone-amber",
+                      sort=12, hint="Click to rank rows by average order value"))
+    cards.append(card("Same Day Last Year",
+                      " · ".join("{0}{1:,.2f}".format(ccy[c]["sym"], ccy[c]["sly"])
+                                 for c in money_ccys),
+                      d_ly.strftime("%d %b %Y"), "tone-slate",
+                      sort=6, hint="Click to rank rows by last-year sales"))
+    cards.append(card("Active Listings", _num(tot["act"]),
+                      "{0} PH ({1:.0f}%) · {2} AH".format(_num(tot["ph"]), ph_share,
+                                                          _num(tot["ah"])), "tone-teal",
+                      sort=13, hint="Click to rank rows by live listing count"))
+    cards.append(card("Rows Trading", "{0} / {1}".format(n_trading, len(data["rows"])),
+                      "had at least one order", "tone-green",
+                      filt="trading", hint="Click to show only rows that traded"))
+    kpis = "".join(cards)
+
+    # one totals row per currency - never a blended total
+    foot = []
+    for c in money_ccys:
+        b = ccy[c]
+        foot.append(
+            '<tr><th>All {0} rows</th><td class="ccy">{0}</td>'
+            '<td class="gs">{sym}{s1:,.2f}</td><td>{sym}{s2:,.2f}</td><td>—</td><td>—</td>'
+            '<td>{sym}{sly:,.2f}</td>'
+            '<td class="gs">{o1}</td><td>{o2}</td><td>—</td><td>{oly}</td>'
+            '<td class="gs">—</td><td>{aov}</td>'
+            '<td class="gs">—</td><td style="text-align:left">—</td>'
+            '<td class="gs">{sym}{ahs:,.2f}</td><td>—</td>'
+            '<td class="gs">{sym}{phs:,.2f}</td><td>—</td><td class="gs">—</td><td></td></tr>'.format(
+                c, sym=b["sym"], s1=b["s1"], s2=b["s2"], sly=b["sly"],
+                o1=_num(b["o1"]), o2=_num(b["o2"]), oly="—",
+                aov=("{0}{1:,.2f}".format(b["sym"], b["s1"] / b["o1"]) if b["o1"] else "—"),
+                ahs=b["ahs"], phs=b["phs"]))
+    footer_rows = "".join(foot)
 
     tvars = dict(("t_" + k, v) for k, v in pal.items())
     html = TEMPLATE.format(
@@ -248,14 +294,8 @@ def render(data, out_path, theme=DEFAULT_THEME):
         generated=generated.strftime("%d %b %Y"),
         band=int(band * 100),
         kpis=kpis,
-        rows="".join(rows),
+        rows="".join(rows), footer_rows=footer_rows,
         n=len(data["rows"]),
-        f_s1="£{0:,.2f}".format(tot["s1"]), f_s2="£{0:,.2f}".format(tot["s2"]),
-        f_o1=_num(tot["o1"]), f_o2=_num(tot["o2"]), f_u=_num(tot["u"]),
-        f_sly="£{0:,.2f}".format(tot["sly"]), f_oly=_num(tot["oly"]),
-        f_aov="£{0:,.2f}".format(aov_all), f_act=_num(tot["act"]),
-        f_ah=_num(tot["ah"]), f_ph=_num(tot["ph"]),
-        f_ahs="£{0:,.2f}".format(tot["ahs"]), f_phs="£{0:,.2f}".format(tot["phs"]),
         **tvars
     )
     with io.open(out_path, "w", encoding="utf-8") as fh:
@@ -284,7 +324,7 @@ TEMPLATE = u"""<!doctype html>
     --grp-bg:{t_grp_bg}; --grp-ink:{t_grp_ink};
     --foot-bg:{t_foot_bg}; --foot-ink:{t_foot_ink};
     --hero:{t_hero}; --hero-ink:{t_hero_ink}; --bar:{t_bar};
-    --grp-divider:{t_grp_divider};
+    --grp-divider:{t_grp_divider}; --grp-h:27px; --foot-h:37px;
     --radius:14px; --shadow:0 1px 2px rgba(20,26,46,.05),0 10px 26px -14px rgba(20,26,46,.22);
   }}
   html,body{{height:100%}}
@@ -410,6 +450,8 @@ TEMPLATE = u"""<!doctype html>
     cursor:default;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;
     font-weight:800;
   }}
+  /* the column-name row must stack UNDER the group row, not on top of it */
+  thead tr:nth-child(2) th{{top:var(--grp-h)}}
   /* alternate group tint so neighbouring blocks never blur together */
   thead th.grp.alt{{background:color-mix(in srgb,var(--grp-bg) 55%,#fff)}}
 
@@ -452,13 +494,21 @@ TEMPLATE = u"""<!doctype html>
   .bar{{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:4px}}
   .bar span{{display:block;height:100%;background:var(--bar)}}
   td.split em{{font-style:normal;font-size:12.5px;color:var(--ink2);font-weight:600}}
+  td.ccy{{text-align:left;font-weight:700;font-size:12.5px}}
   td.mkt{{text-align:left;font-weight:600;color:var(--ink2);font-size:13px;padding-right:4px}}
   td.holder{{text-align:left;font-size:13.5px;white-space:normal;min-width:84px;line-height:1.3}}
   td.holder.muted{{color:var(--ink3);font-style:italic}}
   tfoot th,tfoot td{{
-    position:sticky;bottom:0;background:var(--foot-bg);color:var(--foot-ink);font-weight:700;
+    position:sticky;background:var(--foot-bg);color:var(--foot-ink);font-weight:700;
     padding:7px 5px;text-align:right;border-top:2px solid var(--primary);z-index:3;
   }}
+  /* one totals row per currency - each must pin ABOVE the one below it, or they
+     all sit at bottom:0 and only the last is ever visible while scrolling */
+  tfoot tr:nth-last-child(1) th,tfoot tr:nth-last-child(1) td{{bottom:0}}
+  tfoot tr:nth-last-child(2) th,tfoot tr:nth-last-child(2) td{{bottom:var(--foot-h)}}
+  tfoot tr:nth-last-child(3) th,tfoot tr:nth-last-child(3) td{{bottom:calc(var(--foot-h)*2)}}
+  tfoot tr:nth-last-child(4) th,tfoot tr:nth-last-child(4) td{{bottom:calc(var(--foot-h)*3)}}
+  tfoot tr:not(:last-child) th,tfoot tr:not(:last-child) td{{border-top:1px solid rgba(255,255,255,.18)}}
   tfoot th{{text-align:left;left:0;z-index:4}}
 
   footer.notes{{padding:0 20px 7px;flex:none}}
@@ -473,9 +523,28 @@ TEMPLATE = u"""<!doctype html>
   footer.notes b{{color:var(--ink)}}
   footer.notes b{{color:var(--ink)}}
   .warn{{color:#b45309}}
+  /* The ph_task portal embeds this page in a ~700px container. Auto-reclaim the chrome
+     so the table gets the space, without breaking position:sticky on the headers. */
+  @media (max-height:820px){{
+    .kpis{{display:none}}
+    footer.notes{{display:none}}
+    header.top{{padding:6px 20px 7px}}
+    h1{{font-size:17px}}
+    .sub{{font-size:12.5px;margin:2px 0 0}}
+    .tag{{padding:3px 9px;font-size:12px}}
+    .toolbar{{padding:5px 20px 6px}}
+    .btn,.search{{padding:5px 10px;font-size:13px}}
+    thead th{{padding:5px 5px}}
+    thead th.grp{{padding:2px 9px}}
+    :root{{--grp-h:23px;--foot-h:33px}}
+    tbody td,tbody th{{padding:4px 5px}}
+    tfoot th,tfoot td{{padding:5px 5px}}
+    .wrap{{margin:0 20px 6px}}
+  }}
   body.dense tbody td,body.dense tbody th{{padding:2px 5px;font-size:13.5px}}
   body.dense thead th{{padding:4px 5px}}
   body.dense thead th.grp{{padding:2px 9px}}
+  body.dense{{--grp-h:23px;--foot-h:31px}}
   body.dense tfoot th,body.dense tfoot td{{padding:4px 5px}}
   body.dense header.top .sub{{display:none}}
   body.dense .bar{{display:none}}
@@ -545,16 +614,7 @@ TEMPLATE = u"""<!doctype html>
   </thead>
   <tbody id="tb">{rows}
   </tbody>
-  <tfoot>
-    <tr>
-      <th>All rows</th><td></td>
-      <td class="gs">{f_s1}</td><td>{f_s2}</td><td>—</td><td>—</td><td>{f_sly}</td>
-      <td class="gs">{f_o1}</td><td>{f_o2}</td><td>—</td><td>{f_oly}</td>
-      <td class="gs">{f_u}</td><td>{f_aov}</td>
-      <td class="gs">{f_act}</td><td style="text-align:left">{f_ph} PH / {f_ah} AH</td>
-      <td class="gs">{f_ahs}</td><td>—</td><td class="gs">{f_phs}</td><td>—</td><td>—</td><td></td>
-    </tr>
-  </tfoot>
+  <tfoot>{footer_rows}</tfoot>
 </table>
 </div>
 

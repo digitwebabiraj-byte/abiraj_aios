@@ -28,10 +28,10 @@ XLSX = os.path.abspath(os.path.join(
 SOFFICE = r"C:\Program Files\LibreOffice\program\soffice.exe"
 
 EXPECTED_HEADERS = [
-    "Account", "Market", "Date", "Today's Sales (£)", "Yesterday Sales (£)",
-    "Sales Diff (£)", "Sales Growth %", "Same Day LY Sales (£)",
+    "Account", "Market", "Currency", "Date", "Today's Sales", "Yesterday Sales",
+    "Sales Diff", "Sales Growth %", "Same Day LY Sales",
     "Today's Orders", "Yesterday Orders", "Order Growth %", "Same Day LY Orders",
-    "Units Sold", "Avg Order Value (£)", "Active Listing",
+    "Units Sold", "Avg Order Value", "Active Listing",
     "AH Listing", "AH Listing Sales", "AH Sales Trend",
     "PH Listing", "PH Listing Sales", "PH Sales Trend", "Account Sales Trend",
     "AH Holder",
@@ -58,7 +58,18 @@ REF_TOTALS = {
     "Lighting Sone|UK":          (0.0, 16.58, 0.0, 0, 1, 0),
     "Homin GmbH|Germany":        (152.91, 28.98, 0.0, 3, 2, 0),
 }
-REF_PORTFOLIO = {"sales_r1": 2983.35, "sales_r2": 2891.03, "orders_r1": 142, "orders_r2": 158}
+# Money is NEVER blended. Independent per-currency aggregate, live ledsone, 2026-07-23,
+# obtained by joining order_management.order_info.currency.
+REF_BY_CCY = {
+    "GBP": {"r1": 1899.40, "r2": 2002.72, "ly": 2529.00, "o_r1": 97, "o_r2": 115},
+    "EUR": {"r1": 1083.95, "r2": 858.69, "ly": 1400.06, "o_r1": 45, "o_r2": 42},
+    "USD": {"r1": 0.0, "r2": 29.62, "ly": 0.0, "o_r1": 0, "o_r2": 1},
+}
+REF_ORDERS = {"r1": 142, "r2": 158}
+# listings.market_place_id_mapping, verified 2026-07-23
+SITE_CCY = {"UK": "GBP", "Germany": "EUR", "France": "EUR", "Ireland": "EUR",
+            "Austria": "EUR", "Italy": "EUR", "Spain": "EUR", "Netherlands": "EUR",
+            "US": "USD", "Canada": "CAD"}
 REF_ROWS = 30
 REF_ACTIVE_TOTAL = 14606
 
@@ -119,7 +130,7 @@ def main():
         ws = wb["Daily Sales Track"]
 
         hdrs = [ws.cell(1, c).value for c in range(1, len(EXPECTED_HEADERS) + 1)]
-        check("V1 23 headers exact and in order", hdrs == EXPECTED_HEADERS,
+        check("V1 24 headers exact and in order", hdrs == EXPECTED_HEADERS,
               "" if hdrs == EXPECTED_HEADERS else "got {0}".format(hdrs))
         check("V2 row count = 30 account x marketplace rows", ws.max_row == REF_ROWS + 1,
               "max_row={0}".format(ws.max_row))
@@ -133,8 +144,8 @@ def main():
         mism = []
         for kk, r in rows.items():
             exp = REF_TOTALS.get(kk, (0.0, 0.0, 0.0, 0, 0, 0))
-            for col, e, label in ((4, exp[0], "s_r1"), (5, exp[1], "s_r2"), (8, exp[2], "s_ly"),
-                                  (9, exp[3], "o_r1"), (10, exp[4], "o_r2"), (12, exp[5], "o_ly")):
+            for col, e, label in ((5, exp[0], "s_r1"), (6, exp[1], "s_r2"), (9, exp[2], "s_ly"),
+                                  (10, exp[3], "o_r1"), (11, exp[4], "o_r2"), (13, exp[5], "o_ly")):
                 got = ws.cell(r, col).value or 0
                 if abs(float(got) - e) > 0.005:
                     mism.append("{0}.{1}: {2} != {3}".format(kk, label, got, e))
@@ -143,9 +154,9 @@ def main():
 
         bad, act_total = [], 0
         for kk, r in rows.items():
-            active = ws.cell(r, 15).value or 0
-            ah = ws.cell(r, 16).value or 0
-            ph = ws.cell(r, 19).value or 0
+            active = ws.cell(r, 16).value or 0
+            ah = ws.cell(r, 17).value or 0
+            ph = ws.cell(r, 20).value or 0
             act_total += active
             if ah + ph != active:
                 bad.append("{0} AH+PH={1} != Active={2}".format(kk, ah + ph, active))
@@ -158,17 +169,17 @@ def main():
         for kk, r in rows.items():
             exp = REF_TOTALS.get(kk, (0.0, 0.0, 0.0, 0, 0, 0))
             s1, s2, o1 = exp[0], exp[1], exp[3]
-            got = ws.cell(r, 6).value
+            got = ws.cell(r, 7).value
             if abs(float(got or 0) - (s1 - s2)) > 0.005:
                 diffbad.append("{0}: {1}".format(kk, got))
-            got = ws.cell(r, 7).value
+            got = ws.cell(r, 8).value
             e = "" if s2 == 0 else (s1 - s2) / s2
             if e == "":
                 if got not in (None, ""):
                     growbad.append("{0}: expected blank got {1}".format(kk, got))
             elif got is None or abs(float(got) - e) > 1e-6:
                 growbad.append("{0}: {1} != {2}".format(kk, got, e))
-            got = ws.cell(r, 14).value
+            got = ws.cell(r, 15).value
             e = "" if o1 == 0 else s1 / o1
             if e == "":
                 if got not in (None, ""):
@@ -185,7 +196,7 @@ def main():
         for kk, r in rows.items():
             exp = REF_TOTALS.get(kk, (0.0, 0.0, 0.0, 0, 0, 0))
             want = expected_trend(exp[0], exp[1])
-            got = ws.cell(r, 22).value or ""
+            got = ws.cell(r, 23).value or ""
             got_word = got.split()[-1] if got else ""
             if got_word != want:
                 trendbad.append("{0}: '{1}' != '{2}'".format(kk, got_word, want))
@@ -194,30 +205,64 @@ def main():
 
         ei = wb["Engine Inputs"]
         misalign = [r for kk, r in rows.items()
-                    if (ws.cell(r, 1).value, ws.cell(r, 2).value)
-                    != (ei.cell(r, 1).value, ei.cell(r, 2).value)]
+                    if (ws.cell(r, 1).value, ws.cell(r, 2).value, ws.cell(r, 3).value)
+                    != (ei.cell(r, 1).value, ei.cell(r, 2).value, ei.cell(r, 3).value)]
         check("V10 Engine Inputs rows align 1:1 with the report", not misalign,
               "rows {0}".format(misalign))
 
+        ccybad = []
+        for kk, r in rows.items():
+            site = ws.cell(r, 2).value
+            want = SITE_CCY.get(site)
+            got = ws.cell(r, 3).value
+            if got != want:
+                ccybad.append("{0}: {1} != {2}".format(kk, got, want))
+        check("V15 per-row currency matches listings.market_place_id_mapping",
+              not ccybad, "; ".join(ccybad))
+
+        symbad = []
+        for kk, r in rows.items():
+            code = ws.cell(r, 3).value
+            fmt = ws.cell(r, 5).number_format
+            want = {"GBP": "£", "EUR": "€", "USD": "$", "CAD": "CA$"}[code]
+            if want not in fmt:
+                symbad.append("{0}: {1} lacks {2}".format(kk, fmt, want))
+        check("V16 money cells carry the row's OWN currency symbol",
+              not symbad, "; ".join(symbad))
+
         k = wb["KPI Summary"]
-        kpi = {k.cell(i, 1).value: k.cell(i, 2).value for i in range(6, 15)}
+        kpi = {}
+        for i in range(6, 40):
+            lbl = k.cell(i, 1).value
+            if lbl:
+                kpi[lbl] = k.cell(i, 2).value
         kbad = []
-        for lbl, want in (("Total Sales Today", REF_PORTFOLIO["sales_r1"]),
-                          ("Total Sales Yesterday", REF_PORTFOLIO["sales_r2"])):
-            if abs(float(kpi.get(lbl) or 0) - want) > 0.005:
-                kbad.append("{0}={1}".format(lbl, kpi.get(lbl)))
-        for lbl, want in (("Total Orders", REF_PORTFOLIO["orders_r1"]),
-                          ("Yesterday Orders", REF_PORTFOLIO["orders_r2"]),
+        for ccy, ref in REF_BY_CCY.items():
+            for lbl, key in (("Total Sales Today", "r1"), ("Total Sales Yesterday", "r2"),
+                             ("Same Day LY Sales", "ly")):
+                name = "{0} — {1}".format(lbl, ccy)
+                got = kpi.get(name)
+                if got is None or abs(float(got) - ref[key]) > 0.005:
+                    kbad.append("{0}={1} want {2}".format(name, got, ref[key]))
+        for lbl, want in (("Total Orders", REF_ORDERS["r1"]),
+                          ("Yesterday Orders", REF_ORDERS["r2"]),
                           ("Rows (account x marketplace)", REF_ROWS)):
             if int(kpi.get(lbl) or 0) != want:
                 kbad.append("{0}={1}".format(lbl, kpi.get(lbl)))
-        check("V11 KPI panel reconciles to the whole-channel aggregate", not kbad, "; ".join(kbad))
+        check("V11 KPI totals reconcile PER CURRENCY to the live aggregate",
+              not kbad, "; ".join(kbad[:6]))
 
-        hbad = [kk for kk, r in rows.items() if not str(ws.cell(r, 23).value or "").strip()]
+        blended = [l for l in kpi
+                   if l in ("Total Sales Today", "Total Sales Yesterday",
+                            "Same Day LY Sales", "Average Order Value", "Overall Growth")]
+        check("V17 no blended cross-currency money total anywhere on the KPI sheet",
+              not blended, "found {0}".format(blended))
+
+        hbad = [kk for kk, r in rows.items() if not str(ws.cell(r, 24).value or "").strip()]
         check("V13 AH Holder present on every row", not hbad, "; ".join(hbad))
 
         akey, aval = SELLER_HUB_ANCHOR
-        got = ws.cell(rows[akey], 4).value if akey in rows else None
+        got = ws.cell(rows[akey], 5).value if akey in rows else None
         check("V14 SELLER HUB ANCHOR: LEDSone UK / UK = 837.93",
               got is not None and abs(float(got) - aval) < 0.005, "got {0}".format(got))
 
