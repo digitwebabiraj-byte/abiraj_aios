@@ -27,6 +27,7 @@
       "site": "UK",
       "display": "LEDSone UK",
       "holder": "Sharmilan",
+      "currency": "GBP",
       "s_r1": 837.93,
       "s_r2": 863.36,
       "s_ly": 1233.51,
@@ -40,14 +41,14 @@
       "ah_r2": 336.33,
       "active": 2843,
       "ph_l": 1245,
-      "ah_l": 1598,
-      "currency": "GBP"
+      "ah_l": 1598
     },
     {
       "key": "electricalsone",
       "site": "UK",
       "display": "ElectricalSone UK",
       "holder": "Kobiga",
+      "currency": "GBP",
       "s_r1": 397.95,
       "s_r2": 444.6,
       "s_ly": 497.19,
@@ -61,14 +62,14 @@
       "ah_r2": 166.19,
       "active": 1513,
       "ph_l": 548,
-      "ah_l": 965,
-      "currency": "GBP"
+      "ah_l": 965
     },
     {
       "key": "led_sone",
       "site": "Germany",
       "display": "LEDSone UK",
       "holder": "Sharmilan",
+      "currency": "EUR",
       "s_r1": 306.58,
       "s_r2": 61.33,
       "s_ly": 534.56,
@@ -82,14 +83,14 @@
       "ah_r2": 33.65,
       "active": 1353,
       "ph_l": 214,
-      "ah_l": 1139,
-      "currency": "EUR"
+      "ah_l": 1139
     },
     {
       "key": "so_926407",
       "site": "UK",
       "display": "Sunsone",
       "holder": "Powsteena",
+      "currency": "GBP",
       "s_r1": 261.26,
       "s_r2": 198.0,
       "s_ly": 259.76,
@@ -103,14 +104,14 @@
       "ah_r2": 146.1,
       "active": 1150,
       "ph_l": 457,
-      "ah_l": 693,
-      "currency": "GBP"
+      "ah_l": 693
     },
     {
       "key": "ledsonede",
       "site": "Germany",
       "display": "LEDSone DE",
       "holder": "Jarsini",
+      "currency": "EUR",
       "s_r1": 149.5,
       "s_r2": 241.79,
       "s_ly": 212.66,
@@ -124,14 +125,14 @@
       "ah_r2": 208.41,
       "active": 634,
       "ph_l": 82,
-      "ah_l": 552,
-      "currency": "EUR"
+      "ah_l": 552
     },
     {
       "key": "led_sone",
       "site": "Ireland",
       "display": "LEDSone UK",
       "holder": "Sharmilan",
+      "currency": "EUR",
       "s_r1": 0.0,
       "s_r2": 5.81,
       "s_ly": 0.0,
@@ -145,14 +146,14 @@
       "ah_r2": 5.81,
       "active": 622,
       "ph_l": 0,
-      "ah_l": 622,
-      "currency": "EUR"
+      "ah_l": 622
     },
     {
       "key": "led_sone",
       "site": "Austria",
       "display": "LEDSone UK",
       "holder": "Sharmilan",
+      "currency": "EUR",
       "s_r1": 0.0,
       "s_r2": 0.0,
       "s_ly": 0.0,
@@ -166,14 +167,14 @@
       "ah_r2": 0.0,
       "active": 592,
       "ph_l": 0,
-      "ah_l": 592,
-      "currency": "EUR"
+      "ah_l": 592
     },
     {
       "key": "huettenlampen",
       "site": "Germany",
       "display": "Huetten Lampen DE",
       "holder": "Jarsini",
+      "currency": "EUR",
       "s_r1": 397.19,
       "s_r2": 256.76,
       "s_ly": 394.9,
@@ -187,14 +188,14 @@
       "ah_r2": 201.27,
       "active": 541,
       "ph_l": 92,
-      "ah_l": 449,
-      "currency": "EUR"
+      "ah_l": 449
     },
     {
       "key": "coventrylights",
       "site": "UK",
       "display": "Coventry Lights",
       "holder": "Genga",
+      "currency": "GBP",
       "s_r1": 202.68,
       "s_r2": 280.92,
       "s_ly": 113.61,
@@ -208,14 +209,14 @@
       "ah_r2": 271.95,
       "active": 537,
       "ph_l": 0,
-      "ah_l": 537,
-      "currency": "GBP"
+      "ah_l": 537
     },
     {
       "key": "electricalsone",
       "site": "Germany",
       "display": "ElectricalSone UK",
       "holder": "Kobiga",
+      "currency": "EUR",
       "s_r1": 45.48,
       "s_r2": 159.54,
       "s_ly": 105.46,
@@ -229,14 +230,14 @@
       "ah_r2": 138.84,
       "active": 486,
       "ph_l": 36,
-      "ah_l": 450,
-      "currency": "EUR"
+      "ah_l": 450
     },
     {
       "key": "vintageinterior",
       "site": "UK",
       "display": "Vintage Interior",
       "holder": "— not assigned",
+      "currency": "GBP",
       "s_r1": 157.59,
       "s_r2": 75.78,
       "s_ly": 82.87,
@@ -250,14 +251,14 @@
       "ah_r2": 77.1,
       "active": 474,
       "ph_l": 0,
-      "ah_l": 474,
-      "currency": "GBP"
+      "ah_l": 474
     },
     {
       "key": "dctransformer",
       "site": "UK",
       "display": "DC Transformer",
       "holder": "— not assigned",
+      "currency": "GBP",
       "s_r1": 41.99,
       "s_r2": 57.7,
       "s_ly": 27.34,
@@ -271,14 +272,14 @@
       "ah_r2": 60.76,
       "active": 468,
       "ph_l": 0,
-      "ah_l": 468,
-      "currency": "GBP"
+      "ah_l": 468
     },
     {
       "key": "re6865",
       "site": "UK",
       "display": "Retro LED",
       "holder": "— not assigned",
+      "currency": "GBP",
       "s_r1": 0.0,
       "s_r2": 65.78,
       "s_ly": 314.72,
@@ -292,14 +293,14 @@
       "ah_r2": 68.78,
       "active": 403,
       "ph_l": 0,
-      "ah_l": 403,
-      "currency": "GBP"
+      "ah_l": 403
     },
     {
       "key": "led_sone",
       "site": "US",
       "display": "LEDSone UK",
       "holder": "Sharmilan",
+      "currency": "USD",
       "s_r1": 0.0,
       "s_r2": 0.0,
       "s_ly": 0.0,
@@ -313,14 +314,14 @@
       "ah_r2": 0.0,
       "active": 391,
       "ph_l": 38,
-      "ah_l": 353,
-      "currency": "USD"
+      "ah_l": 353
     },
     {
       "key": "electricalsone",
       "site": "US",
       "display": "ElectricalSone UK",
       "holder": "Kobiga",
+      "currency": "USD",
       "s_r1": 0.0,
       "s_r2": 0.0,
       "s_ly": 0.0,
@@ -334,14 +335,14 @@
       "ah_r2": 0.0,
       "active": 380,
       "ph_l": 3,
-      "ah_l": 377,
-      "currency": "USD"
+      "ah_l": 377
     },
     {
       "key": "led_sone",
       "site": "France",
       "display": "LEDSone UK",
       "holder": "Sharmilan",
+      "currency": "EUR",
       "s_r1": 0.0,
       "s_r2": 26.33,
       "s_ly": 0.0,
@@ -355,14 +356,14 @@
       "ah_r2": 9.08,
       "active": 368,
       "ph_l": 0,
-      "ah_l": 368,
-      "currency": "EUR"
+      "ah_l": 368
     },
     {
       "key": "neighbourmarket",
       "site": "US",
       "display": "Neighbour Market",
       "holder": "— not assigned",
+      "currency": "USD",
       "s_r1": 0.0,
       "s_r2": 29.62,
       "s_ly": 0.0,
@@ -376,14 +377,14 @@
       "ah_r2": 26.99,
       "active": 344,
       "ph_l": 16,
-      "ah_l": 328,
-      "currency": "USD"
+      "ah_l": 328
     },
     {
       "key": "so_926407",
       "site": "Germany",
       "display": "Sunsone",
       "holder": "Sivajitha",
+      "currency": "EUR",
       "s_r1": 32.29,
       "s_r2": 78.15,
       "s_ly": 152.48,
@@ -397,14 +398,14 @@
       "ah_r2": 68.09,
       "active": 295,
       "ph_l": 0,
-      "ah_l": 295,
-      "currency": "EUR"
+      "ah_l": 295
     },
     {
       "key": "lighting_sone",
       "site": "UK",
       "display": "Lighting Sone",
       "holder": "— not assigned",
+      "currency": "GBP",
       "s_r1": 0.0,
       "s_r2": 16.58,
       "s_ly": 0.0,
@@ -418,14 +419,14 @@
       "ah_r2": 16.58,
       "active": 247,
       "ph_l": 0,
-      "ah_l": 247,
-      "currency": "GBP"
+      "ah_l": 247
     },
     {
       "key": "led_sone",
       "site": "Canada",
       "display": "LEDSone UK",
       "holder": "Sharmilan",
+      "currency": "CAD",
       "s_r1": 0.0,
       "s_r2": 0.0,
       "s_ly": 0.0,
@@ -439,14 +440,14 @@
       "ah_r2": 0.0,
       "active": 184,
       "ph_l": 0,
-      "ah_l": 184,
-      "currency": "CAD"
+      "ah_l": 184
     },
     {
       "key": "electricalsone",
       "site": "France",
       "display": "ElectricalSone UK",
       "holder": "Kobiga",
+      "currency": "EUR",
       "s_r1": 0.0,
       "s_r2": 0.0,
       "s_ly": 0.0,
@@ -460,14 +461,14 @@
       "ah_r2": 0.0,
       "active": 167,
       "ph_l": 19,
-      "ah_l": 148,
-      "currency": "EUR"
+      "ah_l": 148
     },
     {
       "key": "homin_gmbh",
       "site": "Germany",
       "display": "Homin GmbH",
       "holder": "— not assigned",
+      "currency": "EUR",
       "s_r1": 152.91,
       "s_r2": 28.98,
       "s_ly": 0.0,
@@ -481,14 +482,14 @@
       "ah_r2": 28.98,
       "active": 164,
       "ph_l": 0,
-      "ah_l": 164,
-      "currency": "EUR"
+      "ah_l": 164
     },
     {
       "key": "electricalsone",
       "site": "Canada",
       "display": "ElectricalSone UK",
       "holder": "Kobiga",
+      "currency": "CAD",
       "s_r1": 0.0,
       "s_r2": 0.0,
       "s_ly": 0.0,
@@ -502,14 +503,14 @@
       "ah_r2": 0.0,
       "active": 154,
       "ph_l": 0,
-      "ah_l": 154,
-      "currency": "CAD"
+      "ah_l": 154
     },
     {
       "key": "led_sone",
       "site": "Italy",
       "display": "LEDSone UK",
       "holder": "Sharmilan",
+      "currency": "EUR",
       "s_r1": 0.0,
       "s_r2": 0.0,
       "s_ly": 0.0,
@@ -523,14 +524,14 @@
       "ah_r2": 0.0,
       "active": 137,
       "ph_l": 0,
-      "ah_l": 137,
-      "currency": "EUR"
+      "ah_l": 137
     },
     {
       "key": "so_926407",
       "site": "France",
       "display": "Sunsone",
       "holder": "— not assigned",
+      "currency": "EUR",
       "s_r1": 0.0,
       "s_r2": 0.0,
       "s_ly": 0.0,
@@ -544,14 +545,14 @@
       "ah_r2": 0.0,
       "active": 70,
       "ph_l": 0,
-      "ah_l": 70,
-      "currency": "EUR"
+      "ah_l": 70
     },
     {
       "key": "bestbringer",
       "site": "UK",
       "display": "Bestbringer",
       "holder": "— not assigned",
+      "currency": "GBP",
       "s_r1": 0.0,
       "s_r2": 0.0,
       "s_ly": 0.0,
@@ -565,14 +566,14 @@
       "ah_r2": 0.0,
       "active": 65,
       "ph_l": 0,
-      "ah_l": 65,
-      "currency": "GBP"
+      "ah_l": 65
     },
     {
       "key": "led_sone",
       "site": "Spain",
       "display": "LEDSone UK",
       "holder": "Sharmilan",
+      "currency": "EUR",
       "s_r1": 0.0,
       "s_r2": 0.0,
       "s_ly": 0.0,
@@ -586,14 +587,14 @@
       "ah_r2": 0.0,
       "active": 14,
       "ph_l": 0,
-      "ah_l": 14,
-      "currency": "EUR"
+      "ah_l": 14
     },
     {
       "key": "led_sone",
       "site": "Netherlands",
       "display": "LEDSone UK",
       "holder": "Sharmilan",
+      "currency": "EUR",
       "s_r1": 0.0,
       "s_r2": 0.0,
       "s_ly": 0.0,
@@ -607,14 +608,14 @@
       "ah_r2": 0.0,
       "active": 6,
       "ph_l": 0,
-      "ah_l": 6,
-      "currency": "EUR"
+      "ah_l": 6
     },
     {
       "key": "huettenlampen",
       "site": "Italy",
       "display": "Huetten Lampen DE",
       "holder": "Jarsini",
+      "currency": "EUR",
       "s_r1": 0.0,
       "s_r2": 0.0,
       "s_ly": 0.0,
@@ -628,14 +629,14 @@
       "ah_r2": 0.0,
       "active": 2,
       "ph_l": 0,
-      "ah_l": 2,
-      "currency": "EUR"
+      "ah_l": 2
     },
     {
       "key": "ledsonede",
       "site": "UK",
       "display": "LEDSone DE",
       "holder": "Jarsini",
+      "currency": "GBP",
       "s_r1": 0.0,
       "s_r2": 0.0,
       "s_ly": 0.0,
@@ -649,8 +650,7 @@
       "ah_r2": 0.0,
       "active": 2,
       "ph_l": 0,
-      "ah_l": 2,
-      "currency": "GBP"
+      "ah_l": 2
     }
   ]
 }

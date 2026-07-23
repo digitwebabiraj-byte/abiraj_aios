@@ -167,3 +167,27 @@ CURRENCY_SYMBOL = {"GBP": "£", "EUR": "€", "USD": "$", "CAD": "CA$"}
 
 for _r in ROWS:
     _r["currency"] = SITE_CURRENCY[_r["site"]]
+
+# ---------------------------------------------------------------------------
+# Maps the daily run (REQ-17-D02) needs to rebuild ROWS from live SQL, kept here
+# so the scheduled job and the one-off build share exactly one definition.
+# ---------------------------------------------------------------------------
+DISPLAY = {
+    "led_sone": "LEDSone UK", "electricalsone": "ElectricalSone UK",
+    "so_926407": "Sunsone", "ledsonede": "LEDSone DE",
+    "huettenlampen": "Huetten Lampen DE", "coventrylights": "Coventry Lights",
+    "vintageinterior": "Vintage Interior", "dctransformer": "DC Transformer",
+    "re6865": "Retro LED", "neighbourmarket": "Neighbour Market",
+    "lighting_sone": "Lighting Sone", "homin_gmbh": "Homin GmbH",
+    "bestbringer": "Bestbringer",
+}
+
+# AH holder is a MANUAL map - no database records who owns an account. Supplied by
+# Thinesh 2026-07-23. Sunsone is ONE eBay account selling into both UK and Germany,
+# so it is the only one split by marketplace. "Jarshini" matched nobody in
+# staff.users (which holds Jarsini id 91 AND Jasmini id 84); Thinesh confirmed Jarsini.
+HOLDER_SITE = {("so_926407", "UK"): "Powsteena", ("so_926407", "Germany"): "Sivajitha"}
+HOLDER_ACCT = {
+    "led_sone": "Sharmilan", "electricalsone": "Kobiga", "coventrylights": "Genga",
+    "huettenlampen": "Jarsini", "ledsonede": "Jarsini",
+}

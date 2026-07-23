@@ -5,10 +5,10 @@ __pycache__/
 # Excel lock files, if a workbook is open while the builder runs
 ~$*.xlsx
 
-# Secrets - passwords never enter git (see AUTOMATION_PLAYBOOK.md)
+# Secrets - passwords NEVER enter git (see AUTOMATION_PLAYBOOK.md)
 automation/dst_secrets.bat
 
-# Run logs and status files - machine-local, regenerated
+# Run logs, status and the collapse-guard baseline - machine-local, regenerated
 automation/*.log
 automation/dst_status.txt
 automation/dst_last_good.json
