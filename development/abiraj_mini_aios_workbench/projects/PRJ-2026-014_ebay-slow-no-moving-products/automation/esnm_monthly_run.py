@@ -182,6 +182,9 @@ def main():
     # ---------- publish ----------
     if DRY:
         log("DRY RUN — ph_task NOT touched")
+        log("NOTE: a dry run still REBUILDS the on-disk artefacts. If you dry-ran with an anchor "
+            "other than the one currently published, the files on disk now differ from ph_task. "
+            "Re-run with the published anchor to resync, or run for real.")
     else:
         sys.path.insert(0, HERE)
         import publish_esnm_ph_task as P
