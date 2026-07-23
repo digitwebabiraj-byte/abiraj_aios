@@ -167,3 +167,20 @@ F (actionability), G (Rule 8 threshold) all open · D02 and D03 not started.
   including a seeded 25-listing × ~15-field sample with 0 mismatches in ~375 comparisons.
 - 🔴 **OPEN — decision H: the anchor sits on a partial day.** Rebuilds drift (Rule 1 8,067→8,066,
   row count 11,156→11,176). Not yet fixed because it changes figures already published.
+
+### 2026-07-23 — business verification
+
+- ✅ **Dashboard verified by Thinesh ("all ok")** — Business Validator gate closed. The report as
+  published (ph_task 411-414, `ebay_priors`, v7, anchor 2026-07-22) is accepted by the requester.
+- ⚠ **Recorded per the REQ-15 precedent:** an artefact verification does **not** by itself close a
+  business assumption that must be confirmed explicitly. Two remain load-bearing:
+  - **Decision C — rule precedence.** The source assigns priorities but never states multi-match
+    resolution. The chosen order (Critical → High → Medium → Low, first match wins, lower rule
+    number inside a band) is what makes **8,065 of 11,176 rows** read "End Listing" and what
+    shadows **7,021 listings** out of Rule 10 entirely. If this is ruled differently the headline
+    number and roughly a third of the recommendations change.
+  - **Decision F — actionability.** 72.2% of rows carry one Critical action. The sharper cut is
+    already measurable in the data: **1,299 listings sold 5,001 units in the same window last year
+    and zero this year** (Declined) vs 3,761 Dormant and 3,007 Never-sold.
+- Also still open: **A** (Watchers / Rule 6 permanently dark), **G** (£5.00 Rule 8 threshold),
+  **B** (11 lost traffic days), ID confirmation, and Sajeesan / Tamil Selvan / Varmen sign-off.

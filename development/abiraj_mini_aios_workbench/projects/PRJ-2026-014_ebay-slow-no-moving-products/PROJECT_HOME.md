@@ -5,7 +5,7 @@
 | **Project ID** | `PRJ-2026-014_ebay-slow-no-moving-products` |
 | **Project code** | `esnm` |
 | **Task ID** | `REQ-16_ebay-slow-no-moving-products` |
-| **Status** | **REQ-16-D01 BUILT + INDEPENDENTLY VERIFIED + PUBLISHED 2026-07-22** (ph_task 411-414, `ebay_priors`, v4) · read-only · **not automated** — awaiting reviewer sign-off |
+| **Status** | **REQ-16-D01 DELIVERED · VERIFIED · PUBLISHED · AUTOMATED · BUSINESS-VERIFIED** (ph_task 411-414, `ebay_priors`, v7 · monthly job next run 2026-08-02) — **dashboard verified by Thinesh 2026-07-23**; technical/queryability/coordination sign-off still open |
 | **Opened** | 2026-07-22 |
 | **Owner** | Abiraj |
 | **Coordinator** | Varmen |
@@ -142,7 +142,7 @@ was consuming ~90px of an already short embed. Every caveat it carried is stated
 
 - **Sajeesan (technical)** — ⬜ pending
 - **Tamil Selvan (queryability)** — ⬜ pending
-- **Thinesh (business)** — ⬜ pending
+- **Thinesh (business)** — ✅ **dashboard verified 2026-07-23 ("all ok").** ⚠ This records review of the **artefact**. Following the REQ-15 precedent, it does **not** by itself close decisions **C** (rule precedence) or **F** (actionability), which need explicit confirmation: precedence is what makes **8,065 of 11,176 rows** read "End Listing" and what shadows **7,021 listings** out of Rule 10.
 - **Varmen (coordination / ID approval)** — ⬜ pending
 
 ## Register links
