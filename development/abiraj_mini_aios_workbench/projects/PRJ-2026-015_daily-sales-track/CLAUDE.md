@@ -31,6 +31,22 @@ The one exception, and it is narrow: **the sample's arithmetic relationships are
 used** (32 of 32 re-derived exactly — see the SOURCE_MANIFEST). Those fix *how the columns relate*,
 not *what feeds them*.
 
+
+## 🔴 Money is per currency — never blended
+
+`order_management.orders.total` is stored in the **marketplace's own currency**, not GBP —
+confirmed by joining `order_management.order_info.currency`, which matches `amount_paid` exactly.
+Site → currency comes from `listings.market_place_id_mapping`: UK = GBP; Germany, France, Ireland,
+Austria, Italy, Spain, Netherlands = EUR; US = USD; Canada = CAD.
+
+**There is no exchange-rate table anywhere in `ledsone`**, so nothing is converted. Every row shows
+its own symbol and totals are reported **one row per currency**.
+
+⚠ The first build rendered every figure with a pound sign and summed them. 20 of 30 rows were
+mislabelled and the headline read **"+3.19% up"** when GBP had actually fallen **5.16%** and EUR
+risen **26.23%** — the blend hid a decline in the biggest market. Three verification gates now exist
+specifically to stop that returning (V15 row currency, V16 own symbol, V17 no blended total).
+
 ## 0. 🔒 SOURCE LOCK — owner instruction 2026-07-23
 
 **Scope of this rule: DATA RETRIEVAL.** Every figure in this report is retrieved through these two

@@ -5,10 +5,10 @@ and the same day last year?**
 
 | | |
 |---|---|
-| Status | **ONBOARDING — specification received, nothing built.** No live query has been run for this requirement. |
+| Status | **REQ-17-D01 DELIVERED · VERIFIED (18/18) · PUBLISHED** — ph_task ids 422-425, audience `ebay_priors`, v4. Not automated; reviewer sign-off pending. |
 | Code | `dst` · Task `REQ-17_daily-sales-track` |
-| Scope | ⚠ **UNDECIDED** — channel, accounts and marketplaces are all open (decisions **F**, **G**) |
-| Output | Read-only daily tracker — 22 columns per account per day + a 9-KPI panel. Changes nothing on any marketplace. |
+| Scope | eBay, **all accounts**, every marketplace with live listings — **30 account × marketplace rows** |
+| Output | Read-only daily tracker — **24 columns**, money **per currency**, + KPI cards. Changes nothing on any marketplace. |
 | Opened | 2026-07-23 |
 
 ⚠ **IDs pending owner confirmation** — the source file carries no requirement number. `REQ-17`

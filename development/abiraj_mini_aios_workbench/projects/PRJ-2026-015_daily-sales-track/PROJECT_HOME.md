@@ -5,7 +5,7 @@
 | **Project ID** | `PRJ-2026-015_daily-sales-track` |
 | **Project code** | `dst` |
 | **Task ID** | `REQ-17_daily-sales-track` |
-| **Status** | **ONBOARDING — specification received and analysed; NOTHING BUILT.** No live query has been run for this requirement. Blocked on decision **A** for 6 of 22 columns. |
+| **Status** | **REQ-17-D01 DELIVERED · VERIFIED · PUBLISHED 2026-07-23** — 30 account × marketplace rows, 24 columns, money per currency. 18/18 verification checks. Live on `ph_task` 422-425 (`ebay_priors`, v4). **Not automated (D02 not started); reviewer sign-off pending.** |
 | **Opened** | 2026-07-23 |
 | **Owner** | Abiraj |
 | **Coordinator** | Varmen |
@@ -20,6 +20,30 @@
 > ⚠ **The project name is deliberately channel-neutral** — `daily-sales-track`, not
 > `ebay-daily-sales-track`. The source never names a channel. A project ID must not be renamed later,
 > so it does not claim one now. See decision **G**.
+
+
+## Grain: one row per account × marketplace
+
+**30 rows.** Changed from one-row-per-account on 2026-07-23 after a Seller Hub check: LEDSone UK
+showed **£837.93** for 22 Jul while the account row read £1,144.51. Both were right — the account
+row combined UK (£837.93) and Germany (€306.58). Seller Hub reports per marketplace, so this report
+does too, and **every row ties to one Seller Hub screen**. That anchor is now a permanent
+verification check.
+
+## 🔴 Money is per currency — never blended
+
+`order_management.orders.total` is stored in the **marketplace's own currency**, not GBP —
+confirmed by joining `order_management.order_info.currency`, which matches `amount_paid` exactly.
+Site → currency comes from `listings.market_place_id_mapping`: UK = GBP; Germany, France, Ireland,
+Austria, Italy, Spain, Netherlands = EUR; US = USD; Canada = CAD.
+
+**There is no exchange-rate table anywhere in `ledsone`**, so nothing is converted. Every row shows
+its own symbol and totals are reported **one row per currency**.
+
+⚠ The first build rendered every figure with a pound sign and summed them. 20 of 30 rows were
+mislabelled and the headline read **"+3.19% up"** when GBP had actually fallen **5.16%** and EUR
+risen **26.23%** — the blend hid a decline in the biggest market. Three verification gates now exist
+specifically to stop that returning (V15 row currency, V16 own symbol, V17 no blended total).
 
 ## Business question
 

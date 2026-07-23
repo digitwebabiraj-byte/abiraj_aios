@@ -4,7 +4,7 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 
 | Task ID | Deliverable | Status | Owner | Evidence | Next |
 |---|---|---|---|---|---|
-| `REQ-17_daily-sales-track` | **REQ-17-D01** — read-only daily sales tracker (22 columns per account per day + a 9-KPI panel): governed dataset + dashboard + workbook | **ONBOARDING 2026-07-23 — NOT BUILT.** Specification received, read cell-by-cell and analysed; source imported COPY-only with SHA-256 verified byte-identical. **No live query has been run.** Blocked on decision **A** for 6 of 22 columns | Abiraj | `evidence/source_documents/REQ-17_.../` (source + SOURCE_MANIFEST) · `DigitWeb_Works_Abiraj/23_07_2026/2026-07-23_abiraj_REQ-dst_REQ-17-D01.md` (requirement document) | Run the Step-2 data-availability audit; then route decisions **A, B, C, D, E, F** to Thinesh |
+| `REQ-17_daily-sales-track` | **REQ-17-D01** — read-only daily sales tracker (22 columns per account per day + a 9-KPI panel): governed dataset + dashboard + workbook | **DELIVERED · VERIFIED · PUBLISHED 2026-07-23.** 30 account × marketplace rows, 24 columns, money per currency (never blended), 18/18 checks, ph_task 422-425 v4. Not automated. Superseded note follows:  Specification received, read cell-by-cell and analysed; source imported COPY-only with SHA-256 verified byte-identical. **No live query has been run.** Blocked on decision **A** for 6 of 22 columns | Abiraj | `evidence/source_documents/REQ-17_.../` (source + SOURCE_MANIFEST) · `DigitWeb_Works_Abiraj/23_07_2026/2026-07-23_abiraj_REQ-dst_REQ-17-D01.md` (requirement document) | Run the Step-2 data-availability audit; then route decisions **A, B, C, D, E, F** to Thinesh |
 
 ## Deliverable plan
 

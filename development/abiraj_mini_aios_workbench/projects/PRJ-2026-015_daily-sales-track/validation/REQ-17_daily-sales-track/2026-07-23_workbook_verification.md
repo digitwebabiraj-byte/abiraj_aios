@@ -127,3 +127,81 @@ Nothing is omitted, and the totals row reconciles to the workbook.
 - **Business plausibility.** No figure has yet been checked against eBay Seller Hub by a human. That
   remains the outstanding acceptance step — REQ-13 was corrected five times precisely because early
   passes skipped it.
+
+---
+
+# ADDENDUM 2026-07-23 - grain change, currency defect, two sticky-layout defects
+
+The record above describes the **first** build (13 rows, one per account, 22 columns). It was
+superseded the same day. Kept for history; this addendum is authoritative.
+
+## Final shape
+
+**30 rows, one per account x marketplace. 24 columns. Money per currency, never blended.
+18/18 verification checks. Published to `ph_task` 422-425 (`ebay_priors`), v4.**
+
+## Defect 1 - grain (found by an external check, not by the harness)
+
+A Seller Hub screenshot showed **LEDSone UK = GBP 837.93** for 22 Jul; the account row read
+**GBP 1,144.51**. Both were correct - the account row combined UK (GBP 837.93) and Germany
+(EUR 306.58). Seller Hub reports per marketplace, so the report was rebuilt at account x
+marketplace. Totals were unchanged by the split (2,983.35 / 142 orders / 223 units), which proves
+nothing was lost or duplicated. **V14 now fails the build if LEDSone UK / UK ever stops equalling
+GBP 837.93.**
+
+## Defect 2 - currency (the serious one)
+
+`order_management.orders.total` is stored in the **marketplace's own currency**, not GBP. Confirmed
+by joining `order_management.order_info.currency`, which matches `amount_paid` exactly:
+
+| Currency | 22 Jul | 21 Jul | Same day LY | Orders 22 Jul |
+|---|---|---|---|---|
+| GBP | 1,899.40 | 2,002.72 | 2,529.00 | 97 |
+| EUR | 1,083.95 | 858.69 | 1,400.06 | 45 |
+| USD | 0.00 | 29.62 | 0.00 | 0 |
+
+The first build rendered **every** figure with a pound sign and summed them. **20 of 30 rows were
+mislabelled**, and every cross-currency total was meaningless - `Total Sales Today GBP 2,983.35` was
+GBP 1,899.40 + EUR 1,083.95 added together.
+
+**The blend also inverted the story.** Split properly, **GBP fell 5.16%** while **EUR rose 26.23%**;
+the blended headline read **"+3.19% up"**, hiding a decline in the largest market. That is the real
+damage - not a cosmetic symbol.
+
+**Fix:** per-row symbol from `listings.market_place_id_mapping`; totals reported one row per
+currency; nothing converted, because `ledsone` holds **no exchange-rate table** (searched
+`exchange` / `fx` / `currency` / `conversion_rate` - zero objects).
+
+**Three new gates prevent recurrence:** V15 (row currency matches the marketplace mapping),
+V16 (money cells carry their own symbol), **V17 (fails if any blended cross-currency total appears
+on the KPI sheet)**. Two publish-time gates also refuse to ship if the EUR total is missing or the
+old blended figure reappears.
+
+## Defects 3 and 4 - sticky layout, both found by measuring in a real browser
+
+| # | Defect | Effect |
+|---|---|---|
+| 3 | **Both header rows pinned at `top:0`** | Scrolling made the column-name row rise and **cover the group headers** - undoing the column grouping precisely when a reader needs it |
+| 4 | **All three currency footer rows pinned at `bottom:0`** | They stacked on each other; only the last (all-zero **USD**) row stayed visible while scrolling |
+
+Same root cause both times: multiple sticky rows sharing one offset. Fixed by staggering
+(`--grp-h`, `--foot-h`), with offsets set to **measured** heights - the first attempt at each was
+2-4px out and left a visible overlap.
+
+## Layout in the ph_task portal
+
+The portal embeds the page in a **~700px** container; the viewport-locked layout compressed the
+table to ~6 rows. A `@media (max-height:820px)` rule now reclaims the chrome automatically
+(11 rows, 14 maximised).
+
+> **An alternative was tried and rejected:** letting the page grow instead of compress rendered all
+> 30 rows, but **broke `position:sticky` entirely** (headers scrolled off at -352px). For a
+> 24-column financial table, losing the headers is worse than a shorter table.
+
+## Still not verified
+
+- **Active Listing is understated ~5-6%** - eBay shows 3,033 active on LEDSone UK's UK site against
+  2,843 here; 6,883 vs 6,510 account-wide. Cause: the listings mirror leaves stale `is_ended` flags
+  on auto-renewing listings. A sync defect **outside this report**; disclosed on both artefacts.
+- **Trend band +/-5% is provisional** (decision E).
+- **No reviewer sign-off** - Sajeesan, Tamil Selvan, Thinesh all pending.
