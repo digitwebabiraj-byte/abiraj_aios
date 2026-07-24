@@ -1,0 +1,7 @@
+smaw_last_good.json
+smaw_status.txt
+smaw_run.log
+smaw_data_all.json
+smaw_dashboard.html
+smaw_ph_task_backup_*.html
+__pycache__/

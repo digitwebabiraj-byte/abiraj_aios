@@ -4,9 +4,11 @@ import json, os
 from datetime import date
 from collections import Counter
 
-rows = json.load(open("data_all.json", encoding="utf-8"))
+# Paths default to this folder (standalone), but the weekly automation runner overrides them via
+# env vars so a scheduled run builds into automation/ without touching the canonical files.
+rows = json.load(open(os.environ.get("SMAW_DATA", "data_all.json"), encoding="utf-8"))
 TODAY = date.today().strftime("%Y-%m-%d")
-FILE_PATH = os.path.abspath("Table5_Weekly_Stock_Check_Thuwaraga_ALL.html")
+FILE_PATH = os.environ.get("SMAW_OUT", os.path.abspath("Table5_Weekly_Stock_Check_Thuwaraga_ALL.html"))
 
 # refined category splits the SQL's "No Stock / Critical" into real stockouts vs dead listings
 def refine(r):
@@ -296,6 +298,6 @@ kpi();actions();head();body();
 """
 
 HTML = HTML.replace("__TODAY__", TODAY).replace("__DATA__", DATA_JSON)
-out = "Table5_Weekly_Stock_Check_Thuwaraga_ALL.html"
+out = FILE_PATH   # SMAW_OUT env override (automation) or the default name (standalone)
 open(out, "w", encoding="utf-8").write(HTML)
 print("saved", out, "| rows", len(rows), "| categories", dict(counts))
