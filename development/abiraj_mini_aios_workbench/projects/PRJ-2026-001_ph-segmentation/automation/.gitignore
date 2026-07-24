@@ -1,0 +1,5 @@
+seg_last_good.json
+seg_status.txt
+backups/
+seg_run.log
+__pycache__/
