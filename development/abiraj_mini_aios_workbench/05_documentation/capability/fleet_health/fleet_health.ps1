@@ -120,7 +120,7 @@ foreach ($g in 'Daily','Weekly','Monthly') {
       <tr class="sev-$($r.sev)">
         <td class="stripe"></td>
         <td class="job"><a href="$($r.dirurl)" title="Open this job's folder">$($r.n)</a></td>
-        <td class="status"><span class="dot"></span>$($r.txt)</td>
+        <td class="status"><span class="chip"><span class="dot"></span>$($r.txt)</span></td>
         <td class="tnum">$lr</td>
         <td class="tnum">$nx</td>
         <td class="sum">$sum</td>
@@ -143,61 +143,70 @@ $html = @"
 <title>AIOS Automation - Fleet Health</title>
 <style>
 :root{
-  --bg:#0d1420; --panel:#141d2c; --panel2:#111927; --line:#25344b; --ink:#eaf0f9; --mut:#8493ab;
-  --accent:#48b6d8;
-  --ok:#3ec98a; --ok-bg:#0f2e20; --wait:#e0a63e; --wait-bg:#2e2410; --crit:#ff5f66; --crit-bg:#331317; --run:#5b8cff; --run-bg:#131f3d;
+  --bg:#eef2f9; --bg2:#f7f9fd; --panel:#ffffff; --line:#e6ebf4; --line2:#eef2f8;
+  --ink:#1b2540; --ink2:#33405c; --mut:#7b879e; --accent:#4d6ef5;
+  --ok:#12a150; --ok-bg:#e7f7ee; --ok-bd:#bfe6cf;
+  --wait:#b57611; --wait-bg:#fdf3e0; --wait-bd:#f0dcae;
+  --crit:#dc2b3a; --crit-bg:#fdebec; --crit-bd:#f6c9cd;
+  --run:#2f63e6; --run-bg:#e9f0ff; --run-bd:#c6d8fb;
+  --shadow:0 1px 2px rgba(20,32,64,.04), 0 4px 16px rgba(20,32,64,.06);
+  --shadow-sm:0 1px 2px rgba(20,32,64,.05);
 }
 *{box-sizing:border-box} html,body{margin:0}
-body{background:radial-gradient(1200px 600px at 20% -10%, #16233a 0%, var(--bg) 60%) fixed;
-  color:var(--ink); font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  padding:30px clamp(16px,4vw,44px); -webkit-font-smoothing:antialiased}
+body{background:linear-gradient(180deg,var(--bg2),var(--bg)) fixed;
+  color:var(--ink); font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,sans-serif;
+  padding:34px clamp(16px,5vw,52px); -webkit-font-smoothing:antialiased; letter-spacing:.005em}
 .tnum{font-variant-numeric:tabular-nums}
-header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
-h1{font-size:18px;letter-spacing:.02em;margin:0;font-weight:650}
-h1 .b{color:var(--mut);font-weight:400}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+h1{font-size:20px;letter-spacing:-.01em;margin:0;font-weight:700}
+h1 .b{color:var(--mut);font-weight:500}
 .asof{color:var(--mut);font-size:12.5px}
-.banner{display:flex;align-items:center;gap:12px;border-radius:13px;padding:15px 18px;margin-bottom:20px;
-  border:1px solid var(--line);font-size:15px;font-weight:600}
-.banner .ic{font-size:19px;line-height:1}
-.banner.ok{background:linear-gradient(90deg,var(--ok-bg),transparent);border-color:#1c5238;color:#7fe3b4}
-.banner.wait,.banner.run{background:linear-gradient(90deg,var(--run-bg),transparent);border-color:#274a86;color:#9db9ff}
-.banner.crit{background:linear-gradient(90deg,var(--crit-bg),transparent);border-color:#6a2027;color:#ff9297}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px}
-.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.kpi b{font-size:26px;display:block;line-height:1.1;font-variant-numeric:tabular-nums}
-.kpi span{color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.banner{display:flex;align-items:center;gap:13px;border-radius:16px;padding:17px 20px;margin-bottom:22px;
+  font-size:15px;font-weight:600;box-shadow:var(--shadow);border:1px solid var(--line)}
+.banner .ic{font-size:16px;line-height:1;width:30px;height:30px;display:grid;place-items:center;border-radius:9px;flex:0 0 auto}
+.banner.ok{background:var(--panel);color:#0c7a3c} .banner.ok .ic{background:var(--ok-bg);color:var(--ok)}
+.banner.wait,.banner.run{background:var(--panel);color:#234ec2} .banner.run .ic,.banner.wait .ic{background:var(--run-bg);color:var(--run)}
+.banner.crit{background:var(--panel);color:#b21f2c} .banner.crit .ic{background:var(--crit-bg);color:var(--crit)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px 18px;box-shadow:var(--shadow-sm)}
+.kpi b{font-size:28px;display:block;line-height:1.05;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kpi span{color:var(--mut);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
 .kpi.ok b{color:var(--ok)} .kpi.wait b{color:var(--wait)} .kpi.crit b{color:var(--crit)} .kpi.tot b{color:var(--ink)}
-.grp{margin-bottom:24px}
-.ghead{display:flex;align-items:center;gap:10px;margin:0 2px 8px}
-.ghead h2{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--mut);font-weight:700;margin:0}
-.gcount{font-size:11px;color:var(--mut);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:1px 9px}
-table{width:100%;border-collapse:separate;border-spacing:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-td{padding:12px 14px;border-top:1px solid var(--line);vertical-align:middle;font-size:13.5px}
+.grp{margin-bottom:26px}
+.ghead{display:flex;align-items:center;gap:10px;margin:0 4px 10px}
+.ghead h2{font-size:11.5px;text-transform:uppercase;letter-spacing:.15em;color:var(--mut);font-weight:700;margin:0}
+.gcount{font-size:11px;color:var(--mut);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:1px 9px;box-shadow:var(--shadow-sm)}
+table{width:100%;border-collapse:separate;border-spacing:0;background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+td{padding:13px 16px;border-top:1px solid var(--line2);vertical-align:middle;font-size:13.5px}
 tbody tr:first-child td{border-top:none}
-tr:hover td{background:rgba(255,255,255,.018)}
-td.stripe{width:4px;padding:0;background:var(--mut)}
-tr.sev-ok    td.stripe{background:var(--ok)}   tr.sev-wait td.stripe{background:var(--wait)}
-tr.sev-crit  td.stripe{background:var(--crit)} tr.sev-run  td.stripe{background:var(--run)}
-td.job{font-weight:700;letter-spacing:.02em;width:74px}
-td.job a{color:var(--ink);text-decoration:none;border-bottom:1px dotted transparent}
-td.job a:hover{border-bottom-color:var(--accent);color:#fff}
-td.status{white-space:nowrap;width:210px;color:var(--mut)}
-td.status .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle;background:var(--mut)}
-tr.sev-ok .dot{background:var(--ok);box-shadow:0 0 0 3px var(--ok-bg)}
-tr.sev-wait .dot{background:var(--wait);box-shadow:0 0 0 3px var(--wait-bg)}
-tr.sev-crit .dot{background:var(--crit);box-shadow:0 0 0 3px var(--crit-bg)}
-tr.sev-run  .dot{background:var(--run);box-shadow:0 0 0 3px var(--run-bg);animation:pulse 1.4s infinite}
-@keyframes pulse{50%{opacity:.4}}
-tr.sev-ok td.status{color:#8fe6bd} tr.sev-crit td.status{color:#ff9297}
-td.tnum{color:var(--mut);white-space:nowrap;width:150px}
-.cd{color:var(--accent);font-size:12px;margin-left:4px}
-td.sum{color:var(--mut);max-width:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-td.log{width:52px;text-align:right}
-td.log a{color:var(--mut);text-decoration:none;font-size:12.5px}
+tr{transition:background .12s}
+tr:hover td{background:#f8faff}
+td.stripe{width:4px;padding:0}
+tr.sev-ok td.stripe{background:var(--ok)} tr.sev-wait td.stripe{background:var(--wait)}
+tr.sev-crit td.stripe{background:var(--crit)} tr.sev-run td.stripe{background:var(--run)}
+td.job{font-weight:700;letter-spacing:.01em;width:78px}
+td.job a{color:var(--ink);text-decoration:none;border-bottom:1.5px solid transparent}
+td.job a:hover{border-bottom-color:var(--accent);color:var(--accent)}
+td.status{white-space:nowrap;width:200px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:4px 11px 4px 9px;border-radius:20px;
+  font-size:12px;font-weight:600;border:1px solid var(--line)}
+.chip .dot{width:7px;height:7px;border-radius:50%;background:var(--mut)}
+tr.sev-ok .chip{background:var(--ok-bg);color:#0c7a3c;border-color:var(--ok-bd)} tr.sev-ok .dot{background:var(--ok)}
+tr.sev-wait .chip{background:var(--wait-bg);color:#9a6410;border-color:var(--wait-bd)} tr.sev-wait .dot{background:var(--wait)}
+tr.sev-crit .chip{background:var(--crit-bg);color:#b21f2c;border-color:var(--crit-bd)} tr.sev-crit .dot{background:var(--crit)}
+tr.sev-run .chip{background:var(--run-bg);color:#234ec2;border-color:var(--run-bd)} tr.sev-run .dot{background:var(--run);animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.35}}
+@media(prefers-reduced-motion:reduce){.dot{animation:none!important}}
+td.tnum{color:var(--ink2);white-space:nowrap;width:158px}
+.cd{color:var(--accent);font-size:11.5px;margin-left:5px;font-weight:600}
+td.sum{color:var(--mut);max-width:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px}
+td.log{width:54px;text-align:right}
+td.log a{color:var(--mut);text-decoration:none;font-size:12.5px;font-weight:600}
 td.log a:hover{color:var(--accent)}
 .mut{color:var(--mut)}
-footer{color:var(--mut);font-size:12px;margin-top:22px;line-height:1.7;border-top:1px solid var(--line);padding-top:14px}
-@media (max-width:720px){td.sum,td.tnum:nth-child(4){display:none} .kpis{grid-template-columns:repeat(2,1fr)}}
+footer{color:var(--mut);font-size:12px;margin-top:24px;line-height:1.75;border-top:1px solid var(--line);padding-top:16px}
+footer b{color:var(--ink2)}
+@media (max-width:760px){td.sum,td.tnum:nth-child(4){display:none} .kpis{grid-template-columns:repeat(2,1fr)}}
 </style></head><body>
 <header>
   <h1>AIOS Automation <span class="b">&middot; Fleet Health</span></h1>
