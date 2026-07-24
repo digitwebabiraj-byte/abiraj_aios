@@ -23,7 +23,7 @@ EXIT CODES
   3 DB error | 4 publish verification failed (rolled back)
 """
 from __future__ import annotations
-import os, sys, json, re, hashlib, argparse, logging
+import os, sys, json, re, time, hashlib, argparse, logging
 from datetime import date, timedelta, datetime
 
 # ----------------------------------------------------------------------------- CONFIG
@@ -202,10 +202,20 @@ def main():
     log.info("Window: %s -> %s (inclusive) | %s days | settle buffer %s days | run %s",
              ws, we - timedelta(days=1), WINDOW_DAYS, SETTLE_DAYS, date.today())
 
-    try:
-        conn = psycopg2.connect(**DB)
-    except Exception as e:
-        die(3, f"DB connect failed: {e}")
+    # Connect with retry - the shared temp_user pool intermittently refuses connections
+    # ("remaining connection slots are reserved..."), confirmed live 2026-07-24. FRRC runs
+    # MONTHLY, so a single refusal on the 8th would otherwise skip a whole month's report.
+    conn = None
+    for attempt in range(1, 6):
+        try:
+            conn = psycopg2.connect(connect_timeout=20, **DB)
+            break
+        except Exception as e:
+            log.warning("DB connect attempt %d/5 failed: %s", attempt, str(e).strip().splitlines()[0])
+            if attempt < 5:
+                time.sleep(8)
+    if conn is None:
+        die(3, "DB connect failed after 5 attempts")
 
     try:
         # ---- 1. reason-domain check: fail closed on an unmapped code ----

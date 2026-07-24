@@ -179,21 +179,27 @@ def _run(publish):
         # --- verify OUTSIDE the write transaction ---------------------------------
         with c.cursor() as cur:
             print("\n=== VERIFY ===")
+            # md5 the payload we intended to store, then compare the DB's own md5 of what it kept.
+            # A length check alone would pass a corruption that preserved byte-length; md5 will not.
+            want_md5 = hashlib.md5(html.encode("utf-8")).hexdigest()
             cur.execute("""SELECT id, task_id, assigned_user, assigned_user_team, version_level,
-                                  version_status, length(html_content), updated_at
+                                  version_status, length(html_content), md5(html_content), updated_at
                              FROM tech_team_outputs.ph_task
                             WHERE task_id = ANY(%s) ORDER BY id""",
                         ([task_id_for(u) for u in RECIPIENTS],))
             got = cur.fetchall()
             for r in got:
-                print("  id=%-4s %-52s %-10s %-12s v%s %-9s %s bytes  %s"
-                      % (r[0], r[1], r[2], r[3], r[4], r[5], format(r[6], ','), r[7]))
+                print("  id=%-4s %-52s %-10s %-12s v%s %-9s %s bytes  md5=%s  %s"
+                      % (r[0], r[1], r[2], r[3], r[4], r[5], format(r[6], ','), r[7][:8], r[8]))
             assert len(got) == len(RECIPIENTS), \
                 "expected %d rows, found %d" % (len(RECIPIENTS), len(got))
             assert all(r[3] == AUDIENCE for r in got), "an audience value is wrong"
             assert all(r[6] == len(html) for r in got), "stored html length mismatch"
+            bad_md5 = [r[0] for r in got if r[7] != want_md5]
+            assert not bad_md5, "stored html md5 mismatch on id(s) %s - payload corrupted" % bad_md5
             # NB: deliberately NO assertion on version_status - see trap 4 in the docstring.
-            print("  all %d rows present, audience correct, html length matches" % len(got))
+            print("  all %d rows present, audience correct, html length + md5 %s match"
+                  % (len(got), want_md5[:8]))
     finally:
         c.close()
 
