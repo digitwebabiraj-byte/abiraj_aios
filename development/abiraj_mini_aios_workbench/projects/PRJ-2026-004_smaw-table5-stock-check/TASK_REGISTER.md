@@ -19,3 +19,29 @@ row below (same pattern as REQ-05 D01–D09 in PRJ-2026-001, REQ-04 in PRJ-2026-
 2. **Legacy→canonical SKU mapping source** — not in `order_management_copy`; candidates unverified.
 3. **4 UNPROVEN D01 fields** — FBA on-hand · container ETA · W1/W2/W3 · stock-checked date.
 4. **Postgresql MCP reconnect** required before any live re-pull.
+
+---
+
+## 2026-07-24 — AUTOMATED (REQ-06 automation complete)
+
+`SMAW_Weekly_StockCheck` registered on the permanent path — **Mondays 08:00**, first run
+**2026-07-27**. `automation/smaw_weekly_run.py` + `run_smaw_weekly.bat` + `smaw_alert.ps1` +
+`AUTOMATION_README.md`; task XML backed up in `05_documentation/capability/scheduled_tasks/`.
+
+SQL already anchors on CURRENT_DATE (run-date safe); its 13 columns map 1:1 to the dashboard rows;
+reuses the signed-off `build_all_html.py` (env-var paths). Weekly REPLACE in place (id 137, task_id
+`SMAW_thuwaraga_table5_all_asins-V2`), backup-first, md5-verified.
+
+**Two issues found + handled 2026-07-24:** (1) `temp_user` has no `supplier` schema access, but the
+3 incoming columns were all-NULL in the live V2 (0/756), so the runner stubs the supplier CTE — zero
+data loss, fails closed if the CTE anchor moves. (2) `build_all_html.py` wrote a hardcoded name, not
+the env-overridable path — fixed `out = FILE_PATH`.
+
+**The inventory feed blocker is CLEARED:** the note's "frozen at 2026-05-04" was stale — the feed is
+live again (updated 2026-07-23). The live V2 (id 137) was built on the frozen feed, so the **first
+automated run refreshes 2-month-stale stock to current**: dry-run 776 rows / 121 critical / 245
+healthy (was 756 frozen). Stock numbers move on first publish — expected, the whole point.
+
+Proven 2026-07-24 (dry-run + Task-Scheduler temp run `LastTaskResult=0`). Nothing published — first
+real publish is the scheduled 2026-07-27 run. Owner authorised proceeding past the pending reviewer
+sign-off. **PSLD (per-PH stock dashboards, dev Sarujanan) is a SEPARATE project — not in scope here.**
