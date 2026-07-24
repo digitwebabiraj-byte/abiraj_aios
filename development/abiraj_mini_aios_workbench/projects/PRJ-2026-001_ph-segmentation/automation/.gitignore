@@ -3,3 +3,4 @@ seg_status.txt
 backups/
 seg_run.log
 __pycache__/
+seg_dryrun_full.log
