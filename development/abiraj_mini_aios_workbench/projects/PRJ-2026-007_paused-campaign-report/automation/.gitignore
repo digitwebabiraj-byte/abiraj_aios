@@ -1,0 +1,6 @@
+pc_last_good.json
+pc_status.txt
+pc_run.log
+pc_dashboard.html
+pc_ph_task_backup_*.html
+__pycache__/
