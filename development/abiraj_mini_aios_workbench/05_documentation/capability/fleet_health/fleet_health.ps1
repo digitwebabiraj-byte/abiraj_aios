@@ -1,9 +1,11 @@
 # Fleet Health - mission-control status board for all 12 automated jobs.
 # Reads Windows Task Scheduler (uniform for every job) + each job's status file, writes
-# fleet_health.html next to this script and opens it.
-# Run:  double-click run_fleet_health.bat   (or: powershell -ExecutionPolicy Bypass -File fleet_health.ps1)
-
+# fleet_health.html next to this script and opens it. DB-free (no warehouse connection).
+# Run:  double-click run_fleet_health.bat   (opens the page)
+#       fleet_health.ps1 -NoOpen            (regenerate silently - used by the auto-refresh task)
+param([switch]$NoOpen)
 $ErrorActionPreference = 'SilentlyContinue'
+$REFRESH = 300   # the open page reloads itself every N seconds to pick up the regenerated file
 $proj = "C:\Users\digit\OneDrive\Desktop\Abiraj_AIOS\development\abiraj_mini_aios_workbench\projects"
 $OUT  = Join-Path $PSScriptRoot 'fleet_health.html'
 
@@ -140,6 +142,7 @@ $stamp = $now.ToString('dddd dd MMM yyyy, HH:mm')
 $html = @"
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="refresh" content="$REFRESH">
 <title>AIOS Automation - Fleet Health</title>
 <style>
 :root{
@@ -225,10 +228,10 @@ $sections
   <span style="color:var(--ok)">green healthy</span>, <span style="color:var(--wait)">amber waiting for its first run</span>,
   <span style="color:var(--crit)">red needs attention</span>. Click a job name to open its folder, or <b>log &rsaquo;</b> for its run log.<br>
   A red job showing <i>Never started (OneDrive?)</i> with no status line never launched &mdash; not a code failure. First real runs land 27 Jul &ndash; 8 Aug.<br>
-  Source: Windows Task Scheduler + each job's status file. Refresh any time &mdash; double-click <b>run_fleet_health.bat</b>.
+  Auto-refreshes every 5 min (a background task regenerates this page every 15 min). Open it once and leave the tab Source: Windows Task Scheduler + each job's status file. Refresh any time &mdash; double-click <b>run_fleet_health.bat</b>.mdash; it stays live. Force a refresh: double-click <b>run_fleet_health.bat</b>.
 </footer>
 </body></html>
 "@
 Set-Content -Path $OUT -Value $html -Encoding utf8
 "Fleet health written: $OUT  ($nOK healthy / $nWait waiting / $nCrit attention)"
-Start-Process $OUT
+if (-not $NoOpen) { Start-Process $OUT }
