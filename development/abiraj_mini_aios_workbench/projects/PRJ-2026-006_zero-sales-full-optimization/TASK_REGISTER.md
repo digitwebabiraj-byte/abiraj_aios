@@ -44,3 +44,25 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 A new day or Claude session does **not** create a new Task ID. Keep using
 `REQ-08_zero-sales-full-optimization` until D01 is formally closed; only a genuinely new requirement
 (with owner confirmation) gets a new deliverable/task id.
+
+---
+
+## 2026-07-24 — AUTOMATED (REQ-08 automation complete)
+
+`ZSFO_Weekly_ZeroSales` registered on the permanent path — **Mondays 08:00**, first run
+**2026-07-27**. `automation/zsfo_weekly_run.py` + `run_zsfo_weekly.bat` + `zsfo_alert.ps1` +
+`AUTOMATION_README.md`; task XML backed up in `05_documentation/capability/scheduled_tasks/`.
+
+Closes the "scheduling not wired — window set in SQL" gap: the runner computes run_date + the 5
+weekly buckets from CURRENT_DATE and substitutes the canonical SQL's literals (guard aborts if any
+reference literal survives). Reuses the signed-off `build_html.py` via env-var path overrides (no
+duplication). Weekly REPLACE in place (task_id `…-V1`), backup-first, md5-verified.
+
+Proven 2026-07-24: `--date 2026-07-10` reproduced the deliverable EXACTLY (1,250 zero-sale rows;
+universe 1,720 vs 1,719 = +1 live-drift, a drift check not equality). Fresh window (24 Jun–23 Jul)
+= 1,289 zero-sale. Task-Scheduler temp dry-run `LastTaskResult=0`, credentials resolved at launch;
+temp task deleted. Nothing published — first real publish is the scheduled 2026-07-27 run.
+
+**Note:** the owner authorised proceeding without waiting on Satheewaran's edge-case sign-off
+(2026-07-24). The core report was already delivered + validated; the open items were edge-case
+rules, flagged but not blocking per owner direction.
