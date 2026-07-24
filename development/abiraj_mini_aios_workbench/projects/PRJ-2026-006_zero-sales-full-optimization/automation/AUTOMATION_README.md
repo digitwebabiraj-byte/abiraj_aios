@@ -8,7 +8,7 @@ warehouse and refreshes the `ph_task` row.
 | | |
 |---|---|
 | Task | `ZSFO_Monthly_ZeroSales` |
-| When | **Monthly, day 4, 08:00** (clear of the other monthly jobs) |
+| When | **Monthly, day 4, 09:00** (clear of the other monthly jobs) |
 | Window | `[run_date-30, run_date-1]`, current day excluded — rolling, computed from the run date |
 | Reads | `public.traffic_data`, `public.order_transaction`, `public.vendor_sales`, listing/stock — READ-ONLY |
 | Writes | 1 row in `ph_task` (`ZSFO`, `ZSFO_utharsika_zero_sales_dashboard-V1`, `assigned_user=utharsika`, `ph_priors`) |
