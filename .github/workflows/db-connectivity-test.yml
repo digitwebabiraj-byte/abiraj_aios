@@ -1,0 +1,50 @@
+name: DB Connectivity Test
+
+# One-off check: can GitHub's cloud servers reach the two databases the automations use?
+# If yes, moving the 12 jobs off this PC to free cloud runs is viable.
+# Run it manually: GitHub repo -> Actions tab -> "DB Connectivity Test" -> Run workflow.
+# It only connects and reads a version string - no writes, no real job.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install the Postgres driver
+        run: pip install psycopg2-binary
+
+      - name: Try to reach both databases from GitHub
+        env:
+          PGPASSWORD: ${{ secrets.PGPASSWORD }}
+          LED_PGPASSWORD: ${{ secrets.LED_PGPASSWORD }}
+        run: |
+          python - <<'PY'
+          import os, sys, psycopg2
+          targets = [
+            ("Warehouse  (order_management_copy @ 149.28.134.54:5435)",
+             dict(host="149.28.134.54", port=5435, dbname="order_management_copy",
+                  user="temp_user", password=os.environ.get("PGPASSWORD",""))),
+            ("Ledsone    (ledsone @ 207.148.78.148:5432)",
+             dict(host="207.148.78.148", port=5432, dbname="ledsone",
+                  user="dbhub_readonly", password=os.environ.get("LED_PGPASSWORD",""))),
+          ]
+          ok = True
+          for label, cfg in targets:
+              try:
+                  c = psycopg2.connect(connect_timeout=25, **cfg)
+                  cur = c.cursor(); cur.execute("SELECT version()")
+                  print("REACHABLE  :", label, "->", cur.fetchone()[0].split(",")[0])
+                  c.close()
+              except Exception as e:
+                  ok = False
+                  print("BLOCKED    :", label, "->", str(e).strip().splitlines()[-1])
+          print()
+          if ok:
+              print("RESULT: GitHub CAN reach your databases -> free cloud migration is viable.")
+          else:
+              print("RESULT: at least one database refused GitHub -> it is IP-restricted;")
+              print("        ask the DB owner (Sajeesan) to allow external connections, or use an always-on VM.")
+          sys.exit(0 if ok else 1)
+          PY
