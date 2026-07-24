@@ -98,3 +98,33 @@ correction window (rn 2..5); the monthly automation uses the normal roll-forward
 Method verified the same day: the whole-portfolio recompute runs in ONE direct-psycopg2 query
 (10,031 ASINs, 30 PHs, ~read-only) with no timeout — so the MCP ~1,300-ASIN limit that forced the
 per-PH split does NOT apply to an autonomous runner.
+
+---
+
+## 2026-07-24 — automation design decisions (owner-confirmed, before build)
+
+The monthly job (REQ-05 automation, target: 3rd of each month) will be built to these
+owner-confirmed rules. Recorded here as the source of truth ahead of the build.
+
+| # | Decision | Confirmed |
+|---|---|---|
+| 1 | **Window** = normal roll-forward, the last 4 complete Saturday-weeks vs the previous 4 (`rn 1..4 / 5..8 / 9..12`). NOT the one-off correction window. | 2026-07-24 |
+| 2 | **Schedule** = the 3rd of each month, 09:00 (staggered clear of DST 09:05 / the rest). | 2026-07-24 |
+| 3 | **Conversion rule** = COUNT-based (`a.conv >= b.bcv`), matching what is already live (HHH ≈ 180). No rule change; this is a refresh. | 2026-07-24 |
+| 4 | **Departed holders** = the job REPORTS them; it never auto-deletes a `ph_task` row. Removal stays a manual, deliberate act (name-match risk too high to automate). | 2026-07-24 |
+| 5 | **Publish grain = NEW ROW PER MONTH**, keyed `ph-asin-YYYY-MM-<PH>` (leader `ph-asin-YYYY-MM-LEADER`). Matches the monthly EBPD/ERA pattern; keeps each month's snapshot so the movement column has history. | 2026-07-24 |
+
+**Re-run safety (the duplicate trap, explicitly avoided):** because the month is in the `task_id`,
+a re-run of the SAME month must **DELETE that month's rows by `task_id` prefix, then INSERT** — never
+a blind INSERT (which would pile up 31 duplicate rows every re-run). A genuinely new month writes its
+own new keys and leaves prior months untouched. This is the EBPD/ERA precedent.
+
+**Still to build (staged, each proven against live before the next):**
+1. Per-PH data layer — the proven path (29 PHs fast, utharsika category-split > 300s); dynamic roster
+   from `00`/`04`, NOT the hardcoded July `NAMES`/`ALLOC`/`EXISTING` maps. (A naive whole-portfolio
+   collapse of `01` was tested 2026-07-24 and returned a broken 1-row result — per-PH is the path.)
+2. Dynamic gates — floor + collapse-vs-last-good + md5, NOT the frozen `EXPECT_SEG={'HHH':180,...}`
+   equality gates hardcoded into `assemble_leader.py`.
+3. Backup-first 31-row publish (leader + 30 per-PH), delete-by-month + insert, md5-verified.
+4. Alert + runbook + dynamic file paths (the toolkit's `BASE` still points at a deleted worktree).
+5. Dry-run reviewed by the owner, THEN register the scheduled task.
