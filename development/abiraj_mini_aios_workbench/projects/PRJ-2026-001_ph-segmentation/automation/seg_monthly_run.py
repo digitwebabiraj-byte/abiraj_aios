@@ -57,6 +57,7 @@ MIN_TOTAL = int(os.getenv("SEG_MIN_TOTAL", "5000"))   # catastrophic floor (live
 MIN_PHS   = int(os.getenv("SEG_MIN_PHS",   "20"))     # roster floor (live 30)
 MAX_DROP  = float(os.getenv("SEG_MAX_DROP", "0.40"))  # collapse guard vs last good run
 PH_TIMEOUT_MS = int(os.getenv("SEG_PH_TIMEOUT_MS", "280000"))  # per-PH statement timeout
+SPLIT_THRESHOLD = int(os.getenv("SEG_SPLIT_THRESHOLD", "900"))  # a PH bigger than this -> category-split
 
 WH = dict(host=os.getenv("PGHOST", "149.28.134.54"), port=os.getenv("PGPORT", "5435"),
           dbname=os.getenv("PGDATABASE", "order_management_copy"),
@@ -137,11 +138,93 @@ def allocations(conn):
         cur.execute(load_sql("04_alloc_counts.sql"))
         return {r[0]: int(r[1]) for r in cur.fetchall()}
 
+def week_windows(conn):
+    """The last 12 complete Saturday-weeks in traffic_data, split cur/prev/prior (4/4/4) -
+    the SAME calendar weeks that sql/01's rn 1..4 / 5..8 / 9..12 select, so a split PH lands on
+    the identical window as a whole PH. Also the order_date half-open spans each window needs."""
+    with conn.cursor() as cur:
+        cur.execute("""SELECT date FROM (SELECT DISTINCT date FROM public.traffic_data
+                       WHERE which_channel=1 AND market_place='UK') d ORDER BY date DESC LIMIT 12""")
+        weeks = [r[0] for r in cur.fetchall()]
+    if len(weeks) < 12:
+        die("only %d complete weeks in traffic_data - cannot form the 4/4/4 window" % len(weeks))
+    cur_w, prev_w, prior_w = weeks[0:4], weeks[4:8], weeks[8:12]
+    def span(ws): return (min(ws) - dt.timedelta(days=6), max(ws) + dt.timedelta(days=1))
+    return {"cur": cur_w, "prev": prev_w, "prior": prior_w,
+            "cur_span": span(cur_w), "prev_span": span(prev_w)}
+
+
+def ph_asin_count(conn, name, cur_weeks):
+    """Cheap traffic-only count of a PH's current-window ASINs, to decide split vs whole."""
+    with conn.cursor() as cur:
+        cur.execute("SET statement_timeout=60000")
+        cur.execute("""SELECT count(*) FROM (
+            SELECT ref_id,sub_source_name,
+                   ROW_NUMBER() OVER (PARTITION BY ref_id,sub_source_name ORDER BY SUM(impression) DESC) rn
+            FROM public.traffic_data
+            WHERE which_channel=1 AND market_place='UK' AND user_name=%s AND date = ANY(%s)
+            GROUP BY 1,2) t WHERE rn=1""", (name, cur_weeks))
+        return cur.fetchone()[0]
+
+
+def _fill02(sql02, name, category, w):
+    """Substitute sql/02's @@...@@ placeholders with quoted SQL literals for one (PH, category)."""
+    def arr(ws): return ",".join("'%s'" % d.isoformat() for d in ws)
+    return (sql02
+            .replace("@@USER@@", name.replace("'", "''"))
+            .replace("@@CATEGORY@@", category.replace("'", "''"))
+            .replace("@@CUR_WEEKS@@", arr(w["cur"]))
+            .replace("@@PREV_WEEKS@@", arr(w["prev"]))
+            .replace("@@PRIOR_WEEKS@@", arr(w["prior"]))
+            .replace("@@CUR_SPAN0@@", w["cur_span"][0].isoformat())
+            .replace("@@CUR_SPAN1@@", w["cur_span"][1].isoformat())
+            .replace("@@PREV_SPAN0@@", w["prev_span"][0].isoformat())
+            .replace("@@PREV_SPAN1@@", w["prev_span"][1].isoformat()))
+
+
+def recompute_ph_split(conn, name, sql02, w):
+    """Category-split recompute for a big PH (sql/02, one category at a time), merged back into
+    the exact sql/01 shape: prepend user_name, concatenate, recompute per-PH rank by impression.
+    Safe because 0 ASINs span categories and each category's benchmark is self-contained."""
+    with conn.cursor() as cur:
+        cur.execute("SET statement_timeout=60000")
+        cur.execute("""SELECT category_name FROM (
+            SELECT ref_id,sub_source_name,category_name,
+                   ROW_NUMBER() OVER (PARTITION BY ref_id,sub_source_name ORDER BY SUM(impression) DESC) rn
+            FROM public.traffic_data
+            WHERE which_channel=1 AND market_place='UK' AND user_name=%s AND date = ANY(%s)
+            GROUP BY 1,2,3) t WHERE rn=1 GROUP BY category_name ORDER BY count(*) DESC""",
+            (name, w["cur"]))
+        cats_list = [r[0] for r in cur.fetchall()]
+    log("  %s: category-split over %d categories" % (name, len(cats_list)))
+
+    merged_rows, merged_cats = [], []
+    for cat in cats_list:
+        q = _fill02(sql02, name, cat, w)
+        for attempt in range(1, 4):
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("SET statement_timeout=%d" % PH_TIMEOUT_MS)
+                    cur.execute(q)
+                    r_rows, r_cats = cur.fetchone()
+                break
+            except Exception as e:
+                conn.rollback(); msg = str(e).strip().splitlines()[-1]
+                log("    %s / %s attempt %d/3 failed: %s" % (name, cat, attempt, msg))
+                if attempt == 3: die("split recompute failed for %s / %s" % (name, cat))
+                time.sleep(5)
+        # 02 row = [cat,seg,mov,ref,sku,acc,imp,clk,conv,cvr,bi,bk,bcvr] -> prepend user, rank added later
+        for x in (r_rows or []): merged_rows.append([name] + x)          # 14 fields (rank appended below)
+        for x in (r_cats or []): merged_cats.append([name] + x)          # 9 fields -> matches 01 cats
+    # per-PH rank = ROW_NUMBER() OVER (ORDER BY imp DESC, ref_id) - imp at idx 7, ref_id at idx 4
+    order = sorted(range(len(merged_rows)), key=lambda i: (-(merged_rows[i][7] or 0), merged_rows[i][4]))
+    for rank, i in enumerate(order, 1):
+        merged_rows[i] = merged_rows[i] + [rank]                         # -> 15 fields, exact 01 shape
+    return merged_rows, merged_cats
+
+
 def recompute_ph(conn, name, sql01):
-    """Run sql/01 for one PH with its own timeout + retry. Returns (rows, cats).
-    NOTE: the utharsika category-split fallback (sql/02) is a KNOWN follow-up - the first full
-    dry-run confirms whether any PH exceeds PH_TIMEOUT_MS on a normal (single) window before we
-    wire the split. Until then a per-PH timeout is a fail-closed abort, not a silent skip."""
+    """Whole-PH recompute via sql/01, with its own timeout + retry. Returns (rows, cats)."""
     q = sql01.replace("__PHNAME__", name.replace("'", "''"))
     for attempt in range(1, 4):
         try:
@@ -252,13 +335,22 @@ def main():
     conn = connect()
     conn.set_session(readonly=True)          # read-only for the whole recompute
     sql01 = load_sql("01_recompute_per_ph.sql")
+    sql02 = load_sql("02_recompute_category_split.sql")
     names = roster(conn)
     alloc = allocations(conn)
+    win = week_windows(conn)
+    log("window: cur %s..%s | prev %s..%s | prior %s..%s"
+        % (win["cur"][-1], win["cur"][0], win["prev"][-1], win["prev"][0], win["prior"][-1], win["prior"][0]))
 
     all_rows, all_cats, per_ph_rows = [], [], {}
     t0 = time.time()
     for i, ph in enumerate(names, 1):
-        rows, cats = recompute_ph(conn, ph, sql01)
+        n = ph_asin_count(conn, ph, win["cur"])
+        if n > SPLIT_THRESHOLD:
+            log("  [%2d/%2d] %-16s ~%d ASINs > %d -> category-split" % (i, len(names), ph, n, SPLIT_THRESHOLD))
+            rows, cats = recompute_ph_split(conn, ph, sql02, win)
+        else:
+            rows, cats = recompute_ph(conn, ph, sql01)
         per_ph_rows[ph] = (rows, cats)
         all_rows += rows; all_cats += cats
         log("  [%2d/%2d] %-16s rows=%-5d cats=%-3d (%.0fs elapsed)"
