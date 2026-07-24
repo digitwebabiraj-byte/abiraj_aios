@@ -25,6 +25,30 @@ $JOBS = @(
 
 $now = Get-Date
 function FileUrl($p) { if ($p) { 'file:///' + ($p -replace '\\','/') } else { '' } }
+function LastSummary($path) {
+  # The authoritative status is the pill (Task Scheduler). This note is a human hint, so show the
+  # last SUCCESSFUL summary rather than the raw last line - status files also hold manual dry-run /
+  # negative-test lines whose FAILED text would otherwise contradict a healthy pill.
+  if (-not ($path -and (Test-Path $path))) { return '' }
+  if ($path -like '*.json') {
+    try {
+      $o = Get-Content $path -Raw -Encoding utf8 | ConvertFrom-Json
+      $parts = @()
+      foreach ($p in $o.PSObject.Properties) {
+        if ($p.Value -is [string] -or $p.Value -is [int] -or $p.Value -is [long] -or $p.Value -is [double]) {
+          if ($p.Name -notmatch 'md5|html|id$') { $parts += ('{0} {1}' -f $p.Name, $p.Value) }
+        }
+      }
+      if ($parts) { return (($parts | Select-Object -First 5) -join ' | ') }
+    } catch {}
+    return ''
+  }
+  $lines = @(Get-Content $path -Tail 15 -Encoding utf8 | Where-Object { $_.Trim() })
+  $good  = @($lines | Where-Object { ($_ -match 'OK|PUBLISHED|done') -and ($_ -notmatch 'FAILED|ABORT') })
+  if ($good.Count)  { return $good[-1].Trim() }
+  if ($lines.Count) { return $lines[-1].Trim() }
+  return ''
+}
 function HtmlEsc($s) { ($s -replace '&','&amp;' -replace '<','&lt;' -replace '>','&gt;' -replace '"','&quot;') }
 function Countdown($next) {
   if (-not $next) { return '' }
@@ -51,8 +75,7 @@ foreach ($j in $JOBS) {
             0 {'Healthy'} 267011 {'Waiting for first run'} 267009 {'Running now'} 267014 {'Terminated'}
             3221225786 {'Never started (OneDrive?)'} -1 {'NOT REGISTERED'} default {"Failed - code $code"} }
   $statusfile = if ($j.f) { Join-Path $j.dir $j.f } else { $null }
-  $raw = ''
-  if ($statusfile -and (Test-Path $statusfile)) { $ll = Get-Content $statusfile -Tail 1; if ($ll) { $raw = $ll.Trim() } }
+  $raw = LastSummary $statusfile
   $data += [pscustomobject]@{
     n=$j.n; grp=$j.grp; cad=$j.cad; sev=$sev; txt=$txt;
     last = if ($i.LastRunTime -and $i.LastRunTime.Year -gt 2000) { $i.LastRunTime.ToString('ddd dd MMM, HH:mm') } else { $null }
