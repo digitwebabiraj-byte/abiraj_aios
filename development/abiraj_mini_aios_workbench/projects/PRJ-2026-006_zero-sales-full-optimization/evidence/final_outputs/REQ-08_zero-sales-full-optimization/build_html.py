@@ -5,8 +5,10 @@ Self-contained single file (data embedded) — opens offline. Run: python build_
 import json, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DATA = os.path.join(HERE, "data.json")
-OUT  = os.path.join(HERE, "ZSFO_Utharsika_dashboard.html")
+# Paths default to this dir (standalone use), but the weekly automation runner overrides them
+# via env vars so a scheduled run builds into automation/ without touching the canonical files.
+DATA = os.environ.get("ZSFO_DATA", os.path.join(HERE, "data.json"))
+OUT  = os.environ.get("ZSFO_OUT",  os.path.join(HERE, "ZSFO_Utharsika_dashboard.html"))
 
 with open(DATA, encoding="utf-8") as f:
     d = json.load(f)
