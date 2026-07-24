@@ -128,3 +128,23 @@ own new keys and leaves prior months untouched. This is the EBPD/ERA precedent.
 3. Backup-first 31-row publish (leader + 30 per-PH), delete-by-month + insert, md5-verified.
 4. Alert + runbook + dynamic file paths (the toolkit's `BASE` still points at a deleted worktree).
 5. Dry-run reviewed by the owner, THEN register the scheduled task.
+
+---
+
+## 2026-07-24 — AUTOMATED (REQ-05 automation COMPLETE)
+
+`SEG_Monthly_Segmentation` registered on the permanent path — **3rd of each month, 09:00**, first
+run **2026-08-03**. Built to the fleet standard: `automation/seg_monthly_run.py` +
+`run_seg_monthly.bat` + `seg_alert.ps1` + `AUTOMATION_README.md`; task XML backed up in
+`05_documentation/capability/scheduled_tasks/`.
+
+Proven end-to-end 2026-07-24: full 30-PH dry-run = 10,031 ASINs, both big PHs (utharsika, Jasmini)
+auto category-split, all gates passed, `HHH 205 · HHL 382 · HLH 136 · LHH 24 · LLH 159 · LLL 9,125`
+in 192s — total matched an independent whole-portfolio query to the digit. Task-Scheduler temp
+dry-run returned `LastTaskResult=0` (credentials resolved at launch); temp task deleted. Nothing
+published — the first real publish is the scheduled 2026-08-03 run (new-row-per-month
+`ph-asin-2026-08-*`).
+
+**Open (unchanged by automation):** `analytics.ph_segment_report` source table still stale (the
+dashboards don't read it); the Dead-Horses side of the count rule (LLH→LLL) was never explicitly
+signed off by Bietrick (only the Champions example) — flag before/at the first live run.
