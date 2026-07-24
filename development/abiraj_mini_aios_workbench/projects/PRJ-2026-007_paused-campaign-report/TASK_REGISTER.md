@@ -34,3 +34,24 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 A new day or Claude session does **not** create a new Task ID. Keep using
 `REQ-09_paused-campaign-report` until D01 is formally closed; only a genuinely new requirement (with
 owner confirmation) gets a new deliverable/task id.
+
+---
+
+## 2026-07-24 — AUTOMATED (REQ-09 automation complete)
+
+`PC_Weekly_PausedCampaigns` registered on the permanent path — **Wednesdays 09:00**, first run
+**2026-07-29**. `automation/pc_weekly_run.py` + `run_pc_weekly.bat` + `pc_alert.ps1` +
+`AUTOMATION_README.md`; task XML backed up in `05_documentation/capability/scheduled_tasks/`.
+
+Keeps the EXACT hand-finished dashboard: the runner reads `Utharsika_Paused_Campaigns_Report.html`
+as a read-only template and re-injects the `<script id="payload">` rows + `const RUN` /
+`TOTAL_PAUSES` / `WINDOW` each run. SQL already uses CURRENT_DATE (run-date safe, no
+parameterization). The 3 pause rules' label/summary/metric-chips are derived from each verbatim
+reason string; WARN logs any reason format that fails to parse. Weekly REPLACE in place (task_id
+`…-V1`, id 215), backup-first, md5-verified.
+
+Proven 2026-07-24 (dry-run + Task-Scheduler temp run `LastTaskResult=0`): 69 still-paused of 88
+total (was 33/41 at D01 — more campaigns paused since), all 11 payload keys present, every rule's
+chips parsed cleanly (0 unparsed), constants updated. Nothing published — first real publish is the
+scheduled 2026-07-29 run. Owner authorised proceeding without the pending Satheewaran edge-case
+sign-off (core report already delivered/validated).
