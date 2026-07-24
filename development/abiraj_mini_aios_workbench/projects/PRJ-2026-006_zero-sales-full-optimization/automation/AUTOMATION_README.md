@@ -1,14 +1,14 @@
 # ZSFO — Zero Sales Full Optimization (Utharsika) — automation (REQ-08)
 
-Weekly refresh of Utharsika's Amazon-UK zero-sale dashboard. Recomputes READ-ONLY from the live
+Monthly refresh of Utharsika's Amazon-UK zero-sale dashboard. Recomputes READ-ONLY from the live
 warehouse and refreshes the `ph_task` row.
 
 ## What runs, and when
 
 | | |
 |---|---|
-| Task | `ZSFO_Weekly_ZeroSales` |
-| When | **Mondays, 08:00** (clear of EBPD/EPC/EPPA at 09:30/10:30/11:00) |
+| Task | `ZSFO_Monthly_ZeroSales` |
+| When | **Monthly, day 4, 08:00** (clear of the other monthly jobs) |
 | Window | `[run_date-30, run_date-1]`, current day excluded — rolling, computed from the run date |
 | Reads | `public.traffic_data`, `public.order_transaction`, `public.vendor_sales`, listing/stock — READ-ONLY |
 | Writes | 1 row in `ph_task` (`ZSFO`, `ZSFO_utharsika_zero_sales_dashboard-V1`, `assigned_user=utharsika`, `ph_priors`) |

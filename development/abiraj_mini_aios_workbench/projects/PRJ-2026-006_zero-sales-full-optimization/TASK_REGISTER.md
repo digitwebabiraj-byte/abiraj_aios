@@ -66,3 +66,14 @@ temp task deleted. Nothing published — first real publish is the scheduled 202
 **Note:** the owner authorised proceeding without waiting on Satheewaran's edge-case sign-off
 (2026-07-24). The core report was already delivered + validated; the open items were edge-case
 rules, flagged but not blocking per owner direction.
+
+---
+
+## 2026-07-24 — cadence changed to MONTHLY (owner decision)
+
+Owner chose MONTHLY over the spec's weekly. Task re-registered `ZSFO_Monthly_ZeroSales`, **day 4,
+08:00**, first run **2026-08-04** (clear of ESNM d2 / SEG d3 / ERA d5 / FRRC d8). No code change —
+the runner is cadence-agnostic (run_date = today, window = last completed 30 days); only the trigger
+changed. The 30-day rolling window is unchanged, so each monthly run still qualifies a product as
+zero-sale on 30 days of data, just checked once a month instead of weekly. Old weekly task + its XML
+removed; monthly XML exported to `05_documentation/capability/scheduled_tasks/`.
