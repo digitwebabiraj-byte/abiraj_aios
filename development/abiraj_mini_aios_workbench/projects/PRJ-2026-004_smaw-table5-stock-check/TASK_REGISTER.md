@@ -24,7 +24,7 @@ row below (same pattern as REQ-05 D01–D09 in PRJ-2026-001, REQ-04 in PRJ-2026-
 
 ## 2026-07-24 — AUTOMATED (REQ-06 automation complete)
 
-`SMAW_Weekly_StockCheck` registered on the permanent path — **Mondays 08:00**, first run
+`SMAW_Weekly_StockCheck` registered on the permanent path — **Mondays 10:00**, first run
 **2026-07-27**. `automation/smaw_weekly_run.py` + `run_smaw_weekly.bat` + `smaw_alert.ps1` +
 `AUTOMATION_README.md`; task XML backed up in `05_documentation/capability/scheduled_tasks/`.
 

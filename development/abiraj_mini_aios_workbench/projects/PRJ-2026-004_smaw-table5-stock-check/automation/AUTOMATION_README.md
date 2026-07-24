@@ -8,7 +8,7 @@ warehouse and refreshes the `ph_task` row (id 137).
 | | |
 |---|---|
 | Task | `SMAW_Weekly_StockCheck` |
-| When | **Mondays, 08:00** (clear of the 09:30–11:00 cluster) |
+| When | **Mondays, 10:00** (clear of the 09:30–11:00 cluster) |
 | What | every Thuwaraga ASIN×account: UK stock, 90-day velocity, days-remaining, stock status |
 | Reads | `public.location_wise_inv_stock` (UK stock), `order_transaction`, `listing_data`, `analytics.ph_segment` — READ-ONLY |
 | Writes | 1 row in `ph_task` (`SMAW`, `SMAW_thuwaraga_table5_all_asins-V2`, `assigned_user=thuwaraga`, `ph_priors`) |
