@@ -65,3 +65,36 @@ but separate open item, unchanged by this entry.
   Task Scheduler, not less — it is where the rest of the fleet should eventually move.
 
 Git: see the commit carrying this entry.
+
+---
+
+## 2026-07-24 — MEASURED CORRECTION: the live dashboards already use the COUNT rule
+
+I read the actual published bytes of `ph_task` id 5 (the leader) on 2026-07-24 and tallied the
+segment column of its embedded data block directly. The result contradicts the "rate rule / 42
+Champions" figure this register and the SQL headers have been citing:
+
+| Source | HHH | HHL | HLH | LHH | LLH | LLL | Total |
+|---|--:|--:|--:|--:|--:|--:|--:|
+| **LIVE published bytes (id 5, measured 2026-07-24)** | **180** | 433 | 173 | 19 | 144 | 8,998 | 9,947 |
+| Documented "D10 rate rule" (cited everywhere) | 42 | 580 | 173 | 10 | 626 | 8,516 | 9,947 |
+| Count rule, normal last-4-week window (today) | 205 | 382 | 136 | 24 | 159 | 9,125 | 10,031 |
+
+The live total is 9,947 (the D10 correction window) and `HLH` matches exactly (173), so the WINDOW
+is the D10 one — but the conversion split gives **HHH ≈ 180**, which is the COUNT rule, not the
+rate rule's 42. Whatever the documented history says, **what is actually in front of the portfolio
+holders today is the count-based conversion rule.**
+
+**Consequence — corrects the 2026-07-21 entry above.** That entry (and my advice at the time)
+warned that running the count rule would be a large, unreviewed change from live (42 → 205). That
+was based on the stale "42" figure and is **wrong**: live is already ~180. So the toolkit's current
+count-rule SQL (`01`/`02`/`03`) is the SAME logic already published — automating it is a refresh,
+not a rule change, and needs no fresh Bietrick sign-off on the rule itself.
+
+The only intended difference for the monthly job is the WINDOW: the live build used the one-off
+correction window (rn 2..5); the monthly automation uses the normal roll-forward (rn 1..4, the last
+4 complete weeks). That is a fresh-values change, not a logic change.
+
+Method verified the same day: the whole-portfolio recompute runs in ONE direct-psycopg2 query
+(10,031 ASINs, 30 PHs, ~read-only) with no timeout — so the MCP ~1,300-ASIN limit that forced the
+per-PH split does NOT apply to an autonomous runner.
