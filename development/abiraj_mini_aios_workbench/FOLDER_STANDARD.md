@@ -57,8 +57,9 @@ A project's closure record lives in its **own** `projects/<ID>/closure/` folder 
 convention (11 of 15 projects) and matches the CLAUDE.md multi-project rule ("all of a project's …
 closure live inside that project folder, never in 01–11"). The workbench-level `09_closure/` is for
 **workbench-governance** closures (e.g. the folder-architecture closure), not per-business-project ones.
-PRJ-2026-015 (DST) is the historical exception — its record sits in `09_closure/` with a pointer in the
-project folder; relocate it if/when convenient and delete the pointer.
+PRJ-2026-015 (DST) was the historical exception; its record was relocated from `09_closure/` into
+`projects/PRJ-2026-015_daily-sales-track/closure/REQ-17_daily-sales-track/2026-07-23_closure.md` on
+2026-07-27, so all business-project closures now live in their own project folders.
 
 ## Known-good reference
 
@@ -68,7 +69,8 @@ project folder; relocate it if/when convenient and delete the pointer.
 
 ## Conformance as of 2026-07-27
 
-All 15 projects now hold the four required folders (`closure/` was added to 012–015 on 2026-07-27).
+All 15 projects now hold the four required folders (`closure/` was added to 012–015 on 2026-07-27, and
+DST's closure record was consolidated into its project folder the same day).
 Deviations that remain are intentional and recorded:
 - **003** blos-project-sentinel — no `sql/` (non-SQL project); left as-is by owner instruction.
 - **002** eod-skills — no `automation/` (onboarding-only, nothing scheduled); left as-is.

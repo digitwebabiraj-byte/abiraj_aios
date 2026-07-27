@@ -121,7 +121,7 @@ needed no decision. Only the inputs to those formulas were open. See the SOURCE_
 | Verification | `validation/REQ-17_.../` — `verify_dst_d01.py` (18/18) + records |
 | Automation | `automation/` — see [AUTOMATION_README.md](automation/AUTOMATION_README.md) |
 | Daily requirement document | `DigitWeb_Works_Abiraj/23_07_2026/2026-07-23_abiraj_REQ-dst_REQ-17-D01.md` |
-| Closure record | `09_closure/2026-07-23_REQ-17_daily-sales-track_closure.md` |
+| Closure record | `closure/REQ-17_daily-sales-track/2026-07-23_closure.md` |
 
 ## Who
 
