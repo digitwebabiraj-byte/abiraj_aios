@@ -244,6 +244,7 @@ def main():
     desc = ("ZSFO weekly - Utharsika Amazon-UK ASINs with 0 units sold in %s..%s (FBA+FBM AND vendor). "
             "%d zero-sale of %d universe. Traffic funnel + stock diagnostics + root-cause hint."
             % (ws, we, len(rows), universe))
+    conn.set_session(readonly=False)   # leave the read-only read phase before publishing (the UPDATE writes)
     try:
         with conn:
             with conn.cursor() as cur:

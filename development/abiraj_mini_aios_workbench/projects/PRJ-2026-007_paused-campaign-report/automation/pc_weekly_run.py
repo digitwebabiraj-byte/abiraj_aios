@@ -210,6 +210,7 @@ def main():
     desc = ("Paused Campaign Report (weekly) - Utharsika Amazon ad targets paused by PPC automation "
             "and still paused today: %d of %d total pauses. Reason verbatim, Days Paused = today - pause date."
             % (len(raw), total_pauses))
+    conn.set_session(readonly=False)   # leave the read-only read phase before publishing (the UPDATE writes)
     try:
         with conn:
             with conn.cursor() as cur:

@@ -170,6 +170,7 @@ def main():
     desc = ("SMAW Table 5 weekly - Thuwaraga full-portfolio stock: %d ASIN-account rows, %d No-Stock/Critical, "
             "%d Healthy. UK stock = location_wise_inv_stock (live); velocity = 90d FBM units / 90."
             % (len(rows), crit, healthy))
+    conn.set_session(readonly=False)   # leave the read-only read phase before publishing (the UPDATE writes)
     try:
         with conn:
             with conn.cursor() as cur:

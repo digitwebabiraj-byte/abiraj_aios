@@ -7,7 +7,8 @@ Reuses the SAME query/config as the xlsx builder so the two never drift. Read-on
 import os, json
 from datetime import date, timedelta
 import psycopg2
-from eppr_build_d01 import SQL, WH, BRAND_MAP, VAT_RATE, HEADERS
+from eppr_build_d01 import fetch_records, HEADERS
+build_records = fetch_records  # single shared data layer (ledsone + warehouse-traffic)
 
 HERE = os.path.dirname(__file__)
 OUTDIR = os.path.abspath(os.path.join(HERE, "..","..","evidence","final_outputs",
@@ -16,38 +17,7 @@ JSON_OUT = os.path.join(OUTDIR, "eppr_d01_data.json")
 HTML_OUT = os.path.join(OUTDIR, "REQ-19-D01_dashboard.html")
 ND = "NO DATA"
 
-def build_records():
-    anchor = date.today() - timedelta(days=1); d0 = anchor - timedelta(days=29)
-    conn = psycopg2.connect(**WH); cur = conn.cursor()
-    cur.execute(SQL, {"d0": d0, "d1": anchor}); rows = cur.fetchall(); conn.close()
-    recs = []
-    for r in rows:
-        (mkt, acct, item_id, parent_sku, rep_sku, vc, title, category, ldate, price, stock, img,
-         units, orders, revenue, last_sold, ebay_fees, ad_cost, is_promoted,
-         shipping_cost, impr, clicks, conv) = r
-        revenue = float(revenue) if revenue is not None else 0.0
-        vat = round(revenue - revenue/(1+VAT_RATE[mkt]), 2) if revenue else 0
-        ctr = round(float(clicks)/float(impr)*100, 2) if impr and clicks is not None and float(impr) > 0 else None
-        cvr = round(float(conv)/float(clicks)*100, 2) if clicks and conv is not None and float(clicks) > 0 else None
-        rec = [
-            img or "", (rep_sku or ND) + ("" if vc == 1 else " (+%d)" % (vc-1)), parent_sku or ND,
-            str(item_id), title or ND, BRAND_MAP.get(acct, acct.title() if acct else ND), category or ND,
-            mkt, acct, ldate.isoformat() if ldate else ND, "Active",
-            round(float(price), 2) if price is not None else None,
-            None, float(shipping_cost) if shipping_cost is not None else 0,
-            float(ebay_fees) if ebay_fees is not None else 0, float(ad_cost) if ad_cost is not None else 0,
-            vat, int(stock) if stock is not None else None,
-            int(units) if units is not None else 0, int(orders) if orders is not None else 0,
-            revenue, None, None, None,
-            int(impr) if impr is not None else None,
-            int(clicks) if clicks is not None else None, int(clicks) if clicks is not None else None,
-            ctr, cvr, None,
-            last_sold.isoformat() if last_sold else ND,
-            (anchor - ldate).days if ldate else None,
-            "Promoted" if is_promoted else "Not Promoted", None, None,
-        ]
-        recs.append({"c": "£" if mkt == "UK" else "€", "v": rec})
-    return recs, d0, anchor
+# data layer lives in eppr_build_d01.fetch_records() (imported above) — ledsone + warehouse-traffic
 
 HTML = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
