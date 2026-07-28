@@ -61,8 +61,9 @@ Revenue on active listings: **UK £59,526 · DE €26,634** (30-day window). Mon
 ## Next actions
 ✅ **CLOSED — signed off by Thinesh 2026-07-28.** No outstanding required actions.
 
-Optional / future (not blocking closure):
+✅ **REQ-19-D02 AUTOMATED 2026-07-28** — Windows task `EPPR_Monthly_Product_Performance`, **2nd Wednesday of each month 10:00** (next 2026-08-12), fail-closed, status file + Desktop alert, proven end-to-end (LastTaskResult 0). The fleet's **10th** scheduled job; 10:00 chosen clear of the other 9 (09:00–09:45 + Mon/Thu 10:30–11:00) on the shared `temp_user` pool. See `automation/AUTOMATION_README.md`.
+
+Optional / future (not blocking):
 - Replace the 20% cost estimate with a real cost basis if one is ever supplied (profit would become booked, not estimated).
 - Define **Sales Trend** bands to fill the last remaining data column.
-- **REQ-19-D02** scheduled refresh (automation).
 - Housekeeping: write `verify_eppr_d01.py`; delete the superseded `.xlsx` versions; rotate the `temp_user` password (pre-existing in git history).

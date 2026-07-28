@@ -139,6 +139,7 @@ img.t{{width:32px;height:32px;object-fit:cover;border-radius:8px;border:1px soli
 </div></body></html>"""
     with open(OUT,"w",encoding="utf-8") as f: f.write(doc)
     print("rows:",n,"| rich static HTML:",round(os.path.getsize(OUT)/1e6,2),"MB ->",OUT)
+    return n
 
 if __name__=="__main__":
     render()
