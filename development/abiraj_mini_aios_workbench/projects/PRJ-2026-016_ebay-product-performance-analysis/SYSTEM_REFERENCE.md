@@ -1,66 +1,64 @@
 # SYSTEM_REFERENCE — REQ-19 eBay Product Performance Analysis
 
-The authoritative field-by-field map: each of the 35 report columns → real `schema.table.column`,
-with the population measured live on 2026-07-27 (warehouse `order_management_copy`).
+Field-by-field map: each of the 35 columns → real source. Built from **raw `ledsone`** (source of record)
++ the **warehouse** for the organic-traffic feed only. Measured live 2026-07-27.
 
 ## Grain & window
-- **Grain:** one row per eBay listing = `listing_data` where `which_channel=2 AND all_list=1 AND
-  wrong_sku=0 AND is_child=1`, grouped by `(market_place, sub_source_name, ref_id)`. **9,781 rows** (UK+DE).
-- **Window:** rolling 30 days ending on the last COMPLETE day (anchor = `CURRENT_DATE-1`), for all flow
-  metrics (sales, fees, ad, traffic, shipping). Stock/price/identity are current snapshot.
+- One row per eBay listing (item_id): `listings.ebay_listings` `all_list=1 AND is_ended=0 AND wrong_sku=0
+  AND site IN ('UK','Germany')`, grouped by item_id → **11,123 rows**.
+- ⚠ **Title/image/type/parent live on the PARENT row (`all_list=0`)** — a separate `meta` CTE takes them
+  over ALL rows per item_id, else Title is only ~8%.
+- Window: rolling 30 days ending the last complete day, for all flow metrics.
 
 ## Column map
-
-| # | Report column | Source | Grade / note |
+| # | Column | Source | Note |
 |---|---|---|---|
-| 1 | Product Image | `listing_data.main_image_url` | 98% |
-| 2 | SKU | `listing_data.sku` (rep + variant count) | 100% |
-| 3 | Parent SKU | `listing_data.parent_sku` | 83% |
-| 4 | eBay Item ID | `listing_data.ref_id` | 100% |
-| 5 | Product Title | `inv_products.title` via resolved SKU | 86% |
-| 6 | Brand | `salesprot_account_brand_map_v1` by account (pinned; temp_user can't read staging_ai) | 100% |
-| 7 | Category | `order_transaction.category_name` else `listing_data.category_id` | 100% (name ~38%, id rest) |
-| 8 | Marketplace | `listing_data.market_place` | 100% |
-| 9 | Account | `listing_data.sub_source_name` | 100% |
-| 10 | Listing Date | `listing_data.created_at` | 100% ⚠ may be ETL date |
-| 11 | Listing Status | `all_list=1` ⇒ "Active" | 100% |
-| 12 | Selling Price | `listing_data.price` (MAX across variants) | 100% |
-| 13 | **Cost Price** | — `sku_cogs` EMPTY | 🔴 NO DATA |
-| 14 | Shipping Cost | `order_shipping_billing_detail.carrier_charge` via order_id (per-sale) | populated where sold |
-| 15 | eBay Fees | `ebay_order_expenses.fee` where `fee_type NOT IN (AD_FEE,PREMIUM_AD_FEES)` | per-sale; item-level attribution partial |
-| 16 | Ad Cost | `ppc_performance.spend` (CPC) + `ebay_order_expenses` AD_FEE/PREMIUM_AD_FEES (CPS) | 100% (0 if not promoted) |
-| 17 | VAT | derived: revenue − revenue/(1+rate), rate 20% UK / 19% DE | derived, flagged |
-| 18 | Available Stock | `listing_data.quantity` (SUM across variants) | 100% |
-| 19 | Units Sold | `order_transaction.quantity` (30d) | 0 if none |
-| 20 | Orders | `COUNT(DISTINCT order_transaction.order_id)` (30d) | 0 if none |
-| 21 | Revenue | `SUM(order_transaction.order_total)` (30d) | 0 if none |
-| 22 | **Gross Profit** | — needs Cost | 🔴 NO DATA |
-| 23 | **Net Profit** | — needs Cost | 🔴 NO DATA |
-| 24 | **Profit Margin %** | — needs Net Profit | 🔴 NO DATA |
-| 25 | Impressions | `traffic_data.impression` (which_channel=2, 30d) | organic |
-| 26 | Views | `traffic_data.click` | = Clicks (eBay one metric) |
-| 27 | Clicks | `traffic_data.click` | = Views |
-| 28 | CTR % | derived: click / impression × 100 | derived |
-| 29 | Conversion Rate % | derived: conversion / click × 100 | derived |
-| 30 | **Watch Count** | — no table in either DB (eBay Trading API only) | 🔴 NO DATA |
-| 31 | Last Sold Date | `MAX(order_transaction.order_date)` | where sold |
+| 1 | Product Image | `ebay_listings.main_image_url` (meta) | 100% |
+| 2 | SKU | `ebay_listings.sku` (`all_list=1`) + variant count | 100% |
+| 3 | Parent SKU | `ebay_listings.parent_sku` (meta) | 74% |
+| 4 | eBay Item ID | `ebay_listings.item_id` | 100% |
+| 5 | Product Title | `ebay_listings.title` (meta, parent row) | ~99% |
+| 6 | Brand | account store-brand map (`BRAND_MAP`) | 100% |
+| 7 | Category | `ebay_listings.product_type` else `category_id` | 100% (real names) |
+| 8 | Marketplace | `ebay_listings.site` (UK/Germany) | 100% |
+| 9 | Account | `order_management.sub_source.name` (source_id=2) | 100% |
+| 10 | Listing Date | `ebay_listings.created_at` (all_list=1) | 100% |
+| 11 | Listing Status | `all_list=1 & is_ended=0` ⇒ Active | 100% |
+| 12 | Selling Price | `ebay_listings.price` (MAX per item) | 100% |
+| 13 | **Cost Price** | **ESTIMATE = 20% × Selling Price** (owner decision) | 🟠 estimate |
+| 14 | Shipping Cost | `order_management.orders.shipping_cost` via order lines | per-sale |
+| 15 | eBay Fees | `accounting.ebay_order_expenses.fee` (non-ad fee_types) | per item_id |
+| 16 | Ad Cost | `ebay_campaigns.performance_data.ad_fees_payout_currency` (CPC) + `ebay_order_expenses` AD_FEE/PREMIUM (CPS) | ebay_listing_id = item_id |
+| 17 | VAT | derived: revenue − revenue/(1+rate), 20% UK / 19% DE | derived |
+| 18 | Available Stock | `ebay_listings.quantity` (SUM per item) | 100% |
+| 19 | Units Sold | `order_item_info.item_quantity` (30d, source_id=2, not Cancelled/Deleted) | 0 if none |
+| 20 | Orders | `COUNT(DISTINCT order_id)` (30d) | 0 if none |
+| 21 | Revenue | `SUM(item_price×item_quantity)` (30d, CAST VARCHAR) | 0 if none |
+| 22 | **Gross Profit** | derived: Revenue − Cost×Units | 🟠 estimate (via #13) |
+| 23 | **Net Profit** | derived: Gross − Fees − Ad − Shipping − VAT | 🟠 estimate |
+| 24 | **Profit Margin %** | derived: Net ÷ Revenue (where Revenue>0) | 🟠 estimate |
+| 25 | Impressions | **warehouse** `traffic_data.impression` (which_channel=2) | organic |
+| 26 | Views | warehouse `traffic_data.click` | = Clicks |
+| 27 | Clicks | warehouse `traffic_data.click` | eBay one metric |
+| 28 | CTR % | derived: click/impression×100 | |
+| 29 | Conversion Rate % | derived: conversion/click×100 | |
+| 30 | **Watch Count** | — no source in either DB (eBay Trading API only) | 🔴 NO DATA |
+| 31 | Last Sold Date | `MAX(order_date)` (30d) | where sold |
 | 32 | Days Active | derived: anchor − listing_date | 100% |
-| 33 | Promotion Status | Promoted if ad spend > 0 in window, else Not Promoted | 100% |
-| 34 | **PPC Campaign** | `ppc.record_name` exists but item→campaign link only 29% in warehouse | 🔴 NO DATA |
+| 33 | Promotion Status | Promoted if ad spend / running campaign, else Not Promoted | 100% |
+| 34 | PPC Campaign | `ebay_campaigns.ads`→`campaigns.campaign_name` (ebay_listing_id=item_id) | ~65% |
 | 35 | **Sales Trend** | — undefined business rule (no bands) | 🔴 NO DATA |
 
-## Tables verified present (2026-07-27)
-`public.listing_data` · `public.order_transaction` · `public.ebay_order_expenses` ·
-`public.order_shipping_billing_detail` · `public.ppc` · `public.ppc_performance` ·
-`public.traffic_data` · `public.inv_products` · `public.location_wise_inv_stock` /
-`public.inv_final_stock` · `development.sku_cogs` (EMPTY) · `development.channel_vat_log` (EMPTY) ·
-`staging_ai.sku_selling_cost_rates_v1` (11,074 rows, selling-cost %, not COGS) ·
-`staging_ai.salesprot_account_brand_map_v1` (39 rows).
+## Key ledsone rules applied (AIOS KB)
+- `all_list=1` mandatory for real SKUs; title/image on the parent row (`all_list=0`).
+- eBay orders isolated with `sub_source.source_id=2` (else Shopify item_ids leak in).
+- `order_item_info.item_price` / `item_quantity` are VARCHAR → CAST.
+- `ebay_campaigns.*.ebay_listing_id` = the eBay item_id (numeric) — the join key for ad/campaign.
 
-## Reconciliation (30-day window)
-Revenue attached to active listings: **UK £54,286.40 · DE €25,340.97** ≈ 93–94% of the full eBay
-UK+DE window total (UK £58,402 · DE €26,876); the remainder is sales from now-inactive listings.
+## Cost / profit = estimate
+No real per-SKU COGS exists (`inventory.products` has no cost; `sku_cogs` empty; `suppliers.invoices.unit_price`
+not SKU-keyed). Owner decision 2026-07-27: **Cost Price = 20% of Selling Price**; Gross/Net/Margin derived
+and flagged as estimates on every artefact.
 
-## To reach a full profit report
-Need a **product Cost Price** (COGS) source — `ledsone.inventory` once reachable, or a figure from
-Thinesh. That single input unlocks columns 13, 22, 23 and 24.
+## Reconciliation
+Revenue on active listings (30d): UK £59,526 · DE €26,634. Per currency, never blended.

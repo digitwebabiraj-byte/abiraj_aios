@@ -21,12 +21,14 @@ from datetime import date, datetime, timedelta
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 
+# Credentials come from the shared global env store (see 05_documentation/capability/shared_db_credentials/);
+# NEVER hardcode passwords in tracked code. LED_* = raw ledsone (read-only), PG* = warehouse (temp_user).
 LED = dict(host=os.getenv("LED_PGHOST","207.148.78.148"), port=os.getenv("LED_PGPORT","5432"),
            dbname=os.getenv("LED_PGDATABASE","ledsone"), user=os.getenv("LED_PGUSER","dbhub_readonly"),
-           password=os.getenv("LED_PGPASSWORD","lds-readonly-2026"), connect_timeout=30)
+           password=os.getenv("LED_PGPASSWORD",""), connect_timeout=30)
 WH = dict(host=os.getenv("PGHOST","149.28.134.54"), port=os.getenv("PGPORT","5435"),
           dbname=os.getenv("PGDATABASE","order_management_copy"),
-          user=os.getenv("PGUSER","temp_user"), password=os.getenv("PGPASSWORD","12we34rt"), connect_timeout=30)
+          user=os.getenv("PGUSER","temp_user"), password=os.getenv("PGPASSWORD",""), connect_timeout=30)
 
 OUT = os.path.abspath(os.path.join(os.path.dirname(__file__),
       "..","..","evidence","final_outputs","REQ-19_ebay-product-performance-analysis",
@@ -175,20 +177,30 @@ def fetch_records():
         conv = tr[2] if tr else None
         ctr = round(clicks/impr*100, 2) if impr and clicks is not None and impr > 0 else None
         cvr = round(conv/clicks*100, 2) if clicks and conv is not None and clicks > 0 else None
+        # Profit stack. Cost Price is an ESTIMATE = 20% of selling price (owner-agreed proxy; no real
+        # COGS exists in either database). Gross/Net/Margin are derived from it and are therefore
+        # estimates, not booked figures — flagged on every artefact.
+        price_v = round(float(price), 2) if price is not None else None
+        cost_v = round(price_v*0.20, 2) if price_v is not None else None
+        ship_v = float(shipping) if shipping is not None else 0
+        fees_v = float(ebay_fees) if ebay_fees is not None else 0
+        ad_v = float(ad_cost) if ad_cost is not None else 0
+        units_v = int(units) if units is not None else 0
+        gross_v = round(revenue - cost_v*units_v, 2) if cost_v is not None else None
+        net_v = round(gross_v - fees_v - ad_v - ship_v - vat, 2) if gross_v is not None else None
+        margin_v = round(net_v/revenue*100, 2) if (net_v is not None and revenue) else None
         v = [
             img or None,
             (rep_sku or ND) + ("" if vc == 1 else " (+%d)" % (vc-1)),
             parent_sku or None, str(item_id), title or None,
             BRAND_MAP.get(account, account.title() if account else None), category or None,
             mkt, account, ldate.isoformat() if ldate else None, "Active",
-            round(float(price), 2) if price is not None else None,
-            None,                                          # Cost Price
-            float(shipping) if shipping is not None else 0,
-            float(ebay_fees) if ebay_fees is not None else 0,
-            float(ad_cost) if ad_cost is not None else 0,
+            price_v,
+            cost_v,                                        # Cost Price = est. 20% of selling price
+            ship_v, fees_v, ad_v,
             vat, int(stock) if stock is not None else None,
-            int(units) if units is not None else 0, int(orders) if orders is not None else 0, revenue,
-            None, None, None,                              # Gross / Net / Margin
+            units_v, int(orders) if orders is not None else 0, revenue,
+            gross_v, net_v, margin_v,                      # derived from the 20% cost estimate
             impr, views, clicks, ctr, cvr, None,           # traffic + Watch Count
             last_sold.isoformat() if last_sold else None,
             (anchor - ldate).days if ldate else None,
@@ -205,8 +217,9 @@ def main():
             "window %s..%s (30 days) | money per marketplace currency: UK £ / DE € (never blended) | "
             "Views=Clicks (eBay one organic click/view metric) | Brand=account store brand | "
             "VAT=std output VAT 20%% UK / 19%% DE of revenue | "
-            "'NO DATA' = no source: Cost Price & Gross/Net/Margin (no COGS in either DB), Watch Count (eBay API only), "
-            "Sales Trend (undefined rule)." % (d0, anchor))
+            "⚠ ESTIMATE: Cost Price = 20%% of selling price (no real COGS exists); Gross/Net Profit & Margin "
+            "are derived from it and are ESTIMATES, not booked figures | "
+            "'NO DATA' = no source: Watch Count (eBay API only), Sales Trend (undefined rule)." % (d0, anchor))
     ws["A1"] = note; ws["A1"].font = Font(name="Arial", size=9, italic=True, color="555555")
     ws.append([]); hr = 3
     ws.append(HEADERS)

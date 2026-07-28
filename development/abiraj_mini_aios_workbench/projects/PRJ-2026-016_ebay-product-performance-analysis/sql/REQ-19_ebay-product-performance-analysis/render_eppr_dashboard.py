@@ -178,7 +178,7 @@ img.thumb:hover{transform:scale(1.1);box-shadow:0 5px 14px rgba(16,26,44,.28);bo
   <div class="tablewrap reveal d4" id="wrap"><table><colgroup id="cg"></colgroup><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
   <div class="foot reveal d4">
     <span>Grain: one row per eBay listing (item_id). Money in each row's own currency — <b>UK £ / DE €</b> — never blended.</span>
-    <span><b>NO DATA</b> = no warehouse source: Cost Price · Gross/Net/Margin (sku_cogs empty) · Watch Count · PPC Campaign · Sales Trend.</span>
+    <span><b>⚠ ESTIMATE:</b> Cost Price = 20% of selling price (no real COGS); Gross/Net/Margin derived from it. <b>NO DATA</b> only: Watch Count (eBay API) · Sales Trend (undefined).</span>
   </div>
 </div>
 <script>

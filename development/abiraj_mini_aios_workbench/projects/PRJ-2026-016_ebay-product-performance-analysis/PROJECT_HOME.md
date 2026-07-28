@@ -5,91 +5,61 @@
 | **Project ID** | `PRJ-2026-016_ebay-product-performance-analysis` |
 | **Project code** | `eppr` *(provisional — pending Varmen)* |
 | **Task ID** | `REQ-19_ebay-product-performance-analysis` *(provisional)* |
-| **Status** | **REQ-19-D01 BUILT (warehouse-only interim) 2026-07-27** — per-listing dashboard, **9,781 live eBay UK+DE listings**, 35 columns, **28 populated / 7 NO DATA**. Not published, not signed off, not automated. Build is **interim** because `ledsone` was unreachable and product **Cost Price** is absent from the warehouse. |
-| **Opened** | 2026-07-27 |
-| **Owner** | Abiraj |
-| **Coordinator** | Varmen |
-| **Technical Reviewer** | Sajeesan |
-| **Queryability Reviewer** | Tamil Selvan |
-| **Business Validator** | **Thinesh** (requester; identity verified live for REQ-16 — `public."user"` id 63, Active). Publish audience NOT decided; candidate `ebay_priors`. |
+| **Status** | **REQ-19-D01 BUILT · PUBLISHED 2026-07-27.** Per-listing eBay dashboard, **11,123 live listings (UK+DE)**, 35 columns, **33/35 populated**. Built from **raw `ledsone`** (+ warehouse for organic traffic only). Published to `tech_team_outputs.ph_task` **ids 472–475** (`ebay_priors`: Thinesh, Jarsini, kobiga, powsteena), v3, static no-JS HTML. **Not signed off, not automated.** |
+| **Opened / Published** | 2026-07-27 |
+| **Owner** | Abiraj · **Coordinator** Varmen · **Tech** Sajeesan · **Queryability** Tamil Selvan |
+| **Business Validator** | **Thinesh** (requester). Publish audience = `ebay_priors` (Thinesh · Jarsini · kobiga · powsteena). |
 
-> ⚠ **IDs provisional.** The source carries no requirement number. REQ-17 = `dst`, **REQ-18 = `fauto`**,
-> so this takes **REQ-19** / **PRJ-2026-016** / code **eppr** — all pending owner confirmation.
+> ⚠ IDs provisional (source has no requirement number; REQ-18 = `fauto`).
 
 ## Business question
+For each eBay listing (UK+DE, all accounts): what it costs to sell, what it earns after costs, how it
+sells, how it's seen, and where it sits in its lifecycle — 35 columns, one row per listing.
 
-> For each eBay listing, across all accounts on UK + Germany: what does it cost to sell, what does it
-> earn after costs, how is it selling, how is it being seen, and where is it in its lifecycle?
+## Grain & window
+One row per eBay **listing (item_id)**; **11,123** active listings (`all_list=1`, UK+DE). Rolling **30
+days** ending the last complete day. Money **per marketplace currency** (UK £ / DE €), never blended.
 
-The genuinely new element vs every prior eBay report is a **per-listing profit-and-loss line**
-(Cost → eBay Fees → Ad Cost → VAT → Gross / Net / Margin). That P&L is exactly what the warehouse
-cannot yet complete — see below.
+## 🔒 Source (owner instruction — the two ledsone MCPs)
+- **Raw `ledsone` Postgres** (`mcp.ledsone.co.uk`, `dbhub_readonly`) — **every column** except organic traffic.
+- **AIOS knowledge base** (`docs.ledsone.co.uk`) — read before SQL (`all_list=1`, `source_id=2`, VARCHAR casts).
+- **Warehouse** (`order_management_copy`) — used for **ONE feed only**: eBay **organic traffic**
+  (Impressions/Views/Conversion), which has no `ledsone` source (the ESNM two-DB pattern). Publish target
+  (`ph_task`) is also the warehouse — the source lock governs data retrieval, not the output step.
 
-## Grain: one row per eBay LISTING (item_id)
+## 🟠 Cost Price is an ESTIMATE (owner decision 2026-07-27)
+No real product COGS exists in any database (`ledsone.inventory.products` has no cost; warehouse
+`sku_cogs` empty; `suppliers.invoices.unit_price` isn't SKU-keyed). Owner decision: **Cost Price = 20% of
+Selling Price**. **Gross Profit, Net Profit and Profit Margin are derived from it and are therefore
+ESTIMATES, not booked figures** — flagged on every artefact (Excel note, dashboard footer, portal footer).
 
-**9,781 rows** — every active eBay listing (UK+DE, `all_list=1`), 15 accounts. Chosen because sales,
-fees, ad-cost and traffic all attribute at item_id grain **without the SKU-sprawl double-count** (one
-SKU is listed under many item_ids; joining sales by SKU alone overstates revenue ~13×).
+## Column coverage — 33/35 populated
+- **From `ledsone`:** Image, SKU, Parent SKU, Item ID, **Title ~99%**, Brand, **Category name**, Marketplace,
+  Account, Listing Date, Status, Selling Price, Shipping, eBay Fees, Ad Cost, VAT, Stock, Units, Orders,
+  Revenue, Last Sold, Days Active, Promotion, **PPC Campaign ~65%**.
+- **Derived from the 20% cost estimate:** Cost Price, Gross Profit, Net Profit, Profit Margin %.
+- **From warehouse traffic feed:** Impressions, Views, Clicks, CTR %, Conversion Rate %.
+- 🔴 **NO DATA (2):** **Watch Count** (eBay Trading API only, in no DB) · **Sales Trend** (undefined bands — decision).
 
-## 🔒 Source lock this build ran under (2026-07-27)
+Full field→source map: `SYSTEM_REFERENCE.md`.
 
-**Warehouse `order_management_copy` ONLY.** `ledsone` (the intended build source) was unreachable all
-day — both the MCP (VPN host `10.8.0.5:5432`) and the direct public host (`207.148.78.148:5432`) timed
-out. Bulk data pulled via **direct psycopg2 as `temp_user`** (the MCP returns text, unusable at 9,781
-rows). The warehouse read confirmed identical counts to the MCP.
+## Deliverables
+- Excel: `evidence/final_outputs/REQ-19_.../REQ-19-D01_ebay_product_performance_v4_final.xlsx`
+- Interactive dashboard (local review, JS): `.../REQ-19-D01_dashboard.html`
+- **Static no-JS portal report (published):** `.../REQ-19-D01_ph_task.html`
+- Data layer: `sql/REQ-19_.../eppr_build_d01.py` (`fetch_records()` — single source for all three outputs)
+- Dashboard renderer: `sql/REQ-19_.../render_eppr_dashboard.py`
+- Portal renderer: `automation/render_eppr_static.py` · Publisher: `automation/publish_eppr_ph_task.py`
 
-## 🔴 The blocker: no product cost anywhere in the warehouse
+## Publish record (ph_task, 2026-07-27)
+Guarded publish as `temp_user` (SELECT-then-INSERT/UPDATE — live table has **no** working `UNIQUE(task_id)`;
+sets `assigned_user_team`, which the sample DDL omits). Dry-run shown before commit. Rows 472–475, v3.
 
-`development.sku_cogs` (the designated COGS table) is **EMPTY (0 rows)**; `development.channel_vat_log`
-is empty; the only populated cost is a slow-stock snapshot (8.7% coverage). `sku_selling_cost_rates_v1`
-gives *selling-cost %*, not product COGS. **Therefore Cost Price, Gross Profit, Net Profit and Profit
-Margin cannot be computed truthfully and ship as `NO DATA` — never fabricated.**
-
-## Column status — 28 populated / 7 NO DATA (measured 2026-07-27)
-
-**Populated:** Image, SKU, Parent SKU, Item ID, Title (86%), Brand (100%, `salesprot` map),
-Category (name→id, 100%), Marketplace, Account, Listing Date, Listing Status, Selling Price, Shipping
-Cost, eBay Fees, Ad Cost, VAT (std 20/19%), Available Stock, Units, Orders, Revenue, Impressions,
-Views, Clicks, CTR %, Conversion Rate %, Last Sold, Days Active, Promotion Status.
-
-**NO DATA (with proven reason):** Cost Price · Gross Profit · Net Profit · Profit Margin % (all need
-COGS) · Watch Count (eBay Trading API only, in no table) · PPC Campaign (item→campaign link 29% in
-warehouse) · Sales Trend (undefined business rule).
-
-Full field-by-field source map: `SYSTEM_REFERENCE.md`.
-
-## Money is per marketplace currency — never blended
-
-UK rows render **£ (GBP)**, DE rows render **€ (EUR)** via per-cell format; no total blends currencies
-(the DST lesson). Revenue reconciles to the live 30-day window: **UK £54,286 · DE €25,341** (≈93–94% of
-the all-eBay window total; the remainder is sales from now-inactive listings, correctly excluded).
-
-## Deliverable
-
-`evidence/final_outputs/REQ-19_.../REQ-19-D01_ebay_product_performance_v4_final.xlsx` — 35 columns,
-9,781 rows, per-row currency. Built by `sql/REQ-19_.../eppr_build_d01.py` (single module, direct
-psycopg2, read-only).
-
-## Known limitations (disclosed on the deliverable)
-
-- **eBay Fees / Shipping** attribute per item_id, but eBay books many fees at order/payout level, so a
-  sold listing can legitimately read £0 there (they default to 0, like Ad Cost/Revenue).
-- **Product Title** 86% (via `inv_products` SKU bridge); **Category name** falls back to `category_id`
-  where the name is absent (~38% carry a name).
-- **`listing_data.created_at`** used as Listing Date may be an ETL date, not the original listing date —
-  unverified.
-
-## Register links
-
-- Task index: `TASK_REGISTER.md` · Execution rules: `CLAUDE.md` · Functional detail: `SYSTEM_REFERENCE.md`
-- Portfolio row: `../../PROJECT_REGISTER.md`
-- Source manifest: `evidence/source_documents/REQ-19_.../SOURCE_MANIFEST.md`
-- Requirement doc: `DigitWeb_Works_Abiraj/27_07_2026/2026-07-27_abiraj_REQ-eppr_REQ-19-D01.md`
+## Reconciliation
+Revenue on active listings: **UK £59,526 · DE €26,634** (30-day window). Money per currency, never blended.
 
 ## Next actions
-
-1. Get **`ledsone`** back or a **Cost Price** source from Thinesh → unlocks the 4 profit columns (26→30+).
-2. Route the decision sheet to Thinesh (cost semantics, scope/window confirmation, Sales-Trend bands,
-   Watchers/Clicks handling).
-3. Reviewer gates (Sajeesan / Tamil Selvan / Thinesh) + confirm IDs (Varmen).
-4. Then consider publish (`ph_task`) and automation (REQ-19-D02) — neither started.
+1. **Reviewer sign-off** — Sajeesan (technical), Tamil Selvan (queryability), Thinesh (business).
+2. **Confirm IDs** (Varmen): `PRJ-2026-016` / `REQ-19` / code `eppr`.
+3. Optional: replace the 20% cost estimate with a real cost basis if Thinesh supplies one; define **Sales
+   Trend** bands to fill the last data column; automate (REQ-19-D02).

@@ -5,8 +5,18 @@ Canonical index of tasks/deliverables within this project. Detail lives in `PROJ
 
 | Task | Deliverable | Description | Status |
 |---|---|---|---|
-| REQ-19 | **REQ-19-D01** | Per-listing eBay Product Performance dashboard (Excel), 35 columns, one row per eBay listing, UK+DE, all accounts | **BUILT — warehouse-only interim, 2026-07-27.** 9,781 rows; 28/35 columns populated, 7 NO DATA. Not published, not signed off. |
-| REQ-19 | REQ-19-D02 | Scheduled refresh (automation) | NOT STARTED (gated on D01 sign-off + publish decision) |
+| REQ-19 | **REQ-19-D01** | Per-listing eBay Product Performance report (Excel + interactive dashboard + static portal HTML), 35 columns, one row per eBay listing, UK+DE, all accounts | **BUILT (ledsone-primary) · PUBLISHED 2026-07-27.** 11,123 rows; **33/35 populated** (only Watch Count + Sales Trend NO DATA). Cost Price = 20% estimate → profit derived (flagged). Published to `ph_task` ids **472–475** (`ebay_priors`), v3. Not signed off, not automated. |
+| REQ-19 | REQ-19-D02 | Scheduled refresh (automation) | NOT STARTED (gated on D01 sign-off) |
+
+## Publish record — ph_task (2026-07-27)
+| id | assigned_user | task_id | team | version |
+|---|---|---|---|---|
+| 472 | Thinesh | `eppr_Thinesh_ebay_product_performance` | ebay_priors | 3 |
+| 473 | Jarsini | `eppr_Jarsini_ebay_product_performance` | ebay_priors | 3 |
+| 474 | kobiga | `eppr_kobiga_ebay_product_performance` | ebay_priors | 3 |
+| 475 | powsteena | `eppr_powsteena_ebay_product_performance` | ebay_priors | 3 |
+
+Static no-JS HTML (portal viewer runs no JS). Guarded temp_user publish; SELECT-then-INSERT/UPDATE (no live UNIQUE on task_id); assigned_user_team set.
 
 ## REQ-19-D01 artefacts
 - Deliverable: `evidence/final_outputs/REQ-19_.../REQ-19-D01_ebay_product_performance_v4_final.xlsx`
