@@ -5,7 +5,7 @@
 | **Project ID** | `PRJ-2026-016_ebay-product-performance-analysis` |
 | **Project code** | `eppr` *(provisional — pending Varmen)* |
 | **Task ID** | `REQ-19_ebay-product-performance-analysis` *(provisional)* |
-| **Status** | ✅ **CLOSED — DELIVERED · PUBLISHED · SIGNED OFF 2026-07-28.** Per-listing eBay report, **11,123 live listings (UK+DE)**, 34 columns, **34/34 populated (no empty columns)**. Built from **raw `ledsone`** (+ warehouse for organic traffic only). Published to `tech_team_outputs.ph_task` **ids 472–475** (`ebay_priors`), v3, static no-JS HTML. **Signed off by Thinesh (business).** Not automated (REQ-19-D02 optional/future). |
+| **Status** | ✅ **CLOSED — DELIVERED · PUBLISHED · SIGNED OFF 2026-07-28.** Per-listing eBay report, **11,123 live listings (UK+DE)**, 34 columns, **34/34 populated (no empty columns)**. Built from **raw `ledsone`** (+ warehouse for organic traffic only). Published to `tech_team_outputs.ph_task` **ids 472–475** (`ebay_priors`), v3, static no-JS HTML. **Signed off by Thinesh (business).** ✅ **AUTOMATED** (REQ-19-D02, monthly 2nd Wed 10:00). |
 | **Opened / Published** | 2026-07-27 · **Signed off 2026-07-28** |
 | **Owner** | Abiraj · **Coordinator** Varmen · **Tech** Sajeesan · **Queryability** Tamil Selvan |
 | **Business Validator** | **Thinesh** (requester) — ✅ **SIGNED OFF 2026-07-28.** Publish audience = `ebay_priors` (Thinesh · Jarsini · kobiga · powsteena). |

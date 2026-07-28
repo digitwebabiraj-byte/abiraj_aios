@@ -25,9 +25,10 @@ estimates. Watch Count was **removed** (eBay Trading API only, in no DB).
 
 ## Authoritative documents
 - `PROJECT_HOME.md` — canonical project truth
-- `SYSTEM_REFERENCE.md` — the 35-column → `schema.table.column` map with grades
+- `SYSTEM_REFERENCE.md` — the 34-column → `schema.table.column` map with grades
 - `CLAUDE.md` — execution rules
 - `TASK_REGISTER.md` — task/deliverable index
 
 ## Next step
-Get a Cost Price source, then route the decision sheet to Thinesh and take D01 through reviewer sign-off.
+✅ Closed — signed off by Thinesh 2026-07-28 and auto-refreshing monthly. No required action.
+Optional: supply a real Cost Price source to turn the estimated profit columns into booked figures.
