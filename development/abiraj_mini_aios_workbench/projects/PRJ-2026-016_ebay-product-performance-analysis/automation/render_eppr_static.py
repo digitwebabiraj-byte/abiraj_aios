@@ -12,9 +12,9 @@ from eppr_build_d01 import fetch_records, HEADERS
 
 OUT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..","evidence","final_outputs",
       "REQ-19_ebay-product-performance-analysis","REQ-19-D01_ph_task.html"))
-MONEY={11,12,13,14,15,16,20,21,22}; PCT={23,27,28}; NUM={17,18,19,24,25,26,31}
-LEFT={0,1,2,3,4,5,6,8,9,32,33,34}; GDIV={7,11,17,21,24,30}; ZMUTE={13,14,15,16,18,19,20,24,25,26}
-W=[62,150,150,120,300,120,150,96,120,102,88,102,96,108,96,94,94,90,72,72,112,104,104,98,104,80,84,72,106,92,116,92,122,150,92]
+MONEY={11,12,13,14,15,16,20,21,22}; PCT={23,27,28}; NUM={17,18,19,24,25,26,30}
+LEFT={0,1,2,3,4,5,6,8,9,31,32,33}; GDIV={7,11,17,21,24,29}; ZMUTE={13,14,15,16,18,19,20,24,25,26}
+W=[62,150,150,120,300,120,150,96,120,102,88,102,96,108,96,94,94,90,72,72,112,104,104,98,104,80,84,72,106,116,92,122,150,92]
 IC={"layers":'<svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
     "card":'<svg viewBox="0 0 24 24"><rect x="1.5" y="4.5" width="21" height="15" rx="2.5"/><path d="M1.5 9.5h21"/></svg>',
     "cart":'<svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1.4"/><circle cx="19" cy="21" r="1.4"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23.5 6H6"/></svg>',
@@ -29,7 +29,7 @@ def render():
         if v[7]=="UK": ukR+=v[20] or 0
         else: deR+=v[20] or 0
         units+=v[18] or 0; orders+=v[19] or 0
-        if v[32]=="Promoted": promo+=1
+        if v[31]=="Promoted": promo+=1
         if (v[20] or 0)>maxRev: maxRev=v[20]
         if (v[18] or 0)>maxUnits: maxUnits=v[18]
     n=len(recs); ppct=round(promo/n*100) if n else 0
@@ -53,7 +53,7 @@ def render():
         if i==7: return f'<span class="m {v}"><span class=fl>{"🇬🇧" if v=="UK" else "🇩🇪"}</span>{v}</span>'
         if i==5: return f'<span class=tag>{html.escape(str(v))}</span>'
         if i==6: return f'<span class="tag a">{html.escape(str(v))}</span>'
-        if i==32: return f'<span class="c {"p" if v=="Promoted" else "np"}">{v}</span>'
+        if i==31: return f'<span class="c {"p" if v=="Promoted" else "np"}">{v}</span>'
         if i==17:
             cl='so' if v==0 else ('sl' if v<5 else ''); return f'<span class="st {cl}">{v:,}</span>'
         if i==27: cl='g' if v>=2 else ('m' if v<0.8 else ''); return f'<span class="pc {cl}">{v:.2f}%</span>'
@@ -135,7 +135,7 @@ img.t{{width:32px;height:32px;object-fit:cover;border-radius:8px;border:1px soli
 <div class=sub>REQ-19-D01 · {n:,} live eBay listings · UK + Germany · window {d0} → {anchor} · money per marketplace currency (UK £ / DE €)</div></div></div>
 <div class=kpis>{kpi_html}</div>
 <div class=tbl><table><colgroup>{cols}</colgroup><thead><tr>{th}</tr></thead><tbody>{''.join(body)}</tbody></table></div>
-<div class=foot>Source: raw ledsone (all columns) + warehouse (organic traffic only). <b>⚠ ESTIMATE:</b> Cost Price = 20% of selling price (no real COGS exists); Gross/Net Profit &amp; Margin are derived from it and are estimates. <b>NO DATA</b> only: Watch Count (eBay API), Sales Trend (undefined). "–" = zero. Money never blended across currencies.</div>
+<div class=foot>Source: raw ledsone (all columns) + warehouse (organic traffic only). <b>⚠ ESTIMATE:</b> Cost Price = 20% of selling price (no real COGS exists); Gross/Net Profit &amp; Margin are derived from it and are estimates. <b>NO DATA</b> only: Sales Trend (undefined bands). "–" = zero. Money never blended across currencies.</div>
 </div></body></html>"""
     with open(OUT,"w",encoding="utf-8") as f: f.write(doc)
     print("rows:",n,"| rich static HTML:",round(os.path.getsize(OUT)/1e6,2),"MB ->",OUT)

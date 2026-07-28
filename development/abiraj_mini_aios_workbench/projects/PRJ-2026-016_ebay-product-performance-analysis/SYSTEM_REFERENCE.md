@@ -1,6 +1,6 @@
 # SYSTEM_REFERENCE — REQ-19 eBay Product Performance Analysis
 
-Field-by-field map: each of the 35 columns → real source. Built from **raw `ledsone`** (source of record)
+Field-by-field map: each of the 34 columns → real source. Built from **raw `ledsone`** (source of record)
 + the **warehouse** for the organic-traffic feed only. Measured live 2026-07-27.
 
 ## Grain & window
@@ -42,12 +42,14 @@ Field-by-field map: each of the 35 columns → real source. Built from **raw `le
 | 27 | Clicks | warehouse `traffic_data.click` | eBay one metric |
 | 28 | CTR % | derived: click/impression×100 | |
 | 29 | Conversion Rate % | derived: conversion/click×100 | |
-| 30 | **Watch Count** | — no source in either DB (eBay Trading API only) | 🔴 NO DATA |
-| 31 | Last Sold Date | `MAX(order_date)` (30d) | where sold |
-| 32 | Days Active | derived: anchor − listing_date | 100% |
-| 33 | Promotion Status | Promoted if ad spend / running campaign, else Not Promoted | 100% |
-| 34 | PPC Campaign | `ebay_campaigns.ads`→`campaigns.campaign_name` (ebay_listing_id=item_id) | ~65% |
-| 35 | **Sales Trend** | — undefined business rule (no bands) | 🔴 NO DATA |
+| 30 | Last Sold Date | `MAX(order_date)` (30d) | where sold |
+| 31 | Days Active | derived: anchor − listing_date | 100% |
+| 32 | Promotion Status | Promoted if ad spend / running campaign, else Not Promoted | 100% |
+| 33 | PPC Campaign | `ebay_campaigns.ads`→`campaigns.campaign_name` (ebay_listing_id=item_id) | ~65% |
+| 34 | **Sales Trend** | — undefined business rule (no bands) | 🔴 NO DATA |
+
+> **Watch Count REMOVED 2026-07-28** — eBay exposes watchers only via the Trading API, which is in no
+> database (both swept). The column was dropped rather than shipped permanently empty; the report is now 34 columns.
 
 ## Key ledsone rules applied (AIOS KB)
 - `all_list=1` mandatory for real SKUs; title/image on the parent row (`all_list=0`).

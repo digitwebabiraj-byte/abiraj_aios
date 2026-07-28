@@ -49,7 +49,7 @@ HEADERS = ["Product Image","SKU","Parent SKU","eBay Item ID","Product Title","Br
            "Marketplace","Account","Listing Date","Listing Status","Selling Price (£/€)","Cost Price (£/€)",
            "Shipping Cost (£/€)","eBay Fees (£/€)","Ad Cost (£/€)","VAT (£/€)","Available Stock","Units Sold","Orders",
            "Revenue (£/€)","Gross Profit (£/€)","Net Profit (£/€)","Profit Margin %","Impressions","Views","Clicks",
-           "CTR %","Conversion Rate %","Watch Count","Last Sold Date","Days Active",
+           "CTR %","Conversion Rate %","Last Sold Date","Days Active",
            "Promotion Status","PPC Campaign","Sales Trend"]
 MONEY_COLS = (12,13,14,15,16,17,21,22,23)
 
@@ -201,7 +201,7 @@ def fetch_records():
             vat, int(stock) if stock is not None else None,
             units_v, int(orders) if orders is not None else 0, revenue,
             gross_v, net_v, margin_v,                      # derived from the 20% cost estimate
-            impr, views, clicks, ctr, cvr, None,           # traffic + Watch Count
+            impr, views, clicks, ctr, cvr,                 # traffic (Watch Count column removed — no source)
             last_sold.isoformat() if last_sold else None,
             (anchor - ldate).days if ldate else None,
             "Promoted" if is_promoted else "Not Promoted", ppc or None, None,   # Sales Trend
@@ -219,7 +219,7 @@ def main():
             "VAT=std output VAT 20%% UK / 19%% DE of revenue | "
             "⚠ ESTIMATE: Cost Price = 20%% of selling price (no real COGS exists); Gross/Net Profit & Margin "
             "are derived from it and are ESTIMATES, not booked figures | "
-            "'NO DATA' = no source: Watch Count (eBay API only), Sales Trend (undefined rule)." % (d0, anchor))
+            "'NO DATA' = no source: Sales Trend (undefined rule). (Watch Count column removed — eBay API only, in no DB.)" % (d0, anchor))
     ws["A1"] = note; ws["A1"].font = Font(name="Arial", size=9, italic=True, color="555555")
     ws.append([]); hr = 3
     ws.append(HEADERS)
@@ -239,7 +239,7 @@ def main():
             cell = ws.cell(row=rownum, column=col)
             if isinstance(cell.value, (int, float)): cell.number_format = cur_fmt
     ws.freeze_panes = "E4"
-    widths=[16,20,18,15,40,15,20,11,14,12,12,12,12,12,12,12,10,9,9,8,12,12,12,11,11,9,9,8,12,11,12,10,14,16,11]
+    widths=[16,20,18,15,40,15,20,11,14,12,12,12,12,12,12,12,10,9,9,8,12,12,12,11,11,9,9,8,12,12,10,14,16,11]
     for i,w in enumerate(widths,1):
         ws.column_dimensions[ws.cell(row=hr,column=i).column_letter].width = w
     wb.save(OUT)

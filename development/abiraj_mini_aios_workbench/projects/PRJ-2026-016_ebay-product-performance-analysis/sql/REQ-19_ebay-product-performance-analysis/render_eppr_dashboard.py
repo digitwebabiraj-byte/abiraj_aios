@@ -178,15 +178,15 @@ img.thumb:hover{transform:scale(1.1);box-shadow:0 5px 14px rgba(16,26,44,.28);bo
   <div class="tablewrap reveal d4" id="wrap"><table><colgroup id="cg"></colgroup><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
   <div class="foot reveal d4">
     <span>Grain: one row per eBay listing (item_id). Money in each row's own currency — <b>UK £ / DE €</b> — never blended.</span>
-    <span><b>⚠ ESTIMATE:</b> Cost Price = 20% of selling price (no real COGS); Gross/Net/Margin derived from it. <b>NO DATA</b> only: Watch Count (eBay API) · Sales Trend (undefined).</span>
+    <span><b>⚠ ESTIMATE:</b> Cost Price = 20% of selling price (no real COGS); Gross/Net/Margin derived from it. <b>NO DATA</b> only: Sales Trend (undefined bands).</span>
   </div>
 </div>
 <script>
 const H=__HEADERS__, DATA=__DATA__;
-const MONEY=new Set([11,12,13,14,15,16,20,21,22]), PCT=new Set([23,27,28]), NUM=new Set([17,18,19,24,25,26,31]);
-const LEFT=new Set([0,1,2,3,4,5,6,8,9,32,33,34]);
-const GDIV=new Set([7,11,17,21,24,30]), ZMUTE=new Set([13,14,15,16,18,19,20,24,25,26]);
-const W=[72,150,150,120,300,120,150,96,120,102,88,102,96,108,96,94,94,90,72,72,112,104,104,98,104,80,84,74,106,92,116,92,122,112,92];
+const MONEY=new Set([11,12,13,14,15,16,20,21,22]), PCT=new Set([23,27,28]), NUM=new Set([17,18,19,24,25,26,30]);
+const LEFT=new Set([0,1,2,3,4,5,6,8,9,31,32,33]);
+const GDIV=new Set([7,11,17,21,24,29]), ZMUTE=new Set([13,14,15,16,18,19,20,24,25,26]);
+const W=[72,150,150,120,300,120,150,96,120,102,88,102,96,108,96,94,94,90,72,72,112,104,104,98,104,80,84,74,106,116,92,122,112,92];
 let ROWH=42; const BUF=10;
 let sortCol=20, sortDir=-1, view=[], maxRev=1, maxUnits=1;
 const wrap=document.getElementById('wrap'), tbody=document.getElementById('tbody'), thead=document.getElementById('thead');
@@ -205,7 +205,7 @@ function acctOpts(){const s=[...new Set(DATA.map(r=>r.v[8]))].sort();
 function computeView(){
   const q=document.getElementById('q').value.trim().toLowerCase();
   const fa=document.getElementById('fAcct').value, fm=document.getElementById('fMkt').value, fp=document.getElementById('fPromo').value;
-  view=DATA.filter(r=>{const v=r.v; if(fa&&v[8]!==fa)return false; if(fm&&v[7]!==fm)return false; if(fp&&v[32]!==fp)return false;
+  view=DATA.filter(r=>{const v=r.v; if(fa&&v[8]!==fa)return false; if(fm&&v[7]!==fm)return false; if(fp&&v[31]!==fp)return false;
     if(q){if(!((v[4]+' '+v[1]+' '+v[3]+' '+v[5]).toLowerCase().includes(q)))return false;} return true;});
   view.sort((a,b)=>{let x=a.v[sortCol],y=b.v[sortCol]; if(x==null)return 1; if(y==null)return -1;
     if(typeof x==='number'&&typeof y==='number')return (x-y)*sortDir; return String(x).localeCompare(String(y))*sortDir;});
@@ -219,7 +219,7 @@ function cell(v,i,cur){
   if(i===7)return `<span class="mkt ${v}"><span class="flag">${v==='UK'?'🇬🇧':'🇩🇪'}</span>${v}</span>`;
   if(i===5)return `<span class="tag" title="${String(v).replace(/"/g,'&quot;')}">${v}</span>`;
   if(i===6)return `<span class="tag alt" title="${String(v).replace(/"/g,'&quot;')}">${v}</span>`;
-  if(i===32)return `<span class="chip ${v==='Promoted'?'pro':'no'}">${v}</span>`;
+  if(i===31)return `<span class="chip ${v==='Promoted'?'pro':'no'}">${v}</span>`;
   if(i===17){const c=v===0?'s-out':v<5?'s-low':'';return `<span class="stock ${c}">${fmtN(v)}</span>`;}
   if(i===27){const cls=v>=2?'g':v>=0.8?'':'m';return `<span class="pctv ${cls}">${v.toFixed(2)}%</span>`;}
   if(i===28){const cls=v>=3?'g':v>=1?'':'m';return `<span class="pctv ${cls}">${v.toFixed(2)}%</span>`;}
@@ -267,7 +267,7 @@ const KPI=[
  {lbl:'DE Revenue',c:'#8b5cf6',bg:'#f2eafe',glow:'rgba(139,92,246,.22)',icon:IC.card,sub:'30-day · EUR',calc:v=>v.reduce((s,r)=>s+(r.v[7]==='Germany'?r.v[20]:0),0),fmt:x=>'€'+Math.round(x).toLocaleString('en-GB')},
  {lbl:'Units Sold',c:'#0ea5a4',bg:'#e0f6f5',glow:'rgba(14,165,164,.22)',icon:IC.cart,sub:'last 30 days',calc:v=>v.reduce((s,r)=>s+(r.v[18]||0),0),fmt:x=>Math.round(x).toLocaleString('en-GB')},
  {lbl:'Orders',c:'#f59e0b',bg:'#fdf0d9',glow:'rgba(245,158,11,.22)',icon:IC.bag,sub:'last 30 days',calc:v=>v.reduce((s,r)=>s+(r.v[19]||0),0),fmt:x=>Math.round(x).toLocaleString('en-GB')},
- {lbl:'Promoted',c:'#16a34a',bg:'#e3f6e9',glow:'rgba(22,163,74,.22)',icon:IC.trend,bar:true,sub:'of listings',calc:v=>v.length?v.filter(r=>r.v[32]==='Promoted').length/v.length*100:0,fmt:x=>Math.round(x)+'%'},
+ {lbl:'Promoted',c:'#16a34a',bg:'#e3f6e9',glow:'rgba(22,163,74,.22)',icon:IC.trend,bar:true,sub:'of listings',calc:v=>v.length?v.filter(r=>r.v[31]==='Promoted').length/v.length*100:0,fmt:x=>Math.round(x)+'%'},
 ];
 function drawKPIs(){document.getElementById('kpis').innerHTML=KPI.map((k,i)=>
  `<div class="kpi reveal d2" style="--c:${k.c};--bg:${k.bg};--glow:${k.glow};animation-delay:${(.04+i*.05).toFixed(2)}s">

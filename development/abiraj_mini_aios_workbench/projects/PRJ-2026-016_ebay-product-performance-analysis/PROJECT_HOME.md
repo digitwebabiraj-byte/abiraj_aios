@@ -5,7 +5,7 @@
 | **Project ID** | `PRJ-2026-016_ebay-product-performance-analysis` |
 | **Project code** | `eppr` *(provisional — pending Varmen)* |
 | **Task ID** | `REQ-19_ebay-product-performance-analysis` *(provisional)* |
-| **Status** | ✅ **CLOSED — DELIVERED · PUBLISHED · SIGNED OFF 2026-07-28.** Per-listing eBay report, **11,123 live listings (UK+DE)**, 35 columns, **33/35 populated**. Built from **raw `ledsone`** (+ warehouse for organic traffic only). Published to `tech_team_outputs.ph_task` **ids 472–475** (`ebay_priors`), v3, static no-JS HTML. **Signed off by Thinesh (business).** Not automated (REQ-19-D02 optional/future). |
+| **Status** | ✅ **CLOSED — DELIVERED · PUBLISHED · SIGNED OFF 2026-07-28.** Per-listing eBay report, **11,123 live listings (UK+DE)**, 34 columns, **33/34 populated**. Built from **raw `ledsone`** (+ warehouse for organic traffic only). Published to `tech_team_outputs.ph_task` **ids 472–475** (`ebay_priors`), v3, static no-JS HTML. **Signed off by Thinesh (business).** Not automated (REQ-19-D02 optional/future). |
 | **Opened / Published** | 2026-07-27 · **Signed off 2026-07-28** |
 | **Owner** | Abiraj · **Coordinator** Varmen · **Tech** Sajeesan · **Queryability** Tamil Selvan |
 | **Business Validator** | **Thinesh** (requester) — ✅ **SIGNED OFF 2026-07-28.** Publish audience = `ebay_priors` (Thinesh · Jarsini · kobiga · powsteena). |
@@ -14,7 +14,7 @@
 
 ## Business question
 For each eBay listing (UK+DE, all accounts): what it costs to sell, what it earns after costs, how it
-sells, how it's seen, and where it sits in its lifecycle — 35 columns, one row per listing.
+sells, how it's seen, and where it sits in its lifecycle — 34 columns, one row per listing.
 
 ## Grain & window
 One row per eBay **listing (item_id)**; **11,123** active listings (`all_list=1`, UK+DE). Rolling **30
@@ -33,13 +33,14 @@ No real product COGS exists in any database (`ledsone.inventory.products` has no
 Selling Price**. **Gross Profit, Net Profit and Profit Margin are derived from it and are therefore
 ESTIMATES, not booked figures** — flagged on every artefact (Excel note, dashboard footer, portal footer).
 
-## Column coverage — 33/35 populated
+## Column coverage — 33/34 populated
+The report is **34 columns** — Watch Count was **removed 2026-07-28** (eBay Trading API only, in no DB, so it could never be filled).
 - **From `ledsone`:** Image, SKU, Parent SKU, Item ID, **Title ~99%**, Brand, **Category name**, Marketplace,
   Account, Listing Date, Status, Selling Price, Shipping, eBay Fees, Ad Cost, VAT, Stock, Units, Orders,
   Revenue, Last Sold, Days Active, Promotion, **PPC Campaign ~65%**.
 - **Derived from the 20% cost estimate:** Cost Price, Gross Profit, Net Profit, Profit Margin %.
 - **From warehouse traffic feed:** Impressions, Views, Clicks, CTR %, Conversion Rate %.
-- 🔴 **NO DATA (2):** **Watch Count** (eBay Trading API only, in no DB) · **Sales Trend** (undefined bands — decision).
+- 🔴 **NO DATA (1):** **Sales Trend** (undefined bands — a business decision, derivable once set).
 
 Full field→source map: `SYSTEM_REFERENCE.md`.
 
