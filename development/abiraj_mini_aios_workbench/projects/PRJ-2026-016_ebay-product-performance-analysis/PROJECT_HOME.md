@@ -5,10 +5,10 @@
 | **Project ID** | `PRJ-2026-016_ebay-product-performance-analysis` |
 | **Project code** | `eppr` *(provisional — pending Varmen)* |
 | **Task ID** | `REQ-19_ebay-product-performance-analysis` *(provisional)* |
-| **Status** | **REQ-19-D01 BUILT · PUBLISHED 2026-07-27.** Per-listing eBay dashboard, **11,123 live listings (UK+DE)**, 35 columns, **33/35 populated**. Built from **raw `ledsone`** (+ warehouse for organic traffic only). Published to `tech_team_outputs.ph_task` **ids 472–475** (`ebay_priors`: Thinesh, Jarsini, kobiga, powsteena), v3, static no-JS HTML. **Not signed off, not automated.** |
-| **Opened / Published** | 2026-07-27 |
+| **Status** | ✅ **CLOSED — DELIVERED · PUBLISHED · SIGNED OFF 2026-07-28.** Per-listing eBay report, **11,123 live listings (UK+DE)**, 35 columns, **33/35 populated**. Built from **raw `ledsone`** (+ warehouse for organic traffic only). Published to `tech_team_outputs.ph_task` **ids 472–475** (`ebay_priors`), v3, static no-JS HTML. **Signed off by Thinesh (business).** Not automated (REQ-19-D02 optional/future). |
+| **Opened / Published** | 2026-07-27 · **Signed off 2026-07-28** |
 | **Owner** | Abiraj · **Coordinator** Varmen · **Tech** Sajeesan · **Queryability** Tamil Selvan |
-| **Business Validator** | **Thinesh** (requester). Publish audience = `ebay_priors` (Thinesh · Jarsini · kobiga · powsteena). |
+| **Business Validator** | **Thinesh** (requester) — ✅ **SIGNED OFF 2026-07-28.** Publish audience = `ebay_priors` (Thinesh · Jarsini · kobiga · powsteena). |
 
 > ⚠ IDs provisional (source has no requirement number; REQ-18 = `fauto`).
 
@@ -59,7 +59,10 @@ sets `assigned_user_team`, which the sample DDL omits). Dry-run shown before com
 Revenue on active listings: **UK £59,526 · DE €26,634** (30-day window). Money per currency, never blended.
 
 ## Next actions
-1. **Reviewer sign-off** — Sajeesan (technical), Tamil Selvan (queryability), Thinesh (business).
-2. **Confirm IDs** (Varmen): `PRJ-2026-016` / `REQ-19` / code `eppr`.
-3. Optional: replace the 20% cost estimate with a real cost basis if Thinesh supplies one; define **Sales
-   Trend** bands to fill the last data column; automate (REQ-19-D02).
+✅ **CLOSED — signed off by Thinesh 2026-07-28.** No outstanding required actions.
+
+Optional / future (not blocking closure):
+- Replace the 20% cost estimate with a real cost basis if one is ever supplied (profit would become booked, not estimated).
+- Define **Sales Trend** bands to fill the last remaining data column.
+- **REQ-19-D02** scheduled refresh (automation).
+- Housekeeping: write `verify_eppr_d01.py`; delete the superseded `.xlsx` versions; rotate the `temp_user` password (pre-existing in git history).

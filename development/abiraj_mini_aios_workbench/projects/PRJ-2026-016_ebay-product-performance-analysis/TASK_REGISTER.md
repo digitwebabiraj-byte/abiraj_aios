@@ -5,8 +5,8 @@ Canonical index of tasks/deliverables within this project. Detail lives in `PROJ
 
 | Task | Deliverable | Description | Status |
 |---|---|---|---|
-| REQ-19 | **REQ-19-D01** | Per-listing eBay Product Performance report (Excel + interactive dashboard + static portal HTML), 35 columns, one row per eBay listing, UK+DE, all accounts | **BUILT (ledsone-primary) · PUBLISHED 2026-07-27.** 11,123 rows; **33/35 populated** (only Watch Count + Sales Trend NO DATA). Cost Price = 20% estimate → profit derived (flagged). Published to `ph_task` ids **472–475** (`ebay_priors`), v3. Not signed off, not automated. |
-| REQ-19 | REQ-19-D02 | Scheduled refresh (automation) | NOT STARTED (gated on D01 sign-off) |
+| REQ-19 | **REQ-19-D01** | Per-listing eBay Product Performance report (Excel + interactive dashboard + static portal HTML), 35 columns, one row per eBay listing, UK+DE, all accounts | ✅ **CLOSED — DELIVERED · PUBLISHED · SIGNED OFF (Thinesh) 2026-07-28.** 11,123 rows; **33/35 populated** (only Watch Count + Sales Trend NO DATA). Cost Price = 20% estimate → profit derived (flagged). Published to `ph_task` ids **472–475** (`ebay_priors`), v3. |
+| REQ-19 | REQ-19-D02 | Scheduled refresh (automation) | OPTIONAL / FUTURE — not started (D01 closed) |
 
 ## Publish record — ph_task (2026-07-27)
 | id | assigned_user | task_id | team | version |
