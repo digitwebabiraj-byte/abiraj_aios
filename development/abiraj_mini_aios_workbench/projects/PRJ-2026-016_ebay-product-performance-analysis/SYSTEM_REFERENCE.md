@@ -46,7 +46,7 @@ Field-by-field map: each of the 34 columns → real source. Built from **raw `le
 | 31 | Days Active | derived: anchor − listing_date | 100% |
 | 32 | Promotion Status | Promoted if ad spend / running campaign, else Not Promoted | 100% |
 | 33 | PPC Campaign | `ebay_campaigns.ads`→`campaigns.campaign_name` (ebay_listing_id=item_id) | ~65% |
-| 34 | **Sales Trend** | — undefined business rule (no bands) | 🔴 NO DATA |
+| 34 | Sales Trend | derived: this-30d units vs prior-30d, ±5% band (Up/Stable/Down; "No sales" if none either window) | ✅ derived |
 
 > **Watch Count REMOVED 2026-07-28** — eBay exposes watchers only via the Trading API, which is in no
 > database (both swept). The column was dropped rather than shipped permanently empty; the report is now 34 columns.

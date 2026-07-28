@@ -5,7 +5,7 @@
 | **Project ID** | `PRJ-2026-016_ebay-product-performance-analysis` |
 | **Project code** | `eppr` *(provisional — pending Varmen)* |
 | **Task ID** | `REQ-19_ebay-product-performance-analysis` *(provisional)* |
-| **Status** | ✅ **CLOSED — DELIVERED · PUBLISHED · SIGNED OFF 2026-07-28.** Per-listing eBay report, **11,123 live listings (UK+DE)**, 34 columns, **33/34 populated**. Built from **raw `ledsone`** (+ warehouse for organic traffic only). Published to `tech_team_outputs.ph_task` **ids 472–475** (`ebay_priors`), v3, static no-JS HTML. **Signed off by Thinesh (business).** Not automated (REQ-19-D02 optional/future). |
+| **Status** | ✅ **CLOSED — DELIVERED · PUBLISHED · SIGNED OFF 2026-07-28.** Per-listing eBay report, **11,123 live listings (UK+DE)**, 34 columns, **34/34 populated (no empty columns)**. Built from **raw `ledsone`** (+ warehouse for organic traffic only). Published to `tech_team_outputs.ph_task` **ids 472–475** (`ebay_priors`), v3, static no-JS HTML. **Signed off by Thinesh (business).** Not automated (REQ-19-D02 optional/future). |
 | **Opened / Published** | 2026-07-27 · **Signed off 2026-07-28** |
 | **Owner** | Abiraj · **Coordinator** Varmen · **Tech** Sajeesan · **Queryability** Tamil Selvan |
 | **Business Validator** | **Thinesh** (requester) — ✅ **SIGNED OFF 2026-07-28.** Publish audience = `ebay_priors` (Thinesh · Jarsini · kobiga · powsteena). |
@@ -33,14 +33,15 @@ No real product COGS exists in any database (`ledsone.inventory.products` has no
 Selling Price**. **Gross Profit, Net Profit and Profit Margin are derived from it and are therefore
 ESTIMATES, not booked figures** — flagged on every artefact (Excel note, dashboard footer, portal footer).
 
-## Column coverage — 33/34 populated
+## Column coverage — 34/34 populated (no empty columns)
 The report is **34 columns** — Watch Count was **removed 2026-07-28** (eBay Trading API only, in no DB, so it could never be filled).
 - **From `ledsone`:** Image, SKU, Parent SKU, Item ID, **Title ~99%**, Brand, **Category name**, Marketplace,
   Account, Listing Date, Status, Selling Price, Shipping, eBay Fees, Ad Cost, VAT, Stock, Units, Orders,
   Revenue, Last Sold, Days Active, Promotion, **PPC Campaign ~65%**.
 - **Derived from the 20% cost estimate:** Cost Price, Gross Profit, Net Profit, Profit Margin %.
 - **From warehouse traffic feed:** Impressions, Views, Clicks, CTR %, Conversion Rate %.
-- 🔴 **NO DATA (1):** **Sales Trend** (undefined bands — a business decision, derivable once set).
+- **Derived:** **Sales Trend** — this-30-day units vs the prior 30 days, ±5% band (editable): **Up / Stable / Down**, or **"No sales"** where a listing sold nothing in either window (77% — the long tail).
+- ✅ **No empty columns. Per-row blanks are legitimate** (e.g. a listing that never sold has no Last Sold Date or Profit Margin).
 
 Full field→source map: `SYSTEM_REFERENCE.md`.
 
@@ -66,5 +67,5 @@ Revenue on active listings: **UK £59,526 · DE €26,634** (30-day window). Mon
 
 Optional / future (not blocking):
 - Replace the 20% cost estimate with a real cost basis if one is ever supplied (profit would become booked, not estimated).
-- Define **Sales Trend** bands to fill the last remaining data column.
+- ✅ Sales Trend now derived (±5% band, editable) — done 2026-07-28.
 - Housekeeping: write `verify_eppr_d01.py`; delete the superseded `.xlsx` versions; rotate the `temp_user` password (pre-existing in git history).

@@ -144,6 +144,10 @@ img.thumb:hover{transform:scale(1.1);box-shadow:0 5px 14px rgba(16,26,44,.28);bo
 .chip{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:650;line-height:1.2}
 .chip.pro{background:rgba(22,163,74,.12);color:var(--good)}
 .chip.no{background:rgba(133,146,166,.14);color:var(--muted)}
+.trend{display:inline-block;padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:700}
+.trend.tu{background:rgba(22,163,74,.12);color:var(--good)}
+.trend.td{background:rgba(220,38,38,.12);color:var(--bad)}
+.trend.ts{background:rgba(133,146,166,.14);color:var(--muted)}
 .mkt{display:inline-block;padding:3px 9px;border-radius:7px;font-size:10.5px;font-weight:750;letter-spacing:.2px}
 .mkt.UK{background:rgba(59,110,246,.12);color:var(--accent)}
 .mkt.Germany{background:rgba(139,92,246,.14);color:var(--accent2)}
@@ -178,7 +182,7 @@ img.thumb:hover{transform:scale(1.1);box-shadow:0 5px 14px rgba(16,26,44,.28);bo
   <div class="tablewrap reveal d4" id="wrap"><table><colgroup id="cg"></colgroup><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
   <div class="foot reveal d4">
     <span>Grain: one row per eBay listing (item_id). Money in each row's own currency — <b>UK £ / DE €</b> — never blended.</span>
-    <span><b>⚠ ESTIMATE:</b> Cost Price = 20% of selling price (no real COGS); Gross/Net/Margin derived from it. <b>NO DATA</b> only: Sales Trend (undefined bands).</span>
+    <span><b>⚠ ESTIMATE:</b> Cost Price = 20% of selling price (no real COGS); Gross/Net/Margin derived from it. Sales Trend = this-30d vs prior-30d units (±5% band). Every column now populated.</span>
   </div>
 </div>
 <script>
@@ -220,6 +224,7 @@ function cell(v,i,cur){
   if(i===5)return `<span class="tag" title="${String(v).replace(/"/g,'&quot;')}">${v}</span>`;
   if(i===6)return `<span class="tag alt" title="${String(v).replace(/"/g,'&quot;')}">${v}</span>`;
   if(i===31)return `<span class="chip ${v==='Promoted'?'pro':'no'}">${v}</span>`;
+  if(i===33){if(v==='No sales')return '<span class="nd">No sales</span>';return `<span class="trend ${v==='Up'?'tu':v==='Down'?'td':'ts'}">${v==='Up'?'▲':v==='Down'?'▼':'▬'} ${v}</span>`;}
   if(i===17){const c=v===0?'s-out':v<5?'s-low':'';return `<span class="stock ${c}">${fmtN(v)}</span>`;}
   if(i===27){const cls=v>=2?'g':v>=0.8?'':'m';return `<span class="pctv ${cls}">${v.toFixed(2)}%</span>`;}
   if(i===28){const cls=v>=3?'g':v>=1?'':'m';return `<span class="pctv ${cls}">${v.toFixed(2)}%</span>`;}

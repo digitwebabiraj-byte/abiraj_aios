@@ -9,11 +9,11 @@ its identity, pricing, cost stack, sales, traffic and lifecycle — 34 columns, 
 
 ## Status
 ✅ **CLOSED — DELIVERED · PUBLISHED · SIGNED OFF (Thinesh) 2026-07-28 · AUTOMATED.** 11,123 live listings,
-**34 columns, 33/34 populated**. Built from **raw `ledsone`** (+ warehouse for organic traffic only).
+**34 columns, 34/34 populated (no empty columns)**. Built from **raw `ledsone`** (+ warehouse for organic traffic only).
 Published to `ph_task` 472–475 (`ebay_priors`). Monthly auto-refresh (`EPPR_Monthly_Product_Performance`,
 2nd Wednesday 10:00).
 
-Only **Sales Trend** is `NO DATA` (undefined bands — a decision). Cost Price / Gross / Net / Margin are
+**Sales Trend** is derived (this-30d vs prior-30d units, ±5% band; Up/Stable/Down or "No sales"). Cost Price / Gross / Net / Margin are
 filled from an **owner-agreed 20%-of-selling-price estimate** (no real COGS exists in any DB), flagged as
 estimates. Watch Count was **removed** (eBay Trading API only, in no DB).
 

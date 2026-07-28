@@ -36,6 +36,7 @@ OUT = os.path.abspath(os.path.join(os.path.dirname(__file__),
 
 ND = "NO DATA"
 VAT_RATE = {"UK":0.20, "Germany":0.19}
+TREND_BAND = 0.05   # Sales Trend: Up if units change >= +5% vs prior 30d, Down if <= -5%, else Stable (editable)
 # Brand = the account's eBay store brand (own-brand listings); values as recorded in the business.
 BRAND_MAP = {
     "led_sone":"LEDSone","ledsonede":"LEDSone DE","electricalsone":"Electricalsone","so_926407":"Sunsone",
@@ -81,6 +82,14 @@ sales AS (
   WHERE o.order_date >= %(t0)s AND o.order_date < %(t1)s AND o.status NOT IN ('Cancelled','Deleted')
   GROUP BY oii.item_id
 ),
+sales_prev AS (   -- units in the PRIOR 30-day window, for the Sales Trend comparison
+  SELECT oii.item_id, SUM(CAST(NULLIF(oii.item_quantity,'') AS numeric)) AS units_prev
+  FROM order_management.order_item_info oii
+  JOIN order_management.orders o     ON o.id=oii.order_id
+  JOIN order_management.sub_source ss ON ss.id=o.sub_source_id AND ss.source_id=2
+  WHERE o.order_date >= %(pt0)s AND o.order_date < %(pt1)s AND o.status NOT IN ('Cancelled','Deleted')
+  GROUP BY oii.item_id
+),
 ship AS (
   SELECT item_id, ROUND(SUM(cc),2) AS shipping FROM (
     SELECT DISTINCT oii.item_id, o.id AS oid, o.shipping_cost AS cc
@@ -121,11 +130,12 @@ SELECT b.item_id, b.site, ss.name AS account, m.parent_sku, b.rep_sku, b.vc,
        s.units, s.orders, s.revenue, s.last_sold,
        f.fee AS ebay_fees, COALESCE(ac.cps,0)+COALESCE(ap.cpc,0) AS ad_cost,
        (ac.cps IS NOT NULL OR ap.cpc IS NOT NULL OR COALESCE(cm.promoted,false)) AS is_promoted,
-       sh.shipping, cm.cname AS ppc_campaign
+       sh.shipping, cm.cname AS ppc_campaign, sp.units_prev
 FROM base b
 JOIN order_management.sub_source ss ON ss.id=b.sub_source
 JOIN meta m ON m.item_id=b.item_id
 LEFT JOIN sales s  ON s.item_id=b.item_id
+LEFT JOIN sales_prev sp ON sp.item_id=b.item_id
 LEFT JOIN ship  sh ON sh.item_id=b.item_id
 LEFT JOIN fees  f  ON f.iid=b.item_id
 LEFT JOIN adcps ac ON ac.iid=b.item_id
@@ -146,6 +156,8 @@ def fetch_records():
     d0 = anchor - timedelta(days=29)
     params = {"t0": datetime.combine(d0, datetime.min.time()),
               "t1": datetime.combine(anchor + timedelta(days=1), datetime.min.time()),
+              "pt0": datetime.combine(d0 - timedelta(days=30), datetime.min.time()),
+              "pt1": datetime.combine(d0, datetime.min.time()),
               "d0": d0, "d1": anchor}
     # 1) everything from raw ledsone
     lc = psycopg2.connect(**LED); cur = lc.cursor(); cur.execute(LED_SQL, params)
@@ -165,7 +177,7 @@ def fetch_records():
     recs = []
     for r in rows:
         (item_id, site, account, parent_sku, rep_sku, vc, title, category, ldate, price, stock, img,
-         units, orders, revenue, last_sold, ebay_fees, ad_cost, is_promoted, shipping, ppc) = r
+         units, orders, revenue, last_sold, ebay_fees, ad_cost, is_promoted, shipping, ppc, units_prev) = r
         mkt = site  # 'UK' / 'Germany'
         cur_sym = "£" if mkt == "UK" else "€"
         revenue = float(revenue) if revenue is not None else 0.0
@@ -189,6 +201,14 @@ def fetch_records():
         gross_v = round(revenue - cost_v*units_v, 2) if cost_v is not None else None
         net_v = round(gross_v - fees_v - ad_v - ship_v - vat, 2) if gross_v is not None else None
         margin_v = round(net_v/revenue*100, 2) if (net_v is not None and revenue) else None
+        # Sales Trend — this-30d units vs prior-30d, ±TREND_BAND (blank only if no sales in either window)
+        up = int(units_prev) if units_prev is not None else 0
+        if units_v == 0 and up == 0:   trend = "No sales"    # no sales in either 30-day window
+        elif up == 0:                  trend = "Up"
+        elif units_v == 0:             trend = "Down"
+        else:
+            ch = (units_v - up) / up
+            trend = "Up" if ch >= TREND_BAND else ("Down" if ch <= -TREND_BAND else "Stable")
         v = [
             img or None,
             (rep_sku or ND) + ("" if vc == 1 else " (+%d)" % (vc-1)),
@@ -204,7 +224,7 @@ def fetch_records():
             impr, views, clicks, ctr, cvr,                 # traffic (Watch Count column removed — no source)
             last_sold.isoformat() if last_sold else None,
             (anchor - ldate).days if ldate else None,
-            "Promoted" if is_promoted else "Not Promoted", ppc or None, None,   # Sales Trend
+            "Promoted" if is_promoted else "Not Promoted", ppc or None, trend,   # Sales Trend (derived)
         ]
         recs.append({"c": cur_sym, "v": v})
     return recs, d0, anchor
@@ -219,7 +239,8 @@ def main():
             "VAT=std output VAT 20%% UK / 19%% DE of revenue | "
             "⚠ ESTIMATE: Cost Price = 20%% of selling price (no real COGS exists); Gross/Net Profit & Margin "
             "are derived from it and are ESTIMATES, not booked figures | "
-            "'NO DATA' = no source: Sales Trend (undefined rule). (Watch Count column removed — eBay API only, in no DB.)" % (d0, anchor))
+            "Sales Trend = this-30d units vs prior-30d, ±5%% band (Up/Stable/Down; blank if no sales either window). "
+            "No NO DATA columns remain. (Watch Count column removed — eBay API only, in no DB.)" % (d0, anchor))
     ws["A1"] = note; ws["A1"].font = Font(name="Arial", size=9, italic=True, color="555555")
     ws.append([]); hr = 3
     ws.append(HEADERS)

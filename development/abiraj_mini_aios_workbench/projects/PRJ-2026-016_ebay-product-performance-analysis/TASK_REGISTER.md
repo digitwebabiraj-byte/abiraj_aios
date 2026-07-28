@@ -5,7 +5,7 @@ Canonical index of tasks/deliverables within this project. Detail lives in `PROJ
 
 | Task | Deliverable | Description | Status |
 |---|---|---|---|
-| REQ-19 | **REQ-19-D01** | Per-listing eBay Product Performance report (Excel + interactive dashboard + static portal HTML), 34 columns, one row per eBay listing, UK+DE, all accounts | ✅ **CLOSED — DELIVERED · PUBLISHED · SIGNED OFF (Thinesh) 2026-07-28.** 11,123 rows; **33/34 populated** (only Sales Trend NO DATA; Watch Count removed — no source). Cost Price = 20% estimate → profit derived (flagged). Published to `ph_task` ids **472–475** (`ebay_priors`), v3. |
+| REQ-19 | **REQ-19-D01** | Per-listing eBay Product Performance report (Excel + interactive dashboard + static portal HTML), 34 columns, one row per eBay listing, UK+DE, all accounts | ✅ **CLOSED — DELIVERED · PUBLISHED · SIGNED OFF (Thinesh) 2026-07-28.** 11,123 rows; **34/34 populated (no empty columns)**. Cost Price = 20% estimate → profit derived (flagged). Published to `ph_task` ids **472–475** (`ebay_priors`), v3. |
 | REQ-19 | **REQ-19-D02** | Scheduled monthly refresh (automation) | ✅ **AUTOMATED · LIVE · PROVEN 2026-07-28.** Windows task **`EPPR_Monthly_Product_Performance`**, **2nd Wednesday of each month 10:00** (next 2026-08-12), fail-closed (refuses to publish on 0 rows / <8,000 / <60% of last good / missing HTML), status file + Desktop alert, git-ignored secrets, registered on the main-tree path. Proven end-to-end: manual runner OK + **Start-ScheduledTask → LastTaskResult 0**, refreshed ph_task 472-475. |
 
 ## Publish record — ph_task (2026-07-27)

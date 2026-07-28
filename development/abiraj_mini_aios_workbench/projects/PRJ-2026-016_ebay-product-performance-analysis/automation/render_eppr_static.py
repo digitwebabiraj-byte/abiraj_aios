@@ -54,6 +54,10 @@ def render():
         if i==5: return f'<span class=tag>{html.escape(str(v))}</span>'
         if i==6: return f'<span class="tag a">{html.escape(str(v))}</span>'
         if i==31: return f'<span class="c {"p" if v=="Promoted" else "np"}">{v}</span>'
+        if i==33:
+            if v=="No sales": return '<span class=nd>No sales</span>'
+            cl="tu" if v=="Up" else "td" if v=="Down" else "ts"; ar="▲" if v=="Up" else "▼" if v=="Down" else "▬"
+            return f'<span class="tr {cl}">{ar} {v}</span>'
         if i==17:
             cl='so' if v==0 else ('sl' if v<5 else ''); return f'<span class="st {cl}">{v:,}</span>'
         if i==27: cl='g' if v>=2 else ('m' if v<0.8 else ''); return f'<span class="pc {cl}">{v:.2f}%</span>'
@@ -122,6 +126,7 @@ img.t{{width:32px;height:32px;object-fit:cover;border-radius:8px;border:1px soli
 .m{{padding:2px 8px;border-radius:7px;font-size:10.5px;font-weight:750}}.m.UK{{background:rgba(59,110,246,.12);color:var(--accent)}}.m.Germany{{background:rgba(139,92,246,.14);color:var(--accent2)}}.fl{{margin-right:4px}}
 .tag{{display:inline-block;max-width:100%;padding:2px 8px;border-radius:7px;background:#eef2f9;color:var(--ink2);font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}}.tag.a{{background:#f0edfb;color:#5f4fb0}}
 .c{{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:650}}.c.p{{background:rgba(22,163,74,.12);color:var(--good)}}.c.np{{background:rgba(133,146,166,.14);color:var(--muted)}}
+.tr{{padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:700}}.tr.tu{{background:rgba(22,163,74,.12);color:var(--good)}}.tr.td{{background:rgba(220,38,38,.12);color:var(--bad)}}.tr.ts{{background:rgba(133,146,166,.14);color:var(--muted)}}
 .st{{font-weight:650}}.st.so{{color:var(--bad)}}.st.sl{{color:var(--warn)}}.st.so::before,.st.sl::before{{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle}}.st.so::before{{background:var(--bad)}}.st.sl::before{{background:var(--warn)}}
 .pc.g{{color:var(--good);font-weight:650}}.pc.m{{color:var(--muted2)}}
 .db{{position:relative;display:flex;align-items:center;justify-content:flex-end;height:100%}}
@@ -135,7 +140,7 @@ img.t{{width:32px;height:32px;object-fit:cover;border-radius:8px;border:1px soli
 <div class=sub>REQ-19-D01 · {n:,} live eBay listings · UK + Germany · window {d0} → {anchor} · money per marketplace currency (UK £ / DE €)</div></div></div>
 <div class=kpis>{kpi_html}</div>
 <div class=tbl><table><colgroup>{cols}</colgroup><thead><tr>{th}</tr></thead><tbody>{''.join(body)}</tbody></table></div>
-<div class=foot>Source: raw ledsone (all columns) + warehouse (organic traffic only). <b>⚠ ESTIMATE:</b> Cost Price = 20% of selling price (no real COGS exists); Gross/Net Profit &amp; Margin are derived from it and are estimates. <b>NO DATA</b> only: Sales Trend (undefined bands). "–" = zero. Money never blended across currencies.</div>
+<div class=foot>Source: raw ledsone (all columns) + warehouse (organic traffic only). <b>⚠ ESTIMATE:</b> Cost Price = 20% of selling price (no real COGS exists); Gross/Net Profit &amp; Margin are derived from it and are estimates. Sales Trend = this-30d vs prior-30d units (±5% band; ▲ Up / ▬ Stable / ▼ Down). Every column populated. "–" = zero. Money never blended across currencies.</div>
 </div></body></html>"""
     with open(OUT,"w",encoding="utf-8") as f: f.write(doc)
     print("rows:",n,"| rich static HTML:",round(os.path.getsize(OUT)/1e6,2),"MB ->",OUT)
