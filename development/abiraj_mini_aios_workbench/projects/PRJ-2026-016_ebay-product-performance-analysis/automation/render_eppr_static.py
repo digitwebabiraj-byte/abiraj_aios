@@ -111,6 +111,7 @@ font-weight:750;padding:7px 9px;height:48px;border-bottom:1.5px solid var(--line
 th.l{{text-align:left}}th.r{{text-align:right}}
 td{{padding:0 9px;height:var(--rowh);border-bottom:1px solid #f0f4fa;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;background:#fff}}
 {left_css}{{text-align:left}}
+tbody tr{{content-visibility:auto;contain-intrinsic-size:auto 40px}}
 tr:nth-child(even) td{{background:#fbfcff}}
 {gdiv_css}{{border-left:2px solid #e4eaf4}}th.g{{border-left:2px solid #dbe4f1}}
 th.s0,td:nth-child(1){{position:sticky;left:0;z-index:2;box-shadow:9px 0 12px -9px rgba(16,26,44,.14)}}
