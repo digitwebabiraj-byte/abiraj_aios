@@ -47,9 +47,15 @@ body{margin:0;color:var(--ink);height:100vh;overflow:hidden;display:flex;flex-di
 .tablewrap{flex:1;overflow:auto;padding:14px 16px 26px}
 table{border-collapse:separate;border-spacing:0;font-size:12.5px;white-space:nowrap;width:100%;
  background:var(--panel);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
-thead th{position:sticky;top:0;z-index:6;background:linear-gradient(180deg,#f2f7ff,#e9f1fb);
- color:#38495f;text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:800;
- padding:13px 13px;border-bottom:2px solid var(--band-line)}
+thead th{position:sticky;top:0;z-index:6;background:linear-gradient(180deg,#f4f8ff,#e7f0fb);
+ text-align:left;padding:14px 13px;border-bottom:2px solid var(--band-line)}
+thead th .thl{display:inline-block;font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;
+ font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;
+ background:linear-gradient(92deg,#24468a,#2f5fb0 45%,#5b8de0);-webkit-background-clip:text;background-clip:text;
+ color:transparent;position:relative;padding-bottom:6px}
+thead th .thl::after{content:"";position:absolute;left:0;bottom:0;width:18px;height:2.5px;border-radius:2px;
+ background:linear-gradient(90deg,var(--eR),var(--eY));transition:width .3s}
+thead th:hover .thl::after{width:100%}
 tbody td{padding:9px 13px;border-bottom:1px solid var(--line);vertical-align:top;background:transparent}
 tbody tr.comp{animation:rowin .5s ease both}
 @keyframes rowin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -144,7 +150,7 @@ function countUp(){document.querySelectorAll('.stat .v').forEach(el=>{
     if(p<1)requestAnimationFrame(tick);}
   requestAnimationFrame(tick);});}
 
-document.getElementById('hd').innerHTML=COLS.map(c=>`<th class="${['Product Name','Title','Primary Keywords','Secondary Keywords','Long-Tail Keywords','Notes'].includes(c)?'wrap':''}">${esc(c)}</th>`).join('');
+document.getElementById('hd').innerHTML=COLS.map(c=>`<th class="${['Product Name','Title','Primary Keywords','Secondary Keywords','Long-Tail Keywords','Notes'].includes(c)?'wrap':''}"><span class="thl">${esc(c)}</span></th>`).join('');
 let html='',idx=0;
 ROWS.forEach(r=>{
  if(r.first){html+=`<tr class="grp"><td colspan="${COLS.length}"><div class="grpband"><span class="gdot"></span><span class="gname">${esc(r.product)}</span></div></td></tr>`;}
