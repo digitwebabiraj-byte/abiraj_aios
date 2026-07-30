@@ -32,14 +32,10 @@ USERS = ["Thinesh","Jarsini","kobiga","powsteena"]      # ebay_priors team, exac
 PROJECT_NAME = ("eckr — eBay Competitor & Keyword Research (top-5 sold-proven eBay UK competitors "
                 "+ keyword sets per product across 9 categories) — LEDsONE analytics platform")
 PROJECT_CODE = "eckr"
-TASK_NAME    = ("eBay Competitor & Keyword Research — 9 product categories, top-5 sold-proven "
-                "competitors each (product image, price, feedback %, shipping, promotion) + "
-                "generated primary/secondary/long-tail keywords")
-DESCRIPTION  = ("Live eBay UK competitor & keyword research for Jarsini's 9 product categories "
-                "(Metal Shade Pendant, Wall Light, Metal shade Ceiling, Glass shade, Spider, Cage, "
-                "Pipe, Bulbs, Lamp Holder). 42 sold-proven competitors with our own 13 eBay accounts "
-                "excluded; each row shows the competitor's product image, price, seller feedback, "
-                "shipping (free/paid) and promotion, plus generated keyword sets. Snapshot 2026-07-30.")
+# Task name / description intentionally blank so the ph_task viewer's top chrome
+# is minimal and the dashboard table gets the full screen (Abiraj request 2026-07-30).
+TASK_NAME    = ""
+DESCRIPTION  = ""
 TEAM, DEVELOPER, TEAM_TAG = "Development", "Abiraj", "ebay_priors"
 PHASE_LEVEL, VERSION_LEVEL, VERSION_STATUS = 1, 1, "released"
 
