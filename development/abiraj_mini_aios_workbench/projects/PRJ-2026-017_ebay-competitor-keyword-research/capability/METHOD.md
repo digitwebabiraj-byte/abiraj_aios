@@ -20,7 +20,7 @@
 
 ## Product categories in scope (9)
 
-Cone metal pendant light · Wall Light · Metal shade Ceiling Light · Glass shade ceiling light ·
+Metal Shade Pendant Light (relabeled from "Cone" 2026-07-30, per Jarsini) · Wall Light · Metal shade Ceiling Light · Glass shade ceiling light ·
 Spider Light · Cage pendant light · Pipe Light · Bulbs · Lamp Holder.
 
 ## Output
