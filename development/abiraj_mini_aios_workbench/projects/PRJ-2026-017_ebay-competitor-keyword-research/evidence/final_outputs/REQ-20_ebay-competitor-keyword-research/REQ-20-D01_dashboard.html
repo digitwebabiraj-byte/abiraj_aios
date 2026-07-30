@@ -71,9 +71,9 @@ body{margin:0;color:var(--ink);height:100vh;overflow:hidden;display:flex;flex-di
 .fclear:hover{text-decoration:underline}
 
 /* ---------- table ---------- */
-.tablewrap{flex:1;overflow:auto;padding:14px 16px 26px}
+.tablewrap{flex:1;overflow:auto;padding:0}
 table{border-collapse:separate;border-spacing:0;font-size:12.5px;white-space:nowrap;width:100%;
- background:var(--panel);box-shadow:var(--shadow)}
+ background:var(--panel)}
 thead th{position:sticky;top:0;z-index:6;background:linear-gradient(180deg,#f4f8ff,#e7f0fb);
  text-align:left;padding:14px 13px;border-bottom:2px solid var(--band-line)}
 thead th:first-child{left:0;z-index:9}
@@ -94,8 +94,10 @@ tr.comp:hover>td{background:#e9f2ff}                        /* hover wins */
 td.num{text-align:right;font-variant-numeric:tabular-nums}
 th.num{font-variant-numeric:tabular-nums}
 /* sticky first two columns */
-tbody td.imgcell{position:sticky;left:0;z-index:3}
-tbody td.product{position:sticky;left:78px;z-index:3;box-shadow:6px 0 10px -8px rgba(20,40,80,.18)}
+tbody td.imgcell{position:sticky;left:0;z-index:5;background:#fff}
+tbody td.product{position:sticky;left:78px;z-index:5;background:#fff;box-shadow:6px 0 10px -8px rgba(20,40,80,.18)}
+tbody tr.alt>td.imgcell,tbody tr.alt>td.product{background:#f6f9fe}
+tr.comp:hover>td.imgcell,tr.comp:hover>td.product{background:#e9f2ff}
 thead th:nth-child(2){box-shadow:6px 0 10px -8px rgba(20,40,80,.18)}
 td.wrap,th.wrap{white-space:normal}
 .imgcell{width:78px;min-width:78px;padding:7px 6px}
