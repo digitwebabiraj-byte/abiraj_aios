@@ -106,7 +106,7 @@ body{margin:0;color:var(--ink);height:100vh;overflow:hidden;display:flex;flex-di
 /* ---------- table ---------- */
 .tablewrap{flex:1;overflow:auto;padding:14px 16px 26px}
 table{border-collapse:separate;border-spacing:0;font-size:12.5px;white-space:nowrap;width:100%;
- background:var(--panel);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+ background:var(--panel);box-shadow:var(--shadow)}
 thead th{position:sticky;top:0;z-index:6;background:linear-gradient(180deg,#f4f8ff,#e7f0fb);
  text-align:left;padding:14px 13px;border-bottom:2px solid var(--band-line)}
 thead th:first-child{left:0;z-index:9}
