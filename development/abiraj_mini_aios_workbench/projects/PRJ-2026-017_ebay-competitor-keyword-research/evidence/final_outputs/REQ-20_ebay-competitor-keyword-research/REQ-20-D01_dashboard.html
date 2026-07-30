@@ -43,6 +43,31 @@ body{margin:0;color:var(--ink);height:100vh;overflow:hidden;display:flex;flex-di
 .search input{border:0;background:transparent;outline:0;color:var(--ink);font-size:13.5px;width:100%}
 .search svg{flex:none}
 
+/* ---------- filter bar ---------- */
+.filterbar{flex:none;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;
+ padding:11px 20px;background:rgba(255,255,255,.72);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);box-shadow:0 4px 14px rgba(26,52,96,.05);z-index:7}
+.chips{display:flex;gap:7px;flex-wrap:wrap;overflow-x:auto;max-width:100%}
+.fchip{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--muted);
+ padding:7px 13px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;transition:all .18s}
+.fchip:hover{transform:translateY(-2px);color:var(--ink);border-color:var(--brand2)}
+.fchip.on{background:linear-gradient(92deg,#2f5fb0,#5b8de0);color:#fff;border-color:transparent;
+ box-shadow:0 6px 15px rgba(47,95,176,.32)}
+.fspacer{flex:1}
+.fgroup{display:flex;align-items:center;gap:7px}
+.fgroup label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.fsel{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 11px;font-size:12.5px;
+ font-weight:600;color:var(--ink);cursor:pointer;outline:0}
+.fsel:focus{border-color:var(--brand2)}
+.ftoggle{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--muted);
+ border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 11px;transition:all .18s;user-select:none}
+.ftoggle.on{background:#fdf1e3;color:var(--amber);border-color:#f4d8b3}
+.ftoggle input{display:none}
+.count{font-size:12px;font-weight:700;color:var(--muted)}
+.count b{color:var(--brand)}
+.fclear{cursor:pointer;font-size:12px;font-weight:700;color:var(--pink);background:none;border:0;padding:6px 4px}
+.fclear:hover{text-decoration:underline}
+
 /* ---------- table ---------- */
 .tablewrap{flex:1;overflow:auto;padding:14px 16px 26px}
 table{border-collapse:separate;border-spacing:0;font-size:12.5px;white-space:nowrap;width:100%;
@@ -126,6 +151,22 @@ tr.hide{display:none}
   </div>
  </div>
 </div>
+<div class="filterbar">
+ <div class="chips" id="chips"></div>
+ <div class="fspacer"></div>
+ <div class="fgroup"><label>Shipping</label>
+   <select class="fsel" id="fship"><option value="">All</option><option value="free">Free postage</option><option value="paid">With postage</option></select></div>
+ <label class="ftoggle" id="fpromo"><input type="checkbox">🏷️ Promotions only</label>
+ <div class="fgroup"><label>Sort</label>
+   <select class="fsel" id="fsort">
+     <option value="sold">Most sold</option>
+     <option value="price_lo">Price: low → high</option>
+     <option value="price_hi">Price: high → low</option>
+     <option value="fb">Best feedback</option>
+   </select></div>
+ <span class="count" id="count"></span>
+ <button class="fclear" id="fclear">Reset</button>
+</div>
 <div class="tablewrap">
  <table>
   <thead><tr id="hd"></tr></thead>
@@ -160,7 +201,9 @@ ROWS.forEach(r=>{
  const search=(r.product+' '+r.cid+' '+r.brand+' '+r.title+' '+r.notes).toLowerCase();
  const imgcell=r.img?`<a href="https://www.ebay.co.uk/itm/${r.cid}" target="_blank" rel="noopener"><img loading="lazy" src="${r.img}" alt=""></a>`:'';
  const delay=Math.min(idx*28,700); idx++;
- html+=`<tr class="comp" style="animation-delay:${delay}ms" data-s="${esc(search)}">
+ const priceNum=parseFloat((r.price.match(/[\d.]+/)||[0])[0])||0;
+ const shipKey=r.ship.toLowerCase().includes('free')?'free':'paid';
+ html+=`<tr class="comp" style="animation-delay:${delay}ms" data-s="${esc(search)}" data-cat="${esc(r.cat)}" data-ship="${shipKey}" data-promo="${r.promo?1:0}" data-sold="${r.soldn}" data-price="${priceNum}" data-fb="${r.fbn}">
   <td class="imgcell">${imgcell}</td>
   <td class="product wrap">${esc(r.product)}</td>
   <td class="cid"><a href="https://www.ebay.co.uk/itm/${r.cid}" target="_blank" rel="noopener">${esc(r.cid)}</a></td>
@@ -173,15 +216,51 @@ ROWS.forEach(r=>{
   <td class="kwcell">${kw(r.pk,'p')}</td><td class="kwcell">${kw(r.sk,'s')}</td><td class="kwcell">${kw(r.lt,'l')}</td>
   <td class="notes">${esc(r.notes)}</td></tr>`;
 });
-document.getElementById('tb').innerHTML=html;
+const tb=document.getElementById('tb');
+tb.innerHTML=html;
 setTimeout(()=>{document.querySelectorAll('.bar>i').forEach(b=>b.style.width=b.dataset.w+'%');countUp();},180);
-document.getElementById('q').addEventListener('input',e=>{
- const q=e.target.value.trim().toLowerCase();let shown=0;
- document.querySelectorAll('tbody tr.comp').forEach(tr=>{const ok=!q||tr.dataset.s.includes(q);tr.classList.toggle('hide',!ok);if(ok)shown++;});
- document.querySelectorAll('tbody tr.grp').forEach(g=>{let n=g.nextElementSibling,any=false;
-   while(n&&n.classList.contains('comp')){if(!n.classList.contains('hide'))any=true;n=n.nextElementSibling;}
-   g.classList.toggle('hide',!any);});
- document.getElementById('empty').style.display=shown?'none':'block';
-});
+
+// ---- filters ----
+const CH=['All',...[...new Set(ROWS.map(r=>r.cat))]];
+document.getElementById('chips').innerHTML=CH.map((c,i)=>`<span class="fchip${i===0?' on':''}" data-c="${esc(c)}">${esc(c)}</span>`).join('');
+const st={cat:'All',ship:'',promo:false,sort:'sold',q:''};
+
+function groups(){const out=[];let cur=null;[...tb.children].forEach(tr=>{
+  if(tr.classList.contains('grp')){cur={band:tr,rows:[]};out.push(cur);}else if(cur)cur.rows.push(tr);});return out;}
+function sortKey(a,b){
+  if(st.sort==='sold')return b.dataset.sold-a.dataset.sold;
+  if(st.sort==='price_lo')return a.dataset.price-b.dataset.price;
+  if(st.sort==='price_hi')return b.dataset.price-a.dataset.price;
+  if(st.sort==='fb')return b.dataset.fb-a.dataset.fb;return 0;}
+function applyAll(){
+  let shown=0;
+  groups().forEach(g=>{
+    // reorder rows within this category per sort
+    const sorted=g.rows.slice().sort(sortKey);
+    let ref=g.band; sorted.forEach(tr=>{ref.after(tr);ref=tr;});
+    let any=false;
+    sorted.forEach(tr=>{
+      const ok=(st.cat==='All'||tr.dataset.cat===st.cat)
+        && (!st.ship||tr.dataset.ship===st.ship)
+        && (!st.promo||tr.dataset.promo==='1')
+        && (!st.q||tr.dataset.s.includes(st.q));
+      tr.classList.toggle('hide',!ok); if(ok){any=true;shown++;}
+    });
+    g.band.classList.toggle('hide',!any);
+  });
+  document.getElementById('count').innerHTML=`<b>${shown}</b> of ${ROWS.length} competitors`;
+  document.getElementById('empty').style.display=shown?'none':'block';
+}
+document.getElementById('chips').addEventListener('click',e=>{const c=e.target.closest('.fchip');if(!c)return;
+  document.querySelectorAll('.fchip').forEach(x=>x.classList.remove('on'));c.classList.add('on');st.cat=c.dataset.c;applyAll();});
+document.getElementById('fship').addEventListener('change',e=>{st.ship=e.target.value;applyAll();});
+document.getElementById('fpromo').addEventListener('change',e=>{st.promo=e.target.checked;e.target.closest('.ftoggle').classList.toggle('on',e.target.checked);applyAll();});
+document.getElementById('fsort').addEventListener('change',e=>{st.sort=e.target.value;applyAll();setTimeout(()=>document.querySelectorAll('.bar>i').forEach(b=>b.style.width=b.dataset.w+'%'),20);});
+document.getElementById('q').addEventListener('input',e=>{st.q=e.target.value.trim().toLowerCase();applyAll();});
+document.getElementById('fclear').addEventListener('click',()=>{st.cat='All';st.ship='';st.promo=false;st.sort='sold';st.q='';
+  document.getElementById('q').value='';document.getElementById('fship').value='';document.getElementById('fsort').value='sold';
+  document.querySelector('#fpromo input').checked=false;document.getElementById('fpromo').classList.remove('on');
+  document.querySelectorAll('.fchip').forEach((x,i)=>x.classList.toggle('on',i===0));applyAll();});
+applyAll();
 </script>
 </body></html>
