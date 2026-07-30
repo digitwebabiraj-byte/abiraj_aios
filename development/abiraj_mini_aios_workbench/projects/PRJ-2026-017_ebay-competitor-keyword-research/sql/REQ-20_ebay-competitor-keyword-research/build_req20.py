@@ -51,16 +51,25 @@ DATA={
  ("333667118358","firstchoicelightingoutlet","firstchoicelighting","Set of 2 Modern Black Metal Swirl Easy Fit Ceiling Light Shade","268","GBP 23.45","99.7% (89.9K)","With postage","-"),
 ],
 "Spider Light":[
+ ("372474939568","loopsdirect","ThatCable","Multi Light Ceiling Pendant 6 Bulb Gloss Copper Industrial Adjustable","","GBP 94.99","98.3% (235.1K)","With postage","-"),
+ ("303227195662","nationallighting","National Lighting","Adjustable Pendant Light Fitting Ceiling Rose E27 Industrial Spider","","GBP 13.42 to 59.92","99.6% (18.4K)","With postage","-"),
+ ("317136278633","themiddleaisleuk23","(not listed)","6 Light Spider Pendant Ceiling Light Hemp Rope Industrial Multiple Hanging","","GBP 68.98","99.3% (4.7K)","With postage","Save up to 15% Multi-buy"),
  ("406427712394","ulsltd","Unbranded","Duplex Spider Fitting for Pendant Lamp Shades BC B22 Bayonet Cap","28","GBP 7.85","100% (1.6K)","With postage","-"),
+ ("166809932104","mossodor_lighting","Mossodor","Black Pendant Light Industrial Ceiling Light Spider Modern Cluster E27","","GBP 32.95","98.3% (886)","With postage","Save up to 20% Multi-buy"),
 ],
 "Cage pendant light":[
  ("372257190104","value-lights","ValueLights","Ceiling Light Shade Geometric Pendant Lampshade Industrial","429+","GBP 12.99 to 15.99","99.8% (685K)","With postage","Save up to 10% Multi-buy"),
  ("232708905363","value-lights","ValueLights","Industrial Metal Ceiling Pendant Light Shade Easy Fit","289+","GBP 22.99 to 25.99","99.8% (685K)","With postage","From GBP 20.69 with coupon"),
  ("131173303482","thelampfactoryuk","Unbranded","Black Wire Cage Light Shade Steel E27 Industrial Pendant","252","GBP 13.00","99.8% (22.6K)","With postage","-"),
  ("141264804458","thelampfactoryuk","Unbranded","Bronze Wire Cage Light Shade Steel E27 Industrial Pendant","157","GBP 13.00","99.8% (22.6K)","With postage","-"),
+ ("372864053966","value-lights","ValueLights","Geometric Globe Lampshade Metal Pendant Ceiling Light Shade","125+","GBP 14.99 to 17.99","99.8% (685K)","With postage","10% off"),
 ],
 "Pipe Light":[
  ("262744851290","sj_modern_antiques","(not listed)","Silver Industrial Ceiling Light Vintage Antique Pendant Pipe Cage","114","GBP 46.99","98.5% (15.2K)","With postage","-"),
+ ("236319831602","industrial_cafe","Moonlight Retail","Industrial Vintage Ceiling Lights Metal Pipe Retro Loft Pendant Steampunk","","GBP 36.95 to 53.75","100% (1.1K)","With postage","-"),
+ ("236319380461","industrial_cafe","Moonlight Retail","Industrial Steampunk Lighting Iron Pipe Edison Bulb Ceiling Bar Light Rope","","GBP 67.19 to 77.27","100% (1.1K)","With postage","-"),
+ ("336171618850","industrial_cafe","Moonlight Retail","Industrial Steampunk Chandelier Iron Pipe Edison Bulb Ceiling Bar Light","","GBP 167.99 to 250.87","100% (1.1K)","With postage","-"),
+ ("336163640353","industrial_cafe","Moonlight Retail","Industrial Steampunk Light Iron Pipe Edison Bulb Ceiling Chain 7 Heads","","GBP 101.91","100% (1.1K)","With postage","-"),
 ],
 "Bulbs":[
  ("303695648760","auctionzltd","Kanlux","2x Vintage Filament LED Edison Screw Bulb E27 Decorative ST64","237","GBP 16.95","99.7% (84.9K)","With postage","Save up to 20% Multi-buy"),
