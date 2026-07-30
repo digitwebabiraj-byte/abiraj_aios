@@ -104,7 +104,7 @@ body{margin:0;color:var(--ink);height:100vh;overflow:hidden;display:flex;flex-di
 .fclear:hover{text-decoration:underline}
 
 /* ---------- table ---------- */
-.tablewrap{flex:1;overflow:auto;padding:0}
+.tablewrap{flex:1;min-height:0;overflow:auto;padding:0}
 table{border-collapse:separate;border-spacing:0;font-size:12.5px;white-space:nowrap;width:100%;
  background:var(--panel)}
 thead th{position:sticky;top:0;z-index:6;background:linear-gradient(180deg,#f4f8ff,#e7f0fb);
