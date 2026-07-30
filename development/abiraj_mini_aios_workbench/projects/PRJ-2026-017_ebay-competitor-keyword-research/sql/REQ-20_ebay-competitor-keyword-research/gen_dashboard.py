@@ -113,7 +113,7 @@ thead th:first-child{left:0;z-index:9}
 thead th:nth-child(2){left:78px;z-index:9}
 thead th.num{text-align:right}
 thead th .thl{display:inline-block;font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;
- font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;
+ font-size:11.5px;font-weight:900;letter-spacing:1.3px;text-transform:uppercase;
  background:linear-gradient(92deg,#24468a,#2f5fb0 45%,#5b8de0);-webkit-background-clip:text;background-clip:text;
  color:transparent;position:relative;padding-bottom:6px}
 thead th .thl::after{content:"";position:absolute;left:0;bottom:0;width:18px;height:2.5px;border-radius:2px;
