@@ -51,14 +51,14 @@ for r in rows:
     pct=max(3,round(r["soldn"]/maxsold*100)); fbw=max(6,min(100,(r["fbn"]-90)/10*100))
     ship='<span class="tag free">Free postage</span>' if "free" in r["ship"].lower() else '<span class="tag paid">With postage</span>'
     promo=f'<span class="tag promo">{esc(r["promo"])}</span>' if r["promo"] else '<span class="tag none">—</span>'
-    imgc=f'<a href="https://www.ebay.co.uk/itm/{r["cid"]}"><img loading="lazy" src="{r["img"]}" alt=""></a>' if r["img"] else ""
+    imgc=f'<a href="https://www.ebay.co.uk/itm/{r["cid"]}" target="_blank" rel="noopener noreferrer"><img loading="lazy" src="{r["img"]}" alt=""></a>' if r["img"] else ""
     cnt=(re.search(r"\(([^)]+)\)", r["fb"]) or [None,""])[1]
     altcls=" alt" if alt%2==1 else ""; alt+=1
     sh="free" if "free" in r["ship"].lower() else "paid"
     body.append(f'''<tr class="comp{altcls}" data-cat="{esc(r["cat"])}" data-ship="{sh}" data-promo="{1 if r["promo"] else 0}" data-sold="{r["soldn"]}" data-price="{(re.search(r"[\\d.]+",r["price"]) or [0])[0]}" data-fb="{r["fbn"]}" data-s="{esc((r["product"]+" "+r["cid"]+" "+r["brand"]+" "+r["title"]+" "+r["notes"]).lower())}">
 <td class="imgcell">{imgc}</td>
 <td class="product wrap">{esc(r["product"])}</td>
-<td class="cid"><a href="https://www.ebay.co.uk/itm/{r["cid"]}">{esc(r["cid"])}</a></td>
+<td class="cid"><a href="https://www.ebay.co.uk/itm/{r["cid"]}" target="_blank" rel="noopener noreferrer">{esc(r["cid"])}</a></td>
 <td class="brand">{esc(r["brand"])}</td>
 <td class="ttl">{esc(r["title"])}</td>
 <td class="soldc num"><span class="soldn">{esc(r["sold"])}</span><div class="bar"><i style="width:{pct}%"></i></div></td>

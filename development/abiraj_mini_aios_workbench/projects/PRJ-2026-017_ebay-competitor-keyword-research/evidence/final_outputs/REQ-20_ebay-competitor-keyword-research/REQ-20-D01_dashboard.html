@@ -222,14 +222,14 @@ ROWS.forEach(r=>{
  const ship=r.ship.toLowerCase().includes('free')?'<span class="tag free">Free postage</span>':'<span class="tag paid">With postage</span>';
  const promo=r.promo?`<span class="tag promo">${esc(r.promo)}</span>`:'<span class="tag none">—</span>';
  const search=(r.product+' '+r.cid+' '+r.brand+' '+r.title+' '+r.notes).toLowerCase();
- const imgcell=r.img?`<a href="https://www.ebay.co.uk/itm/${r.cid}"><img loading="lazy" src="${r.img}" alt=""></a>`:'';
+ const imgcell=r.img?`<a href="https://www.ebay.co.uk/itm/${r.cid}" target="_blank" rel="noopener noreferrer"><img loading="lazy" src="${r.img}" alt=""></a>`:'';
  const delay=Math.min(idx*28,700); idx++;
  const priceNum=parseFloat((r.price.match(/[\d.]+/)||[0])[0])||0;
  const shipKey=r.ship.toLowerCase().includes('free')?'free':'paid';
  html+=`<tr class="comp" style="animation-delay:${delay}ms" data-s="${esc(search)}" data-cat="${esc(r.cat)}" data-ship="${shipKey}" data-promo="${r.promo?1:0}" data-sold="${r.soldn}" data-price="${priceNum}" data-fb="${r.fbn}">
   <td class="imgcell">${imgcell}</td>
   <td class="product wrap">${esc(r.product)}</td>
-  <td class="cid"><a href="https://www.ebay.co.uk/itm/${r.cid}">${esc(r.cid)}</a></td>
+  <td class="cid"><a href="https://www.ebay.co.uk/itm/${r.cid}" target="_blank" rel="noopener noreferrer">${esc(r.cid)}</a></td>
   <td class="brand">${esc(r.brand)}</td>
   <td class="ttl">${esc(r.title)}</td>
   <td class="soldc num"><span class="soldn">${esc(r.sold)}</span><div class="bar"><i data-w="${pct}"></i></div></td>
