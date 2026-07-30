@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eBay Competitor &amp; Keyword Research — Jarsini</title>
+<style>
+:root{
+  --bg:#f5f7fb; --panel:#ffffff; --ink:#0f1b2d; --muted:#5b6b82; --line:#e5eaf1;
+  --brand:#2f5496; --brand2:#4f7cd6; --accent:#12b981; --warn:#f59e0b; --pink:#e0567a;
+  --chip:#eef3fb; --shadow:0 8px 30px rgba(20,40,80,.08); --radius:16px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0b1220;--panel:#121b2c;--ink:#eaf0fb;--muted:#94a6bf;--line:#22304a;
+        --brand:#6f9bef;--brand2:#8ab0f6;--chip:#182338;--shadow:0 10px 34px rgba(0,0,0,.45);}
+}
+:root[data-theme=dark]{--bg:#0b1220;--panel:#121b2c;--ink:#eaf0fb;--muted:#94a6bf;--line:#22304a;
+  --brand:#6f9bef;--brand2:#8ab0f6;--chip:#182338;--shadow:0 10px 34px rgba(0,0,0,.45);}
+:root[data-theme=light]{--bg:#f5f7fb;--panel:#ffffff;--ink:#0f1b2d;--muted:#5b6b82;--line:#e5eaf1;
+  --brand:#2f5496;--brand2:#4f7cd6;--chip:#eef3fb;--shadow:0 8px 30px rgba(20,40,80,.08);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;line-height:1.5}
+a{color:var(--brand);text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:26px 20px 80px}
+header.hero{display:flex;flex-wrap:wrap;align-items:center;gap:16px;justify-content:space-between;
+  margin-bottom:22px;animation:fade .6s ease both}
+.htitle h1{margin:0;font-size:26px;letter-spacing:-.4px}
+.htitle p{margin:4px 0 0;color:var(--muted);font-size:13.5px}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--chip);border:1px solid var(--line);
+  padding:5px 11px;border-radius:999px;font-size:12px;color:var(--muted);font-weight:600}
+.theme-btn{cursor:pointer;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:9px 13px;color:var(--ink);font-size:13px;font-weight:600;box-shadow:var(--shadow);transition:transform .15s}
+.theme-btn:hover{transform:translateY(-2px)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;
+  box-shadow:var(--shadow);animation:rise .6s ease both}
+.kpi .n{font-size:26px;font-weight:800;letter-spacing:-.5px;
+  background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.kpi .l{color:var(--muted);font-size:12.5px;margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.controls{position:sticky;top:0;z-index:20;background:var(--bg);padding:12px 0;margin-bottom:8px;
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-bottom:1px solid var(--line)}
+.search{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px;padding:9px 13px;box-shadow:var(--shadow)}
+.search input{border:0;outline:0;background:transparent;color:var(--ink);font-size:14px;width:100%}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--muted);
+  padding:8px 13px;border-radius:999px;font-size:12.5px;font-weight:700;transition:all .2s;white-space:nowrap}
+.chip:hover{transform:translateY(-2px);color:var(--ink)}
+.chip.active{background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border-color:transparent;
+  box-shadow:0 6px 16px rgba(47,84,150,.35)}
+.section{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);margin:18px 0;overflow:hidden;animation:rise .5s ease both}
+.section.hide{display:none}
+.sec-head{padding:18px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+  cursor:pointer;border-bottom:1px solid var(--line)}
+.sec-head:hover{background:var(--chip)}
+.sec-title{display:flex;align-items:center;gap:12px}
+.dot{width:11px;height:11px;border-radius:50%;background:linear-gradient(90deg,var(--brand),var(--brand2));flex:none}
+.sec-title h2{margin:0;font-size:18px;letter-spacing:-.3px}
+.sec-title .sku{font-size:11.5px;color:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace}
+.sec-meta{display:flex;gap:8px;align-items:center}
+.pill{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:11.5px;color:var(--muted);font-weight:700}
+.caret{transition:transform .3s;color:var(--muted)}
+.section.collapsed .body{display:none}
+.section.collapsed .caret{transform:rotate(-90deg)}
+.kwrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;padding:16px 20px;background:linear-gradient(180deg,var(--chip),transparent)}
+.kwbox .kwl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px;color:var(--muted)}
+.kw{display:inline-block;margin:0 6px 6px 0;padding:5px 10px;border-radius:8px;font-size:12px;font-weight:600;
+  border:1px solid var(--line);animation:pop .4s ease both}
+.kw.p{background:rgba(47,84,150,.12);color:var(--brand);border-color:rgba(47,84,150,.25)}
+.kw.s{background:rgba(18,185,129,.12);color:var(--accent);border-color:rgba(18,185,129,.25)}
+.kw.l{background:rgba(224,86,122,.12);color:var(--pink);border-color:rgba(224,86,122,.25)}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:820px}
+thead th{text-align:left;padding:11px 14px;color:var(--muted);font-size:11px;text-transform:uppercase;
+  letter-spacing:.5px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel)}
+tbody td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:var(--chip)}
+.seller{font-weight:700}
+.brand{color:var(--muted);font-size:12px}
+.ttl{max-width:280px;color:var(--ink)}
+.soldcell{min-width:130px}
+.bar{height:7px;border-radius:6px;background:var(--line);overflow:hidden;margin-top:5px}
+.bar>i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--brand),var(--brand2));width:0;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.soldn{font-weight:800}
+.price{font-weight:800;white-space:nowrap}
+.fb{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.fbdot{width:8px;height:8px;border-radius:50%}
+.tag{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
+.tag.free{background:rgba(18,185,129,.15);color:var(--accent)}
+.tag.paid{background:var(--chip);color:var(--muted)}
+.tag.promo{background:rgba(245,158,11,.15);color:var(--warn)}
+.tag.none{color:var(--muted)}
+footer{margin-top:26px;color:var(--muted);font-size:12px;text-align:center;line-height:1.7}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+@media (max-width:640px){.htitle h1{font-size:21px}.kpi .n{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="htitle">
+      <h1>eBay Competitor &amp; Keyword Research</h1>
+      <p>Portfolio Holder: <b>Jarsini</b> · eBay UK · snapshot 2026-07-30 · our own 13 seller accounts excluded</p>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span class="badge">✔ all competitors sold-proven</span>
+      <button class="theme-btn" id="themeBtn">◐ Theme</button>
+    </div>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="controls">
+    <div class="search">🔎<input id="q" placeholder="Search seller, brand, title…"></div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div id="sections"></div>
+
+  <footer>
+    Live eBay UK data · competitor columns scraped from public listings · keyword columns generated ·
+    Shipping shown as free / paid (exact postage is viewer-location dependent).<br>
+    PRJ-2026-017 · REQ-20-D01 · Only genuine competitors (our own accounts filtered out).
+  </footer>
+</div>
+
+<script>
+const CATS = [{"name": "Metal Shade Pendant Light", "sku": "CRSF100BM+PHSH1PBRYB+SCRN70BM+LSFT220BM", "primary": "Metal Shade Pendant Light, Metal Pendant Light, Hanging Pendant Light", "secondary": "Ceiling Pendant Shade, Industrial Pendant Light, Easy Fit Pendant Shade, Kitchen Pendant Light", "longtail": "Black Metal Shade Pendant Light for Kitchen Island, Industrial Easy Fit Metal Pendant Shade E27, Modern Chrome Metal Pendant Ceiling Light", "rows": [{"id": "333675680799", "seller": "firstchoicelightingoutlet", "brand": "firstchoicelighting", "title": "Set of 2 Modern Three Tier Easy Fit Jewelled Ceiling Light Shade", "sold": "751", "soldn": 751, "price": "£ 20.39", "fb": "99.7% (89.9K)", "fbn": 99.7, "ship": "With postage", "promo": ""}, {"id": "285423964421", "seller": "picknmix.online", "brand": "Giggi", "title": "Metal & Rope Lamp Shades Ceiling Pendant Light Shade", "sold": "236", "soldn": 236, "price": "£ 18.99", "fb": "99.6% (21.9K)", "fbn": 99.6, "ship": "With postage", "promo": "Save up to 15% Multi-buy"}, {"id": "372257187156", "seller": "value-lights", "brand": "ValueLights", "title": "Ceiling Light Fitting 3 Way Chrome Spotlight Swirl Glass", "sold": "8,367", "soldn": 8367, "price": "£ 19.99", "fb": "99.8% (685K)", "fbn": 99.8, "ship": "With postage", "promo": ""}, {"id": "154695326074", "seller": "homeessenceltd", "brand": "Innoteck", "title": "Ceiling Light Shade Chandelier Pendant Acrylic Crystal Droplet Chrome", "sold": "354+", "soldn": 354, "price": "£ 10.99", "fb": "99.9% (60.1K)", "fbn": 99.9, "ship": "With postage", "promo": "Save up to 20% Multi-buy"}, {"id": "201620721277", "seller": "buybox786", "brand": "OPTIMAL PRODUCTS", "title": "Chandelier Style Ceiling Light Shade Droplet Pendant Acrylic Crystal Bead", "sold": "65+", "soldn": 65, "price": "£ 10.95 to 19.95", "fb": "99.7% (220.4K)", "fbn": 99.7, "ship": "With postage", "promo": "Save up to 6% Multi-buy"}], "maxsold": 8367}, {"name": "Wall Light", "sku": "", "primary": "Wall Light, Wall Lamp, Wall Sconce", "secondary": "Indoor Wall Light, Bedside Wall Lamp, Industrial Wall Sconce, LED Wall Light", "longtail": "Black Industrial Wall Light for Living Room, Vintage Wall Sconce with Switch, Modern LED Bedside Wall Reading Lamp", "rows": [{"id": "115699570601", "seller": "eat_sleep_buy_repeat", "brand": "(not listed)", "title": "Vintage Industrial Wall Light Antique Retro Cage Bulkhead Gold Brass Ship Lamp", "sold": "257", "soldn": 257, "price": "£ 64.99", "fb": "100% (1.4K)", "fbn": 100.0, "ship": "With postage", "promo": ""}, {"id": "234566652967", "seller": "burgesshandg", "brand": "(not listed)", "title": "Vintage Industrial Wall Light Antique Retro Style Lamp Sconce Fixture Rustic", "sold": "71", "soldn": 71, "price": "£ 31.99", "fb": "99.7% (9.8K)", "fbn": 99.7, "ship": "With postage", "promo": ""}, {"id": "155030374927", "seller": "theyinltd", "brand": "Unbranded", "title": "Modern Vintage Retro Industrial Rustic Sconce Wall Light", "sold": "61", "soldn": 61, "price": "£ 7.99", "fb": "99.7% (5.5K)", "fbn": 99.7, "ship": "With postage", "promo": "Save up to 6% Multi-buy"}, {"id": "116478119802", "seller": "eat_sleep_buy_repeat", "brand": "(not listed)", "title": "Industrial Bulkhead Light Wall Ceiling Retro Old Marine Brass Gold", "sold": "61", "soldn": 61, "price": "£ 69.99", "fb": "100% (1.4K)", "fbn": 100.0, "ship": "With postage", "promo": ""}, {"id": "137354830445", "seller": "weshipnow", "brand": "Does not apply", "title": "Vintage Brass Boho Wall Sconces with Tulip Glass Shade for Modern Spaces", "sold": "2", "soldn": 2, "price": "£ 81.26", "fb": "99.8% (28.1K)", "fbn": 99.8, "ship": "With postage", "promo": ""}], "maxsold": 257}, {"name": "Metal shade Ceiling Light", "sku": "", "primary": "Metal Ceiling Light, Ceiling Shade, Metal Pendant Shade", "secondary": "Industrial Ceiling Light, Metal Lampshade, Ceiling Light Fitting, Retro Ceiling Shade", "longtail": "Black Metal Ceiling Light Shade for Kitchen, Industrial Metal Pendant Shade E27, Vintage Metal Ceiling Lampshade Easy Fit", "rows": [{"id": "372257187156", "seller": "value-lights", "brand": "ValueLights", "title": "Ceiling Light Fitting 3 Way Chrome Spotlight Swirl Glass", "sold": "8,367", "soldn": 8367, "price": "£ 19.99", "fb": "99.8% (685K)", "fbn": 99.8, "ship": "With postage", "promo": ""}, {"id": "372336415252", "seller": "value-lights", "brand": "ValueLights", "title": "Lampshade Ceiling Pendant Light Shade Easy Fit Chandelier", "sold": "6,442+", "soldn": 6442, "price": "£ 17.99", "fb": "99.8% (685K)", "fbn": 99.8, "ship": "With postage", "promo": "Save up to 10% Multi-buy"}, {"id": "333667118358", "seller": "firstchoicelightingoutlet", "brand": "firstchoicelighting", "title": "Set of 2 Modern Black Metal Swirl Easy Fit Ceiling Light Shade", "sold": "268", "soldn": 268, "price": "£ 23.45", "fb": "99.7% (89.9K)", "fbn": 99.7, "ship": "With postage", "promo": ""}, {"id": "285423964421", "seller": "picknmix.online", "brand": "Giggi", "title": "Metal & Rope Lamp Shades Ceiling Pendant Light Shade", "sold": "236", "soldn": 236, "price": "£ 18.99", "fb": "99.6% (21.9K)", "fbn": 99.6, "ship": "With postage", "promo": "Save up to 15% Multi-buy"}, {"id": "393696656791", "seller": "innoteck_uk", "brand": "Innoteck", "title": "Innoteck Ceiling Light Shade - Modern Chandelier Pendant", "sold": "92+", "soldn": 92, "price": "£ 10.49", "fb": "99.8% (10.2K)", "fbn": 99.8, "ship": "With postage", "promo": "Save up to 20% Multi-buy"}], "maxsold": 8367}, {"name": "Glass shade ceiling light", "sku": "", "primary": "Glass Ceiling Light, Glass Pendant Light, Glass Shade", "secondary": "Clear Glass Pendant, Glass Lampshade, Ceiling Glass Light Fitting, Modern Glass Pendant", "longtail": "Clear Glass Globe Pendant Light for Kitchen Island, Vintage Glass Ceiling Shade E27, Modern Frosted Glass Hanging Light", "rows": [{"id": "333675680799", "seller": "firstchoicelightingoutlet", "brand": "firstchoicelighting", "title": "Set of 2 Modern Three Tier Easy Fit Jewelled Ceiling Light", "sold": "751", "soldn": 751, "price": "£ 20.39", "fb": "99.7% (89.9K)", "fbn": 99.7, "ship": "With postage", "promo": ""}, {"id": "283064879219", "seller": "picknmix.online", "brand": "Giggi", "title": "Modern Chandelier Style Ceiling Pendant Light Shade K9", "sold": "600", "soldn": 600, "price": "£ 21.99", "fb": "99.6% (21.9K)", "fbn": 99.6, "ship": "With postage", "promo": ""}, {"id": "272110237788", "seller": "moonlight_retail_15", "brand": "MoonLight Retail", "title": "New Modern Vintage Industrial Retro Loft Glass Ceiling Lamp Shade", "sold": "269+", "soldn": 269, "price": "£ 32.47 to 35.83", "fb": "100% (3.9K)", "fbn": 100.0, "ship": "With postage", "promo": "Save up to 5% Multi-buy"}, {"id": "141200077246", "seller": "buyitbetter_uk", "brand": "ElekTek", "title": "ElekTek 3-Hook Ceiling Rose Pendant Plate Suspended Glass", "sold": "59+", "soldn": 59, "price": "£ 17.25 to 19.99", "fb": "99.9% (55.5K)", "fbn": 99.9, "ship": "With postage", "promo": "Save up to 7% Multi-buy"}, {"id": "356659461782", "seller": "value-lights", "brand": "ValueLights", "title": "Corinne Spiral Twill Glass Easy Fit Ceiling Pendant Light Shade", "sold": "11", "soldn": 11, "price": "£ 34.99 to 37.99", "fb": "99.8% (685K)", "fbn": 99.8, "ship": "With postage", "promo": "From GBP 31.49 with coupon"}], "maxsold": 751}, {"name": "Spider Light", "sku": "", "primary": "Spider Light, Spider Pendant, Multi-Head Pendant Light", "secondary": "Sputnik Light, Multi Light Pendant, Industrial Spider Lamp, Adjustable Spider Ceiling Light", "longtail": "Black Multi-Head Spider Pendant Light for Living Room, Industrial Sputnik Ceiling Light 6 Head, Adjustable DIY Spider Chandelier E27", "rows": [{"id": "303682816669", "seller": "best-love2010", "brand": "Unbranded", "title": "Retro 4/6/8/10/12 Heads Mix-color Chandelier Spider Pendant Ceiling Light", "sold": "67", "soldn": 67, "price": "£ 22.99 to 49.99", "fb": "96.4% (14.7K)", "fbn": 96.4, "ship": "With postage", "promo": ""}, {"id": "303227195662", "seller": "nationallighting", "brand": "(not listed)", "title": "Adjustable Pendant Light Fitting Ceiling Rose E27 Industrial Spider Hanging Lamp", "sold": "39", "soldn": 39, "price": "£ 13.42 to 59.92", "fb": "99.6% (18.4K)", "fbn": 99.6, "ship": "With postage", "promo": ""}, {"id": "292861051418", "seller": "best-love2010", "brand": "Unbranded", "title": "Vintage Edison Multiple Adjustable DIY Ceiling Spider Light", "sold": "34+", "soldn": 34, "price": "£ 11.99 to 21.99", "fb": "96.4% (14.7K)", "fbn": 96.4, "ship": "With postage", "promo": ""}, {"id": "236823130326", "seller": "wowzer-uk", "brand": "ANWIO", "title": "ANWIO 6 Heads Spider Light Chandelier Pendant DIY Spider Rope", "sold": "1", "soldn": 1, "price": "£ 29.99", "fb": "99.8% (13.4K)", "fbn": 99.8, "ship": "With postage", "promo": ""}], "maxsold": 67}, {"name": "Cage pendant light", "sku": "", "primary": "Cage Pendant Light, Cage Light, Metal Cage Pendant", "secondary": "Industrial Cage Light, Wire Cage Pendant, Vintage Cage Lamp, Cage Ceiling Light", "longtail": "Black Metal Cage Pendant Light for Kitchen, Industrial Wire Cage Hanging Lamp E27, Vintage Cage Ceiling Light Fitting", "rows": [{"id": "372257190104", "seller": "value-lights", "brand": "ValueLights", "title": "Ceiling Light Shade Geometric Pendant Lampshade Lamp Industrial", "sold": "951+", "soldn": 951, "price": "£ 12.99 to 15.99", "fb": "99.8% (685K)", "fbn": 99.8, "ship": "With postage", "promo": "Save up to 10% Multi-buy"}, {"id": "232708905363", "seller": "value-lights", "brand": "ValueLights", "title": "Industrial Metal Ceiling Pendant Light Shade Easy Fit", "sold": "289+", "soldn": 289, "price": "£ 22.99 to 25.99", "fb": "99.8% (685K)", "fbn": 99.8, "ship": "With postage", "promo": "From GBP 20.69 with coupon"}, {"id": "131173303482", "seller": "thelampfactoryuk", "brand": "Unbranded", "title": "Black Wire Cage Light Shade Steel E27 Industrial Pendant", "sold": "252", "soldn": 252, "price": "£ 13.00", "fb": "99.8% (22.6K)", "fbn": 99.8, "ship": "With postage", "promo": ""}, {"id": "141264804458", "seller": "thelampfactoryuk", "brand": "Unbranded", "title": "Bronze Wire Cage Light Shade Steel E27 Industrial Pendant", "sold": "157", "soldn": 157, "price": "£ 13.00", "fb": "99.8% (22.6K)", "fbn": 99.8, "ship": "With postage", "promo": ""}, {"id": "262744851290", "seller": "sj_modern_antiques", "brand": "(not listed)", "title": "Silver Industrial Ceiling Light Vintage Antique Pendant Cage", "sold": "114", "soldn": 114, "price": "£ 46.99", "fb": "98.5% (15.2K)", "fbn": 98.5, "ship": "With postage", "promo": ""}], "maxsold": 951}, {"name": "Pipe Light", "sku": "", "primary": "Pipe Light, Pipe Pendant Light, Steampunk Light", "secondary": "Industrial Pipe Light, Steampunk Pendant, Pipe Wall Light, Water Pipe Lamp", "longtail": "Industrial Steampunk Pipe Pendant Light for Kitchen Island, Black Metal Pipe Ceiling Light E27, Vintage Water Pipe Wall Lamp", "rows": [{"id": "174650219163", "seller": "nmstoute", "brand": "Stout & Burg Designs", "title": "Steampunk Industrial Iron Pipe Lamp/Light Socket 1-1/4 x 1/2", "sold": "334+", "soldn": 334, "price": "£ 3.18 to 10.46", "fb": "99% (4.4K)", "fbn": 99.0, "ship": "With postage", "promo": ""}, {"id": "333977871043", "seller": "steampunkeddesignstudio", "brand": "Unbranded", "title": "Industrial Rustic Retro Style Pipe Light Steampunk Desk Table Lamp", "sold": "148", "soldn": 148, "price": "£ 41.91", "fb": "100% (1.4K)", "fbn": 100.0, "ship": "With postage", "promo": ""}, {"id": "201795458338", "seller": "mrwillieslighting", "brand": "Mr. Willies", "title": "Retro Industrial Pipe Desk Table 3 bulbs steampunk edison", "sold": "83", "soldn": 83, "price": "£ 130.88", "fb": "100% (882)", "fbn": 100.0, "ship": "With postage", "promo": ""}, {"id": "353005301113", "seller": "happy_home_2019", "brand": "Unbranded", "title": "Iron Vintage Steampunk Stop Valve Light Switch W/ Wire Pipe Lamp", "sold": "77", "soldn": 77, "price": "£ 16.22", "fb": "99.4% (3K)", "fbn": 99.4, "ship": "Free postage", "promo": ""}, {"id": "164791375113", "seller": "ztt_online", "brand": "(not listed)", "title": "Retro Switch Valve Steampunk Light Industrial Pipe Table Lamp", "sold": "25", "soldn": 25, "price": "£ 10.48", "fb": "99.3% (26.9K)", "fbn": 99.3, "ship": "With postage", "promo": ""}], "maxsold": 334}, {"name": "Bulbs", "sku": "", "primary": "LED Bulb, Filament Bulb, Light Bulb", "secondary": "Edison Bulb, Vintage LED Bulb, E27 Bulb, Dimmable LED Filament Bulb", "longtail": "E27 Vintage Edison LED Filament Bulb Warm White, Dimmable Squirrel Cage Light Bulb, ST64 Amber Decorative LED Bulb 4W", "rows": [{"id": "223224109836", "seller": "safield-online", "brand": "Auraglow", "title": "Auraglow Mysa LED Light Bulb Vintage Retro Edison Style Decorative E27 T30 Tube", "sold": "180", "soldn": 180, "price": "£ 10.99", "fb": "99.8% (188.5K)", "fbn": 99.8, "ship": "With postage", "promo": ""}, {"id": "353725905176", "seller": "auctionzltd", "brand": "Kanlux", "title": "10x EXTRA LARGE GLOBE FILAMENT E27 BULB Vintage Incandescent Edison", "sold": "10", "soldn": 10, "price": "£ 70.94", "fb": "99.7% (84.9K)", "fbn": 99.7, "ship": "With postage", "promo": ""}, {"id": "352802795272", "seller": "value-lights", "brand": "ValueLights", "title": "Filament LED Light Bulb Decorative Vintage Edison Lightbulb", "sold": "102+", "soldn": 102, "price": "£ 5.99 to 19.99", "fb": "99.8% (685K)", "fbn": 99.8, "ship": "With postage", "promo": "Save up to 15% Multi-buy"}, {"id": "142340181955", "seller": "thelampfactoryuk", "brand": "Unbranded", "title": "Vintage Edison Filament LED Bulb Teardrop E27 ES 4W Clear Warm White Dimmable", "sold": "169", "soldn": 169, "price": "£ 3.50", "fb": "99.8% (22.6K)", "fbn": 99.8, "ship": "With postage", "promo": ""}, {"id": "364884514396", "seller": "dqpltd", "brand": "Unbranded", "title": "2x 4W (=33W) Vintage T30 Tube Gold LED Filament ES E27 2700K Light Bulbs", "sold": "5", "soldn": 5, "price": "£ 9.99", "fb": "99.6% (185.3K)", "fbn": 99.6, "ship": "With postage", "promo": "Save up to 8% Multi-buy"}], "maxsold": 180}, {"name": "Lamp Holder", "sku": "", "primary": "Lamp Holder, Bulb Holder, E27 Holder", "secondary": "Ceiling Rose Lamp Holder, Pendant Lamp Holder, Bakelite Bulb Holder, E27 Fitting", "longtail": "E27 Vintage Bakelite Pendant Lamp Holder with Cord Grip, Ceiling Rose Bulb Holder Kit, Screw E27 Fitting with Switch", "rows": [{"id": "396977702027", "seller": "gmuk.ltd", "brand": "Luxa", "title": "Black Retro E27 Vintage Screw In Light Bulb Lamp Holder Ceiling Rose Pendant Kit", "sold": "38", "soldn": 38, "price": "£ 8.99", "fb": "100% (2.5K)", "fbn": 100.0, "ship": "With postage", "promo": "Save up to 5% Multi-buy"}, {"id": "225227368158", "seller": "universalmerchandise4u", "brand": "Crown", "title": "E27 Ceiling Rose Pendant With Tube And Lamp Holder Brass Light Fitting UK", "sold": "11", "soldn": 11, "price": "£ 18.85", "fb": "100% (1.2K)", "fbn": 100.0, "ship": "With postage", "promo": ""}, {"id": "224707047105", "seller": "yuki-store-2020", "brand": "Unbranded", "title": "E27 Ceiling Rose Light Fitting Vintage Industrial Flex Pendant Lamp Bulb Holder", "sold": "18", "soldn": 18, "price": "£ 10.59", "fb": "99.6% (2.9K)", "fbn": 99.6, "ship": "Free postage", "promo": ""}, {"id": "274419951502", "seller": "bandhstore", "brand": "Crown Lighting", "title": "E27 Modern Ceiling Rose Pendant With Tube And Lamp Holder Fitting", "sold": "2", "soldn": 2, "price": "£ 24.95", "fb": "100% (8.5K)", "fbn": 100.0, "ship": "With postage", "promo": ""}, {"id": "184848546669", "seller": "colchester-electrical-wholesale", "brand": "Knightsbridge", "title": "ES E27 Screw In Bulb Lamp Matt White Pendant Set Lampholder Ceiling Rose", "sold": "22", "soldn": 22, "price": "£ 18.99", "fb": "99.9% (44.1K)", "fbn": 99.9, "ship": "With postage", "promo": ""}], "maxsold": 38}];
+const kf = n => n>=1000 ? (n/1000).toFixed(n>=10000?0:1)+'k' : ''+n;
+const totalSold = CATS.reduce((a,c)=>a+c.rows.reduce((s,r)=>s+r.soldn,0),0);
+const totalComp = CATS.reduce((a,c)=>a+c.rows.length,0);
+const brandCount = new Set(CATS.flatMap(c=>c.rows.map(r=>r.brand)).filter(b=>!['(not listed)','Unbranded','Does not apply'].includes(b))).size;
+const fbs = CATS.flatMap(c=>c.rows.map(r=>r.fbn)).filter(x=>x>0);
+const avgfb = (fbs.reduce((a,b)=>a+b,0)/fbs.length).toFixed(1);
+
+const KPIS=[['Categories',CATS.length],['Competitors',totalComp],['Units sold (visible)',kf(totalSold)],
+            ['Avg feedback',avgfb+'%'],['Distinct brands',brandCount]];
+document.getElementById('kpis').innerHTML = KPIS.map((k,i)=>
+  `<div class="kpi" style="animation-delay:${i*70}ms"><div class="n">${k[1]}</div><div class="l">${k[0]}</div></div>`).join('');
+
+const fbColor = p => p>=99 ? 'var(--accent)' : p>=97 ? 'var(--warn)' : 'var(--pink)';
+const esc = s => (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const kwChips=(str,cls)=>str.split(',').map(k=>`<span class="kw ${cls}">${esc(k.trim())}</span>`).join('');
+
+function rowHTML(r,max){
+  const pct=Math.max(4,Math.round(r.soldn/max*100));
+  const ship = r.ship.toLowerCase().includes('free')?'<span class="tag free">Free postage</span>':'<span class="tag paid">Paid postage</span>';
+  const promo = r.promo?`<span class="tag promo">${esc(r.promo)}</span>`:'<span class="tag none">—</span>';
+  return `<tr data-s="${esc((r.seller+' '+r.brand+' '+r.title).toLowerCase())}">
+    <td><div class="seller"><a href="https://www.ebay.co.uk/itm/${r.id}" target="_blank" rel="noopener">${esc(r.seller)}</a></div><div class="brand">${esc(r.brand)}</div></td>
+    <td class="ttl">${esc(r.title)}</td>
+    <td class="soldcell"><span class="soldn">${esc(r.sold)}</span><div class="bar"><i data-w="${pct}"></i></div></td>
+    <td class="price">${esc(r.price)}</td>
+    <td><div class="fb"><span class="fbdot" style="background:${fbColor(r.fbn)}"></span>${esc(r.fb)}</div></td>
+    <td>${ship}</td><td>${promo}</td></tr>`;
+}
+function sectionHTML(c,i){
+  const rows=c.rows.slice().sort((a,b)=>b.soldn-a.soldn);
+  return `<div class="section" data-cat="${esc(c.name)}" style="animation-delay:${i*60}ms">
+    <div class="sec-head" onclick="this.parentElement.classList.toggle('collapsed')">
+      <div class="sec-title"><span class="dot"></span><div><h2>${esc(c.name)}</h2>${c.sku?`<div class="sku">SKU ${esc(c.sku)}</div>`:''}</div></div>
+      <div class="sec-meta"><span class="pill">${c.rows.length} competitors</span><span class="caret">▾</span></div>
+    </div>
+    <div class="body">
+      <div class="kwrow">
+        <div class="kwbox"><div class="kwl">🎯 Primary keywords</div>${kwChips(c.primary,'p')}</div>
+        <div class="kwbox"><div class="kwl">🔗 Secondary keywords</div>${kwChips(c.secondary,'s')}</div>
+        <div class="kwbox"><div class="kwl">🧲 Long-tail keywords</div>${kwChips(c.longtail,'l')}</div>
+      </div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Seller / Brand</th><th>Title</th><th>Sold</th><th>Price</th><th>Feedback</th><th>Shipping</th><th>Promotion</th></tr></thead>
+        <tbody>${rows.map(r=>rowHTML(r,c.maxsold)).join('')}</tbody>
+      </table></div>
+    </div></div>`;
+}
+document.getElementById('sections').innerHTML = CATS.map(sectionHTML).join('');
+
+// filter chips
+const chips=['All',...CATS.map(c=>c.name)];
+document.getElementById('chips').innerHTML=chips.map((n,i)=>`<span class="chip${i===0?' active':''}" data-c="${esc(n)}">${esc(n)}</span>`).join('');
+let active='All';
+function applyFilter(){
+  const q=document.getElementById('q').value.trim().toLowerCase();
+  document.querySelectorAll('.section').forEach(sec=>{
+    const catOk = active==='All' || sec.dataset.cat===active;
+    let any=false;
+    sec.querySelectorAll('tbody tr').forEach(tr=>{
+      const ok = !q || tr.dataset.s.includes(q);
+      tr.style.display = ok?'':'none'; if(ok) any=true;
+    });
+    sec.classList.toggle('hide', !catOk || (q && !any));
+  });
+  animateBars();
+}
+document.getElementById('chips').addEventListener('click',e=>{
+  const c=e.target.closest('.chip'); if(!c)return;
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+  c.classList.add('active'); active=c.dataset.c; applyFilter();
+});
+document.getElementById('q').addEventListener('input',applyFilter);
+
+function animateBars(){
+  requestAnimationFrame(()=>document.querySelectorAll('.section:not(.hide) .bar>i').forEach(b=>{b.style.width=b.dataset.w+'%';}));
+}
+// theme toggle
+const tb=document.getElementById('themeBtn');
+tb.addEventListener('click',()=>{
+  const cur=document.documentElement.getAttribute('data-theme');
+  const dark=cur? cur==='dark' : matchMedia('(prefers-color-scheme:dark)').matches;
+  document.documentElement.setAttribute('data-theme', dark?'light':'dark');
+});
+animateBars();
+</script>
+</body>
+</html>
