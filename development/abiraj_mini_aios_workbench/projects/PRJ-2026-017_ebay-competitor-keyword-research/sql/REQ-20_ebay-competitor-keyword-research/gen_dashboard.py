@@ -109,6 +109,9 @@ table{border-collapse:separate;border-spacing:0;font-size:12.5px;white-space:now
  background:var(--panel);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
 thead th{position:sticky;top:0;z-index:6;background:linear-gradient(180deg,#f4f8ff,#e7f0fb);
  text-align:left;padding:14px 13px;border-bottom:2px solid var(--band-line)}
+thead th:first-child{left:0;z-index:9}
+thead th:nth-child(2){left:78px;z-index:9}
+thead th.num{text-align:right}
 thead th .thl{display:inline-block;font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;
  font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;
  background:linear-gradient(92deg,#24468a,#2f5fb0 45%,#5b8de0);-webkit-background-clip:text;background-clip:text;
@@ -116,12 +119,17 @@ thead th .thl{display:inline-block;font-family:"Trebuchet MS","Segoe UI",system-
 thead th .thl::after{content:"";position:absolute;left:0;bottom:0;width:18px;height:2.5px;border-radius:2px;
  background:linear-gradient(90deg,var(--eR),var(--eY));transition:width .3s}
 thead th:hover .thl::after{width:100%}
-tbody td{padding:9px 13px;border-bottom:1px solid var(--line);vertical-align:top;background:transparent}
+tbody td{padding:9px 13px;border-bottom:1px solid var(--line);vertical-align:middle;background:#fff}
 tbody tr.comp{animation:rowin .5s ease both}
 @keyframes rowin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-tr.comp{transition:box-shadow .2s,transform .2s}
-tr.comp:hover{box-shadow:inset 3px 0 0 var(--brand)}
-tr.comp:hover td{background:#f5f9ff}
+tbody tr.alt>td{background:#f6f9fe}                         /* zebra */
+tr.comp:hover>td{background:#e9f2ff}                        /* hover wins */
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+th.num{font-variant-numeric:tabular-nums}
+/* sticky first two columns */
+tbody td.imgcell{position:sticky;left:0;z-index:3}
+tbody td.product{position:sticky;left:78px;z-index:3;box-shadow:6px 0 10px -8px rgba(20,40,80,.18)}
+thead th:nth-child(2){box-shadow:6px 0 10px -8px rgba(20,40,80,.18)}
 td.wrap,th.wrap{white-space:normal}
 .imgcell{width:78px;min-width:78px;padding:7px 6px}
 .imgcell a{display:block;width:66px;height:66px;border-radius:12px;overflow:hidden;border:1px solid var(--line);
@@ -133,13 +141,18 @@ td.wrap,th.wrap{white-space:normal}
 .cid a:hover{text-decoration:underline}
 .brand{font-weight:600}
 .ttl{white-space:normal;min-width:230px;max-width:300px;color:#33455c}
-.soldc{min-width:118px}.soldn{font-weight:800}
-.bar{height:7px;border-radius:6px;background:#e8eef7;overflow:hidden;margin-top:5px;width:96px}
+.soldc{min-width:118px;text-align:right}.soldn{font-weight:800;font-variant-numeric:tabular-nums}
+.bar{height:7px;border-radius:6px;background:#e8eef7;overflow:hidden;margin-top:5px;width:96px;margin-left:auto}
 .bar>i{display:block;height:100%;border-radius:6px;width:0;
  background:linear-gradient(90deg,var(--brand),var(--brand2));transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
 .price{font-weight:800}
-.fb{display:flex;align-items:center;gap:7px;font-weight:600}
-.fbdot{width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 3px rgba(0,0,0,.04)}
+/* feedback mini bar */
+.fbcell{min-width:118px}
+.fbtop{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.fbpct{font-weight:800;font-variant-numeric:tabular-nums}
+.fbcnt{font-size:10.5px;color:var(--muted);font-weight:700}
+.fbbar{height:6px;border-radius:5px;background:#e8eef7;overflow:hidden;margin-top:5px;width:100px}
+.fbbar>i{display:block;height:100%;border-radius:5px;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
 .tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:10.5px;font-weight:700}
 .tag.free{background:#e5f6ec;color:var(--green)}.tag.paid{background:#eef2f8;color:var(--muted)}
 .tag.promo{background:#fdf1e3;color:var(--amber);white-space:normal}.tag.none{color:#bcc7d4}
@@ -226,7 +239,9 @@ function countUp(){document.querySelectorAll('.stat .v').forEach(el=>{
     if(p<1)requestAnimationFrame(tick);}
   requestAnimationFrame(tick);});}
 
-document.getElementById('hd').innerHTML=COLS.map(c=>`<th class="${['Product Name','Title','Primary Keywords','Secondary Keywords','Long-Tail Keywords','Notes'].includes(c)?'wrap':''}"><span class="thl">${esc(c)}</span></th>`).join('');
+const WRAP=['Product Name','Title','Primary Keywords','Secondary Keywords','Long-Tail Keywords','Notes'];
+const NUMH=['Sold Quantity','Price'];
+document.getElementById('hd').innerHTML=COLS.map(c=>`<th class="${WRAP.includes(c)?'wrap':NUMH.includes(c)?'num':''}"><span class="thl">${esc(c)}</span></th>`).join('');
 let html='',idx=0;
 ROWS.forEach(r=>{
  if(r.first){html+=`<tr class="grp"><td colspan="${COLS.length}"><div class="grpband"><span class="gdot"></span><span class="gname">${esc(r.product)}</span></div></td></tr>`;}
@@ -244,16 +259,18 @@ ROWS.forEach(r=>{
   <td class="cid"><a href="https://www.ebay.co.uk/itm/${r.cid}" target="_blank" rel="noopener">${esc(r.cid)}</a></td>
   <td class="brand">${esc(r.brand)}</td>
   <td class="ttl">${esc(r.title)}</td>
-  <td class="soldc"><span class="soldn">${esc(r.sold)}</span><div class="bar"><i data-w="${pct}"></i></div></td>
-  <td class="price">${esc(r.price)}</td>
-  <td><div class="fb"><span class="fbdot" style="background:${fbColor(r.fbn)}"></span>${esc(r.fb)}</div></td>
+  <td class="soldc num"><span class="soldn">${esc(r.sold)}</span><div class="bar"><i data-w="${pct}"></i></div></td>
+  <td class="price num">${esc(r.price)}</td>
+  <td class="fbcell"><div class="fbtop"><span class="fbpct" style="color:${fbColor(r.fbn)}">${r.fbn}%</span><span class="fbcnt">${esc((r.fb.match(/\(([^)]+)\)/)||[])[1]||'')}</span></div><div class="fbbar"><i data-fw="${Math.max(6,Math.min(100,(r.fbn-90)/10*100))}" style="background:${fbColor(r.fbn)}"></i></div></td>
   <td>${ship}</td><td>${promo}</td>
   <td class="kwcell">${kw(r.pk,'p')}</td><td class="kwcell">${kw(r.sk,'s')}</td><td class="kwcell">${kw(r.lt,'l')}</td>
   <td class="notes">${esc(r.notes)}</td></tr>`;
 });
 const tb=document.getElementById('tb');
 tb.innerHTML=html;
-setTimeout(()=>{document.querySelectorAll('.bar>i').forEach(b=>b.style.width=b.dataset.w+'%');countUp();},180);
+function animBars(){document.querySelectorAll('.bar>i').forEach(b=>b.style.width=b.dataset.w+'%');
+  document.querySelectorAll('.fbbar>i').forEach(b=>b.style.width=b.dataset.fw+'%');}
+setTimeout(()=>{animBars();countUp();},180);
 
 // ---- filters ----
 const CH=['All',...[...new Set(ROWS.map(r=>r.cat))]];
@@ -273,13 +290,15 @@ function applyAll(){
     // reorder rows within this category per sort
     const sorted=g.rows.slice().sort(sortKey);
     let ref=g.band; sorted.forEach(tr=>{ref.after(tr);ref=tr;});
-    let any=false;
+    let any=false, vi=0;
     sorted.forEach(tr=>{
       const ok=(st.cat==='All'||tr.dataset.cat===st.cat)
         && (!st.ship||tr.dataset.ship===st.ship)
         && (!st.promo||tr.dataset.promo==='1')
         && (!st.q||tr.dataset.s.includes(st.q));
-      tr.classList.toggle('hide',!ok); if(ok){any=true;shown++;}
+      tr.classList.toggle('hide',!ok);
+      if(ok){any=true;shown++;tr.classList.toggle('alt',vi%2===1);vi++;}
+      else tr.classList.remove('alt');
     });
     g.band.classList.toggle('hide',!any);
   });
@@ -290,7 +309,7 @@ document.getElementById('chips').addEventListener('click',e=>{const c=e.target.c
   document.querySelectorAll('.fchip').forEach(x=>x.classList.remove('on'));c.classList.add('on');st.cat=c.dataset.c;applyAll();});
 document.getElementById('fship').addEventListener('change',e=>{st.ship=e.target.value;applyAll();});
 document.getElementById('fpromo').addEventListener('change',e=>{st.promo=e.target.checked;e.target.closest('.ftoggle').classList.toggle('on',e.target.checked);applyAll();});
-document.getElementById('fsort').addEventListener('change',e=>{st.sort=e.target.value;applyAll();setTimeout(()=>document.querySelectorAll('.bar>i').forEach(b=>b.style.width=b.dataset.w+'%'),20);});
+document.getElementById('fsort').addEventListener('change',e=>{st.sort=e.target.value;applyAll();setTimeout(animBars,20);});
 document.getElementById('q').addEventListener('input',e=>{st.q=e.target.value.trim().toLowerCase();applyAll();});
 document.getElementById('fclear').addEventListener('click',()=>{st.cat='All';st.ship='';st.promo=false;st.sort='sold';st.q='';
   document.getElementById('q').value='';document.getElementById('fship').value='';document.getElementById('fsort').value='sold';
