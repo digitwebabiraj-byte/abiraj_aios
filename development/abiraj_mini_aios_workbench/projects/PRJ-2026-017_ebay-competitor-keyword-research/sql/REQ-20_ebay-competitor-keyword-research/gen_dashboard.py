@@ -79,10 +79,14 @@ body{margin:0;color:var(--ink);height:100vh;overflow:hidden;display:flex;flex-di
 .search svg{flex:none}
 
 /* ---------- filter bar ---------- */
-.filterbar{flex:none;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;
- padding:11px 20px;background:rgba(255,255,255,.72);backdrop-filter:blur(8px);
+.filterbar{flex:none;display:flex;flex-wrap:nowrap;gap:12px;align-items:center;
+ padding:9px 18px;background:rgba(255,255,255,.72);backdrop-filter:blur(8px);
  border-bottom:1px solid var(--line);box-shadow:0 4px 14px rgba(26,52,96,.05);z-index:7}
-.chips{display:flex;gap:7px;flex-wrap:wrap;max-width:100%;padding:4px 2px}
+.chips{display:flex;gap:7px;flex-wrap:nowrap;flex:1;min-width:0;overflow-x:auto;padding:6px 2px}
+.chips::-webkit-scrollbar{height:6px}
+.chips::-webkit-scrollbar-thumb{background:#cdd9ec;border-radius:6px}
+.fspacer{display:none}
+.fgroup,.ftoggle,.fsel,.count,.fclear{flex:none;white-space:nowrap}
 .fchip{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--muted);
  padding:7px 13px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;transition:all .18s}
 .fchip:hover{transform:translateY(-2px);color:var(--ink);border-color:var(--brand2)}
