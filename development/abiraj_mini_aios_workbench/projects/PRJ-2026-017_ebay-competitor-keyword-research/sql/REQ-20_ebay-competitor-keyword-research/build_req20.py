@@ -22,11 +22,11 @@ SKU={"Metal Shade Pendant Light":"CRSF100BM+PHSH1PBRYB+SCRN70BM+LSFT220BM"}
 
 DATA={
 "Metal Shade Pendant Light":[
- ("333675680799","firstchoicelightingoutlet","firstchoicelighting","Set of 2 Modern Three Tier Easy Fit Jewelled Ceiling Light Shade","751","GBP 20.39","99.7% (89.9K)","With postage","-"),
+ ("372336415252","value-lights","ValueLights","Lampshade Ceiling Pendant Light Shade Easy Fit Metal","6,442+","GBP 17.99","99.8% (685K)","With postage","Save up to 10% Multi-buy"),
+ ("333667118358","firstchoicelightingoutlet","firstchoicelighting","Set of 2 Modern Black Metal Swirl Easy Fit Ceiling Light Shade","268","GBP 23.45","99.7% (89.9K)","With postage","-"),
  ("285423964421","picknmix.online","Giggi","Metal & Rope Lamp Shades Ceiling Pendant Light Shade","236","GBP 18.99","99.6% (21.9K)","With postage","Save up to 15% Multi-buy"),
- ("372257187156","value-lights","ValueLights","Ceiling Light Fitting 3 Way Chrome Spotlight Swirl Glass","8,367","GBP 19.99","99.8% (685K)","With postage","-"),
- ("154695326074","homeessenceltd","Innoteck","Ceiling Light Shade Chandelier Pendant Acrylic Crystal Droplet Chrome","354+","GBP 10.99","99.9% (60.1K)","With postage","Save up to 20% Multi-buy"),
- ("201620721277","buybox786","OPTIMAL PRODUCTS","Chandelier Style Ceiling Light Shade Droplet Pendant Acrylic Crystal Bead","65+","GBP 10.95 to 19.95","99.7% (220.4K)","With postage","Save up to 6% Multi-buy"),
+ ("405002496188","online336","Homion","Ancient Moroccan Style Metal Ceiling Light Shade Easy Fit Pendant","61+","GBP 99.99","99.8% (26.7K)","With postage","Save up to 6% Multi-buy"),
+ ("163799621837","goodwood-originals123","Unbranded","Lampshade Industrial Pendant Ceiling Light Silver Metal Retro Nordic","19+","GBP 14.00 to 29.00","100% (3.1K)","With postage","-"),
 ],
 "Wall Light":[
  ("115699570601","eat_sleep_buy_repeat","(not listed)","Vintage Industrial Wall Light Antique Retro Cage Bulkhead Gold Brass Ship Lamp","257","GBP 64.99","100% (1.4K)","With postage","-"),
@@ -63,11 +63,9 @@ DATA={
  ("262744851290","sj_modern_antiques","(not listed)","Silver Industrial Ceiling Light Vintage Antique Pendant Cage","114","GBP 46.99","98.5% (15.2K)","With postage","-"),
 ],
 "Pipe Light":[
- ("174650219163","nmstoute","Stout & Burg Designs","Steampunk Industrial Iron Pipe Lamp/Light Socket 1-1/4 x 1/2","334+","GBP 3.18 to 10.46","99% (4.4K)","With postage","-"),
- ("333977871043","steampunkeddesignstudio","Unbranded","Industrial Rustic Retro Style Pipe Light Steampunk Desk Table Lamp","148","GBP 41.91","100% (1.4K)","With postage","-"),
- ("201795458338","mrwillieslighting","Mr. Willies","Retro Industrial Pipe Desk Table 3 bulbs steampunk edison","83","GBP 130.88","100% (882)","With postage","-"),
- ("353005301113","happy_home_2019","Unbranded","Iron Vintage Steampunk Stop Valve Light Switch W/ Wire Pipe Lamp","77","GBP 16.22","99.4% (3K)","Free postage","-"),
- ("164791375113","ztt_online","(not listed)","Retro Switch Valve Steampunk Light Industrial Pipe Table Lamp","25","GBP 10.48","99.3% (26.9K)","With postage","-"),
+ ("402787699623","huihuibest","huihuibest","4 Heads Chandelier Vintage Pendant Light Steampunk Style Loft Ceiling Fixture","53","GBP 69.12","99.8% (9.6K)","With postage","-"),
+ ("174650219163","nmstoute","Stout & Burg Designs","Steampunk Industrial Iron Pipe Ceiling Light Pendant Kit","334+","GBP 3.18 to 10.46","99% (4.4K)","With postage","-"),
+ ("353005301113","happy_home_2019","Unbranded","Iron Vintage Steampunk Industrial Pipe Ceiling Pendant Light","77","GBP 16.22","99.4% (3K)","Free postage","-"),
 ],
 "Bulbs":[
  ("223224109836","safield-online","Auraglow","Auraglow Mysa LED Light Bulb Vintage Retro Edison Style Decorative E27 T30 Tube","180","GBP 10.99","99.8% (188.5K)","With postage","-"),
