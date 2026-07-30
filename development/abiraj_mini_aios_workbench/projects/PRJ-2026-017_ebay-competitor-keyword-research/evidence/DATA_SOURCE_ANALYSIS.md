@@ -1,7 +1,7 @@
 # REQ-20 — Data-Source Feasibility Analysis
 
 **Project:** PRJ-2026-017 eBay Competitor & Keyword Research
-**PH / owner:** Jarsini (eBay `ebay_priors` user)
+**End user / owner:** Jarsini (eBay `ebay_priors` user)
 **Source brief:** `evidence/source_documents/REQ-20_.../Jarsini_task_source.xlsx`
 **Analysed:** 2026-07-30 against **live** warehouse (`public.listing_data` etc.) + raw ledsone DB.
 

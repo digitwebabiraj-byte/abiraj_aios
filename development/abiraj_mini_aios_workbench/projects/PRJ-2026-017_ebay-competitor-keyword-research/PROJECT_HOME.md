@@ -1,6 +1,6 @@
 # PRJ-2026-017 — eBay Competitor & Keyword Research (eckr)
 
-**PH / requester:** Jarsini (`staff.users` id 91, username `Jarsini`, team `ebay_priors`)
+**End user / requester:** Jarsini (`staff.users` id 91, username `Jarsini`, team `ebay_priors`)
 **Owner/developer:** Abiraj · **Requirement:** REQ-20 · **Code:** `eckr`
 **Onboarded / delivered:** 2026-07-30 · **Source:** `Jarsini task.xlsx`
 
