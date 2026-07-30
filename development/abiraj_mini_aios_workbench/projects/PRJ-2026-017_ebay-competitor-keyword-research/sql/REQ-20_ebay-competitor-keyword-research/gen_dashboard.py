@@ -11,7 +11,7 @@ def fbpct(s):
     m=re.match(r"([\d.]+)%", s or ""); return float(m.group(1)) if m else 0.0
 
 # Build rows exactly like the Excel: 14 columns, Product Name/SKU/keywords only on first row of each category
-COLS=["Image","Product Name","SKU","Competitor ID","Brand","Title","Sold Quantity","Price",
+COLS=["Image","Product Name","Competitor ID","Brand","Title","Sold Quantity","Price",
       "Feedback Rate","Shipping type","Promotion Type & %","Primary Keywords",
       "Secondary Keywords","Long-Tail Keywords","Notes"]
 rows=[]
@@ -127,7 +127,7 @@ document.getElementById('stats').innerHTML=[
 const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fbColor=p=>p>=99?'var(--green)':p>=97?'var(--amber)':'var(--pink)';
 const kw=(str,cls)=>!str?'':str.split(',').map(k=>`<span class="kw ${cls}">${esc(k.trim())}</span>`).join('');
-document.getElementById('hd').innerHTML=COLS.map(c=>`<th class="${['Product Name','SKU','Title','Primary Keywords','Secondary Keywords','Long-Tail Keywords','Notes'].includes(c)?'wrap':''}">${esc(c)}</th>`).join('');
+document.getElementById('hd').innerHTML=COLS.map(c=>`<th class="${['Product Name','Title','Primary Keywords','Secondary Keywords','Long-Tail Keywords','Notes'].includes(c)?'wrap':''}">${esc(c)}</th>`).join('');
 let html='';
 ROWS.forEach(r=>{
  const pct=Math.max(3,Math.round(r.soldn/S.maxsold*100));
@@ -138,7 +138,6 @@ ROWS.forEach(r=>{
  html+=`<tr class="${r.first?'newcat':''}" data-s="${esc(search)}">
   <td class="imgcell">${imgcell}</td>
   <td class="product wrap">${esc(r.product)}</td>
-  <td class="sku">${esc(r.sku)}</td>
   <td class="cid"><a href="https://www.ebay.co.uk/itm/${r.cid}" target="_blank" rel="noopener">${esc(r.cid)}</a></td>
   <td class="brand">${esc(r.brand)}</td>
   <td class="ttl">${esc(r.title)}</td>

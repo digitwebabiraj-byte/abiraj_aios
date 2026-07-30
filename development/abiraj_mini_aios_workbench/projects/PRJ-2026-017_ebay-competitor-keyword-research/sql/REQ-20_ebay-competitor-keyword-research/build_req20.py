@@ -2,7 +2,7 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
 OUT=r"C:\Users\digit\OneDrive\Desktop\Abiraj_AIOS\.claude\worktrees\gifted-keller-42ebdd\development\abiraj_mini_aios_workbench\projects\PRJ-2026-017_ebay-competitor-keyword-research\evidence\final_outputs\REQ-20_ebay-competitor-keyword-research\REQ-20-D01_ebay_competitor_keyword_SOLD.xlsx"
 wb=openpyxl.Workbook(); ws=wb.active; ws.title="Competitor & Keyword"
-cols=["Product Name","SKU","Competitor ID","Brand","Title","Sold Quantity","Price","Feedback Rate","Shipping type","Promotion Type & %","Primary Keywords","Secondary Keywords","Long-Tail Keywords","Notes"]
+cols=["Product Name","Competitor ID","Brand","Title","Sold Quantity","Price","Feedback Rate","Shipping type","Promotion Type & %","Primary Keywords","Secondary Keywords","Long-Tail Keywords","Notes"]
 ws.append(cols)
 hf=Font(bold=True,color="FFFFFF"); fill=PatternFill("solid",fgColor="2F5496")
 for c in ws[1]: c.font=hf; c.fill=fill; c.alignment=Alignment(wrap_text=True,vertical="top")
@@ -93,10 +93,10 @@ for cat in order:
         cid,seller,brand,title,sold,price,fb,ship,promo=r
         total+=1
         if sold.strip(): sold_ok+=1
-        ws.append([cat if i==0 else "", SKU.get(cat,"") if i==0 else "", cid, brand, title, sold, price, fb, ship, promo,
+        ws.append([cat if i==0 else "", cid, brand, title, sold, price, fb, ship, promo,
                    pk if i==0 else "", sk if i==0 else "", lt if i==0 else "", "Competitor seller: "+seller+"."])
 
-widths=[22,30,15,20,42,11,17,15,14,22,30,34,46,30]
+widths=[22,15,20,42,11,17,15,14,22,30,34,46,30]
 import openpyxl.utils as u
 for i,w in enumerate(widths,1): ws.column_dimensions[u.get_column_letter(i)].width=w
 for row in ws.iter_rows(min_row=2):
