@@ -61,7 +61,7 @@ WAREHOUSE = {
     "password": os.getenv("PGPASSWORD"),
 }
 
-RECIPIENTS = ["Thinesh", "Jarsini", "kobiga", "powsteena"]
+RECIPIENTS = ["Thinesh", "Jarsini", "kobiga", "powsteena", "Sharmilan", "Sivajitha"]  # ebay_priors — keep in step with publish_dst_ph_task.py (Sharmilan+Sivajitha added 2026-07-31)
 AUDIENCE = "ebay_priors"
 
 # --- fail-closed thresholds -------------------------------------------------
