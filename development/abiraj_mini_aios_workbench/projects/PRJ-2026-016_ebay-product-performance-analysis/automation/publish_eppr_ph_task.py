@@ -22,7 +22,7 @@ DB = {"host": os.getenv("PGHOST","149.28.134.54"), "port": os.getenv("PGPORT","5
 HTML_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..","evidence","final_outputs",
       "REQ-19_ebay-product-performance-analysis","REQ-19-D01_ph_task.html"))
 
-RECIPIENTS = ["Thinesh", "Jarsini", "kobiga", "powsteena"]   # ebay_priors — exact usernames from live rows
+RECIPIENTS = ["Thinesh", "Jarsini", "kobiga", "powsteena", "Sharmilan", "Sivajitha"]   # ebay_priors — exact usernames from live rows (Sharmilan+Sivajitha added 2026-07-28)
 ROW = dict(project_name="eBay Product Performance Analysis", project_code="eppr",
            task_name="REQ-19-D01 eBay Product Performance Analysis — per-listing, UK+DE (35 cols)",
            team="Development", developer="Abiraj", assigned_user_team="ebay_priors",
