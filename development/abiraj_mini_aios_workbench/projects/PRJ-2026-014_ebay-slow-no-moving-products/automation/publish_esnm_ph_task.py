@@ -23,9 +23,9 @@ TRAPS THIS SCRIPT EXISTS TO AVOID  (all verified live against the real table, 20
    So this script SELECTs by task_id first and UPDATEs in place, and refuses to proceed if it
    ever finds more than one row for a task_id.
 
-3. **One row PER USER.** ebay_priors is 4 people (Jarsini, kobiga, powsteena, Thinesh) and the
-   established eBay convention (see epd rows 395-398) is one ph_task row each, not one shared
-   row. Publishing a single row would deliver the report to only one of them.
+3. **One row PER USER.** ebay_priors is 6 people (Thinesh, Jarsini, kobiga, powsteena, Sharmilan,
+   Sivajitha) and the established eBay convention (see epd rows 395-398) is one ph_task row each,
+   not one shared row. Publishing a single row would deliver the report to only one of them.
 
 4. **Never assert `version_status` after writing.** Staff change it themselves (row 401 sits at
    'completed'). A post-write assertion that it equals 'released' would fail on any row a user
@@ -53,7 +53,11 @@ TASK_NAME    = "REQ-16-D01 eBay Slow Moving & No Moving Products — UK + German
 TEAM         = "Development"
 DEVELOPER    = "Abiraj"
 AUDIENCE     = "ebay_priors"
-RECIPIENTS   = ["Thinesh", "Jarsini", "kobiga", "powsteena"]
+RECIPIENTS   = ["Thinesh", "Jarsini", "kobiga", "powsteena", "Sharmilan", "Sivajitha"]
+# Sharmilan (user id 232) and Sivajitha (id 231) added 2026-07-23 on owner instruction. Both
+# are already `ebay_priors` members receiving the other eBay reports (eckr / eppr / dst), so the
+# ESNM report was reaching only 4 of the audience's 6. Verified live in public."user" (both Active,
+# single exact match) before this change.
 PERIOD       = "2026-07"
 # Deliberately NULL. The portal renders a DESCRIPTION panel above the report from this
 # column, which stole ~90px of vertical space from the dashboard inside an already short
