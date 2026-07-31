@@ -20,7 +20,7 @@ Presentation (first governed report) · requirement `REQ-14` · deliverable `REQ
 A light-theme HTML dashboard (EBPD house style) with a **date-range dropdown** — Full month / 1st–2nd
 half / Week 1–4, each re-scoping the whole dashboard from live per-window pulls (pure-CSS, works in the
 no-JS ph_task viewer), rendered **full-width / full-screen**. **Published per-user to
-`tech_team_outputs.ph_task` — ids 387 (Thinesh), 388 (Jarsini), 389 (kobiga), 390 (powsteena)**,
+`tech_team_outputs.ph_task` — ids 518 (Thinesh), 519 (Jarsini), 520 (kobiga), 521 (powsteena), 522 (Sharmilan), 523 (Sivajitha)**,
 `project_code=ERA`, `assigned_user_team=ebay_priors`, `released`. **Automated monthly:** Windows Task
 `ERA_Monthly_Dashboard`, **day 5 @ 09:30** (next run 2026-08-05), reports the last complete month, direct
 psycopg2 (no MCP). The canonical SQL is live-verified against `ledsone` — see

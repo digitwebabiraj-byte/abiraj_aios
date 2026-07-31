@@ -32,8 +32,8 @@ intentional blanks). **Built live against the Ledsone DB, published, automated, 
 
 ## Owner and Reviewers
 - Owner / Developer: **Abiraj**
-- Requester / report owner: **Thinesh** (+ the eBay account managers; likely report viewers Jarsini,
-  kobiga, powsteena, as in PRJ-2026-010 / 011)
+- Requester / report owner: **Thinesh** (+ the eBay account managers; report viewers Jarsini,
+  kobiga, powsteena, Sharmilan, Sivajitha — the 6 ebay_priors recipients)
 - Coordinator: Varmen
 - Technical Reviewer: **Sajeesan** — **signed off 2026-07-20**
 - Queryability Reviewer: **Tamil Selvan** — **signed off 2026-07-20**
@@ -93,7 +93,7 @@ Reason breakdown sums to 153 (Wrong Size 47 / Ordered Wrong Item 28 / Not as Des
 build must match these for June 2026 before it is accepted.
 
 ## Status
-**REQ-14-D01 DELIVERED · PUBLISHED (4 users) · REQ-14-D02 AUTOMATION LIVE — 2026-07-20.**
+**REQ-14-D01 DELIVERED · PUBLISHED (6 users) · REQ-14-D02 AUTOMATION LIVE — 2026-07-20.**
 - Handoff bundle imported COPY-only + SHA-256; canonical SQL **live-verified** against `ledsone` (direct
   read-only psycopg2, no MCP) — reproduces the June-2026 reference to the penny (144 SKUs · 153 returns ·
   17.7% · Refund £2,937.37 · Return Cost £869.39 · Ad Spend £1,387.96 · Ad Sales £9,343.63 · ACOS 14.9% ·
@@ -101,7 +101,7 @@ build must match these for June 2026 before it is accepted.
 - **REQ-14-D01** — light-theme HTML dashboard (EBPD house style) with a **date-range dropdown** (Full
   month / 1st–2nd half / Week 1–4, each re-scoping the whole dashboard from live per-window pulls; pure-CSS
   so it works in the no-JS ph_task viewer), rendered **full-width / full-screen**. **PUBLISHED per-user to
-  `tech_team_outputs.ph_task` — ids 387 (Thinesh), 388 (Jarsini), 389 (kobiga), 390 (powsteena)**, all
+  `tech_team_outputs.ph_task` — ids 518 (Thinesh), 519 (Jarsini), 520 (kobiga), 521 (powsteena), 522 (Sharmilan), 523 (Sivajitha)**, all
   `project_code=ERA`, `assigned_user_team=ebay_priors`, `released`. (Row ids incremented on each layout
   refresh + the ebra→ERA re-key; the old ebra-coded rows were retired.)
 - **REQ-14-D02** — fully autonomous **monthly** refresh: Windows Task **`ERA_Monthly_Dashboard`**, **day 5
@@ -115,4 +115,4 @@ build must match these for June 2026 before it is accepted.
 
 ## One Next Action
 Commit the branch to git (pending owner instruction). Otherwise **COMPLETE** — delivered, published (ids
-387–390), automated (monthly, 5th), and signed off.
+518–523), automated (monthly, 5th), and signed off.

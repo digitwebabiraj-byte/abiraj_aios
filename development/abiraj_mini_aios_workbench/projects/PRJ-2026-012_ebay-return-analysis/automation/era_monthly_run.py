@@ -105,8 +105,9 @@ REQUIREMENT_ID = "REQ-14"
 DELIVERABLE_ID = "REQ-14-D01"
 PHASE = "Phase — Reporting & Presentation (eBay Return Analysis Dashboard — first governed report)"
 
-# report recipients — the eBay team group (same as PRJ-2026-010 epc / PRJ-2026-011 ebpd)
-ASSIGNED = ["Thinesh", "Jarsini", "kobiga", "powsteena"]
+# report recipients — the eBay team group. Thinesh + the account managers; Sharmilan & Sivajitha
+# added 2026-07-20 on owner instruction (now 6 recipients, all future monthly runs publish to all 6).
+ASSIGNED = ["Thinesh", "Jarsini", "kobiga", "powsteena", "Sharmilan", "Sivajitha"]
 ASSIGNED_USER_TEAM = "ebay_priors"
 
 # ---- ledsone (read) + warehouse (publish) connections from env ----

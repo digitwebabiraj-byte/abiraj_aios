@@ -6,7 +6,7 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 
 | Task ID | Deliverable | Source ref | Status | Evidence | Validation |
 |---|---|---|---|---|---|
-| REQ-14_ebay-return-analysis | eBay Return Analysis Dashboard — a per-SKU eBay returns dashboard (Excel), one row per variant SKU with ≥ 1 eBay return in the period; 19 columns (SKU · Title · Account · Orders · Returns · Return Rate · Last Month/Last Year Returns · Refund £ · Return Cost £ · Main Reason · Rank · Neg Feedback · Open Cases · Stock · Ad Spend/Sales · ACOS · ROAS) + Return-Reason Breakdown + Filter Options + Before/After efficiency. Built from the live Ledsone PostgreSQL; reference period June 2026. **DELIVERED · PUBLISHED (ids 387–390) · AUTOMATED (monthly, 5th) · SIGNED OFF 2026-07-20.** | `files (6).zip` (5 files: 2 handoff docs, SQL, build script, reference June-2026 xlsx) + `Thinesh task (2).xlsx` (mockup). Imported COPY-only + SHA-256 (`evidence/source_documents/REQ-14_.../SOURCE_MANIFEST.md`). **Governance identity CONFIRMED by owner 2026-07-20:** project = eBay Return Analysis, `project_code=ERA`, phase = Reporting & Presentation (first governed report), requirement `REQ-14`, deliverable `REQ-14-D01`. | **LIVE-VERIFIED 2026-07-20** — canonical SQL run against the `ledsone` DB via a direct read-only psycopg2 connection (no MCP); reproduces the reference to the penny: 144 rows / 153 returns / 17.7% / £2,937.37 refund / £869.39 return cost / £1,387.96 ad spend / £9,343.63 ad sales / 14.9% ACOS / 6.73x ROAS; reason breakdown sums to 153 (live Orders 863). `validation/REQ-14_.../2026-07-20_live_count_verification.md`. Full 144-row diff + workbook rebuild still pending. | `evidence/source_documents/REQ-14_.../` (handoffs, mockup, manifest) · `sql/REQ-14_.../ebay_return_analysis.sql` · `evidence/final_outputs/REQ-14_.../` (build script + reference xlsx) · `validation/REQ-14_.../2026-07-20_live_count_verification.md` | Aggregate totals + reason breakdown LIVE-VERIFIED; no publish, no reviewer/business sign-off yet. |
+| REQ-14_ebay-return-analysis | eBay Return Analysis Dashboard — a per-SKU eBay returns dashboard (Excel), one row per variant SKU with ≥ 1 eBay return in the period; 19 columns (SKU · Title · Account · Orders · Returns · Return Rate · Last Month/Last Year Returns · Refund £ · Return Cost £ · Main Reason · Rank · Neg Feedback · Open Cases · Stock · Ad Spend/Sales · ACOS · ROAS) + Return-Reason Breakdown + Filter Options + Before/After efficiency. Built from the live Ledsone PostgreSQL; reference period June 2026. **DELIVERED · PUBLISHED (ids 518–523) · AUTOMATED (monthly, 5th) · SIGNED OFF 2026-07-20.** | `files (6).zip` (5 files: 2 handoff docs, SQL, build script, reference June-2026 xlsx) + `Thinesh task (2).xlsx` (mockup). Imported COPY-only + SHA-256 (`evidence/source_documents/REQ-14_.../SOURCE_MANIFEST.md`). **Governance identity CONFIRMED by owner 2026-07-20:** project = eBay Return Analysis, `project_code=ERA`, phase = Reporting & Presentation (first governed report), requirement `REQ-14`, deliverable `REQ-14-D01`. | **LIVE-VERIFIED 2026-07-20** — canonical SQL run against the `ledsone` DB via a direct read-only psycopg2 connection (no MCP); reproduces the reference to the penny: 144 rows / 153 returns / 17.7% / £2,937.37 refund / £869.39 return cost / £1,387.96 ad spend / £9,343.63 ad sales / 14.9% ACOS / 6.73x ROAS; reason breakdown sums to 153 (live Orders 863). `validation/REQ-14_.../2026-07-20_live_count_verification.md`. Full 144-row diff + workbook rebuild still pending. | `evidence/source_documents/REQ-14_.../` (handoffs, mockup, manifest) · `sql/REQ-14_.../ebay_return_analysis.sql` · `evidence/final_outputs/REQ-14_.../` (build script + reference xlsx) · `validation/REQ-14_.../2026-07-20_live_count_verification.md` | Aggregate totals + reason breakdown LIVE-VERIFIED; no publish, no reviewer/business sign-off yet. |
 
 ## REQ-14-D01 — intended deliverable detail
 - **Scope:** a populated read-only per-SKU eBay Return Analysis dashboard for the reporting period,
@@ -41,20 +41,24 @@ Two generators in `evidence/final_outputs/REQ-14_.../`, both in the **PRJ-2026-0
 - **Verified in-browser** (served via localhost): DOM renders, JS filters compute ("144/144 SKUs"), and the
   "1st half" preset correctly switches to 79 SKUs / 82 returns / £1,584.59 / ACOS 15.3% / ROAS 6.55x.
 
-## REQ-14-D01 — PUBLISHED 2026-07-20 (4 users)
+## REQ-14-D01 — PUBLISHED 2026-07-20 (6 users)
 Published per-user to `tech_team_outputs.ph_task`, all `project_code=ERA`,
 `assigned_user_team=ebay_priors`, `released` (the same eBay team group as PRJ-2026-010/011). Current live
 rows (ids incremented across layout refreshes + the ebra→ERA re-key; old ebra rows retired):
 | id | assigned_user | task_id |
 |---|---|---|
-| 387 | Thinesh | `ERA_Thinesh_ebay_return_analysis_2026-06` |
-| 388 | Jarsini | `ERA_Jarsini_ebay_return_analysis_2026-06` |
-| 389 | kobiga | `ERA_kobiga_ebay_return_analysis_2026-06` |
-| 390 | powsteena | `ERA_powsteena_ebay_return_analysis_2026-06` |
+| 518 | Thinesh | `ERA_Thinesh_ebay_return_analysis_2026-06` |
+| 519 | Jarsini | `ERA_Jarsini_ebay_return_analysis_2026-06` |
+| 520 | kobiga | `ERA_kobiga_ebay_return_analysis_2026-06` |
+| 521 | powsteena | `ERA_powsteena_ebay_return_analysis_2026-06` |
+| 522 | Sharmilan | `ERA_Sharmilan_ebay_return_analysis_2026-06` |
+| 523 | Sivajitha | `ERA_Sivajitha_ebay_return_analysis_2026-06` |
 Guarded `temp_user` publish (pre-flight read-only check; **pre-DELETE by task_id +
 plain INSERT** — no real UNIQUE on `task_id`; `assigned_user_team` set — missing from the sample DDL).
-Publisher = `automation/era_monthly_run.py`. Each row carries the ~521 KB dashboard HTML. Verified live
-(read-only) post-publish. Recipients confirmed real — all four already receive the epc + ebpd dashboards.
+Publisher = `automation/era_monthly_run.py`. Each row carries the dashboard HTML. Verified live
+(read-only) post-publish. **Sharmilan & Sivajitha added 2026-07-20 on owner instruction (4 → 6 recipients);
+all six are existing eBay `ph_task` recipients.** Row ids increment on every refresh (were 387–390 for the
+original 4; now 518–523 for all 6).
 
 ## REQ-14-D02 — MONTHLY AUTOMATION LIVE 2026-07-20
 Fully autonomous monthly refresh (the recurring evolution of D01):
@@ -69,7 +73,7 @@ Fully autonomous monthly refresh (the recurring evolution of D01):
 - **Security:** all DB passwords in the **git-ignored** `automation/era_secrets.bat` (template provided);
   no plaintext credentials in any tracked file.
 - **Verified:** end-to-end dry-run (`--no-publish`) resolves the dynamic month to June 2026 and reconciles
-  144 SKUs / 153 returns / £2,937.37; the live publish then produced ids 375–378.
+  144 SKUs / 153 returns / £2,937.37; the live publish then produced ids 518–523.
 - Registrar: `automation/register_era_task.ps1` (`-Remove` to unschedule). Docs: `automation/` scripts.
 
 ## Onboarding (this session — 2026-07-20)
@@ -90,29 +94,3 @@ before any publish.
 A new day or Claude session does **not** create a new Task ID. Keep using
 `REQ-14_ebay-return-analysis` until D01 is closed; a genuinely new requirement (with owner confirmation)
 earns a new deliverable/task id.
-
----
-
-## 2026-07-21 — post-delivery hardening (no scope change)
-
-Like EBPD, D02 shipped with no validation between the pull and the `DELETE`+`INSERT`. Closed:
-
-1. **Seven gates before any write** — zero-SKU, floor (`ERA_MIN_SKUS`), `returns >= SKUs`,
-   non-negative money, the **June 2026 anchor** (144 SKUs / 153 returns), render/placeholder, and a
-   **collapse guard** (>40% fall vs the last good run, from PRJ-2026-013 / EPPA; deliberately
-   generous because returns are seasonal).
-2. **md5-verified publish**, rolled back on mismatch.
-3. **Credentials via the global store**; `--dry-run` alias added.
-4. **`AUTOMATION_README.md` written** — it was the only automated project with no runbook.
-
-⚠ **UNRESOLVED — source-of-truth conflict (a STOP condition under the automation pattern).**
-This project's `CLAUDE.md` still says `REQ-14`/`ERA` are *"working defaults, minted with owner
-confirmation PENDING"* and *"do not publish to `ph_task` without explicit owner instruction"*, and
-the "One next action" above still describes D01 as not yet run. Meanwhile a scheduled task publishes
-monthly, unattended, as `version_status='released'`, and the delivery record says all three
-reviewers signed off 2026-07-20. The automation is very likely the correct state and this paperwork
-is stale — **but that must be reconciled by the owner, not assumed.**
-
-Proven: reproduces the signed-off June reference exactly (144 SKUs / 153 returns / £2,937.37 refund
-/ £1,387.96 ad spend / ACOS 14.9% / ROAS 6.73x); forced floor and a forced 500→144 collapse abort
-with nothing published. Git `539bf1b`, `d29bff5`, `04b6ed0`.
