@@ -15,6 +15,10 @@ repeat/trend analytics (worst SKUs, parent-family issues, monthly trend, escalat
 (2026-06-15 → 07-15), **20 rows (6 Negative / 14 Neutral)** from live DB data, published to
 `tech_team_outputs.ph_task` **id 257** (`project_code=ebft`, `assigned_user=Thinesh`, released).
 CSV + xlsx + dashboard in `evidence/final_outputs/REQ-11_ebay-feedback-triage/`.
+**Audience fanned out 1 → 6 on 2026-07-31** — the same report now reaches all `ebay_priors` members
+(ids 530–534: Jarsini, kobiga, powsteena, Sharmilan, Sivajitha), matching every other `ebay_priors`
+report. Audience addition only — no new scope; see
+`evidence/logs_or_screenshots/REQ-11_.../2026-07-31_fan_out_to_ebay_priors_audience.md`.
 
 **What is NOT done:** the Steps 3–9 **BUILD** (production DDL, live `GetFeedback` sync, the LLM
 classifier layer, case tracking). The report's AI columns are a **one-time LLM read of 20 comments —

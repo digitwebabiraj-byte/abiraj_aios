@@ -19,6 +19,11 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 xlsx, self-contained light-theme HTML dashboard. **Query:** `sql/REQ-11_.../d01_feedback_triage_pull.sql`.
 **Published:** `ph_task` **id 257** (`project_code=ebft`, `task_id=ebft_Thinesh_ebay_feedback_triage-V1`,
 `assigned_user=Thinesh`, `assigned_user_team=ebay_priors`, phase 1 / version 1 / released).
+**Audience fanned out 1 → 6 on 2026-07-31** — the identical report was cloned to the other five
+`ebay_priors` members: ids **530 Jarsini · 531 kobiga · 532 powsteena · 533 Sharmilan · 534 Sivajitha**
+(each `ebft_<user>_ebay_feedback_triage-V1`, byte-identical `html_content` to id 257, released,
+unactioned). Audience addition only — no new scope/data/rebuild; the read-only-slice + BUILD-gated status
+below is unchanged. Evidence: `evidence/logs_or_screenshots/REQ-11_.../2026-07-31_fan_out_to_ebay_priors_audience.md`.
 
 **⚠ What this delivery does NOT settle — read before treating this as "the system":**
 - **The AI columns are a one-time LLM read of 20 comments — NOT a classifier.** No model, no rules
