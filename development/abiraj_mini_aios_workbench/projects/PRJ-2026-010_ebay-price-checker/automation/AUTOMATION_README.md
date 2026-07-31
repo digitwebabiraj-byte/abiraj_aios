@@ -1,7 +1,7 @@
 # EPC — Weekly Auto-Refresh (REQ-12)
 
 Unattended **weekly** run of the eBay Price Checker via **Windows Task Scheduler**.
-Pull live prices → validate → rebuild the dashboard → publish to all 4 users' `ph_task` rows.
+Pull live prices → validate → rebuild the dashboard → publish to all 6 users' `ph_task` rows.
 **No human, no MCP, no manual step.**
 
 ## Cadence
@@ -9,7 +9,7 @@ Pull live prices → validate → rebuild the dashboard → publish to all 4 use
 |---|---|---|
 | **Runs** | **Every Monday, 10:30** | Prices move daily (competitor repricing + manual changes); a week-old "Too high" flag is often wrong. Monday morning = fresh list for the week. **10:30 avoids the other jobs on this machine** — they share the same restricted `temp_user` account, whose pool intermittently returns *"too many clients"*: FRRC 09:00 (day 8) · ERA 09:30 (5th) · **EBPD 09:30 Monday** (same day as EPC). 10:30 leaves a full hour after EBPD even if it runs long. |
 | **Window** | **Live / current state** | This is a "what is mispriced right now" report — no reporting period, no settle buffer needed (unlike FRRC/ERA). |
-| **Publishes to** | `ph_task` ids **264 (Thinesh), 299 (Jarsini), 300 (kobiga), 301 (powsteena)** | Updated **in place** — same ids, same links; `version_level` bumps each run. |
+| **Publishes to** | `ph_task` ids **264 (Thinesh), 299 (Jarsini), 300 (kobiga), 301 (powsteena), 528 (Sharmilan), 529 (Sivajitha)** | Updated **in place** — same ids, same links; `version_level` bumps each run. 528/529 added 2026-07-31. |
 
 ## One-time setup (3 steps)
 
@@ -73,7 +73,7 @@ Start-ScheduledTask -TaskName "EPC_Weekly_Price_Checker"
   - any row with a **missing/non-positive eBay price** or no account
   - the dashboard **failing to render** (placeholder left, or < 1 MB)
   - **missing credentials**
-- **One transaction.** All 4 users are updated together; any error rolls the whole thing back.
+- **One transaction.** All 6 users are updated together; any error rolls the whole thing back.
 - **No credential in any tracked file.** Everything comes from `epc_secrets.bat`, which is git-ignored.
 - **Connection retries.** The `temp_user` pool intermittently returns *"too many clients"* — the runner
   retries 5× with backoff before giving up (and even then, publishes nothing).
@@ -102,7 +102,9 @@ AIOS KB: `all_list=1`, Amazon `_` suffix, `ENC`→`sku_original`, `<char>PK` pac
 [EPC]   updated Jarsini    -> id 299 (version 2)
 [EPC]   updated kobiga     -> id 300 (version 2)
 [EPC]   updated powsteena  -> id 301 (version 2)
-[EPC] published to ph_task for 4 users
+[EPC]   updated Sharmilan  -> id 528 (version 2)
+[EPC]   updated Sivajitha  -> id 529 (version 2)
+[EPC] published to ph_task for 6 users
 ```
 Row counts drift week to week — that is the point (the catalogue moved 130,336 → 130,850 within one day
 on 2026-07-16).

@@ -33,7 +33,7 @@ THRESHOLD, TOL_LO, TOL_HI = 20.0, 0.50, 1.00     # Q4/Q5
 PRIO_HIGH, PRIO_MED       = 5.00, 2.00           # Q6 bands (developer defaults, owner-confirmed)
 AMZ_SUB_SOURCE            = 8                    # Q3: 'amazon Ledsone'
 WEB_SUB_UK, WEB_SUB_DE    = 104, 108             # Shopify ledsone / ledsone-de
-ASSIGNED = ["Thinesh", "Jarsini", "kobiga", "powsteena"]
+ASSIGNED = ["Thinesh", "Jarsini", "kobiga", "powsteena", "Sharmilan", "Sivajitha"]
 MIN_ROWS = int(os.getenv("EPC_MIN_ROWS", "50000"))   # catastrophic-failure floor (expect ~126k)
 
 # (db_account, site) -> Thinesh's label.  Anything not here is NOT published.

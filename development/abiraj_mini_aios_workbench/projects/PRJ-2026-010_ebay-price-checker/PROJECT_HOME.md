@@ -88,20 +88,25 @@ Status: **CONFIRMED** in shape and rule. The target rule is the owner's CONFIRME
 - **F. FX** for the German (EUR) accounts — confirmed (Thinesh).
 - **G. Bundles** — bundle-pricing policy confirmed (Thinesh); the sum-of-components rule stands (~11%).
 
-## Live Publish — 4 users
+## Live Publish — 6 users
 **`tech_team_outputs.ph_task`** — published per-user, all `project_code=epc`,
-`assigned_user_team=ebay_priors`, `released`, each the same 17 MB version-3 dashboard (Export-CSV + taller
-table):
+`assigned_user_team=ebay_priors`, `released`, each carrying the identical ~18 MB dashboard (Export-CSV +
+taller table):
 
-| id | assigned_user | task_id |
-|---|---|---|
-| 264 | Thinesh | `epc_Thinesh_ebay_price_checker-V1` |
-| 299 | Jarsini | `epc_Jarsini_ebay_price_checker-V1` |
-| 300 | kobiga | `epc_kobiga_ebay_price_checker-V1` |
-| 301 | powsteena | `epc_powsteena_ebay_price_checker-V1` |
+| id | assigned_user | task_id | added |
+|---|---|---|---|
+| 264 | Thinesh | `epc_Thinesh_ebay_price_checker-V1` | 2026-07-16 |
+| 299 | Jarsini | `epc_Jarsini_ebay_price_checker-V1` | 2026-07-16 |
+| 300 | kobiga | `epc_kobiga_ebay_price_checker-V1` | 2026-07-16 |
+| 301 | powsteena | `epc_powsteena_ebay_price_checker-V1` | 2026-07-16 |
+| 528 | Sharmilan | `epc_Sharmilan_ebay_price_checker-V1` | 2026-07-31 |
+| 529 | Sivajitha | `epc_Sivajitha_ebay_price_checker-V1` | 2026-07-31 |
 
-Guarded `temp_user` INSERTs (names verified live against `staff.users`; `Jarsini` ≠ `Jasmini`),
-independently re-verified via the Postgres MCP (four `epc` rows, four users). Committed + pushed to git `main`.
+Guarded `temp_user` INSERTs. The first four were name-verified live and re-verified via the Postgres MCP.
+The last two (**Sharmilan, Sivajitha**, 2026-07-31) were verified against the exact spellings already in
+`ph_task.assigned_user` (each already receives other reports through this registry) and given a byte-identical
+copy of the live dashboard (18,393,533 B, md5-matched to id 264). All six now sit in the weekly runner's
+`ASSIGNED` list. Committed + pushed to git `main`.
 
 ## Status
 **REQ-12-D01 — DELIVERED · PUBLISHED (4 users) · SIGNED OFF — CLOSED 2026-07-16.** Technically GREEN (8/8

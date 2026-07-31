@@ -8,12 +8,13 @@ price** from the Amazon price (fallback: the website price), measure the drift a
 price, and return a **Status / Priority / Action** — an exception report of what's mispriced and which way.
 **Task:** REQ-12_ebay-price-checker. **Dev:** Abiraj. **Business Validator:** Thinesh.
 
-## ✅ Status — **REQ-12-D01 DELIVERED · PUBLISHED (4 users) · SIGNED OFF — CLOSED 2026-07-16**
+## ✅ Status — **REQ-12-D01 DELIVERED · PUBLISHED (6 users) · SIGNED OFF — CLOSED 2026-07-16**
 
 A populated read-only report over **126,070 live eBay UK & DE listings**, published per-user to
-`tech_team_outputs.ph_task` — **id 264 (Thinesh), 299 (Jarsini), 300 (kobiga), 301 (powsteena)**, all
-`project_code=epc`, `assigned_user_team=ebay_priors`, `released`, each the same 17 MB dashboard (with the
-Export-CSV button + taller table, version 3). Deliverables — the 13-column UI xlsx, the full-screen
+`tech_team_outputs.ph_task` — **id 264 (Thinesh), 299 (Jarsini), 300 (kobiga), 301 (powsteena)** at
+delivery, plus **528 (Sharmilan), 529 (Sivajitha)** added 2026-07-31 — all
+`project_code=epc`, `assigned_user_team=ebay_priors`, `released`, each carrying the identical dashboard
+(with the Export-CSV button + taller table). Deliverables — the 13-column UI xlsx, the full-screen
 dashboard, the decision sheet and the build scripts — in `evidence/final_outputs/REQ-12_ebay-price-checker/`.
 **Signed off 2026-07-16** by Thinesh (business), Sajeesan (technical / shipping / Q8 vocabulary) and
 Tamil Selvan (queryability). Data note: Status is computed on **item price only** (shipping basis accepted
@@ -24,7 +25,7 @@ at sign-off); a shipping-aware refresh, if scoped, is a future REQ-12-D02.
 
 ## 🔁 Weekly automation (built 2026-07-16) — `automation/`
 Runs unattended every **Monday 10:30** (Windows Task Scheduler), following the **PRJ-2026-011 (EBPD)**
-pattern: pull live prices from `ledsone` → validate → rebuild the dashboard → refresh all 4 `ph_task` rows
+pattern: pull live prices from `ledsone` → validate → rebuild the dashboard → refresh all 6 `ph_task` rows
 in place. **Fails closed** (a bad pull publishes nothing — the last good dashboard stays live), alerts on
 your Desktop if a run fails, and keeps no credential in any tracked file.
 Test safely: `run_epc_weekly.bat --dry-run` · Health: `check_status.bat` · Setup: `automation/AUTOMATION_README.md`.
@@ -92,6 +93,7 @@ All previously-open items were closed at sign-off:
 | `sql/REQ-12_.../d01_price_checker_pull.sql` | Canonical extraction query (read-only) |
 | `evidence/logs_or_screenshots/REQ-12_.../2026-07-16_source_audit_and_aios_rules_correction.md` | Source identification + the AIOS-rules correction + the shipping-blind caveat |
 | `evidence/logs_or_screenshots/REQ-12_.../2026-07-16_d01_delivery_and_publish_record.md` | Delivery + the 4-user `ph_task` publish (ids 264, 299–301) |
+| `evidence/logs_or_screenshots/REQ-12_.../2026-07-31_added_two_users.md` | Later fan-out to Sharmilan + Sivajitha (ids 528, 529) |
 | `DigitWeb_Works_Abiraj/16_07_2026/2026-07-16_abiraj_REQ-epc_REQ-12-D01.md` | Daily requirement / planning doc |
 
 ## Rules

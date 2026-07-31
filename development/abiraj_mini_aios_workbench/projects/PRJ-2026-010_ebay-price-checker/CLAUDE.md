@@ -59,7 +59,8 @@ match. Exact SKU only — never approximate/parent/ASIN** (owner FAIL conditions
 - **Q8 two new status values** (`PRICE_TOO_HIGH`, `PRICE_SOURCE_MISSING`) — decided (Sajeesan). Do not alter
   `staging_ai.pricing_safe_status_reason_catalog_v1` further without him.
 - **FX** for the German (EUR) accounts — confirmed (Thinesh).
-- Published to 4 users (`ph_task` ids 264, 299–301, `ebay_priors`, released); committed + pushed to `main`.
+- Published to 6 users (`ph_task` ids 264, 299–301 on 2026-07-16 + 528, 529 on 2026-07-31, `ebay_priors`,
+  released); the weekly runner's `ASSIGNED` list carries all six; committed + pushed to `main`.
 
 ## Locked Conventions (from the sources — reproduce, do not re-invent)
 - Grain: **one row per eBay listing SKU** (`item_id` + `sku`). eBay price is per-variant (this resolves the

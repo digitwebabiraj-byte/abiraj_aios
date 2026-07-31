@@ -6,7 +6,7 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 
 | Task ID | Deliverable | Source ref | Status | Evidence | Validation |
 |---|---|---|---|---|---|
-| REQ-12_ebay-price-checker | eBay Price Checker — cross-channel price-drift report over live eBay UK & DE listings across Thinesh's 13 accounts. Target = Amazon ×0.90 (lowest), else website ×1.10, else DATA MISSING; tolerance ±£0.50/£1.00 at the £20 band; priority by money-at-risk. **D01 report DELIVERED · PUBLISHED (4 users: ids 264, 299–301, released) · SIGNED OFF — CLOSED 2026-07-16.** | `Ebay System Task -Thinesh.xlsx` (13-col shape, legend, 7 **mock** rows) + the owner's **CONFIRMED BUSINESS RULE** + **Thinesh Q1–Q8** (both chat-captured). Task ID **minted with owner confirmation 2026-07-16** — the source carries no requirement id. | **D01 DELIVERED (read-only) 2026-07-16 — CLOSED.** `ph_task` ids **264, 299–301**. Technically GREEN (8/8 reconciled); all decisions + reviewer gates signed off 2026-07-16. | `evidence/final_outputs/REQ-12_.../` (UI xlsx · dashboard · decision sheet · scripts) + `sql/REQ-12_.../d01_price_checker_pull.sql` + `validation/REQ-12_.../2026-07-16_validation.md` | 8/8 DB reconciliation PASS; 0 formula errors; 0 blanks; dashboard KPIs = xlsx. Business + reviewer sign-off **complete 2026-07-16**. |
+| REQ-12_ebay-price-checker | eBay Price Checker — cross-channel price-drift report over live eBay UK & DE listings across Thinesh's 13 accounts. Target = Amazon ×0.90 (lowest), else website ×1.10, else DATA MISSING; tolerance ±£0.50/£1.00 at the £20 band; priority by money-at-risk. **D01 report DELIVERED · PUBLISHED (6 users: ids 264, 299–301 on 2026-07-16 + 528, 529 on 2026-07-31, released) · SIGNED OFF — CLOSED 2026-07-16.** | `Ebay System Task -Thinesh.xlsx` (13-col shape, legend, 7 **mock** rows) + the owner's **CONFIRMED BUSINESS RULE** + **Thinesh Q1–Q8** (both chat-captured). Task ID **minted with owner confirmation 2026-07-16** — the source carries no requirement id. | **D01 DELIVERED (read-only) 2026-07-16 — CLOSED.** `ph_task` ids **264, 299–301**. Technically GREEN (8/8 reconciled); all decisions + reviewer gates signed off 2026-07-16. | `evidence/final_outputs/REQ-12_.../` (UI xlsx · dashboard · decision sheet · scripts) + `sql/REQ-12_.../d01_price_checker_pull.sql` + `validation/REQ-12_.../2026-07-16_validation.md` | 8/8 DB reconciliation PASS; 0 formula errors; 0 blanks; dashboard KPIs = xlsx. Business + reviewer sign-off **complete 2026-07-16**. |
 
 ## REQ-12-D01 — deliverable detail (2026-07-16)
 - **Scope:** a populated read-only price-drift report over **126,070 live eBay UK & DE listings**, in three
@@ -17,12 +17,15 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 - **project_code `epc`** — minted with owner confirmation 2026-07-16; verified unused in `ph_task` before
   publish.
 - **Requirement doc:** `DigitWeb_Works_Abiraj/16_07_2026/2026-07-16_abiraj_REQ-epc_REQ-12-D01.md`.
-- **Published — 4 users** to `tech_team_outputs.ph_task`, all `project_code=epc`,
-  `assigned_user_team=ebay_priors`, `released`, each the same 17 MB version-3 dashboard (Export-CSV +
-  taller table): **id 264 (Thinesh), 299 (Jarsini), 300 (kobiga), 301 (powsteena)**. Guarded `temp_user`
-  INSERTs (dry-run + manual duplicate guard — no UNIQUE on `task_id` in live; names verified live against
-  `staff.users`, `Jarsini` ≠ `Jasmini`). Independently re-verified via the Postgres MCP (four `epc` rows).
-  Detail: `evidence/logs_or_screenshots/REQ-12_.../2026-07-16_d01_delivery_and_publish_record.md`.
+- **Published — 6 users** to `tech_team_outputs.ph_task`, all `project_code=epc`,
+  `assigned_user_team=ebay_priors`, `released`, each carrying the identical dashboard (Export-CSV +
+  taller table): **id 264 (Thinesh), 299 (Jarsini), 300 (kobiga), 301 (powsteena)** on 2026-07-16, plus
+  **528 (Sharmilan), 529 (Sivajitha)** on 2026-07-31. Guarded `temp_user` INSERTs (dry-run + manual
+  duplicate guard — no UNIQUE on `task_id` in live). The first four were name-verified live and re-verified
+  via the Postgres MCP; the last two against the exact `ph_task.assigned_user` spellings already in the
+  registry, given a byte-identical (md5-matched) copy of the live dashboard.
+  Detail: `evidence/logs_or_screenshots/REQ-12_.../2026-07-16_d01_delivery_and_publish_record.md` +
+  `.../2026-07-31_added_two_users.md`.
 
 ## Decisions — RESOLVED & SIGNED OFF 2026-07-16 (audit trail)
 - **Shipping basis** — signed off (Sajeesan / DB owner) on an item-price basis. ⚠ **Data note (true
@@ -57,7 +60,7 @@ Canonical index of tasks in this project. One requirement = one Task ID.
 ## Automation — WEEKLY AUTO-REFRESH BUILT 2026-07-16 (part of REQ-12, not a separate task)
 `automation/` — unattended weekly run via Windows Task Scheduler (**Monday 10:30**), following the
 **PRJ-2026-011 (EBPD)** pattern: pull live prices from `ledsone` → validate → rebuild the dashboard →
-guarded UPSERT of all 4 `ph_task` rows (264, 299–301) in place, `version_level` bumping each run.
+guarded UPSERT of all 6 `ph_task` rows (264, 299–301, 528, 529) in place, `version_level` bumping each run.
 Files: `epc_weekly_run.py` (runner) · `epc_build_html.py` (**single source of truth for the UI**) ·
 `run_epc_weekly.bat` · `register_scheduled_task.ps1` · `epc_secrets.template.bat` · `epc_alert.ps1`
 (desktop alert on failure, auto-clears on success) · `check_status.bat`. **Fails closed** — 0 rows, a
