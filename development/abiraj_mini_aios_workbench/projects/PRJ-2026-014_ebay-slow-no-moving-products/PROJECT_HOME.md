@@ -93,15 +93,19 @@ field-by-field to the live database. All ten PASS/FAIL rules in `TASK_REGISTER.m
 
 ## Published — REQ-16-D01 is LIVE
 
-**Published to `tech_team_outputs.ph_task` on 2026-07-22 for the `ebay_priors` audience**, one row
-per recipient as the established eBay convention requires:
+**Published to `tech_team_outputs.ph_task` for the `ebay_priors` audience** — one row per recipient.
+First published 2026-07-22 to the four then in scope; **Sharmilan and Sivajitha added 2026-07-31**
+on owner instruction (both already `ebay_priors` members receiving the other eBay reports, both
+verified live in `public."user"` before writing), bringing it to **all six**:
 
 | ph_task id | assigned_user | task_id | version |
 |---|---|---|---|
-| **411** | Thinesh | `esnm_Thinesh_ebay_slow_no_moving_products_2026-07` | v4 |
-| **412** | Jarsini | `esnm_Jarsini_…` | v4 |
-| **413** | kobiga | `esnm_kobiga_…` | v4 |
-| **414** | powsteena | `esnm_powsteena_…` | v4 |
+| **411** | Thinesh | `esnm_Thinesh_…` | v8 |
+| **412** | Jarsini | `esnm_Jarsini_…` | v8 |
+| **413** | kobiga | `esnm_kobiga_…` | v8 |
+| **414** | powsteena | `esnm_powsteena_…` | v8 |
+| **516** | Sharmilan | `esnm_Sharmilan_…` | v1 |
+| **517** | Sivajitha | `esnm_Sivajitha_…` | v1 |
 
 Publisher: `automation/publish_esnm_ph_task.py` — dry-run by default, artefact sanity guards, and
 SELECT-then-UPDATE because **there is no unique constraint on `task_id`** despite the sample DDL

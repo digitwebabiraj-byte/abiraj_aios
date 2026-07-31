@@ -167,3 +167,14 @@ F (actionability), G (Rule 8 threshold) all open · D02 and D03 not started.
   including a seeded 25-listing × ~15-field sample with 0 mismatches in ~375 comparisons.
 - 🔴 **OPEN — decision H: the anchor sits on a partial day.** Rebuilds drift (Rule 1 8,067→8,066,
   row count 11,156→11,176). Not yet fixed because it changes figures already published.
+
+### 2026-07-31 — two recipients added
+
+- ✅ **Sharmilan (user id 232) and Sivajitha (id 231) added to the ESNM publish** on owner
+  instruction. Both **already `ebay_priors` members** receiving the other eBay reports
+  (`eckr` / `eppr` / `dst`), so the ESNM report had been reaching only 4 of the audience's 6.
+  Both verified live in `public."user"` (Active, single exact match) **before** the write.
+- ph_task now **6 rows**: 411-414 (Thinesh/Jarsini/kobiga/powsteena, refreshed v7→v8) + **516
+  Sharmilan / 517 Sivajitha** (new, v1). All `ebay_priors`, same 3,171,867-byte artefact.
+- `RECIPIENTS` in `automation/publish_esnm_ph_task.py` updated, so the **monthly job also
+  publishes to all six** from now on.

@@ -8,7 +8,7 @@ unattended, once a month.
 | Task name | `ESNM_Monthly_Slow_No_Moving` |
 | Schedule | **2nd of every month, 09:45** |
 | Anchor | **last day of the previous calendar month** |
-| Audience | `ebay_priors` — Thinesh · Jarsini · kobiga · powsteena (ph_task 411-414) |
+| Audience | `ebay_priors` — Thinesh · Jarsini · kobiga · powsteena · Sharmilan · Sivajitha (ph_task 411-414, 516-517) |
 | Connection | direct psycopg2, **no MCP** (a Scheduled Task has no MCP session) |
 | Behaviour on failure | **fails closed** — previous report survives untouched, Desktop alert raised |
 
