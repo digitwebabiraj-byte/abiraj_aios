@@ -27,7 +27,7 @@ DB = dict(host=os.getenv("PGHOST","149.28.134.54"), port=os.getenv("PGPORT","543
 HTML_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
     "..","..","evidence","final_outputs","REQ-20_ebay-competitor-keyword-research","REQ-20-D01_ph_task.html")
 
-USERS = ["Thinesh","Jarsini","kobiga","powsteena"]      # ebay_priors team, exact staff.users.username casing
+USERS = ["Thinesh","Jarsini","kobiga","powsteena","Sharmilan","Sivajitha"]   # ebay_priors audience, exact staff.users.username casing
 
 PROJECT_NAME = ("eckr — eBay Competitor & Keyword Research (top-5 sold-proven eBay UK competitors "
                 "+ keyword sets per product across 9 categories) — LEDsONE analytics platform")
