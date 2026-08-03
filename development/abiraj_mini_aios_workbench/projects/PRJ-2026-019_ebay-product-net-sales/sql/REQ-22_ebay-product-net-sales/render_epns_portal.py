@@ -132,12 +132,18 @@ h1{font-family:var(--display);font-size:21px;font-weight:800;letter-spacing:-.5p
 .ctrls input{flex:1;min-width:200px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13.5px;outline:none}
 .ctrls input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,110,246,.14)}
 .cnt{font-size:12px;color:var(--muted);font-weight:700}
-.tw{max-height:74vh;overflow:auto}
-table{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px}
-thead th{position:sticky;top:0;z-index:2;background:linear-gradient(180deg,#eef4ff,#e7eeff);text-align:right;padding:10px 11px;font-size:10.5px;
- text-transform:uppercase;letter-spacing:.5px;color:#41527a;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:inset 0 -1px 0 rgba(59,110,246,.18)}
+.tw{max-height:74vh;overflow-y:auto;overflow-x:hidden}
+table{border-collapse:separate;border-spacing:0;width:100%;table-layout:fixed;font-size:11.5px}
+thead th{position:sticky;top:0;z-index:2;background:linear-gradient(180deg,#eef4ff,#e7eeff);text-align:right;padding:8px 7px;font-size:9.5px;
+ text-transform:uppercase;letter-spacing:.3px;color:#41527a;font-weight:800;white-space:normal;line-height:1.2;cursor:pointer;box-shadow:inset 0 -1px 0 rgba(59,110,246,.18)}
 thead th.l{text-align:left}
-tbody td{padding:8px 11px;text-align:right;border-bottom:1px solid #eef3fa;white-space:nowrap}
+/* fixed-layout widths so all 15 columns fit the container (no horizontal scroll) */
+th:nth-child(1){width:6%}   /* Date */
+th:nth-child(2){width:8%}   /* Order ID */
+th:nth-child(3){width:12%}  /* SKU */
+th:nth-child(4){width:8%}   /* Account */
+th:nth-child(5){width:5%}   /* Market */
+tbody td{padding:6px 7px;text-align:right;border-bottom:1px solid #eef3fa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 tbody td.l{text-align:left}
 tbody tr:nth-child(even) td{background:rgba(244,248,255,.5)}
 tbody tr:hover td{background:linear-gradient(90deg,rgba(59,110,246,.09),rgba(124,92,255,.05))}
@@ -145,7 +151,7 @@ tbody tr:hover td{background:linear-gradient(90deg,rgba(59,110,246,.09),rgba(124
 .net{font-weight:800;color:#0e9257}
 .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:800}
 .pill.uk{background:linear-gradient(135deg,#e7efff,#dbe8ff);color:#2b5bd7}.pill.de{background:linear-gradient(135deg,#fff0e4,#ffe6d3);color:#c9631d}.pill.us{background:linear-gradient(135deg,#e6faf0,#d6f6e5);color:#0e9257}.pill.other{background:#eef1f6;color:#5b6b82}
-.sku{color:var(--muted);max-width:250px;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:bottom}
+.sku{color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:bottom}
 .foot{color:var(--muted);font-size:10.5px;line-height:1.5;margin-top:12px}.foot b{color:var(--ink)}
 </style></head>
 <body><div class="wrap">
