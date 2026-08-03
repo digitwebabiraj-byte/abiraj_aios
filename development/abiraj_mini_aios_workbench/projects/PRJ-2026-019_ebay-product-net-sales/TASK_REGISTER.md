@@ -35,7 +35,7 @@ JS (search/sort) is progressive enhancement only. Rows verified: v2, `has_static
 - **Settled-only** — includes an order only once eBay books its fees (settlement lag); adds a `Fees Settled` column. Fixes the fee-deviation vs eBay on recent orders. ~4,072 settled orders.
 - **Product Cost** now the EPPR 20%-of-price proxy (was NO DATA) → adds `Net Profit [est]`.
 - Dashboard table shows all 12 source columns incl. Promotion + Postage (were initially missing).
-| REQ-22 | *(future)* | Scheduled refresh (automation), if requested after sign-off. | ⚪ Not requested. |
+| REQ-22 | **REQ-22-D04** | Scheduled weekly refresh (automation) — build → render → guarded ph_task publish, fail-closed. | ✅ **AUTOMATED · LIVE · PROVEN 2026-08-03.** Windows task **`EPNS_Weekly_Net_Sales`**, **every Wednesday 11:30** (free slot, clear of the fleet's 09:00–11:00). Fail-closed gates (row-floor 1,500 · collapse guard 60% · Desktop alert · status file), git-ignored secrets, live ledsone `169.58.91.229`. Proven: manual run OK + **Start-ScheduledTask → LastTaskResult 0** (4,072 rows). Sets `assigned_user_team='ebay_priors'`. See `automation/AUTOMATION_README.md`. |
 
 ## Source
 `evidence/source_documents/REQ-22_.../Kobiga task.xlsx` (SHA-256 in `SOURCE_MANIFEST.md`, imported 2026-08-03).
