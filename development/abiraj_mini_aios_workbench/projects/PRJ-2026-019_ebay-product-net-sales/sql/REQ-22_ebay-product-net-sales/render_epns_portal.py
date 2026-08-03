@@ -89,12 +89,21 @@ def render_portal(rows, out_path):
             else:
                 cls = {"fee":"mono fee","est":"mono est","net":"mono net","m":"mono"}[k]
                 cells.append('<td class="%s">%s</td>' % (cls, _money(v,cur)))
-        body.append("<tr>" + "".join(cells) + "</tr>")
+        body.append('<tr data-cur="%s" data-mkt="%s" data-acct="%s">%s</tr>' % (
+            _esc(cur), _esc(d.get("marketplace","")), _esc(d.get("account","")), "".join(cells)))
+
+    # filter dropdown options (distinct, sorted)
+    accts = sorted({(d.get("account") or "") for d in rows if d.get("account")})
+    mkts  = sorted({(d.get("marketplace") or "") for d in rows if d.get("marketplace")})
+    cur_opts  = "".join('<option value="%s">%s</option>' % (c, c) for c in order)
+    mkt_opts  = "".join('<option value="%s">%s</option>' % (_esc(m), _esc(m)) for m in mkts)
+    acct_opts = "".join('<option value="%s">%s</option>' % (_esc(a), _esc(a)) for a in accts)
 
     html = (TEMPLATE
             .replace("/*__FONTS__*/", _font_css())
             .replace("__ANCHOR__", anchor).replace("__NROWS__", str(len(rows)))
             .replace("<!--KPIS-->", "".join(kpis))
+            .replace("<!--CUROPTS-->", cur_opts).replace("<!--MKTOPTS-->", mkt_opts).replace("<!--ACCTOPTS-->", acct_opts)
             .replace("<!--HEAD-->", head).replace("<!--BODY-->", "".join(body)))
     with open(out_path, "w", encoding="utf-8") as fh:
         fh.write(html)
@@ -128,10 +137,13 @@ h1{font-family:var(--display);font-size:21px;font-weight:800;letter-spacing:-.5p
 .kpi .bar{height:6px;border-radius:6px;background:rgba(16,26,44,.07);margin-top:8px;overflow:hidden}.kpi .bar>i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--g1),var(--g2))}
 .kpi.gbp{--g1:#3b6ef6;--g2:#63b3ff}.kpi.eur{--g1:#7c5cff;--g2:#b07bff}.kpi.usd{--g1:#12b26b;--g2:#4fd68f}.kpi.other{--g1:#5b6b82;--g2:#93a2b8}
 .card{background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.8);border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(16,26,44,.05),0 22px 56px -26px rgba(16,26,44,.32)}
-.ctrls{padding:10px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fbfdff,#f6faff);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.ctrls input{flex:1;min-width:200px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13.5px;outline:none}
-.ctrls input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,110,246,.14)}
-.cnt{font-size:12px;color:var(--muted);font-weight:700}
+.ctrls{padding:10px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fbfdff,#f6faff);display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.ctrls input{flex:1;min-width:180px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13.5px;outline:none}
+.ctrls select{border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:13px;background:#fff;color:var(--ink);cursor:pointer;outline:none}
+.ctrls input:focus,.ctrls select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,110,246,.14)}
+.ctrls .clr{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
+.ctrls .clr:hover{border-color:var(--accent);color:var(--accent)}
+.cnt{font-size:12px;color:var(--muted);font-weight:700;margin-left:auto}
 .tw{max-height:74vh;overflow-y:auto;overflow-x:hidden}
 table{border-collapse:separate;border-spacing:0;width:100%;table-layout:fixed;font-size:11.5px}
 thead th{position:sticky;top:0;z-index:2;background:linear-gradient(180deg,#eef4ff,#e7eeff);text-align:right;padding:8px 7px;font-size:9.5px;
@@ -159,7 +171,14 @@ tbody tr:hover td{background:linear-gradient(90deg,rgba(59,110,246,.09),rgba(124
 <p class="lead"><span class="badge">SETTLED ONLY</span>Kobiga - REQ-22-D01 - last 30 days ending __ANCHOR__ - <b>__NROWS__</b> settled orders - ties to eBay (VAT-inclusive fees) - per marketplace currency, never blended.</p>
 <div class="kpis"><!--KPIS--></div>
 <div class="card">
- <div class="ctrls"><input id="q" type="search" placeholder="Search order ID, SKU or account..."><span class="cnt" id="cnt"></span></div>
+ <div class="ctrls">
+   <input id="q" type="search" placeholder="Search order ID, SKU or account...">
+   <select id="fcur" title="Currency"><option value="">All currencies</option><!--CUROPTS--></select>
+   <select id="fmkt" title="Marketplace"><option value="">All marketplaces</option><!--MKTOPTS--></select>
+   <select id="facct" title="Account"><option value="">All accounts</option><!--ACCTOPTS--></select>
+   <button class="clr" id="clr" type="button">Clear</button>
+   <span class="cnt" id="cnt"></span>
+ </div>
  <div class="tw"><table><thead><tr><!--HEAD--></tr></thead><tbody id="tb"><!--BODY--></tbody></table></div>
 </div>
 <div class="foot"><b>Net Sales (NNV)</b> = Gross - Final Value Fee - General (eBay net payout; ties to eBay "Total fees incl VAT").
@@ -167,13 +186,28 @@ tbody tr:hover td{background:linear-gradient(90deg,rgba(59,110,246,.09),rgba(124
 <b>VAT (20%)</b> and <b>Product Cost</b> (20% proxy) are estimates; <b>Net Profit-est</b> = NNV - VAT - Product Cost - PPC. Unsettled recent orders are excluded until eBay books their fees.</div>
 </div>
 <script>
-(function(){var tb=document.getElementById('tb'),q=document.getElementById('q'),cnt=document.getElementById('cnt');
-var rows=[].slice.call(tb.rows);function upd(){cnt.textContent=rows.filter(function(r){return r.style.display!=='none';}).length.toLocaleString()+' orders';}
-upd();
-q.addEventListener('input',function(){var s=q.value.toLowerCase();rows.forEach(function(r){r.style.display=r.textContent.toLowerCase().indexOf(s)>-1?'':'none';});upd();});
-var ths=document.querySelectorAll('thead th');ths.forEach(function(th,i){var dir=1;th.addEventListener('click',function(){dir*=-1;
- var num=!th.classList.contains('l');rows.slice().sort(function(a,b){var x=a.cells[i].textContent.replace(/[^0-9.\-]/g,''),y=b.cells[i].textContent.replace(/[^0-9.\-]/g,'');
- if(num){return ((parseFloat(x)||0)-(parseFloat(y)||0))*dir;}return a.cells[i].textContent<b.cells[i].textContent?-dir:dir;}).forEach(function(r){tb.appendChild(r);});});});
+(function(){
+ var tb=document.getElementById('tb'),q=document.getElementById('q'),cnt=document.getElementById('cnt');
+ var fcur=document.getElementById('fcur'),fmkt=document.getElementById('fmkt'),facct=document.getElementById('facct'),clr=document.getElementById('clr');
+ var rows=[].slice.call(tb.rows);
+ function upd(){cnt.textContent=rows.filter(function(r){return r.style.display!=='none';}).length.toLocaleString()+' orders';}
+ function apply(){
+   var s=q.value.toLowerCase(), cu=fcur.value, mk=fmkt.value, ac=facct.value;
+   rows.forEach(function(r){
+     var ok=(!s||r.textContent.toLowerCase().indexOf(s)>-1)
+       &&(!cu||r.getAttribute('data-cur')===cu)
+       &&(!mk||r.getAttribute('data-mkt')===mk)
+       &&(!ac||r.getAttribute('data-acct')===ac);
+     r.style.display=ok?'':'none';
+   });
+   upd();
+ }
+ q.addEventListener('input',apply); fcur.onchange=apply; fmkt.onchange=apply; facct.onchange=apply;
+ clr.onclick=function(){q.value='';fcur.value='';fmkt.value='';facct.value='';apply();};
+ upd();
+ var ths=document.querySelectorAll('thead th');ths.forEach(function(th,i){var dir=1;th.addEventListener('click',function(){dir*=-1;
+  var num=!th.classList.contains('l');rows.slice().sort(function(a,b){var x=a.cells[i].textContent.replace(/[^0-9.\-]/g,''),y=b.cells[i].textContent.replace(/[^0-9.\-]/g,'');
+  if(num){return ((parseFloat(x)||0)-(parseFloat(y)||0))*dir;}return a.cells[i].textContent<b.cells[i].textContent?-dir:dir;}).forEach(function(r){tb.appendChild(r);});});});
 })();
 </script>
 </body></html>
