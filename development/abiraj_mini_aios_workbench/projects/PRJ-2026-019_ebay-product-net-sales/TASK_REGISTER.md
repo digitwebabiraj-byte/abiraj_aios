@@ -5,9 +5,7 @@ Canonical index of tasks/deliverables within this project. Detail lives in `PROJ
 
 | Task | Deliverable | Description | Status |
 |---|---|---|---|
-| REQ-22 | **REQ-22-D01** | Per-order eBay **Net Sales (NNV)** report (Excel): Order ID · SKU · Account · Marketplace · Currency · Order Date · Gross Sales · VAT (20%, est) · Promotion · Final Value Fee · Product Cost (NO DATA) · Postage · PPC Cost · General · Net Sales (NNV), one row per eBay order, last 30 days, per marketplace currency. | ✅ **BUILT · DELIVERED 2026-08-03.** 4,432 orders from raw ledsone; reconciles to worked example (22.39) & eBay payout. Not yet published / committed / signed off. |
-| REQ-22 | **REQ-22-D02** | **Net Sales Lookup** tab — enter any single Order ID, return its Net Sales and full deduction breakdown (INDEX/MATCH). | ✅ **BUILT · DELIVERED 2026-08-03** (Tab 2 of the D01 workbook). |
-| REQ-22 | **REQ-22-D03** | **HTML dashboard** — self-contained modern light-theme UI (gradient/glass, embedded Sora/Manrope fonts), animated per-currency KPI tiles, searchable/sortable/filterable table (all 12 source columns), CSV export, full-screen. | ✅ **BUILT · DELIVERED 2026-08-03** (`REQ-22-D01_dashboard.html`, renderer `render_epns_dashboard.py`). Interactive JS version for local review; static no-JS portal version TBD if `ph_task` publish is approved. |
+| REQ-22 | **REQ-22-D01** | Per-order eBay **Net Sales (NNV)** report — one deliverable rendered several ways from one data layer: **(a)** Excel workbook, Tab 1 Net Sales (Order ID · SKU · Account · Marketplace · Currency · Date · Fees Settled · Gross · VAT 20% est · Promotion · Final Value Fee · Product Cost 20% est · Postage · PPC · General · Net Sales NNV · Net Profit est) + **Tab 2 Net Sales Lookup** (any Order ID → breakdown, INDEX/MATCH); **(b)** interactive HTML dashboard (gradient/glass, embedded Sora/Manrope fonts, per-currency KPIs, search/sort/filter, CSV, full-screen); **(c)** static no-JS portal HTML published to `ph_task`; **(d)** weekly scheduled auto-refresh. One row per settled eBay order, last 30 days, per marketplace currency. | ✅ **CLOSED — DELIVERED · PUBLISHED · AUTOMATED · SIGNED OFF (Kobiga) 2026-08-03.** 4,072 settled orders from live ledsone; NNV = Gross − FVF − General(AD_FEE) reconciles to the worked example (22.39) & eBay payout. Published to `ph_task` ids 594–599 (`ebay_priors`). Weekly auto-refresh `EPNS_Weekly_Net_Sales` (Wed 11:30, proven). Git `main` `91103b5`. |
 
 ## Publish record — ph_task (2026-08-03)
 Published the HTML dashboard to `tech_team_outputs.ph_task` (warehouse `order_management_copy`) for the
@@ -35,18 +33,16 @@ JS (search/sort) is progressive enhancement only. Rows verified: v2, `has_static
 - **Settled-only** — includes an order only once eBay books its fees (settlement lag); adds a `Fees Settled` column. Fixes the fee-deviation vs eBay on recent orders. ~4,072 settled orders.
 - **Product Cost** now the EPPR 20%-of-price proxy (was NO DATA) → adds `Net Profit [est]`.
 - Dashboard table shows all 12 source columns incl. Promotion + Postage (were initially missing).
-| REQ-22 | **REQ-22-D04** | Scheduled weekly refresh (automation) — build → render → guarded ph_task publish, fail-closed. | ✅ **AUTOMATED · LIVE · PROVEN 2026-08-03.** Windows task **`EPNS_Weekly_Net_Sales`**, **every Wednesday 11:30** (free slot, clear of the fleet's 09:00–11:00). Fail-closed gates (row-floor 1,500 · collapse guard 60% · Desktop alert · status file), git-ignored secrets, live ledsone `169.58.91.229`. Proven: manual run OK + **Start-ScheduledTask → LastTaskResult 0** (4,072 rows). Sets `assigned_user_team='ebay_priors'`. See `automation/AUTOMATION_README.md`. |
+- **Automation** (component of D01): Windows task **`EPNS_Weekly_Net_Sales`**, **every Wednesday 11:30** (free slot, clear of the fleet's 09:00–11:00). Fail-closed gates (row-floor 1,500 · collapse guard 60% · Desktop alert · status file), git-ignored secrets, live ledsone `169.58.91.229`. Proven: manual run OK + **Start-ScheduledTask → LastTaskResult 0** (4,072 rows). Sets `assigned_user_team='ebay_priors'`. See `automation/AUTOMATION_README.md`.
+- **Fee mapping (corrected):** General = `AD_FEE` (Promoted Listings General fee, per order); PPC = `PREMIUM_AD_FEES` (CPC, listing-allocated). NNV = Gross − FVF − General; premium ad spend → Net Profit.
 
 ## Source
 `evidence/source_documents/REQ-22_.../Kobiga task.xlsx` (SHA-256 in `SOURCE_MANIFEST.md`, imported 2026-08-03).
 
-## Open items
-- 🔴 **Product Cost source** — no per-SKU COGS in any DB (`sku_cogs` empty). Blocks column 8 and the
-  Net Sales value. Needs a cost basis from Kobiga or an explicit owner decision (`NO DATA` vs estimate).
-- 🟠 **Deduction set / grain confirmation** — the exact deductions, their sign, `Promotion %` vs amount,
-  the `General` bucket definition, and grain (order vs order-line vs SKU) must be confirmed with Kobiga.
-- 🟠 **Marketplace scope** — UK only vs UK+DE (drives currency handling).
-- Confirm IDs (Varmen): `PRJ-2026-019` / `REQ-22` / code `epns`.
-- Reviewer gates: Sajeesan (technical), Tamil Selvan (queryability), Kobiga (business).
-- Publish audience (`ph_task`, likely `ebay_priors`) not decided; no publish, no git commit yet.
-- Validation harness (`verify_epns_d01.py`) — TODO once built.
+## Open items (all non-blocking — task CLOSED & signed off)
+- Confirm IDs (Varmen): `PRJ-2026-019` / `REQ-22` / code `epns` (cosmetic).
+- Reviewer gates: Sajeesan (technical), Tamil Selvan (queryability).
+- Optional: supply a real COGS source to make Product Cost / Net Profit booked instead of estimated; write `verify_epns_d01.py`.
+
+## Sign-off
+✅ **Kobiga (Business Validator) — SIGNED OFF 2026-08-03.** See `closure/REQ-22_.../2026-08-03_closure_signoff.md`.

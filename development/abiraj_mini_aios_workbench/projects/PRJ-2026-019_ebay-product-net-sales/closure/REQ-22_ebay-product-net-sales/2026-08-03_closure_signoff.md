@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Project | `PRJ-2026-019_ebay-product-net-sales` · code `epns` |
-| Task | `REQ-22` · deliverables D01 (report) · D02 (lookup) · D03 (dashboard) · D04 (automation) |
+| Task | `REQ-22` · deliverable **REQ-22-D01** (the report — Excel 2-tab incl. Net Sales Lookup + interactive dashboard + static portal HTML + weekly automation are all components of D01) |
 | **Business sign-off** | ✅ **Kobiga — SIGNED OFF 2026-08-03** (requester / Business Validator) |
 | Status | ✅ **CLOSED — DELIVERED · PUBLISHED · AUTOMATED · SIGNED OFF** |
 | Git | `main` HEAD `e38dc7a` (pushed) |
