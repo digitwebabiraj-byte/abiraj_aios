@@ -40,7 +40,7 @@ JS (search/sort) is progressive enhancement only. Rows verified: v2, `has_static
 `evidence/source_documents/REQ-22_.../Kobiga task.xlsx` (SHA-256 in `SOURCE_MANIFEST.md`, imported 2026-08-03).
 
 ## Open items (all non-blocking — task CLOSED & signed off)
-- Confirm IDs (Varmen): `PRJ-2026-019` / `REQ-22` / code `epns` (cosmetic).
+- Confirm the provisional IDs: `PRJ-2026-019` / `REQ-22` / code `epns` (cosmetic).
 - Reviewer gates: Sajeesan (technical), Tamil Selvan (queryability).
 - Optional: supply a real COGS source to make Product Cost / Net Profit booked instead of estimated; write `verify_epns_d01.py`.
 

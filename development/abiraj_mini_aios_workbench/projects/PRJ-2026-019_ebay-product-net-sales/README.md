@@ -50,5 +50,5 @@ Gross Sales = `orders.total` (already net of promotion). Window = last 30 days e
 - `TASK_REGISTER.md` — task/deliverable index
 
 ## Next step
-Discovery: confirm scope/IDs with Varmen, resolve the **Product Cost** source with Kobiga, then read the
+Discovery: confirm scope/IDs (owner), resolve the **Product Cost** source with Kobiga, then read the
 AIOS knowledge base and map every column live against `ledsone` before building.
