@@ -21,6 +21,6 @@
   **Net Profit [est] = NNV − VAT − Product Cost − PPC**. These are estimates, not booked figures.
 
 ## Remaining (non-blocking)
-- Varmen to confirm the provisional `REQ-22` / `PRJ-2026-019` / `epns` identity.
+- Confirm the provisional `REQ-22` / `PRJ-2026-019` / `epns` identity.
 - Reviewer gates: Sajeesan (technical), Tamil Selvan (queryability).
 - Optional: supply a real COGS source to make Net Profit booked; write `verify_epns_d01.py`.
