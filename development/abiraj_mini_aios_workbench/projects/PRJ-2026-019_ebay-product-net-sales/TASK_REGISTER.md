@@ -22,7 +22,10 @@ Published the HTML dashboard to `tech_team_outputs.ph_task` (warehouse `order_ma
 | 598 | Sharmilan | epns_Sharmilan_ebay_product_net_sales | 1 (released) |
 | 599 | Sivajitha | epns_Sivajitha_ebay_product_net_sales | 1 (released) |
 
-Portal runs JS (verified: live `ebft`/`eckr` rows carry `<script>`), so the interactive dashboard was published as-is.
+**Updated to v2 (2026-08-03):** re-published the **static-first portal build** (`render_epns_portal.py` →
+`REQ-22-D01_ph_task.html`) — all KPI tiles and 4,072 rows are server-rendered into the HTML, so the report
+renders in the portal **even with no JavaScript** (the JS-only dashboard showed blank in the portal tile).
+JS (search/sort) is progressive enhancement only. Rows verified: v2, `has_static_table=True`, anchor row present.
 
 ## Build refinements (2026-08-03)
 - **Settled-only** — includes an order only once eBay books its fees (settlement lag); adds a `Fees Settled` column. Fixes the fee-deviation vs eBay on recent orders. ~4,072 settled orders.

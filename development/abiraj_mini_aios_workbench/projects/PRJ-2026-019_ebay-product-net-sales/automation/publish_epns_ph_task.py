@@ -72,7 +72,7 @@ def main():
                             VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,1,1,'released')""",
                             (PROJECT_NAME, PROJECT_CODE, TASK_NAME, tid, TEAM, DEVELOPER, user, html, DESCRIPTION))
         if COMMIT:
-            conn.commit(); print("\n✅ COMMITTED.")
+            conn.commit(); print("\nCOMMITTED.")
         else:
             conn.rollback(); print("\n(dry-run) rolled back — nothing written. Set EPNS_COMMIT=1 to publish.")
     except Exception as e:
