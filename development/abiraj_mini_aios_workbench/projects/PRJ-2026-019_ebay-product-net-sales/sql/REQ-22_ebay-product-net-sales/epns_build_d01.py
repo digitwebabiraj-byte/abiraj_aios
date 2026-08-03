@@ -39,27 +39,39 @@ WITH ebay_orders AS (
     AND o.order_date <  CURRENT_DATE                 -- anchor on last COMPLETE day
     AND o.status IN ('Completed','New','Inprogress') -- sales; excludes Cancelled/Refunded
 ),
+settled AS (   -- an order is settled once eBay has booked its SALE (fee) transactions
+  SELECT DISTINCT order_id FROM accounting.ebay_order_expenses
+  WHERE transaction_type = 'SALE' AND order_id IS NOT NULL AND order_id <> ''
+),
+eo AS (SELECT e.* FROM ebay_orders e JOIN settled s ON s.order_id = e.order_id),
 lines AS (
   SELECT oii.order_id AS oid,
          string_agg(DISTINCT COALESCE(NULLIF(oii.item_sku,''), oii.real_sku), ' | ') AS skus
   FROM order_management.order_item_info oii
   GROUP BY oii.order_id
 ),
-fees AS (   -- eBay fee stack, bucketed by fee_type (join by eBay order_id)
+-- fee buckets. Final Value Fee = SALE fees. General = AD_FEE (eBay "Promoted Listings General fee",
+-- per-order, exact). PPC = PREMIUM_AD_FEES (Advanced/Priority CPC ads) — billed per LISTING (no order_id),
+-- so allocated across each listing's settled orders in the window (even split; ties to the true total).
+fees AS (
   SELECT e.order_id AS oref,
-         SUM(e.fee) FILTER (WHERE e.transaction_type = 'SALE')                       AS fvf,
-         SUM(e.fee) FILTER (WHERE e.fee_type IN ('AD_FEE','PREMIUM_AD_FEES'))        AS ppc,
-         SUM(e.fee) FILTER (WHERE e.fee_type IN ('INSERTION_FEE','OTHER_FEES',
-              'SUBTITLE_FEE','INTERNATIONAL_LISTING_FEE','GALLERY_PLUS_FEE',
-              'PAYMENT_DISPUTE_FEE'))                                                AS gen
+         SUM(e.fee) FILTER (WHERE e.transaction_type = 'SALE') AS fvf,
+         SUM(e.fee) FILTER (WHERE e.fee_type = 'AD_FEE')       AS genr
   FROM accounting.ebay_order_expenses e
   WHERE e.order_id IS NOT NULL AND e.order_id <> ''
   GROUP BY e.order_id
 ),
-settled AS (   -- an order is settled once eBay has booked its SALE (fee) transactions
-  SELECT DISTINCT order_id FROM accounting.ebay_order_expenses
-  WHERE transaction_type = 'SALE' AND order_id IS NOT NULL AND order_id <> ''
-)
+ol AS (SELECT DISTINCT eo.id AS oid, eo.order_id, oii.item_id AS listing
+       FROM eo JOIN order_management.order_item_info oii ON oii.order_id = eo.id
+       WHERE oii.item_id IS NOT NULL),
+prem AS (SELECT item_id::text AS listing, SUM(fee) AS pf FROM accounting.ebay_order_expenses
+         WHERE transaction_date >= CURRENT_DATE - INTERVAL '30 days' AND fee_type = 'PREMIUM_AD_FEES'
+         GROUP BY item_id),
+lcount AS (SELECT listing, COUNT(DISTINCT order_id) AS c FROM ol GROUP BY listing),
+ppc AS (SELECT ol.order_id, SUM(COALESCE(prem.pf,0)/NULLIF(lcount.c,0)) AS ppc_fee
+        FROM ol LEFT JOIN prem ON prem.listing = ol.listing
+                LEFT JOIN lcount ON lcount.listing = ol.listing
+        GROUP BY ol.order_id)
 SELECT eo.order_id,
        l.skus AS sku,
        eo.account,
@@ -74,17 +86,19 @@ SELECT eo.order_id,
        ROUND(COALESCE(eo.discount,0),2)                          AS promotion,
        ROUND(COALESCE(f.fvf,0),2)                                AS final_value_fee,
        ROUND(COALESCE(eo.shipping_cost,0),2)                     AS postage,
-       ROUND(COALESCE(f.ppc,0),2)                                AS ppc_cost,
-       ROUND(COALESCE(f.gen,0),2)                                AS general,
+       ROUND(COALESCE(p.ppc_fee,0),2)                            AS ppc_cost,         -- PREMIUM_AD_FEES (listing-allocated)
+       ROUND(COALESCE(f.genr,0),2)                               AS general,          -- AD_FEE (Promoted Listings General fee)
        ROUND(eo.total * 0.20, 2)                                 AS product_cost,     -- ESTIMATE (EPPR 20% proxy)
-       ROUND(eo.total - COALESCE(f.fvf,0) - COALESCE(f.ppc,0) - COALESCE(f.gen,0), 2)
-                                                                 AS net_sales_nnv,
-       ROUND((eo.total - COALESCE(f.fvf,0) - COALESCE(f.ppc,0) - COALESCE(f.gen,0))
-             - (eo.total - eo.total/1.2) - (eo.total * 0.20), 2) AS net_profit_est    -- ESTIMATE
-FROM ebay_orders eo
-JOIN settled s ON s.order_id = eo.order_id          -- SETTLED ONLY: fees booked, ties to eBay
+       -- NNV = eBay net payout = Gross - Final Value Fee - General(AD_FEE). Ties to eBay's per-order
+       -- payout and the source anchor (22.39). PPC (premium/CPC) is account-level, so it is NOT in NNV;
+       -- it is carried into Net Profit instead.
+       ROUND(eo.total - COALESCE(f.fvf,0) - COALESCE(f.genr,0), 2)  AS net_sales_nnv,
+       ROUND((eo.total - COALESCE(f.fvf,0) - COALESCE(f.genr,0))
+             - (eo.total - eo.total/1.2) - (eo.total * 0.20) - COALESCE(p.ppc_fee,0), 2) AS net_profit_est  -- ESTIMATE (incl PPC)
+FROM eo                                             -- eo = SETTLED orders only (fees booked, ties to eBay)
 LEFT JOIN lines l ON l.oid  = eo.id
 LEFT JOIN fees  f ON f.oref = eo.order_id
+LEFT JOIN ppc   p ON p.order_id = eo.order_id
 ORDER BY eo.order_date DESC, eo.order_id;
 """
 
