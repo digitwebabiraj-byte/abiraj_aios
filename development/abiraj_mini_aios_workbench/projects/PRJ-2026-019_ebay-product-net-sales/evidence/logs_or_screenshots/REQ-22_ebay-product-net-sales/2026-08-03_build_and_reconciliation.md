@@ -32,11 +32,15 @@ Workbook re-read with pandas reproduces these exactly.
 ## Column verdicts
 - **Sourced & reconciled:** Order ID, SKU, Account, Marketplace, Currency, Order Date, Gross Sales,
   Promotion, Final Value Fee, Postage, PPC Cost, General, Net Sales (NNV).
-- **VAT (20%)** — DERIVED estimate (`total − total/1.2`), shown for context, **not deducted from NNV**
-  (output VAT is remitted to HMRC separately).
-- **Product Cost** — 🔴 **NO DATA.** Swept every ledsone schema 2026-08-03: no per-SKU COGS anywhere
-  (`inventory` has no cost column; only `business_reports.amz_search_query_performance` median *market*
-  price exists, which is not our cost). Column ships literally `NO DATA`.
+- **VAT (20%)** — DERIVED estimate (`total − total/1.2`).
+- **Product Cost** — 🟠 **ESTIMATE = 20% of selling price (Gross).** No real per-SKU COGS exists anywhere
+  (swept 2026-08-03: `inventory` has no cost column; only `business_reports.amz_search_query_performance`
+  median *market* price, not our cost). Applied the **owner-agreed 20% proxy already used in EPPR/PRJ-2026-016**
+  (`eppr_build_d01.py` line 196: `cost_v = round(price_v*0.20, 2)`). Anchor: 26.38 × 0.20 = 5.28.
+- **Net Profit [est]** — DERIVED estimate = NNV − VAT − Product Cost (inherits both proxies). Anchor:
+  22.39 − 4.40 − 5.28 = **12.71**. GBP total est. net profit ≈ £24,877.82. Not a booked figure.
+- **Net Sales (NNV)** is unchanged (Gross − eBay fees = 22.39) — adding the cost estimate did not disturb the
+  figure that reconciles to eBay's payout.
 
 ## Ad-fee attribution notes
 - `AD_FEE` (CPC) carries `order_id` + `item_id` → per-order attributable.
