@@ -6,7 +6,24 @@ knowledge base first (source_id=2, VARCHAR casts). All figures below are from th
 ## Universe
 - eBay orders (`sub_source.source_id = 2`), `order_date` in the last 30 days ending the last complete
   day (`>= CURRENT_DATE-30 AND < CURRENT_DATE`), `status IN ('Completed','New','Inprogress')`.
-- **4,432 orders** (grain = one row per order; multi-line orders are 5.5% — SKUs concatenated with ` | `).
+- **SETTLED ONLY** — an order is included only once eBay has booked its SALE (fee) transactions
+  (`accounting.ebay_order_expenses.transaction_type='SALE'`). Grain = one row per order; multi-line
+  orders ~5.5% (SKUs concatenated with ` | `). `Fees Settled` column = Yes on every row.
+
+## ⚠ Fee-settlement lag (the reason for the settled-only rule)
+eBay books fees at **payout**, a few days after the sale. Very recent orders therefore have **no fee
+rows yet** and would read FVF £0 / PPC £0 / Net = Gross — deviating from eBay. At build time **356 of
+4,428 in-window orders (£5,950 gross) were unsettled**; they are **excluded** and reappear next run once
+eBay charges them. This is why a settled build (~4,072 orders) is smaller than the raw order count.
+
+**Verified against live eBay (item 164244350750, SKU PLTTBC+LSFT220BC+ICST64E2740):**
+- Unsettled order `17-14966-70561` (2026-08-02, Inprogress) — **0 fee rows in DB** → correctly excluded.
+- Settled order `16-14953-20378` (2026-07-30) — DB **FVF £4.05** = eBay "Total fees (incl VAT) £4.05";
+  DB **AD_FEE £3.23** = eBay Promoted Listings "£3.23"; **Net £19.61**. Matches the eBay fee screens exactly.
+
+> Note: eBay stores fees **VAT-inclusive** (the £4.05 already contains eBay's £0.68 fee-VAT). The report's
+> **Output VAT (20%)** column is a *different* number — the derived output VAT on the sale price — shown
+> for info only and **not** deducted from NNV.
 
 ## The decoded deduction stack (from order 02-14934-76138)
 | Component | Source | Value on anchor |

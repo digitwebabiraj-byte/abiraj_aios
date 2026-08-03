@@ -25,12 +25,19 @@ Gross Sales = `orders.total` (already net of promotion). Window = last 30 days e
 > derived estimate. **Net Profit [est] = NNV − VAT − Product Cost** — a derived estimate (inherits both
 > proxies), flagged on the sheet; not a booked figure. Replace the 20% with a real COGS source to make it booked.
 
-## Deliverable
-[REQ-22-D01_ebay_product_net_sales.xlsx](evidence/final_outputs/REQ-22_ebay-product-net-sales/REQ-22-D01_ebay_product_net_sales.xlsx)
-— **Tab 1 Net Sales** (12 source columns + Marketplace/Currency/Order Date, 4,432 orders) · **Tab 2 Net
-Sales Lookup** (enter any Order ID → its Net Sales + full breakdown via INDEX/MATCH). Builder:
-[epns_build_d01.py](sql/REQ-22_ebay-product-net-sales/epns_build_d01.py). Reconciliation:
-[evidence/logs_or_screenshots/…/2026-08-03_build_and_reconciliation.md](evidence/logs_or_screenshots/REQ-22_ebay-product-net-sales/2026-08-03_build_and_reconciliation.md).
+## Deliverables
+- **Excel:** [REQ-22-D01_ebay_product_net_sales.xlsx](evidence/final_outputs/REQ-22_ebay-product-net-sales/REQ-22-D01_ebay_product_net_sales.xlsx)
+  — **Tab 1 Net Sales** (all 12 source columns + Marketplace/Currency/Order Date/Fees-Settled/Net Profit) · **Tab 2 Net
+  Sales Lookup** (enter any Order ID → its Net Sales + breakdown via INDEX/MATCH). **Settled-only ≈4,072 orders.**
+- **HTML dashboard:** [REQ-22-D01_dashboard.html](evidence/final_outputs/REQ-22_ebay-product-net-sales/REQ-22-D01_dashboard.html)
+  — self-contained modern light-theme UI (embedded Sora/Manrope fonts, gradient/glass design), animated per-currency
+  KPI tiles, searchable/sortable/filterable table (all 12 source columns), CSV export, full-screen. Runs JS (local review).
+- **Builder:** [epns_build_d01.py](sql/REQ-22_ebay-product-net-sales/epns_build_d01.py) · **Dashboard renderer:**
+  [render_epns_dashboard.py](sql/REQ-22_ebay-product-net-sales/render_epns_dashboard.py) (+ `epns_fonts.css`, embedded).
+- **Reconciliation:** [2026-08-03_build_and_reconciliation.md](evidence/logs_or_screenshots/REQ-22_ebay-product-net-sales/2026-08-03_build_and_reconciliation.md).
+
+> **Settled-only rule:** an order appears only once eBay has booked its fees (settlement lags the sale a few days),
+> so every figure ties to eBay's VAT-inclusive fee totals. Very recent/unsettled orders are excluded until next run.
 
 ## Authoritative documents
 - `PROJECT_HOME.md` — canonical project truth
