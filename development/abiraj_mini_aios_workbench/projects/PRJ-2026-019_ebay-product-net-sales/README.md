@@ -10,6 +10,10 @@ Final Value Fee, Product Cost, Postage, PPC Cost, General — resolving to **Net
 **Net Sales Lookup** tab to look up any single Order ID.
 
 ## Status
+✅ **CLOSED — DELIVERED · PUBLISHED · AUTOMATED · SIGNED OFF (Kobiga) 2026-08-03.** Weekly auto-refresh
+(`EPNS_Weekly_Net_Sales`, Wed 11:30). Published to `ph_task` ids 594–599 (ebay_priors). Git `main` `e38dc7a`.
+
+Original delivery note:
 ✅ **BUILT · DELIVERED (2026-08-03).** Built from the **raw ledsone** DB (read-only), **4,432 eBay orders**
 over the last 30 days. Reconciles to the penny to the source worked example (order `02-14934-76138` →
 Net **22.39**) and to eBay's own payout (`ebay_order_expenses` SALE `transaction_amount`). **Not yet

@@ -5,7 +5,7 @@
 | **Project ID** | `PRJ-2026-019_ebay-product-net-sales` |
 | **Project code** | `epns` *(provisional — pending Varmen)* |
 | **Task ID** | `REQ-22_ebay-product-net-sales` *(provisional — REQ-21 = `bsdt`)* |
-| **Status** | 🟡 **ONBOARDED — DISCOVERY · BUILD PENDING.** Requirement captured from `Kobiga task.xlsx` (imported 2026-08-03). Structure scaffolded. Not built / not published / not committed / not signed off. |
+| **Status** | ✅ **CLOSED — DELIVERED · PUBLISHED · AUTOMATED · SIGNED OFF (Kobiga) 2026-08-03.** Settled-only 4,072 orders from live ledsone; NNV = Gross − FVF − General(AD_FEE) ties to eBay payout (anchor 22.39). Published `ph_task` ids 594–599 (ebay_priors). Weekly auto-refresh `EPNS_Weekly_Net_Sales` (Wed 11:30, proven). Git `main` `e38dc7a`. Cosmetic-open: Varmen ID confirmation. See `closure/REQ-22_.../2026-08-03_closure_signoff.md`. |
 | **Opened** | 2026-08-03 |
 | **Owner** | Abiraj · **Coordinator** Varmen · **Tech** Sajeesan · **Queryability** Tamil Selvan |
 | **Business Validator** | **Kobiga** (requester / PH). Likely publish audience = `ebay_priors` (kobiga is a member) — to confirm. |
