@@ -1,5 +1,5 @@
 {
- "anchor": "2026-07-27",
+ "anchor": "2026-08-02",
  "thresholds": {
   "stock_floor": 5,
   "acos_ceiling": 40.0,
@@ -10,21 +10,21 @@
   "prio_med": 15.0
  },
  "kpis": {
-  "scope": 45,
-  "paused": 7,
-  "high": 7,
-  "med": 0,
+  "scope": 46,
+  "paused": 12,
+  "high": 11,
+  "med": 1,
   "low": 0,
-  "stock": 5,
-  "r1": 2,
+  "stock": 9,
+  "r1": 3,
   "r2": 0,
-  "running": 23,
-  "off": 15,
-  "spend_at_risk": 779.54,
-  "spend_all": 3400.92,
-  "listings": 1538,
-  "oos_listings": 6,
-  "nodata_listings": 216
+  "running": 22,
+  "off": 12,
+  "spend_at_risk": 968.01,
+  "spend_all": 3235.68,
+  "listings": 1477,
+  "oos_listings": 19,
+  "nodata_listings": 136
  },
  "rows": [
   {
@@ -32,20 +32,20 @@
    "campaign": "JD | Target Mixed | New | ST | smart",
    "type": "Smart",
    "status": "RUNNING",
-   "listings": 24,
-   "no_stock_data": 4,
+   "listings": 23,
+   "no_stock_data": 1,
    "out_of_stock": 1,
    "low_stock": 0,
-   "spend30": 136.49,
-   "sales30": 704.51,
-   "ord30": 49.0,
-   "spend7": 33.21,
-   "sales7": 102.49,
-   "ord14": 24.0,
-   "clicks14": 308.0,
-   "spend14": 66.84,
-   "acos30": 19.37374913060141,
-   "acos7": 32.40316128402772,
+   "spend30": 137.61,
+   "sales30": 636.99,
+   "ord30": 44.0,
+   "spend7": 26.91,
+   "sales7": 75.64,
+   "ord14": 11.0,
+   "clicks14": 278.0,
+   "spend14": 60.5,
+   "acos30": 21.603164884849058,
+   "acos7": 35.57641459545214,
    "outcome": "PAUSED",
    "rule": "Stock",
    "priority": "High",
@@ -58,30 +58,30 @@
     [
      "Stock rule — advertised listings that are out of stock",
      true,
-     "1 of 24 listings at 0 units"
+     "1 of 23 listings at 0 units"
     ]
    ],
-   "reason": "1 of the 24 listings this campaign advertises is out of stock (0 units). Ads are paused so spend does not keep running on items that cannot be bought."
+   "reason": "1 of the 23 listings this campaign advertises is out of stock (0 units). Ads are paused so spend does not keep running on items that cannot be bought."
   },
   {
    "campaign_id": "155338191012",
    "campaign": "JD | PH | BULB | TUWA | MANUAL",
    "type": "Manual",
    "status": "RUNNING",
-   "listings": 69,
-   "no_stock_data": 3,
+   "listings": 67,
+   "no_stock_data": 0,
    "out_of_stock": 1,
    "low_stock": 0,
-   "spend30": 130.66,
-   "sales30": 403.33,
-   "ord30": 46.0,
-   "spend7": 23.86,
-   "sales7": 33.53,
-   "ord14": 7.0,
-   "clicks14": 230.0,
-   "spend14": 52.17,
-   "acos30": 32.395309052140924,
-   "acos7": 71.1601550849985,
+   "spend30": 122.36,
+   "sales30": 432.94,
+   "ord30": 44.0,
+   "spend7": 24.09,
+   "sales7": 94.1,
+   "ord14": 8.0,
+   "clicks14": 220.0,
+   "spend14": 48.48,
+   "acos30": 28.26257680048044,
+   "acos7": 25.600425079702443,
    "outcome": "PAUSED",
    "rule": "Stock",
    "priority": "High",
@@ -94,33 +94,438 @@
     [
      "Stock rule — advertised listings that are out of stock",
      true,
-     "1 of 69 listings at 0 units"
+     "1 of 67 listings at 0 units"
     ]
    ],
-   "reason": "1 of the 69 listings this campaign advertises is out of stock (0 units). Ads are paused so spend does not keep running on items that cannot be bought."
+   "reason": "1 of the 67 listings this campaign advertises is out of stock (0 units). Ads are paused so spend does not keep running on items that cannot be bought."
+  },
+  {
+   "campaign_id": "164421244012",
+   "campaign": "JD | PH | 3 head pendant light | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 49,
+   "no_stock_data": 1,
+   "out_of_stock": 1,
+   "low_stock": 0,
+   "spend30": 94.25,
+   "sales30": 231.34,
+   "ord30": 6.0,
+   "spend7": 22.14,
+   "sales7": 37.89,
+   "ord14": 3.0,
+   "clicks14": 255.0,
+   "spend14": 44.41,
+   "acos30": 40.740900838592545,
+   "acos7": 58.43230403800476,
+   "outcome": "PAUSED",
+   "rule": "Stock",
+   "priority": "High",
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     true,
+     "1 of 49 listings at 0 units"
+    ]
+   ],
+   "reason": "1 of the 49 listings this campaign advertises is out of stock (0 units). Ads are paused so spend does not keep running on items that cannot be bought."
+  },
+  {
+   "campaign_id": "144201913012",
+   "campaign": "JD | Without general | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 20,
+   "no_stock_data": 0,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 91.65,
+   "sales30": 207.44,
+   "ord30": 20.0,
+   "spend7": 25.81,
+   "sales7": 40.25,
+   "ord14": 9.0,
+   "clicks14": 175.0,
+   "spend14": 40.02,
+   "acos30": 44.18145005784805,
+   "acos7": 64.12422360248446,
+   "outcome": "PAUSED",
+   "rule": "Rule 1",
+   "priority": "High",
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 20 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "20 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     true,
+     "30D ACOS 44.2%"
+    ],
+    [
+     "Do-not-pause — 7D ACOS < 20% (improving trend)",
+     false,
+     "7D ACOS 64.1%"
+    ]
+   ],
+   "reason": "30-day ACOS is 44.2%, over the 40% ceiling. The last 7 days are still at 64.1% ACOS — not below the 20% needed to count as an improving trend, so the campaign is paused."
+  },
+  {
+   "campaign_id": "163193938012",
+   "campaign": "JD | Ceiling Lights | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 72,
+   "no_stock_data": 11,
+   "out_of_stock": 4,
+   "low_stock": 0,
+   "spend30": 90.05,
+   "sales30": 251.96,
+   "ord30": 17.0,
+   "spend7": 20.78,
+   "sales7": 81.47,
+   "ord14": 14.0,
+   "clicks14": 249.0,
+   "spend14": 40.01,
+   "acos30": 35.739799968248924,
+   "acos7": 25.506321345280476,
+   "outcome": "PAUSED",
+   "rule": "Stock",
+   "priority": "High",
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     true,
+     "4 of 72 listings at 0 units"
+    ]
+   ],
+   "reason": "4 of the 72 listings this campaign advertises are out of stock (0 units). Ads are paused so spend does not keep running on items that cannot be bought."
+  },
+  {
+   "campaign_id": "28863477012",
+   "campaign": "JD | stock clearance products | Smart",
+   "type": "Smart",
+   "status": "RUNNING",
+   "listings": 34,
+   "no_stock_data": 1,
+   "out_of_stock": 1,
+   "low_stock": 0,
+   "spend30": 88.07,
+   "sales30": 434.79,
+   "ord30": 28.0,
+   "spend7": 22.07,
+   "sales7": 101.63,
+   "ord14": 19.0,
+   "clicks14": 183.0,
+   "spend14": 36.83,
+   "acos30": 20.255755652153912,
+   "acos7": 21.71602873167372,
+   "outcome": "PAUSED",
+   "rule": "Stock",
+   "priority": "High",
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     true,
+     "1 of 34 listings at 0 units"
+    ]
+   ],
+   "reason": "1 of the 34 listings this campaign advertises is out of stock (0 units). Ads are paused so spend does not keep running on items that cannot be bought."
+  },
+  {
+   "campaign_id": "164195009012",
+   "campaign": "JD | Wall lights | New | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 103,
+   "no_stock_data": 14,
+   "out_of_stock": 3,
+   "low_stock": 0,
+   "spend30": 86.69,
+   "sales30": 431.54,
+   "ord30": 30.0,
+   "spend7": 20.73,
+   "sales7": 225.07,
+   "ord14": 19.0,
+   "clicks14": 242.0,
+   "spend14": 37.74,
+   "acos30": 20.088520183528754,
+   "acos7": 9.210467854445284,
+   "outcome": "PAUSED",
+   "rule": "Stock",
+   "priority": "High",
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     true,
+     "3 of 103 listings at 0 units"
+    ]
+   ],
+   "reason": "3 of the 103 listings this campaign advertises are out of stock (0 units). Ads are paused so spend does not keep running on items that cannot be bought."
+  },
+  {
+   "campaign_id": "22831214012",
+   "campaign": "JD | Target product | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 56,
+   "no_stock_data": 11,
+   "out_of_stock": 1,
+   "low_stock": 0,
+   "spend30": 77.41,
+   "sales30": 297.92,
+   "ord30": 28.0,
+   "spend7": 22.83,
+   "sales7": 56.44,
+   "ord14": 6.0,
+   "clicks14": 120.0,
+   "spend14": 26.37,
+   "acos30": 25.983485499462937,
+   "acos7": 40.45003543586109,
+   "outcome": "PAUSED",
+   "rule": "Stock",
+   "priority": "High",
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     true,
+     "1 of 56 listings at 0 units"
+    ]
+   ],
+   "reason": "1 of the 56 listings this campaign advertises is out of stock (0 units). Ads are paused so spend does not keep running on items that cannot be bought."
+  },
+  {
+   "campaign_id": "26896653012",
+   "campaign": "JD | PH | Flush light | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 40,
+   "no_stock_data": 7,
+   "out_of_stock": 2,
+   "low_stock": 0,
+   "spend30": 71.2,
+   "sales30": 209.73,
+   "ord30": 20.0,
+   "spend7": 12.9,
+   "sales7": 73.05,
+   "ord14": 5.0,
+   "clicks14": 130.0,
+   "spend14": 22.9,
+   "acos30": 33.94840986029657,
+   "acos7": 17.659137577002053,
+   "outcome": "PAUSED",
+   "rule": "Stock",
+   "priority": "High",
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     true,
+     "2 of 40 listings at 0 units"
+    ]
+   ],
+   "reason": "2 of the 40 listings this campaign advertises are out of stock (0 units). Ads are paused so spend does not keep running on items that cannot be bought."
+  },
+  {
+   "campaign_id": "129690966012",
+   "campaign": "JD | PH | Lampshade  | Utharsika | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 58,
+   "no_stock_data": 8,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 64.77,
+   "sales30": 114.82,
+   "ord30": 10.0,
+   "spend7": 11.83,
+   "sales7": 30.87,
+   "ord14": 3.0,
+   "clicks14": 86.0,
+   "spend14": 13.8,
+   "acos30": 56.410033095279566,
+   "acos7": 38.321995464852606,
+   "outcome": "PAUSED",
+   "rule": "Rule 1",
+   "priority": "High",
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 58 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "10 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     true,
+     "30D ACOS 56.4%"
+    ],
+    [
+     "Do-not-pause — 7D ACOS < 20% (improving trend)",
+     false,
+     "7D ACOS 38.3%"
+    ]
+   ],
+   "reason": "30-day ACOS is 56.4%, over the 40% ceiling. The last 7 days are still at 38.3% ACOS — not below the 20% needed to count as an improving trend, so the campaign is paused."
+  },
+  {
+   "campaign_id": "85734687012",
+   "campaign": "JD | Mixed Product | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 65,
+   "no_stock_data": 4,
+   "out_of_stock": 1,
+   "low_stock": 1,
+   "spend30": 28.79,
+   "sales30": 56.65,
+   "ord30": 2.0,
+   "spend7": 8.62,
+   "sales7": 0.0,
+   "ord14": 0.0,
+   "clicks14": 52.0,
+   "spend14": 8.62,
+   "acos30": 50.82082965578111,
+   "acos7": null,
+   "outcome": "PAUSED",
+   "rule": "Stock",
+   "priority": "High",
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     true,
+     "1 of 65 listings at 0 units"
+    ]
+   ],
+   "reason": "1 of the 65 listings this campaign advertises is out of stock (0 units). Ads are paused so spend does not keep running on items that cannot be bought."
+  },
+  {
+   "campaign_id": "165612935012",
+   "campaign": "AH- 30/07/2026, 10:27",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 18,
+   "no_stock_data": 0,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 15.16,
+   "sales30": 19.89,
+   "ord30": 1.0,
+   "spend7": 15.16,
+   "sales7": 19.89,
+   "ord14": 1.0,
+   "clicks14": 86.0,
+   "spend14": 15.16,
+   "acos30": 76.21920563097034,
+   "acos7": 76.21920563097034,
+   "outcome": "PAUSED",
+   "rule": "Rule 1",
+   "priority": "Medium",
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 18 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "1 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     true,
+     "30D ACOS 76.2%"
+    ],
+    [
+     "Do-not-pause — 7D ACOS < 20% (improving trend)",
+     false,
+     "7D ACOS 76.2%"
+    ]
+   ],
+   "reason": "30-day ACOS is 76.2%, over the 40% ceiling. The last 7 days are still at 76.2% ACOS — not below the 20% needed to count as an improving trend, so the campaign is paused."
   },
   {
    "campaign_id": "34199100012",
    "campaign": "JD | PH | PSU 4 types | Transformer | Manual",
    "type": "Manual",
    "status": "RUNNING",
-   "listings": 15,
+   "listings": 14,
    "no_stock_data": 1,
-   "out_of_stock": 1,
+   "out_of_stock": 0,
    "low_stock": 0,
-   "spend30": 130.34,
-   "sales30": 596.59,
-   "ord30": 39.0,
-   "spend7": 25.06,
-   "sales7": 144.06,
-   "ord14": 21.0,
-   "clicks14": 254.0,
-   "spend14": 52.44,
-   "acos30": 21.847499958095174,
-   "acos7": 17.395529640427597,
-   "outcome": "PAUSED",
-   "rule": "Stock",
-   "priority": "High",
+   "spend30": 125.68,
+   "sales30": 557.21,
+   "ord30": 37.0,
+   "spend7": 26.77,
+   "sales7": 136.5,
+   "ord14": 19.0,
+   "clicks14": 234.0,
+   "spend14": 52.11,
+   "acos30": 22.555230523501013,
+   "acos7": 19.61172161172161,
+   "outcome": "RUNNING",
+   "rule": "—",
+   "priority": null,
    "trace": [
     [
      "State check — campaign is live",
@@ -129,11 +534,26 @@
     ],
     [
      "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 14 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
      true,
-     "1 of 15 listings at 0 units"
+     "37 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     false,
+     "30D ACOS 22.6%"
+    ],
+    [
+     "Rule 2 scope — 14D orders = 0",
+     false,
+     "19 orders in 14D"
     ]
    ],
-   "reason": "1 of the 15 listings this campaign advertises is out of stock (0 units). Ads are paused so spend does not keep running on items that cannot be bought."
+   "reason": "No rule matched — the campaign keeps running."
   },
   {
    "campaign_id": "14841895012",
@@ -144,19 +564,19 @@
    "no_stock_data": 0,
    "out_of_stock": 0,
    "low_stock": 0,
-   "spend30": 121.71,
-   "sales30": 268.3,
-   "ord30": 40.0,
-   "spend7": 18.16,
-   "sales7": 55.7,
-   "ord14": 24.0,
-   "clicks14": 339.0,
-   "spend14": 50.92,
-   "acos30": 45.363399180022355,
-   "acos7": 32.6032315978456,
-   "outcome": "PAUSED",
-   "rule": "Rule 1",
-   "priority": "High",
+   "spend30": 123.5,
+   "sales30": 309.37,
+   "ord30": 47.0,
+   "spend7": 33.87,
+   "sales7": 125.1,
+   "ord14": 29.0,
+   "clicks14": 346.0,
+   "spend14": 51.29,
+   "acos30": 39.919837088276175,
+   "acos7": 27.074340527577938,
+   "outcome": "RUNNING",
+   "rule": "—",
+   "priority": null,
    "trace": [
     [
      "State check — campaign is live",
@@ -171,143 +591,20 @@
     [
      "Rule 1 scope — 30D orders > 0",
      true,
-     "40 orders in 30D"
+     "47 orders in 30D"
     ],
     [
      "Condition — 30D ACOS ≥ 40%",
-     true,
-     "30D ACOS 45.4%"
-    ],
-    [
-     "Do-not-pause — 7D ACOS < 20% (improving trend)",
      false,
-     "7D ACOS 32.6%"
-    ]
-   ],
-   "reason": "30-day ACOS is 45.4%, over the 40% ceiling. The last 7 days are still at 32.6% ACOS — not below the 20% needed to count as an improving trend, so the campaign is paused."
-  },
-  {
-   "campaign_id": "164421244012",
-   "campaign": "JD | PH | 3 head pendant light | Manual",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 52,
-   "no_stock_data": 4,
-   "out_of_stock": 1,
-   "low_stock": 0,
-   "spend30": 90.37,
-   "sales30": 263.43,
-   "ord30": 7.0,
-   "spend7": 21.65,
-   "sales7": 83.78,
-   "ord14": 5.0,
-   "clicks14": 253.0,
-   "spend14": 43.78,
-   "acos30": 34.305128497133964,
-   "acos7": 25.841489615660063,
-   "outcome": "PAUSED",
-   "rule": "Stock",
-   "priority": "High",
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
+     "30D ACOS 39.9%"
     ],
     [
-     "Stock rule — advertised listings that are out of stock",
-     true,
-     "1 of 52 listings at 0 units"
-    ]
-   ],
-   "reason": "1 of the 52 listings this campaign advertises is out of stock (0 units). Ads are paused so spend does not keep running on items that cannot be bought."
-  },
-  {
-   "campaign_id": "164195009012",
-   "campaign": "JD | Wall lights | New | Manual",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 108,
-   "no_stock_data": 17,
-   "out_of_stock": 1,
-   "low_stock": 0,
-   "spend30": 87.44,
-   "sales30": 362.49,
-   "ord30": 23.0,
-   "spend7": 16.24,
-   "sales7": 60.38,
-   "ord14": 8.0,
-   "clicks14": 225.0,
-   "spend14": 33.79,
-   "acos30": 24.12204474606196,
-   "acos7": 26.896323285856237,
-   "outcome": "PAUSED",
-   "rule": "Stock",
-   "priority": "High",
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     true,
-     "1 of 108 listings at 0 units"
-    ]
-   ],
-   "reason": "1 of the 108 listings this campaign advertises is out of stock (0 units). Ads are paused so spend does not keep running on items that cannot be bought."
-  },
-  {
-   "campaign_id": "17371404012",
-   "campaign": "JD | Sm wall | smart",
-   "type": "Smart",
-   "status": "RUNNING",
-   "listings": 32,
-   "no_stock_data": 5,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 82.53,
-   "sales30": 185.25,
-   "ord30": 10.0,
-   "spend7": 8.4,
-   "sales7": 0.0,
-   "ord14": 1.0,
-   "clicks14": 168.0,
-   "spend14": 26.76,
-   "acos30": 44.550607287449395,
-   "acos7": null,
-   "outcome": "PAUSED",
-   "rule": "Rule 1",
-   "priority": "High",
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
+     "Rule 2 scope — 14D orders = 0",
      false,
-     "0 of 32 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "10 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     true,
-     "30D ACOS 44.6%"
-    ],
-    [
-     "Do-not-pause — 7D ACOS < 20% (improving trend)",
-     false,
-     "no 7D sales"
+     "29 orders in 14D"
     ]
    ],
-   "reason": "30-day ACOS is 44.6%, over the 40% ceiling. The last 7 days are showing no attributed sales at all — not below the 20% needed to count as an improving trend, so the campaign is paused."
+   "reason": "No rule matched — the campaign keeps running."
   },
   {
    "campaign_id": "28863466012",
@@ -318,16 +615,16 @@
    "no_stock_data": 1,
    "out_of_stock": 0,
    "low_stock": 0,
-   "spend30": 121.22,
-   "sales30": 436.63,
+   "spend30": 119.94,
+   "sales30": 431.24,
    "ord30": 35.0,
-   "spend7": 21.22,
-   "sales7": 151.85,
-   "ord14": 19.0,
-   "clicks14": 252.0,
-   "spend14": 49.24,
-   "acos30": 27.762636557268166,
-   "acos7": 13.974316759960487,
+   "spend7": 25.87,
+   "sales7": 88.05,
+   "ord14": 18.0,
+   "clicks14": 242.0,
+   "spend14": 47.82,
+   "acos30": 27.812818847973286,
+   "acos7": 29.381033503691086,
    "outcome": "RUNNING",
    "rule": "—",
    "priority": null,
@@ -355,7 +652,7 @@
     [
      "Rule 2 scope — 14D orders = 0",
      false,
-     "19 orders in 14D"
+     "18 orders in 14D"
     ]
    ],
    "reason": "No rule matched — the campaign keeps running."
@@ -369,16 +666,16 @@
    "no_stock_data": 1,
    "out_of_stock": 0,
    "low_stock": 0,
-   "spend30": 114.71,
-   "sales30": 381.44,
-   "ord30": 31.0,
-   "spend7": 18.79,
-   "sales7": 76.44,
-   "ord14": 12.0,
-   "clicks14": 217.0,
-   "spend14": 44.26,
-   "acos30": 30.072881711409394,
-   "acos7": 24.581371009942437,
+   "spend30": 116.78,
+   "sales30": 342.68,
+   "ord30": 27.0,
+   "spend7": 29.06,
+   "sales7": 12.48,
+   "ord14": 8.0,
+   "clicks14": 198.0,
+   "spend14": 48.13,
+   "acos30": 34.07844052760593,
+   "acos7": 232.8525641025641,
    "outcome": "RUNNING",
    "rule": "—",
    "priority": null,
@@ -396,17 +693,17 @@
     [
      "Rule 1 scope — 30D orders > 0",
      true,
-     "31 orders in 30D"
+     "27 orders in 30D"
     ],
     [
      "Condition — 30D ACOS ≥ 40%",
      false,
-     "30D ACOS 30.1%"
+     "30D ACOS 34.1%"
     ],
     [
      "Rule 2 scope — 14D orders = 0",
      false,
-     "12 orders in 14D"
+     "8 orders in 14D"
     ]
    ],
    "reason": "No rule matched — the campaign keeps running."
@@ -420,16 +717,16 @@
    "no_stock_data": 0,
    "out_of_stock": 0,
    "low_stock": 0,
-   "spend30": 111.19,
-   "sales30": 353.84,
-   "ord30": 23.0,
-   "spend7": 11.91,
-   "sales7": 48.76,
-   "ord14": 5.0,
-   "clicks14": 162.0,
-   "spend14": 35.52,
-   "acos30": 31.42380737056297,
-   "acos7": 24.42575881870386,
+   "spend30": 102.3,
+   "sales30": 357.36,
+   "ord30": 25.0,
+   "spend7": 22.41,
+   "sales7": 151.02,
+   "ord14": 15.0,
+   "clicks14": 142.0,
+   "spend14": 35.71,
+   "acos30": 28.626595030221623,
+   "acos7": 14.839094159713945,
    "outcome": "RUNNING",
    "rule": "—",
    "priority": null,
@@ -447,122 +744,91 @@
     [
      "Rule 1 scope — 30D orders > 0",
      true,
-     "23 orders in 30D"
+     "25 orders in 30D"
     ],
     [
      "Condition — 30D ACOS ≥ 40%",
      false,
-     "30D ACOS 31.4%"
+     "30D ACOS 28.6%"
     ],
     [
      "Rule 2 scope — 14D orders = 0",
      false,
-     "5 orders in 14D"
+     "15 orders in 14D"
     ]
    ],
    "reason": "No rule matched — the campaign keeps running."
   },
   {
-   "campaign_id": "15405839012",
-   "campaign": "JD | PLA | Pendent Lights | Smart",
-   "type": "Smart",
-   "status": "ENDED",
-   "listings": 51,
-   "no_stock_data": 9,
+   "campaign_id": "160677049012",
+   "campaign": "JD | PH | Pendant Light Fitting  | Tharshana | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 29,
+   "no_stock_data": 6,
    "out_of_stock": 0,
    "low_stock": 0,
-   "spend30": 102.54,
-   "sales30": 216.31,
-   "ord30": 16.0,
-   "spend7": 1.51,
-   "sales7": 0.0,
-   "ord14": 0.0,
-   "clicks14": 135.0,
-   "spend14": 30.9,
-   "acos30": 47.40418843326707,
-   "acos7": null,
-   "outcome": "ALREADY OFF",
+   "spend30": 93.99,
+   "sales30": 481.73,
+   "ord30": 32.0,
+   "spend7": 22.09,
+   "sales7": 235.79,
+   "ord14": 24.0,
+   "clicks14": 248.0,
+   "spend14": 45.04,
+   "acos30": 19.51092935876943,
+   "acos7": 9.368505873870818,
+   "outcome": "RUNNING",
    "rule": "—",
    "priority": null,
    "trace": [
     [
      "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
      false,
-     "campaign is ENDED — rules not evaluated"
+     "0 of 29 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "32 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     false,
+     "30D ACOS 19.5%"
+    ],
+    [
+     "Rule 2 scope — 14D orders = 0",
+     false,
+     "24 orders in 14D"
     ]
    ],
-   "reason": "Campaign is already ENDED. No pause action taken — the rules are not evaluated against a campaign that is not running."
+   "reason": "No rule matched — the campaign keeps running."
   },
   {
    "campaign_id": "155945896012",
    "campaign": "JD | PH | Abinayaa | Light Fittings | Manual",
    "type": "Manual",
    "status": "RUNNING",
-   "listings": 48,
-   "no_stock_data": 9,
-   "out_of_stock": 0,
-   "low_stock": 1,
-   "spend30": 93.76,
-   "sales30": 317.49,
-   "ord30": 34.0,
-   "spend7": 13.84,
-   "sales7": 60.55,
-   "ord14": 20.0,
-   "clicks14": 177.0,
-   "spend14": 34.89,
-   "acos30": 29.53163879177297,
-   "acos7": 22.857142857142858,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 48 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "34 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 29.5%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "20 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "163193938012",
-   "campaign": "JD | Ceiling Lights | Manual",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 74,
-   "no_stock_data": 14,
+   "listings": 44,
+   "no_stock_data": 4,
    "out_of_stock": 0,
    "low_stock": 0,
-   "spend30": 93.69,
-   "sales30": 245.64,
-   "ord30": 16.0,
-   "spend7": 19.11,
-   "sales7": 85.36,
+   "spend30": 93.11,
+   "sales30": 256.18,
+   "ord30": 29.0,
+   "spend7": 22.18,
+   "sales7": 61.14,
    "ord14": 12.0,
-   "clicks14": 240.0,
-   "spend14": 39.17,
-   "acos30": 38.14118221787982,
-   "acos7": 22.387535145267105,
+   "clicks14": 176.0,
+   "spend14": 35.28,
+   "acos30": 36.345538293387456,
+   "acos7": 36.27739614000654,
    "outcome": "RUNNING",
    "rule": "—",
    "priority": null,
@@ -575,73 +841,22 @@
     [
      "Stock rule — advertised listings that are out of stock",
      false,
-     "0 of 74 listings at 0 units"
+     "0 of 44 listings at 0 units"
     ],
     [
      "Rule 1 scope — 30D orders > 0",
      true,
-     "16 orders in 30D"
+     "29 orders in 30D"
     ],
     [
      "Condition — 30D ACOS ≥ 40%",
      false,
-     "30D ACOS 38.1%"
+     "30D ACOS 36.3%"
     ],
     [
      "Rule 2 scope — 14D orders = 0",
      false,
      "12 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "135730419012",
-   "campaign": "JD | MH | 3 head Pendent | Smart",
-   "type": "Smart",
-   "status": "RUNNING",
-   "listings": 29,
-   "no_stock_data": 0,
-   "out_of_stock": 0,
-   "low_stock": 1,
-   "spend30": 93.08,
-   "sales30": 411.16,
-   "ord30": 9.0,
-   "spend7": 15.52,
-   "sales7": 219.56,
-   "ord14": 4.0,
-   "clicks14": 146.0,
-   "spend14": 34.3,
-   "acos30": 22.638388948341277,
-   "acos7": 7.068682820185826,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 29 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "9 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 22.6%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "4 orders in 14D"
     ]
    ],
    "reason": "No rule matched — the campaign keeps running."
@@ -655,16 +870,16 @@
    "no_stock_data": 0,
    "out_of_stock": 0,
    "low_stock": 0,
-   "spend30": 91.41,
-   "sales30": 619.86,
-   "ord30": 83.0,
-   "spend7": 19.53,
-   "sales7": 130.4,
-   "ord14": 26.0,
+   "spend30": 91.17,
+   "sales30": 562.41,
+   "ord30": 72.0,
+   "spend7": 20.78,
+   "sales7": 85.12,
+   "ord14": 23.0,
    "clicks14": 222.0,
-   "spend14": 41.14,
-   "acos30": 14.746878327364243,
-   "acos7": 14.976993865030675,
+   "spend14": 40.51,
+   "acos30": 16.2105936949912,
+   "acos7": 24.412593984962406,
    "outcome": "RUNNING",
    "rule": "—",
    "priority": null,
@@ -682,17 +897,68 @@
     [
      "Rule 1 scope — 30D orders > 0",
      true,
-     "83 orders in 30D"
+     "72 orders in 30D"
     ],
     [
      "Condition — 30D ACOS ≥ 40%",
      false,
-     "30D ACOS 14.7%"
+     "30D ACOS 16.2%"
     ],
     [
      "Rule 2 scope — 14D orders = 0",
      false,
-     "26 orders in 14D"
+     "23 orders in 14D"
+    ]
+   ],
+   "reason": "No rule matched — the campaign keeps running."
+  },
+  {
+   "campaign_id": "135730419012",
+   "campaign": "JD | MH | 3 head Pendent | Smart",
+   "type": "Smart",
+   "status": "RUNNING",
+   "listings": 29,
+   "no_stock_data": 0,
+   "out_of_stock": 0,
+   "low_stock": 1,
+   "spend30": 89.61,
+   "sales30": 336.29,
+   "ord30": 8.0,
+   "spend7": 21.86,
+   "sales7": 21.89,
+   "ord14": 5.0,
+   "clicks14": 158.0,
+   "spend14": 37.84,
+   "acos30": 26.6466442653662,
+   "acos7": 99.86295111923252,
+   "outcome": "RUNNING",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 29 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "8 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     false,
+     "30D ACOS 26.6%"
+    ],
+    [
+     "Rule 2 scope — 14D orders = 0",
+     false,
+     "5 orders in 14D"
     ]
    ],
    "reason": "No rule matched — the campaign keeps running."
@@ -702,275 +968,20 @@
    "campaign": "JD | LJ | Lighting Parts | Thojika | Manual",
    "type": "Manual",
    "status": "RUNNING",
-   "listings": 42,
-   "no_stock_data": 6,
-   "out_of_stock": 0,
-   "low_stock": 1,
-   "spend30": 91.17,
-   "sales30": 350.31,
-   "ord30": 27.0,
-   "spend7": 17.3,
-   "sales7": 34.65,
-   "ord14": 7.0,
-   "clicks14": 250.0,
-   "spend14": 36.9,
-   "acos30": 26.025520253489766,
-   "acos7": 49.927849927849934,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 42 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "27 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 26.0%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "7 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "15405904012",
-   "campaign": "JD | PLA | Light Product | Smart",
-   "type": "Smart",
-   "status": "RUNNING",
-   "listings": 23,
-   "no_stock_data": 4,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 90.5,
-   "sales30": 350.07,
-   "ord30": 33.0,
-   "spend7": 14.2,
-   "sales7": 82.43,
-   "ord14": 12.0,
-   "clicks14": 187.0,
-   "spend14": 32.53,
-   "acos30": 25.85197246265033,
-   "acos7": 17.226737838165715,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 23 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "33 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 25.9%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "12 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "164267739012",
-   "campaign": "JD | Plug in light | Manual",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 37,
+   "listings": 41,
    "no_stock_data": 5,
    "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 89.49,
-   "sales30": 588.14,
-   "ord30": 40.0,
-   "spend7": 25.58,
-   "sales7": 176.51,
-   "ord14": 17.0,
-   "clicks14": 332.0,
-   "spend14": 43.29,
-   "acos30": 15.215764953922534,
-   "acos7": 14.492096765055804,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 37 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "40 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 15.2%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "17 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "28863477012",
-   "campaign": "JD | stock clearance products | Smart",
-   "type": "Smart",
-   "status": "RUNNING",
-   "listings": 36,
-   "no_stock_data": 3,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 89.31,
-   "sales30": 381.61,
-   "ord30": 24.0,
-   "spend7": 14.12,
-   "sales7": 170.81,
-   "ord14": 16.0,
-   "clicks14": 163.0,
-   "spend14": 31.59,
-   "acos30": 23.40347475170986,
-   "acos7": 8.266494935893682,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 36 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "24 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 23.4%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "16 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "144201913012",
-   "campaign": "JD | Without general | Manual",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 24,
-   "no_stock_data": 4,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 89.29,
-   "sales30": 288.27,
-   "ord30": 36.0,
-   "spend7": 14.06,
-   "sales7": 32.91,
-   "ord14": 11.0,
-   "clicks14": 121.0,
-   "spend14": 28.76,
-   "acos30": 30.974433690637255,
-   "acos7": 42.722576724399886,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 24 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "36 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 31.0%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "11 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "153333633012",
-   "campaign": "JD | PSU+Bulbs | Transformer | Manual",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 10,
-   "no_stock_data": 1,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 88.61,
-   "sales30": 369.63,
-   "ord30": 32.0,
-   "spend7": 9.93,
-   "sales7": 28.36,
+   "low_stock": 1,
+   "spend30": 89.04,
+   "sales30": 277.02,
+   "ord30": 25.0,
+   "spend7": 20.71,
+   "sales7": 25.36,
    "ord14": 8.0,
-   "clicks14": 116.0,
-   "spend14": 26.5,
-   "acos30": 23.972621269918566,
-   "acos7": 35.01410437235543,
+   "clicks14": 263.0,
+   "spend14": 38.51,
+   "acos30": 32.142083604071914,
+   "acos7": 81.6640378548896,
    "outcome": "RUNNING",
    "rule": "—",
    "priority": null,
@@ -983,73 +994,22 @@
     [
      "Stock rule — advertised listings that are out of stock",
      false,
-     "0 of 10 listings at 0 units"
+     "0 of 41 listings at 0 units"
     ],
     [
      "Rule 1 scope — 30D orders > 0",
      true,
-     "32 orders in 30D"
+     "25 orders in 30D"
     ],
     [
      "Condition — 30D ACOS ≥ 40%",
      false,
-     "30D ACOS 24.0%"
+     "30D ACOS 32.1%"
     ],
     [
      "Rule 2 scope — 14D orders = 0",
      false,
      "8 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "159902435012",
-   "campaign": "JD | MH | Flush Light & Lamp Shade | Shanthini | Manual",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 43,
-   "no_stock_data": 14,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 88.41,
-   "sales30": 345.56,
-   "ord30": 27.0,
-   "spend7": 20.98,
-   "sales7": 39.77,
-   "ord14": 12.0,
-   "clicks14": 274.0,
-   "spend14": 43.33,
-   "acos30": 25.584558397962727,
-   "acos7": 52.7533316570279,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 43 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "27 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 25.6%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "12 orders in 14D"
     ]
    ],
    "reason": "No rule matched — the campaign keeps running."
@@ -1059,676 +1019,20 @@
    "campaign": "JD | Target Transformer | Manual",
    "type": "Manual",
    "status": "RUNNING",
-   "listings": 4,
-   "no_stock_data": 0,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 87.45,
-   "sales30": 674.28,
-   "ord30": 51.0,
-   "spend7": 19.65,
-   "sales7": 136.06,
-   "ord14": 31.0,
-   "clicks14": 193.0,
-   "spend14": 40.09,
-   "acos30": 12.969389571098061,
-   "acos7": 14.442157871527266,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 4 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "51 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 13.0%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "31 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "160677049012",
-   "campaign": "JD | PH | Pendant Light Fitting  | Tharshana | Manual",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 30,
-   "no_stock_data": 7,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 85.88,
-   "sales30": 245.94,
-   "ord30": 15.0,
-   "spend7": 22.99,
-   "sales7": 97.98,
-   "ord14": 8.0,
-   "clicks14": 244.0,
-   "spend14": 45.75,
-   "acos30": 34.9190859559242,
-   "acos7": 23.463972239232493,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 30 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "15 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 34.9%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "8 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "13950665012",
-   "campaign": "JD | MH | LEDSONE Cable | Manual",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 46,
-   "no_stock_data": 3,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 78.12,
-   "sales30": 398.89,
-   "ord30": 61.0,
-   "spend7": 24.37,
-   "sales7": 95.28,
-   "ord14": 37.0,
-   "clicks14": 249.0,
-   "spend14": 45.06,
-   "acos30": 19.58434656170874,
-   "acos7": 25.577246011754827,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 46 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "61 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 19.6%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "37 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "22831214012",
-   "campaign": "JD | Target product | Manual",
-   "type": "Manual",
-   "status": "ENDED",
-   "listings": 58,
-   "no_stock_data": 14,
-   "out_of_stock": 1,
-   "low_stock": 0,
-   "spend30": 77.97,
-   "sales30": 286.83,
-   "ord30": 25.0,
-   "spend7": 0.67,
-   "sales7": 0.0,
-   "ord14": 2.0,
-   "clicks14": 44.0,
-   "spend14": 16.36,
-   "acos30": 27.18334902206882,
-   "acos7": null,
-   "outcome": "ALREADY OFF",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     false,
-     "campaign is ENDED — rules not evaluated"
-    ]
-   ],
-   "reason": "Campaign is already ENDED. No pause action taken — the rules are not evaluated against a campaign that is not running."
-  },
-  {
-   "campaign_id": "129690966012",
-   "campaign": "JD | PH | Lampshade  | Utharsika | Manual",
-   "type": "Manual",
-   "status": "PAUSED",
-   "listings": 61,
-   "no_stock_data": 11,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 75.08,
-   "sales30": 140.89,
-   "ord30": 13.0,
-   "spend7": 0.0,
-   "sales7": 0.0,
-   "ord14": 1.0,
-   "clicks14": 88.0,
-   "spend14": 14.56,
-   "acos30": 53.2898005536234,
-   "acos7": null,
-   "outcome": "ALREADY OFF",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     false,
-     "campaign is PAUSED — rules not evaluated"
-    ]
-   ],
-   "reason": "Campaign is already PAUSED. No pause action taken — the rules are not evaluated against a campaign that is not running."
-  },
-  {
-   "campaign_id": "28863417012",
-   "campaign": "JD | MH | Cables | Jasmini | Smart",
-   "type": "Smart",
-   "status": "PAUSED",
-   "listings": 6,
-   "no_stock_data": 0,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 74.9,
-   "sales30": 160.88,
-   "ord30": 27.0,
-   "spend7": 5.02,
-   "sales7": 0.0,
-   "ord14": 7.0,
-   "clicks14": 136.0,
-   "spend14": 25.26,
-   "acos30": 46.55643958229737,
-   "acos7": null,
-   "outcome": "ALREADY OFF",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     false,
-     "campaign is PAUSED — rules not evaluated"
-    ]
-   ],
-   "reason": "Campaign is already PAUSED. No pause action taken — the rules are not evaluated against a campaign that is not running."
-  },
-  {
-   "campaign_id": "26896653012",
-   "campaign": "JD | PH | Flush light | Manual",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 43,
-   "no_stock_data": 10,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 72.65,
-   "sales30": 254.22,
-   "ord30": 21.0,
-   "spend7": 8.14,
-   "sales7": 57.78,
-   "ord14": 8.0,
-   "clicks14": 169.0,
-   "spend14": 31.35,
-   "acos30": 28.577609944142875,
-   "acos7": 14.08791969539633,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 43 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "21 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 28.6%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "8 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "17109990012",
-   "campaign": "JD | Spider Light | Manual",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 19,
-   "no_stock_data": 5,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 71.07,
-   "sales30": 214.8,
-   "ord30": 4.0,
-   "spend7": 19.4,
-   "sales7": 181.91,
-   "ord14": 3.0,
-   "clicks14": 159.0,
-   "spend14": 38.67,
-   "acos30": 33.08659217877094,
-   "acos7": 10.66461436974328,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 19 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "4 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 33.1%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "3 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "162961217012",
-   "campaign": "JD | PH | Pendant - II | Manual",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 68,
-   "no_stock_data": 18,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 66.56,
-   "sales30": 328.37,
-   "ord30": 24.0,
-   "spend7": 23.16,
-   "sales7": 131.08,
-   "ord14": 15.0,
-   "clicks14": 226.0,
-   "spend14": 32.77,
-   "acos30": 20.269817583823126,
-   "acos7": 17.668599328654256,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 68 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "24 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 20.3%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "15 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "155212621012",
-   "campaign": "JD | MH | Hemp Lights | Renuha | Manual",
-   "type": "Manual",
-   "status": "PAUSED",
    "listings": 8,
    "no_stock_data": 1,
    "out_of_stock": 0,
    "low_stock": 0,
-   "spend30": 62.72,
-   "sales30": 93.43,
-   "ord30": 3.0,
-   "spend7": 0.0,
-   "sales7": 0.0,
-   "ord14": 0.0,
-   "clicks14": 58.0,
-   "spend14": 13.06,
-   "acos30": 67.13047201113133,
-   "acos7": null,
-   "outcome": "ALREADY OFF",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     false,
-     "campaign is PAUSED — rules not evaluated"
-    ]
-   ],
-   "reason": "Campaign is already PAUSED. No pause action taken — the rules are not evaluated against a campaign that is not running."
-  },
-  {
-   "campaign_id": "38338866012",
-   "campaign": "JD | MH | Wall lights | Shimee | Manual",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 16,
-   "no_stock_data": 5,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 61.52,
-   "sales30": 189.63,
-   "ord30": 14.0,
-   "spend7": 20.82,
-   "sales7": 82.99,
-   "ord14": 14.0,
-   "clicks14": 198.0,
-   "spend14": 33.08,
-   "acos30": 32.442124136476295,
-   "acos7": 25.087359922882275,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 16 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "14 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 32.4%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "14 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "163055118012",
-   "campaign": "JD | Wall light + video campaign",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 5,
-   "no_stock_data": 2,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 56.12,
-   "sales30": 189.3,
-   "ord30": 12.0,
-   "spend7": 1.47,
-   "sales7": 36.8,
-   "ord14": 2.0,
-   "clicks14": 92.0,
-   "spend14": 18.38,
-   "acos30": 29.646064447966186,
-   "acos7": 3.9945652173913047,
-   "outcome": "RUNNING",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     true,
-     "eligible for pause rules"
-    ],
-    [
-     "Stock rule — advertised listings that are out of stock",
-     false,
-     "0 of 5 listings at 0 units"
-    ],
-    [
-     "Rule 1 scope — 30D orders > 0",
-     true,
-     "12 orders in 30D"
-    ],
-    [
-     "Condition — 30D ACOS ≥ 40%",
-     false,
-     "30D ACOS 29.6%"
-    ],
-    [
-     "Rule 2 scope — 14D orders = 0",
-     false,
-     "2 orders in 14D"
-    ]
-   ],
-   "reason": "No rule matched — the campaign keeps running."
-  },
-  {
-   "campaign_id": "163710397012",
-   "campaign": "JD  | Shade+video campaign",
-   "type": "Smart",
-   "status": "PAUSED",
-   "listings": 3,
-   "no_stock_data": 2,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 50.61,
-   "sales30": 69.64,
-   "ord30": 6.0,
-   "spend7": 4.06,
-   "sales7": 9.99,
-   "ord14": 1.0,
-   "clicks14": 61.0,
-   "spend14": 8.43,
-   "acos30": 72.67375071797817,
-   "acos7": 40.64064064064063,
-   "outcome": "ALREADY OFF",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     false,
-     "campaign is PAUSED — rules not evaluated"
-    ]
-   ],
-   "reason": "Campaign is already PAUSED. No pause action taken — the rules are not evaluated against a campaign that is not running."
-  },
-  {
-   "campaign_id": "156649526012",
-   "campaign": "JD | Promotion Dec 2025  | smart",
-   "type": "Smart",
-   "status": "ENDED",
-   "listings": 103,
-   "no_stock_data": 6,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 45.81,
-   "sales30": 76.93,
-   "ord30": 7.0,
-   "spend7": 0.0,
-   "sales7": 0.0,
-   "ord14": 0.0,
-   "clicks14": 0.0,
-   "spend14": 0.0,
-   "acos30": 59.54764071233589,
-   "acos7": null,
-   "outcome": "ALREADY OFF",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     false,
-     "campaign is ENDED — rules not evaluated"
-    ]
-   ],
-   "reason": "Campaign is already ENDED. No pause action taken — the rules are not evaluated against a campaign that is not running."
-  },
-  {
-   "campaign_id": "149867100012",
-   "campaign": "JD | Flush light | Smart",
-   "type": "Smart",
-   "status": "ENDED",
-   "listings": 36,
-   "no_stock_data": 10,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 41.26,
-   "sales30": 47.47,
-   "ord30": 3.0,
-   "spend7": 0.0,
-   "sales7": 0.0,
-   "ord14": 0.0,
-   "clicks14": 0.0,
-   "spend14": 0.0,
-   "acos30": 86.9180535074784,
-   "acos7": null,
-   "outcome": "ALREADY OFF",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     false,
-     "campaign is ENDED — rules not evaluated"
-    ]
-   ],
-   "reason": "Campaign is already ENDED. No pause action taken — the rules are not evaluated against a campaign that is not running."
-  },
-  {
-   "campaign_id": "85734687012",
-   "campaign": "JD | Mixed Product | Manual",
-   "type": "Manual",
-   "status": "ENDED",
-   "listings": 69,
-   "no_stock_data": 7,
-   "out_of_stock": 0,
-   "low_stock": 1,
-   "spend30": 40.04,
-   "sales30": 120.41,
-   "ord30": 5.0,
-   "spend7": 0.0,
-   "sales7": 0.0,
-   "ord14": 0.0,
-   "clicks14": 0.0,
-   "spend14": 0.0,
-   "acos30": 33.25305207208704,
-   "acos7": null,
-   "outcome": "ALREADY OFF",
-   "rule": "—",
-   "priority": null,
-   "trace": [
-    [
-     "State check — campaign is live",
-     false,
-     "campaign is ENDED — rules not evaluated"
-    ]
-   ],
-   "reason": "Campaign is already ENDED. No pause action taken — the rules are not evaluated against a campaign that is not running."
-  },
-  {
-   "campaign_id": "165065723012",
-   "campaign": "JD | Cables | Video | Manual",
-   "type": "Manual",
-   "status": "RUNNING",
-   "listings": 8,
-   "no_stock_data": 0,
-   "out_of_stock": 0,
-   "low_stock": 0,
-   "spend30": 39.33,
-   "sales30": 332.46,
-   "ord30": 53.0,
-   "spend7": 11.5,
-   "sales7": 81.88,
-   "ord14": 24.0,
-   "clicks14": 123.0,
-   "spend14": 23.41,
-   "acos30": 11.829994585814834,
-   "acos7": 14.04494382022472,
+   "spend30": 88.5,
+   "sales30": 655.78,
+   "ord30": 52.0,
+   "spend7": 20.63,
+   "sales7": 86.43,
+   "ord14": 27.0,
+   "clicks14": 201.0,
+   "spend14": 40.69,
+   "acos30": 13.495379548019153,
+   "acos7": 23.86902695823209,
    "outcome": "RUNNING",
    "rule": "—",
    "priority": null,
@@ -1746,39 +1050,755 @@
     [
      "Rule 1 scope — 30D orders > 0",
      true,
-     "53 orders in 30D"
+     "52 orders in 30D"
     ],
     [
      "Condition — 30D ACOS ≥ 40%",
      false,
-     "30D ACOS 11.8%"
+     "30D ACOS 13.5%"
     ],
     [
      "Rule 2 scope — 14D orders = 0",
      false,
-     "24 orders in 14D"
+     "27 orders in 14D"
     ]
    ],
    "reason": "No rule matched — the campaign keeps running."
+  },
+  {
+   "campaign_id": "159902435012",
+   "campaign": "JD | MH | Flush Light & Lamp Shade | Shanthini | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 36,
+   "no_stock_data": 8,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 88.44,
+   "sales30": 328.65,
+   "ord30": 28.0,
+   "spend7": 19.8,
+   "sales7": 50.67,
+   "ord14": 8.0,
+   "clicks14": 262.0,
+   "spend14": 41.73,
+   "acos30": 26.910086718393426,
+   "acos7": 39.07637655417407,
+   "outcome": "RUNNING",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 36 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "28 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     false,
+     "30D ACOS 26.9%"
+    ],
+    [
+     "Rule 2 scope — 14D orders = 0",
+     false,
+     "8 orders in 14D"
+    ]
+   ],
+   "reason": "No rule matched — the campaign keeps running."
+  },
+  {
+   "campaign_id": "164267739012",
+   "campaign": "JD | Plug in light | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 37,
+   "no_stock_data": 5,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 87.82,
+   "sales30": 527.49,
+   "ord30": 37.0,
+   "spend7": 20.81,
+   "sales7": 136.82,
+   "ord14": 19.0,
+   "clicks14": 354.0,
+   "spend14": 44.89,
+   "acos30": 16.64865684657529,
+   "acos7": 15.209764654290309,
+   "outcome": "RUNNING",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 37 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "37 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     false,
+     "30D ACOS 16.6%"
+    ],
+    [
+     "Rule 2 scope — 14D orders = 0",
+     false,
+     "19 orders in 14D"
+    ]
+   ],
+   "reason": "No rule matched — the campaign keeps running."
+  },
+  {
+   "campaign_id": "15405904012",
+   "campaign": "JD | PLA | Light Product | Smart",
+   "type": "Smart",
+   "status": "RUNNING",
+   "listings": 19,
+   "no_stock_data": 1,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 85.03,
+   "sales30": 429.83,
+   "ord30": 40.0,
+   "spend7": 20.53,
+   "sales7": 172.66,
+   "ord14": 21.0,
+   "clicks14": 207.0,
+   "spend14": 35.3,
+   "acos30": 19.782239490030943,
+   "acos7": 11.890420479555196,
+   "outcome": "RUNNING",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 19 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "40 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     false,
+     "30D ACOS 19.8%"
+    ],
+    [
+     "Rule 2 scope — 14D orders = 0",
+     false,
+     "21 orders in 14D"
+    ]
+   ],
+   "reason": "No rule matched — the campaign keeps running."
+  },
+  {
+   "campaign_id": "17371404012",
+   "campaign": "JD | Sm wall | smart",
+   "type": "Smart",
+   "status": "RUNNING",
+   "listings": 27,
+   "no_stock_data": 1,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 83.95,
+   "sales30": 262.18,
+   "ord30": 14.0,
+   "spend7": 24.32,
+   "sales7": 175.1,
+   "ord14": 9.0,
+   "clicks14": 191.0,
+   "spend14": 31.38,
+   "acos30": 32.019986268975515,
+   "acos7": 13.889206167904057,
+   "outcome": "RUNNING",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 27 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "14 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     false,
+     "30D ACOS 32.0%"
+    ],
+    [
+     "Rule 2 scope — 14D orders = 0",
+     false,
+     "9 orders in 14D"
+    ]
+   ],
+   "reason": "No rule matched — the campaign keeps running."
+  },
+  {
+   "campaign_id": "153333633012",
+   "campaign": "JD | PSU+Bulbs | Transformer | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 10,
+   "no_stock_data": 1,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 83.42,
+   "sales30": 328.71,
+   "ord30": 30.0,
+   "spend7": 19.08,
+   "sales7": 44.43,
+   "ord14": 9.0,
+   "clicks14": 114.0,
+   "spend14": 29.0,
+   "acos30": 25.377992759575314,
+   "acos7": 42.943956785955436,
+   "outcome": "RUNNING",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 10 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "30 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     false,
+     "30D ACOS 25.4%"
+    ],
+    [
+     "Rule 2 scope — 14D orders = 0",
+     false,
+     "9 orders in 14D"
+    ]
+   ],
+   "reason": "No rule matched — the campaign keeps running."
+  },
+  {
+   "campaign_id": "13950665012",
+   "campaign": "JD | MH | LEDSONE Cable | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 43,
+   "no_stock_data": 0,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 81.91,
+   "sales30": 361.14,
+   "ord30": 57.0,
+   "spend7": 24.64,
+   "sales7": 48.2,
+   "ord14": 20.0,
+   "clicks14": 267.0,
+   "spend14": 47.9,
+   "acos30": 22.68095475438888,
+   "acos7": 51.120331950207465,
+   "outcome": "RUNNING",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 43 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "57 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     false,
+     "30D ACOS 22.7%"
+    ],
+    [
+     "Rule 2 scope — 14D orders = 0",
+     false,
+     "20 orders in 14D"
+    ]
+   ],
+   "reason": "No rule matched — the campaign keeps running."
+  },
+  {
+   "campaign_id": "15405839012",
+   "campaign": "JD | PLA | Pendent Lights | Smart",
+   "type": "Smart",
+   "status": "ENDED",
+   "listings": 47,
+   "no_stock_data": 5,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 79.97,
+   "sales30": 107.26,
+   "ord30": 9.0,
+   "spend7": 0.0,
+   "sales7": 0.0,
+   "ord14": 0.0,
+   "clicks14": 20.0,
+   "spend14": 4.52,
+   "acos30": 74.55715084840574,
+   "acos7": null,
+   "outcome": "ALREADY OFF",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     false,
+     "campaign is ENDED — rules not evaluated"
+    ]
+   ],
+   "reason": "Campaign is already ENDED. No pause action taken — the rules are not evaluated against a campaign that is not running."
+  },
+  {
+   "campaign_id": "162961217012",
+   "campaign": "JD | PH | Pendant - II | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 61,
+   "no_stock_data": 15,
+   "out_of_stock": 0,
+   "low_stock": 1,
+   "spend30": 74.3,
+   "sales30": 320.27,
+   "ord30": 25.0,
+   "spend7": 28.66,
+   "sales7": 70.97,
+   "ord14": 16.0,
+   "clicks14": 272.0,
+   "spend14": 48.45,
+   "acos30": 23.199175695506916,
+   "acos7": 40.38326053261942,
+   "outcome": "RUNNING",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 61 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "25 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     false,
+     "30D ACOS 23.2%"
+    ],
+    [
+     "Rule 2 scope — 14D orders = 0",
+     false,
+     "16 orders in 14D"
+    ]
+   ],
+   "reason": "No rule matched — the campaign keeps running."
+  },
+  {
+   "campaign_id": "17109990012",
+   "campaign": "JD | Spider Light | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 18,
+   "no_stock_data": 4,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 71.08,
+   "sales30": 231.9,
+   "ord30": 4.0,
+   "spend7": 16.68,
+   "sales7": 49.99,
+   "ord14": 4.0,
+   "clicks14": 191.0,
+   "spend14": 35.73,
+   "acos30": 30.651142733937043,
+   "acos7": 33.36667333466693,
+   "outcome": "RUNNING",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 18 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "4 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     false,
+     "30D ACOS 30.7%"
+    ],
+    [
+     "Rule 2 scope — 14D orders = 0",
+     false,
+     "4 orders in 14D"
+    ]
+   ],
+   "reason": "No rule matched — the campaign keeps running."
+  },
+  {
+   "campaign_id": "38338866012",
+   "campaign": "JD | MH | Wall lights | Shimee | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 14,
+   "no_stock_data": 3,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 69.0,
+   "sales30": 341.56,
+   "ord30": 23.0,
+   "spend7": 18.86,
+   "sales7": 170.82,
+   "ord14": 16.0,
+   "clicks14": 229.0,
+   "spend14": 37.49,
+   "acos30": 20.20142873872819,
+   "acos7": 11.040861725793233,
+   "outcome": "RUNNING",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 14 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "23 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     false,
+     "30D ACOS 20.2%"
+    ],
+    [
+     "Rule 2 scope — 14D orders = 0",
+     false,
+     "16 orders in 14D"
+    ]
+   ],
+   "reason": "No rule matched — the campaign keeps running."
+  },
+  {
+   "campaign_id": "163055118012",
+   "campaign": "JD | Wall light + video campaign",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 4,
+   "no_stock_data": 1,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 57.99,
+   "sales30": 268.99,
+   "ord30": 17.0,
+   "spend7": 17.17,
+   "sales7": 79.69,
+   "ord14": 7.0,
+   "clicks14": 99.0,
+   "spend14": 17.84,
+   "acos30": 21.558422246180157,
+   "acos7": 21.54599071401682,
+   "outcome": "RUNNING",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 4 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "17 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     false,
+     "30D ACOS 21.6%"
+    ],
+    [
+     "Rule 2 scope — 14D orders = 0",
+     false,
+     "7 orders in 14D"
+    ]
+   ],
+   "reason": "No rule matched — the campaign keeps running."
+  },
+  {
+   "campaign_id": "28863417012",
+   "campaign": "JD | MH | Cables | Jasmini | Smart",
+   "type": "Smart",
+   "status": "PAUSED",
+   "listings": 6,
+   "no_stock_data": 0,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 55.96,
+   "sales30": 113.3,
+   "ord30": 20.0,
+   "spend7": 0.0,
+   "sales7": 10.18,
+   "ord14": 4.0,
+   "clicks14": 49.0,
+   "spend14": 9.43,
+   "acos30": 49.3909973521624,
+   "acos7": 0.0,
+   "outcome": "ALREADY OFF",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     false,
+     "campaign is PAUSED — rules not evaluated"
+    ]
+   ],
+   "reason": "Campaign is already PAUSED. No pause action taken — the rules are not evaluated against a campaign that is not running."
+  },
+  {
+   "campaign_id": "165065723012",
+   "campaign": "JD | Cables | Video | Manual",
+   "type": "Manual",
+   "status": "RUNNING",
+   "listings": 8,
+   "no_stock_data": 0,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 50.68,
+   "sales30": 356.61,
+   "ord30": 57.0,
+   "spend7": 14.19,
+   "sales7": 46.58,
+   "ord14": 26.0,
+   "clicks14": 141.0,
+   "spend14": 25.22,
+   "acos30": 14.211603712739407,
+   "acos7": 30.46371833404895,
+   "outcome": "RUNNING",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     true,
+     "eligible for pause rules"
+    ],
+    [
+     "Stock rule — advertised listings that are out of stock",
+     false,
+     "0 of 8 listings at 0 units"
+    ],
+    [
+     "Rule 1 scope — 30D orders > 0",
+     true,
+     "57 orders in 30D"
+    ],
+    [
+     "Condition — 30D ACOS ≥ 40%",
+     false,
+     "30D ACOS 14.2%"
+    ],
+    [
+     "Rule 2 scope — 14D orders = 0",
+     false,
+     "26 orders in 14D"
+    ]
+   ],
+   "reason": "No rule matched — the campaign keeps running."
+  },
+  {
+   "campaign_id": "155212621012",
+   "campaign": "JD | MH | Hemp Lights | Renuha | Manual",
+   "type": "Manual",
+   "status": "PAUSED",
+   "listings": 8,
+   "no_stock_data": 0,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 44.84,
+   "sales30": 61.65,
+   "ord30": 1.0,
+   "spend7": 0.0,
+   "sales7": 0.0,
+   "ord14": 0.0,
+   "clicks14": 14.0,
+   "spend14": 3.25,
+   "acos30": 72.73317112733172,
+   "acos7": null,
+   "outcome": "ALREADY OFF",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     false,
+     "campaign is PAUSED — rules not evaluated"
+    ]
+   ],
+   "reason": "Campaign is already PAUSED. No pause action taken — the rules are not evaluated against a campaign that is not running."
+  },
+  {
+   "campaign_id": "163710397012",
+   "campaign": "JD  | Shade+video campaign",
+   "type": "Smart",
+   "status": "PAUSED",
+   "listings": 3,
+   "no_stock_data": 2,
+   "out_of_stock": 0,
+   "low_stock": 0,
+   "spend30": 38.96,
+   "sales30": 55.75,
+   "ord30": 5.0,
+   "spend7": 0.0,
+   "sales7": 0.0,
+   "ord14": 1.0,
+   "clicks14": 35.0,
+   "spend14": 5.34,
+   "acos30": 69.88340807174887,
+   "acos7": null,
+   "outcome": "ALREADY OFF",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     false,
+     "campaign is PAUSED — rules not evaluated"
+    ]
+   ],
+   "reason": "Campaign is already PAUSED. No pause action taken — the rules are not evaluated against a campaign that is not running."
+  },
+  {
+   "campaign_id": "156649526012",
+   "campaign": "JD | Promotion Dec 2025  | smart",
+   "type": "Smart",
+   "status": "ENDED",
+   "listings": 100,
+   "no_stock_data": 1,
+   "out_of_stock": 1,
+   "low_stock": 0,
+   "spend30": 23.65,
+   "sales30": 25.28,
+   "ord30": 2.0,
+   "spend7": 0.0,
+   "sales7": 0.0,
+   "ord14": 0.0,
+   "clicks14": 0.0,
+   "spend14": 0.0,
+   "acos30": 93.55221518987341,
+   "acos7": null,
+   "outcome": "ALREADY OFF",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     false,
+     "campaign is ENDED — rules not evaluated"
+    ]
+   ],
+   "reason": "Campaign is already ENDED. No pause action taken — the rules are not evaluated against a campaign that is not running."
   },
   {
    "campaign_id": "159695736012",
    "campaign": "JD | MH | Wire Cage | Paulroshan | Manual",
    "type": "Manual",
    "status": "ENDED",
-   "listings": 31,
-   "no_stock_data": 6,
+   "listings": 27,
+   "no_stock_data": 2,
    "out_of_stock": 0,
    "low_stock": 0,
-   "spend30": 36.72,
-   "sales30": 80.21,
-   "ord30": 9.0,
+   "spend30": 18.67,
+   "sales30": 17.08,
+   "ord30": 2.0,
    "spend7": 0.0,
    "sales7": 0.0,
    "ord14": 0.0,
    "clicks14": 0.0,
    "spend14": 0.0,
-   "acos30": 45.779827951626984,
+   "acos30": 109.30913348946139,
    "acos7": null,
    "outcome": "ALREADY OFF",
    "rule": "—",
@@ -1797,19 +1817,50 @@
    "campaign": "JD | MH | Ceiling rose & Tapes | Prasath | Manual",
    "type": "Manual",
    "status": "ENDED",
-   "listings": 11,
-   "no_stock_data": 2,
+   "listings": 10,
+   "no_stock_data": 1,
    "out_of_stock": 0,
    "low_stock": 0,
-   "spend30": 33.96,
-   "sales30": 98.26,
-   "ord30": 13.0,
+   "spend30": 17.2,
+   "sales30": 15.98,
+   "ord30": 2.0,
    "spend7": 0.0,
    "sales7": 0.0,
    "ord14": 0.0,
    "clicks14": 0.0,
    "spend14": 0.0,
-   "acos30": 34.56136779971504,
+   "acos30": 107.63454317897371,
+   "acos7": null,
+   "outcome": "ALREADY OFF",
+   "rule": "—",
+   "priority": null,
+   "trace": [
+    [
+     "State check — campaign is live",
+     false,
+     "campaign is ENDED — rules not evaluated"
+    ]
+   ],
+   "reason": "Campaign is already ENDED. No pause action taken — the rules are not evaluated against a campaign that is not running."
+  },
+  {
+   "campaign_id": "149867100012",
+   "campaign": "JD | Flush light | Smart",
+   "type": "Smart",
+   "status": "ENDED",
+   "listings": 34,
+   "no_stock_data": 8,
+   "out_of_stock": 3,
+   "low_stock": 0,
+   "spend30": 16.7,
+   "sales30": 18.89,
+   "ord30": 1.0,
+   "spend7": 0.0,
+   "sales7": 0.0,
+   "ord14": 0.0,
+   "clicks14": 0.0,
+   "spend14": 0.0,
+   "acos30": 88.4065643197459,
    "acos7": null,
    "outcome": "ALREADY OFF",
    "rule": "—",
@@ -1828,19 +1879,19 @@
    "campaign": "JD | MH | Lighting Accessories & Hardware | Tharsika.T | Manual",
    "type": "Manual",
    "status": "ENDED",
-   "listings": 19,
-   "no_stock_data": 2,
+   "listings": 18,
+   "no_stock_data": 1,
    "out_of_stock": 0,
    "low_stock": 0,
-   "spend30": 15.23,
-   "sales30": 36.41,
-   "ord30": 5.0,
+   "spend30": 4.48,
+   "sales30": 20.97,
+   "ord30": 3.0,
    "spend7": 0.0,
    "sales7": 0.0,
    "ord14": 0.0,
    "clicks14": 0.0,
    "spend14": 0.0,
-   "acos30": 41.82916781104093,
+   "acos30": 21.36385312350978,
    "acos7": null,
    "outcome": "ALREADY OFF",
    "rule": "—",

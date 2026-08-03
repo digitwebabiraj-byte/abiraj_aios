@@ -1,8 +1,16 @@
 -- ============================================================================
 -- Paused Campaign Report — Utharsika (PRJ-2026-007 / REQ-09-D01 / PH-2026-07-UTHAR10)
--- READ-ONLY. DB: order_management_copy (Postgres MCP execute_sql).
+-- READ-ONLY. DB: order_management_copy (Postgres MCP execute_sql / temp_user psycopg2).
 -- Returns: Campaign Name, Ad Group Name, ASIN, SKU, Pause Reason,
 --          Campaign Pause Date, Days Paused — one row per still-paused ad target.
+--
+-- OPTIMIZED 2026-08-03 (output-identical, validated 341 rows / 0 ASIN / 0 SKU mismatches
+-- vs the prior wholesale join). ppc_performance is 24.7M rows with NO index on record_id,
+-- so the previous `LEFT JOIN ppc_performance ON record_id` full-scanned it every run and
+-- the warehouse terminated the backend mid-query once Utharsika grew to 91 campaigns.
+-- The perf CTE now reaches ASIN/SKU through the (parent_id, record_type, date) index
+-- instead — every paused ad's perf rows carry its campaign parent_id, so this returns
+-- exactly the same rows via an index seek (~4s instead of a timeout).
 --
 -- Rules (see SYSTEM_REFERENCE.md §4):
 --   scope  : campaign record_name ILIKE '%utharsika%' (no owner column exists)
@@ -12,11 +20,6 @@
 --   filter : still paused today (current ppc.record_status='paused' at ad grain)
 --   reason : verbatim from ppc_etl_automation_log.reason
 --   days   : CURRENT_DATE - action_datetime::date
---
--- Note: util_camp is intentionally NOT filtered to source=1 / non-SB here because
---       the pause log only contains Amazon ad-level events. If pause automation is
---       later widened to other platforms, add
---       "AND p.source=1 AND p.record_subtype <> 'SB'" to util_camp.
 -- ============================================================================
 
 WITH util_camp AS (
@@ -34,6 +37,15 @@ pauses AS (   -- latest successful automation pause per ad target
       AND al.status      = 'success'
       AND al.applied_by  = '0'
     ORDER BY al.record_id, al.source, al.action_datetime DESC
+),
+perf AS (   -- ASIN/SKU limited via the (parent_id, record_type, date) index to Utharsika ads only.
+            -- ppc_performance has NO record_id index (24.7M rows), so a record_id join = full scan.
+            -- Every paused ad's perf rows carry its campaign parent_id, so parent_id IN util_camp
+            -- reaches exactly the same rows through an index seek. DISTINCT collapses per-date dupes.
+    SELECT DISTINCT pp.record_id, pp.source, pp.ref_id, pp.sku
+    FROM public.ppc_performance pp
+    WHERE pp.record_type = 'ad'
+      AND pp.parent_id IN (SELECT parent_id FROM util_camp)
 )
 SELECT uc.campaign_name                          AS "Campaign Name",
        ag.record_name                            AS "Ad Group Name",
@@ -50,8 +62,7 @@ JOIN public.ppc st  ON st.record_main_type = 'ad'
 LEFT JOIN public.ppc ag ON ag.record_main_type = 'ad_group'
                    AND ag.parent_id = ps.parent_id AND ag.child_id = ps.child_id
                    AND ag.source = ps.source
-LEFT JOIN public.ppc_performance pp ON pp.record_id = ps.record_id
-                   AND pp.source = ps.source AND pp.record_type = 'ad'
+LEFT JOIN perf pp ON pp.record_id = ps.record_id AND pp.source = ps.source
 GROUP BY uc.campaign_name, ag.record_name, ps.reason, ps.action_datetime
 ORDER BY "Days Paused" DESC, "Campaign Name";
 
