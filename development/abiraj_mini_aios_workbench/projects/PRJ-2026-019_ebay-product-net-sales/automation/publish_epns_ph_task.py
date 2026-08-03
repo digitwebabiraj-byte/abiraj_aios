@@ -25,6 +25,8 @@ HTML_FILE = os.getenv("EPNS_HTML", os.path.join(
     "REQ-22_ebay-product-net-sales", "REQ-22-D01_dashboard.html"))
 
 AUDIENCE = ["Thinesh", "Jarsini", "kobiga", "powsteena", "Sharmilan", "Sivajitha"]  # ebay_priors
+ASSIGNED_TEAM = "ebay_priors"   # ⚠ the portal ("Ebay Priors") filters on this column — MUST be set,
+                                #   or the rows are invisible in the portal (the sample DDL omits it)
 
 PROJECT_NAME = "eBay Product Net Sales"
 PROJECT_CODE = "epns"
@@ -59,18 +61,21 @@ def main():
                     if COMMIT:
                         cur.execute("""UPDATE tech_team_outputs.ph_task
                             SET html_content=%s, description=%s, task_name=%s, project_name=%s,
-                                developer=%s, version_level=COALESCE(version_level,0)+1,
+                                developer=%s, assigned_user_team=%s,
+                                version_level=COALESCE(version_level,0)+1,
                                 version_status='released', updated_at=now()
                             WHERE id=%s""",
-                            (html, DESCRIPTION, TASK_NAME, PROJECT_NAME, DEVELOPER, rid))
+                            (html, DESCRIPTION, TASK_NAME, PROJECT_NAME, DEVELOPER, ASSIGNED_TEAM, rid))
                 else:
                     print(f"  INSERT new    {tid}  (assigned_user={user})")
                     if COMMIT:
                         cur.execute("""INSERT INTO tech_team_outputs.ph_task
                             (project_name, project_code, task_name, task_id, team, developer,
-                             assigned_user, html_content, description, phase_level, version_level, version_status)
-                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,1,1,'released')""",
-                            (PROJECT_NAME, PROJECT_CODE, TASK_NAME, tid, TEAM, DEVELOPER, user, html, DESCRIPTION))
+                             assigned_user, assigned_user_team, html_content, description,
+                             phase_level, version_level, version_status)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1,1,'released')""",
+                            (PROJECT_NAME, PROJECT_CODE, TASK_NAME, tid, TEAM, DEVELOPER, user,
+                             ASSIGNED_TEAM, html, DESCRIPTION))
         if COMMIT:
             conn.commit(); print("\nCOMMITTED.")
         else:
