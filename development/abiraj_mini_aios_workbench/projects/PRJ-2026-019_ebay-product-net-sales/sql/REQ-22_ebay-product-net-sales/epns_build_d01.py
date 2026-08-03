@@ -15,11 +15,12 @@ DEFINITION (reconciled to eBay's own payout, 2026-08-03):
   This ties, to the penny, to accounting.ebay_order_expenses SALE transaction_amount
   and to the source worked example order 02-14934-76138 -> 22.39.
 
-  VAT (20%) is a DERIVED standard-rate ESTIMATE shown for context (not deducted from NNV,
-  because output VAT is remitted to HMRC separately).
-  Product Cost is NO DATA — no per-SKU COGS exists in any ledsone schema (swept 2026-08-03).
-  A "true net profit" (NNV - VAT - Product Cost) is therefore NOT computed; it needs a COGS
-  source from Kobiga. See PROJECT_HOME.md / SYSTEM_REFERENCE.md.
+  VAT (20%) is a DERIVED standard-rate ESTIMATE.
+  Product Cost is an ESTIMATE = 20% of selling price (Gross) — the owner-agreed proxy already
+  used in PRJ-2026-016 (EPPR, eppr_build_d01.py); no real per-SKU COGS exists in any ledsone
+  schema (swept 2026-08-03). Flagged as an estimate on the sheet.
+  Net Profit (est.) = Net Sales (NNV) - VAT (20%) - Product Cost (20%) — a derived estimate that
+  inherits both proxies; NOT a booked figure. See PROJECT_HOME.md / SYSTEM_REFERENCE.md.
 
 MONEY IS PER MARKETPLACE CURRENCY, NEVER BLENDED (UK GBP / DE+others EUR / US USD; no FX table).
 
@@ -70,8 +71,11 @@ SELECT eo.order_id,
        ROUND(COALESCE(eo.shipping_cost,0),2)                     AS postage,
        ROUND(COALESCE(f.ppc,0),2)                                AS ppc_cost,
        ROUND(COALESCE(f.gen,0),2)                                AS general,
+       ROUND(eo.total * 0.20, 2)                                 AS product_cost,     -- ESTIMATE (EPPR 20% proxy)
        ROUND(eo.total - COALESCE(f.fvf,0) - COALESCE(f.ppc,0) - COALESCE(f.gen,0), 2)
-                                                                 AS net_sales_nnv
+                                                                 AS net_sales_nnv,
+       ROUND((eo.total - COALESCE(f.fvf,0) - COALESCE(f.ppc,0) - COALESCE(f.gen,0))
+             - (eo.total - eo.total/1.2) - (eo.total * 0.20), 2) AS net_profit_est    -- ESTIMATE
 FROM ebay_orders eo
 LEFT JOIN lines l ON l.oid  = eo.id
 LEFT JOIN fees  f ON f.oref = eo.order_id
@@ -108,18 +112,32 @@ COLS = [
     ("VAT (20%) [est]", "vat_20", "money"),
     ("Promotion", "promotion", "money"),
     ("Final Value Fee", "final_value_fee", "money"),
-    ("Product Cost", None, "nodata"),
+    ("Product Cost [est 20%]", "product_cost", "money"),
     ("Postage", "postage", "money"),
     ("PPC Cost", "ppc_cost", "money"),
     ("General", "general", "money"),
     ("Net Sales (NNV)", "net_sales_nnv", "money"),
+    ("Net Profit [est]", "net_profit_est", "money"),
 ]
+
+def _derive(rows):
+    """Populate the two estimate columns if the source rows lack them (JSON-render path)."""
+    for r in rows:
+        g = float(r.get("gross_sales") or 0)
+        if r.get("product_cost") is None:
+            r["product_cost"] = round(g * 0.20, 2)
+        if r.get("net_profit_est") is None:
+            nnv = float(r.get("net_sales_nnv") or 0)
+            vat = float(r.get("vat_20") or 0)
+            r["net_profit_est"] = round(nnv - vat - float(r["product_cost"]), 2)
+    return rows
 
 def write_workbook(rows, out_path):
     from openpyxl import Workbook
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
     from openpyxl.utils import get_column_letter
 
+    rows = _derive(rows)
     anchor = dt.date.today().isoformat()
     hdr_fill = PatternFill("solid", fgColor="1F3864")
     hdr_font = Font(name="Arial", bold=True, color="FFFFFF", size=10)
@@ -138,10 +156,9 @@ def write_workbook(rows, out_path):
     ws["A2"] = (f"One row per eBay order · last 30 days ending {anchor} (last complete day) · "
                 f"{len(rows)} orders · source: raw ledsone (source_id=2), read-only.")
     ws["A2"].font = note_font
-    ws["A3"] = ("Net Sales (NNV) = Gross Sales − Final Value Fee − PPC Cost − General "
-                "(= eBay net payout; ties to eBay SALE transaction_amount). "
-                "VAT (20%) is a derived ESTIMATE (not deducted from NNV). "
-                "Product Cost = NO DATA (no COGS in any DB). Money per marketplace currency — NEVER blended.")
+    ws["A3"] = ("Net Sales (NNV) = Gross − Final Value Fee − PPC − General (= eBay net payout; ties to eBay SALE transaction_amount). "
+                "ESTIMATES: VAT (20%) derived; Product Cost = 20% of selling price (EPPR owner-agreed proxy, no real COGS); "
+                "Net Profit [est] = NNV − VAT − Product Cost. Money per marketplace currency — NEVER blended.")
     ws["A3"].font = note_font
 
     hr = 5
@@ -168,7 +185,7 @@ def write_workbook(rows, out_path):
             cell.border = border
         r += 1
 
-    widths = [18, 30, 16, 12, 9, 12, 13, 14, 12, 15, 13, 11, 11, 11, 15]
+    widths = [18, 30, 16, 12, 9, 12, 13, 14, 12, 15, 17, 11, 11, 11, 15, 15]
     for i, w in enumerate(widths, start=1):
         ws.column_dimensions[get_column_letter(i)].width = w
     ws.freeze_panes = "A6"

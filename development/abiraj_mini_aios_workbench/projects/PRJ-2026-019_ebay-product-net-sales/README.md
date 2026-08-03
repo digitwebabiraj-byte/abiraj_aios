@@ -20,9 +20,10 @@ decision pending Kobiga.
 `Net Sales (NNV) = Gross Sales − Final Value Fee − PPC Cost − General` (= eBay net payout).
 Gross Sales = `orders.total` (already net of promotion). Window = last 30 days ending the last complete day.
 
-> ⚠ **Product Cost = NO DATA** — no per-SKU COGS exists in any ledsone schema (swept 2026-08-03; the EPPR
-> `sku_cogs`-empty lesson). **VAT (20%)** is a derived estimate shown for context, **not** deducted from
-> NNV. A "true net profit" (NNV − VAT − Product Cost) needs a COGS source from Kobiga.
+> ⚠ **Product Cost = ESTIMATE (20% of selling price)** — the owner-agreed proxy already used in EPPR
+> (PRJ-2026-016); no real per-SKU COGS exists in any ledsone schema (swept 2026-08-03). **VAT (20%)** is a
+> derived estimate. **Net Profit [est] = NNV − VAT − Product Cost** — a derived estimate (inherits both
+> proxies), flagged on the sheet; not a booked figure. Replace the 20% with a real COGS source to make it booked.
 
 ## Deliverable
 [REQ-22-D01_ebay_product_net_sales.xlsx](evidence/final_outputs/REQ-22_ebay-product-net-sales/REQ-22-D01_ebay_product_net_sales.xlsx)
