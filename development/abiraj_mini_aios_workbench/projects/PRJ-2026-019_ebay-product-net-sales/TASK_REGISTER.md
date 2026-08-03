@@ -22,6 +22,10 @@ Published the HTML dashboard to `tech_team_outputs.ph_task` (warehouse `order_ma
 | 598 | Sharmilan | epns_Sharmilan_ebay_product_net_sales | 1 (released) |
 | 599 | Sivajitha | epns_Sivajitha_ebay_product_net_sales | 1 (released) |
 
+**Updated to v3 (2026-08-03):** set **`assigned_user_team='ebay_priors'`** on all 6 rows — the portal
+("Ebay Priors") filters on this column, which the sample DDL omits; leaving it NULL made the rows invisible
+in the portal despite existing. This was the reason the report didn't appear. Publish script now always sets it.
+
 **Updated to v2 (2026-08-03):** re-published the **static-first portal build** (`render_epns_portal.py` →
 `REQ-22-D01_ph_task.html`) — all KPI tiles and 4,072 rows are server-rendered into the HTML, so the report
 renders in the portal **even with no JavaScript** (the JS-only dashboard showed blank in the portal tile).
