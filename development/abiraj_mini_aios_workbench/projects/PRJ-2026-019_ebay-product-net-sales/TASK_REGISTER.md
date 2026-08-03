@@ -7,6 +7,12 @@ Canonical index of tasks/deliverables within this project. Detail lives in `PROJ
 |---|---|---|---|
 | REQ-22 | **REQ-22-D01** | Per-order eBay **Net Sales (NNV)** report (Excel): Order ID · SKU · Account · Marketplace · Currency · Order Date · Gross Sales · VAT (20%, est) · Promotion · Final Value Fee · Product Cost (NO DATA) · Postage · PPC Cost · General · Net Sales (NNV), one row per eBay order, last 30 days, per marketplace currency. | ✅ **BUILT · DELIVERED 2026-08-03.** 4,432 orders from raw ledsone; reconciles to worked example (22.39) & eBay payout. Not yet published / committed / signed off. |
 | REQ-22 | **REQ-22-D02** | **Net Sales Lookup** tab — enter any single Order ID, return its Net Sales and full deduction breakdown (INDEX/MATCH). | ✅ **BUILT · DELIVERED 2026-08-03** (Tab 2 of the D01 workbook). |
+| REQ-22 | **REQ-22-D03** | **HTML dashboard** — self-contained modern light-theme UI (gradient/glass, embedded Sora/Manrope fonts), animated per-currency KPI tiles, searchable/sortable/filterable table (all 12 source columns), CSV export, full-screen. | ✅ **BUILT · DELIVERED 2026-08-03** (`REQ-22-D01_dashboard.html`, renderer `render_epns_dashboard.py`). Interactive JS version for local review; static no-JS portal version TBD if `ph_task` publish is approved. |
+
+## Build refinements (2026-08-03)
+- **Settled-only** — includes an order only once eBay books its fees (settlement lag); adds a `Fees Settled` column. Fixes the fee-deviation vs eBay on recent orders. ~4,072 settled orders.
+- **Product Cost** now the EPPR 20%-of-price proxy (was NO DATA) → adds `Net Profit [est]`.
+- Dashboard table shows all 12 source columns incl. Promotion + Postage (were initially missing).
 | REQ-22 | *(future)* | Scheduled refresh (automation), if requested after sign-off. | ⚪ Not requested. |
 
 ## Source
