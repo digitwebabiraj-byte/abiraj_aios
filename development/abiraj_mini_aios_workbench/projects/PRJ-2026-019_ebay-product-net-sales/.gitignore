@@ -1,0 +1,15 @@
+# Python bytecode - regenerated on every run, never an artefact
+__pycache__/
+*.pyc
+
+# Excel lock files (created while a workbook is open in Excel)
+~$*.xlsx
+
+# Secrets - DB passwords NEVER enter git (credentials come from the shared global store /
+# git-ignored *_secrets.bat; see 05_documentation/capability/shared_db_credentials/)
+*_secrets.bat
+
+# Machine-local run artefacts, if automation is added later
+automation/*.log
+automation/*_status.txt
+automation/*_last_good.json
