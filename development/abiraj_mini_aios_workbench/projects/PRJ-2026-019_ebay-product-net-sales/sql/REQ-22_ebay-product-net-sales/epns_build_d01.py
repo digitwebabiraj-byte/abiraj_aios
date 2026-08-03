@@ -55,6 +55,10 @@ fees AS (   -- eBay fee stack, bucketed by fee_type (join by eBay order_id)
   FROM accounting.ebay_order_expenses e
   WHERE e.order_id IS NOT NULL AND e.order_id <> ''
   GROUP BY e.order_id
+),
+settled AS (   -- an order is settled once eBay has booked its SALE (fee) transactions
+  SELECT DISTINCT order_id FROM accounting.ebay_order_expenses
+  WHERE transaction_type = 'SALE' AND order_id IS NOT NULL AND order_id <> ''
 )
 SELECT eo.order_id,
        l.skus AS sku,
@@ -64,8 +68,9 @@ SELECT eo.order_id,
             ELSE eo.market_place END AS marketplace,
        CASE eo.market_place WHEN '23' THEN 'GBP' WHEN '24' THEN 'USD' ELSE 'EUR' END AS currency,
        to_char(eo.order_date,'YYYY-MM-DD')                       AS order_date,
+       'Yes'                                                     AS fees_settled,
        ROUND(eo.total,2)                                         AS gross_sales,
-       ROUND(eo.total - eo.total/1.2, 2)                         AS vat_20,          -- ESTIMATE
+       ROUND(eo.total - eo.total/1.2, 2)                         AS vat_20,          -- ESTIMATE (output VAT on sale)
        ROUND(COALESCE(eo.discount,0),2)                          AS promotion,
        ROUND(COALESCE(f.fvf,0),2)                                AS final_value_fee,
        ROUND(COALESCE(eo.shipping_cost,0),2)                     AS postage,
@@ -77,6 +82,7 @@ SELECT eo.order_id,
        ROUND((eo.total - COALESCE(f.fvf,0) - COALESCE(f.ppc,0) - COALESCE(f.gen,0))
              - (eo.total - eo.total/1.2) - (eo.total * 0.20), 2) AS net_profit_est    -- ESTIMATE
 FROM ebay_orders eo
+JOIN settled s ON s.order_id = eo.order_id          -- SETTLED ONLY: fees booked, ties to eBay
 LEFT JOIN lines l ON l.oid  = eo.id
 LEFT JOIN fees  f ON f.oref = eo.order_id
 ORDER BY eo.order_date DESC, eo.order_id;
@@ -108,8 +114,9 @@ COLS = [
     ("Marketplace", "marketplace", None),
     ("Currency", "currency", None),
     ("Order Date", "order_date", None),
+    ("Fees Settled", "fees_settled", None),
     ("Gross Sales", "gross_sales", "money"),
-    ("VAT (20%) [est]", "vat_20", "money"),
+    ("Output VAT (20%) [est]", "vat_20", "money"),
     ("Promotion", "promotion", "money"),
     ("Final Value Fee", "final_value_fee", "money"),
     ("Product Cost [est 20%]", "product_cost", "money"),
@@ -153,12 +160,13 @@ def write_workbook(rows, out_path):
     # Title + provenance banner
     ws["A1"] = "eBay Product Net Sales (NNV) — REQ-22-D01 (Kobiga)"
     ws["A1"].font = Font(name="Arial", bold=True, size=13)
-    ws["A2"] = (f"One row per eBay order · last 30 days ending {anchor} (last complete day) · "
-                f"{len(rows)} orders · source: raw ledsone (source_id=2), read-only.")
+    ws["A2"] = (f"One row per eBay order · last 30 days ending {anchor} · SETTLED orders only "
+                f"(eBay fees booked) so every figure ties to eBay · {len(rows)} orders · raw ledsone (source_id=2), read-only.")
     ws["A2"].font = note_font
     ws["A3"] = ("Net Sales (NNV) = Gross − Final Value Fee − PPC − General (= eBay net payout; ties to eBay SALE transaction_amount). "
-                "ESTIMATES: VAT (20%) derived; Product Cost = 20% of selling price (EPPR owner-agreed proxy, no real COGS); "
-                "Net Profit [est] = NNV − VAT − Product Cost. Money per marketplace currency — NEVER blended.")
+                "Fees are VAT-inclusive as eBay books them. Output VAT (20%) is a derived estimate on the SALE price (info only, NOT the fee-VAT eBay shows, and NOT deducted from NNV). "
+                "Product Cost = 20% of selling price (EPPR owner-agreed proxy, no real COGS); Net Profit [est] = NNV − Output VAT − Product Cost. "
+                "Money per marketplace currency — NEVER blended. Unsettled/very recent orders are excluded until eBay books their fees; they appear next run.")
     ws["A3"].font = note_font
 
     hr = 5
@@ -185,7 +193,7 @@ def write_workbook(rows, out_path):
             cell.border = border
         r += 1
 
-    widths = [18, 30, 16, 12, 9, 12, 13, 14, 12, 15, 17, 11, 11, 11, 15, 15]
+    widths = [18, 30, 16, 12, 9, 12, 11, 13, 16, 12, 15, 17, 11, 11, 11, 15, 15]
     for i, w in enumerate(widths, start=1):
         ws.column_dimensions[get_column_letter(i)].width = w
     ws.freeze_panes = "A6"
