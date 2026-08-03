@@ -162,8 +162,9 @@ tbody tr:hover td{background:linear-gradient(90deg,rgba(59,110,246,.09),rgba(124
  <div class="ctrls"><input id="q" type="search" placeholder="Search order ID, SKU or account..."><span class="cnt" id="cnt"></span></div>
  <div class="tw"><table><thead><tr><!--HEAD--></tr></thead><tbody id="tb"><!--BODY--></tbody></table></div>
 </div>
-<div class="foot"><b>Net Sales (NNV)</b> = Gross - Final Value Fee - PPC - General (eBay net payout; ties to eBay "Total fees incl VAT").
-<b>VAT (20%)</b> and <b>Product Cost</b> (20% proxy) are estimates; <b>Net Profit-est</b> = NNV - VAT - Product Cost. Unsettled recent orders are excluded until eBay books their fees.</div>
+<div class="foot"><b>Net Sales (NNV)</b> = Gross - Final Value Fee - General (eBay net payout; ties to eBay "Total fees incl VAT").
+<b>General</b> = AD_FEE (Promoted Listings "General" campaign fee, per order). <b>PPC Cost</b> = Advanced/Priority (CPC) ads (PREMIUM_AD_FEES) — billed per listing, allocated across the listing's orders; carried into Net Profit, not into NNV.
+<b>VAT (20%)</b> and <b>Product Cost</b> (20% proxy) are estimates; <b>Net Profit-est</b> = NNV - VAT - Product Cost - PPC. Unsettled recent orders are excluded until eBay books their fees.</div>
 </div>
 <script>
 (function(){var tb=document.getElementById('tb'),q=document.getElementById('q'),cnt=document.getElementById('cnt');
