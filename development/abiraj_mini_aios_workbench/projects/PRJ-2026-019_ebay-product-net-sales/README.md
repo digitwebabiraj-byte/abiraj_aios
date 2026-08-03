@@ -10,21 +10,26 @@ Final Value Fee, Product Cost, Postage, PPC Cost, General — resolving to **Net
 **Net Sales Lookup** tab to look up any single Order ID.
 
 ## Status
-🟡 **ONBOARDED — DISCOVERY · BUILD PENDING.** Requirement captured from `Kobiga task.xlsx` (imported
-2026-08-03). Structure scaffolded to the workbench standard. **Not built, not published, not committed,
-not signed off.** IDs provisional (see below).
+✅ **BUILT · DELIVERED (2026-08-03).** Built from the **raw ledsone** DB (read-only), **4,432 eBay orders**
+over the last 30 days. Reconciles to the penny to the source worked example (order `02-14934-76138` →
+Net **22.39**) and to eBay's own payout (`ebay_order_expenses` SALE `transaction_amount`). **Not yet
+published (ph_task) / committed / signed off** — IDs provisional; publish audience + the profit-definition
+decision pending Kobiga.
 
-## The formula (from the source)
-`Net Sales (NNV) = Gross Sales − VAT (20%) − Promotion − Final Value Fee − Product Cost − Postage − PPC Cost − General`
-Window = last 30 days of order data.
+## The formula (reconciled against live data)
+`Net Sales (NNV) = Gross Sales − Final Value Fee − PPC Cost − General` (= eBay net payout).
+Gross Sales = `orders.total` (already net of promotion). Window = last 30 days ending the last complete day.
 
-> ⚠ **Product Cost has no source** — no per-SKU COGS exists in any database (the EPPR / `sku_cogs`-empty
-> lesson). This is the primary open blocker: either a real cost basis is supplied, or the column is
-> flagged `NO DATA` / an owner-agreed estimate. Do **not** silently guess it.
+> ⚠ **Product Cost = NO DATA** — no per-SKU COGS exists in any ledsone schema (swept 2026-08-03; the EPPR
+> `sku_cogs`-empty lesson). **VAT (20%)** is a derived estimate shown for context, **not** deducted from
+> NNV. A "true net profit" (NNV − VAT − Product Cost) needs a COGS source from Kobiga.
 
-## Deliverable (planned)
-`evidence/final_outputs/REQ-22_.../REQ-22-D01_ebay_product_net_sales.xlsx` — Net Sales table + Net Sales
-Lookup tab (build pending).
+## Deliverable
+[REQ-22-D01_ebay_product_net_sales.xlsx](evidence/final_outputs/REQ-22_ebay-product-net-sales/REQ-22-D01_ebay_product_net_sales.xlsx)
+— **Tab 1 Net Sales** (12 source columns + Marketplace/Currency/Order Date, 4,432 orders) · **Tab 2 Net
+Sales Lookup** (enter any Order ID → its Net Sales + full breakdown via INDEX/MATCH). Builder:
+[epns_build_d01.py](sql/REQ-22_ebay-product-net-sales/epns_build_d01.py). Reconciliation:
+[evidence/logs_or_screenshots/…/2026-08-03_build_and_reconciliation.md](evidence/logs_or_screenshots/REQ-22_ebay-product-net-sales/2026-08-03_build_and_reconciliation.md).
 
 ## Authoritative documents
 - `PROJECT_HOME.md` — canonical project truth

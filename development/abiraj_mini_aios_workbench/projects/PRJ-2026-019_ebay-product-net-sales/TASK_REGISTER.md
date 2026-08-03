@@ -5,8 +5,8 @@ Canonical index of tasks/deliverables within this project. Detail lives in `PROJ
 
 | Task | Deliverable | Description | Status |
 |---|---|---|---|
-| REQ-22 | **REQ-22-D01** | Per-order eBay **Net Sales (NNV)** report (Excel): 12-column table (Order ID · SKU · Account · Gross Sales · VAT 20% · Promotion % · Final Value Fee · Product Cost · Postage · PPC Cost · General · Net Sales) at eBay order-line grain, last 30 days, per marketplace currency. | 🟡 **ONBOARDED — DISCOVERY · BUILD PENDING.** Requirement captured; structure scaffolded 2026-08-03. Not built / published / committed / signed off. |
-| REQ-22 | **REQ-22-D02** | **Net Sales Lookup** tab — enter any single Order ID, return its Net Sales and full deduction breakdown. | 🟡 **PLANNED** (same workbook, part of D01 build). |
+| REQ-22 | **REQ-22-D01** | Per-order eBay **Net Sales (NNV)** report (Excel): Order ID · SKU · Account · Marketplace · Currency · Order Date · Gross Sales · VAT (20%, est) · Promotion · Final Value Fee · Product Cost (NO DATA) · Postage · PPC Cost · General · Net Sales (NNV), one row per eBay order, last 30 days, per marketplace currency. | ✅ **BUILT · DELIVERED 2026-08-03.** 4,432 orders from raw ledsone; reconciles to worked example (22.39) & eBay payout. Not yet published / committed / signed off. |
+| REQ-22 | **REQ-22-D02** | **Net Sales Lookup** tab — enter any single Order ID, return its Net Sales and full deduction breakdown (INDEX/MATCH). | ✅ **BUILT · DELIVERED 2026-08-03** (Tab 2 of the D01 workbook). |
 | REQ-22 | *(future)* | Scheduled refresh (automation), if requested after sign-off. | ⚪ Not requested. |
 
 ## Source
