@@ -397,6 +397,11 @@ def main():
                 % (total, len(names), " ".join("%s=%d" % (k, seg[k]) for k in SEG_ORDER)))
         conn.close(); log("done."); return
 
+    conn.rollback()                      # close the read-only view/txn before writing
+    conn.set_session(readonly=False)     # BUGFIX 2026-08-03: the recompute connection is opened
+                                         # read-only (line ~336); the publish INSERT/DELETE needs
+                                         # read-write or Postgres rejects it ("cannot execute INSERT
+                                         # in a read-only transaction"). Reset once reads are done.
     publish(conn, month_tag, leader_html, per_ph_html, generated)
     record_good(total, per_ph_rows)
     _status("OK", "%d ASINs / %d PHs | %s | PUBLISHED %d rows"
