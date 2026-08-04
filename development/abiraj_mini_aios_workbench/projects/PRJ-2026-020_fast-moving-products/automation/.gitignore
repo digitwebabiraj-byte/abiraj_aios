@@ -1,0 +1,5 @@
+*_secrets.bat
+*.log
+*_status.txt
+*_last_good.json
+__pycache__/
