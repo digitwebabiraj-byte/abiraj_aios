@@ -61,20 +61,21 @@ HTML = """<!doctype html>
 <title>Fast Moving Products — Germany · REQ-23-D01</title>
 <style>
 :root{
-  --bg:#eef1f8; --card:#ffffff; --ink:#1e2436; --muted:#6b7488; --line:#e6eaf4;
-  --brand:#4f46e5; --brand2:#6366f1; --sky:#0284c7; --accent:#0891b2;
-  --grow:#047857; --growbg:#d9f7e8; --stab:#a16207; --stabbg:#fdf1cf;
-  --slow:#dc2626; --slowbg:#fde3e3; --oos:#e11d48; --oosbg:#fdeaee;
-  --shadow:0 10px 34px rgba(31,41,80,.09),0 2px 8px rgba(31,41,80,.05); --radius:14px;
+  --bg:#f2f6f4; --card:#ffffff; --ink:#152b2a; --muted:#5f7472; --line:#e3ece9;
+  --brand:#0d9488; --brand2:#14b8a6; --sky:#0891b2; --accent:#f59e0b;
+  --grow:#047857; --growbg:#d4f5e4; --stab:#b45309; --stabbg:#fdeecb;
+  --slow:#e11d48; --slowbg:#ffe1e8; --oos:#e11d48; --oosbg:#fff0f3;
+  --zebra:#f5faf8; --hover:#eafaf4;
+  --shadow:0 10px 34px rgba(15,60,55,.09),0 2px 8px rgba(15,60,55,.05); --radius:14px;
 }
 *{box-sizing:border-box} html,body{margin:0}
 body{font-family:'Segoe UI',Roboto,Helvetica,Arial,system-ui,sans-serif;color:var(--ink);
-  background:radial-gradient(1000px 460px at 10% -10%,rgba(99,102,241,.12),transparent 55%),
-    radial-gradient(900px 460px at 100% -6%,rgba(2,132,199,.10),transparent 52%),var(--bg);
+  background:radial-gradient(1000px 460px at 8% -10%,rgba(20,184,166,.16),transparent 55%),
+    radial-gradient(900px 460px at 100% -6%,rgba(245,158,11,.12),transparent 52%),var(--bg);
   background-attachment:fixed;min-height:100vh;padding:14px clamp(12px,2vw,30px);-webkit-font-smoothing:antialiased}
 .wrap{width:100%;max-width:none;margin:0}
-header.hero{background:linear-gradient(115deg,#4338ca 0%,#4f46e5 40%,#4f7fe0 72%,#0ea5e9 120%);
-  color:#fff;border-radius:16px;padding:14px 22px;box-shadow:0 12px 34px rgba(67,56,202,.28);
+header.hero{background:linear-gradient(115deg,#134e4a 0%,#0f766e 38%,#0d9488 70%,#14b8a6 108%);
+  color:#fff;border-radius:16px;padding:14px 22px;box-shadow:0 12px 34px rgba(13,148,136,.30);
   position:relative;overflow:hidden;animation:drop .5s ease;display:flex;align-items:center;
   justify-content:space-between;gap:16px;flex-wrap:wrap}
 .hero h1{margin:0;font-size:20px;font-weight:800;letter-spacing:.2px}
@@ -88,10 +89,10 @@ header.hero{background:linear-gradient(115deg,#4338ca 0%,#4f46e5 40%,#4f7fe0 72%
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}
 .kpi{border-radius:12px;padding:11px 15px;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow);
   display:flex;flex-direction:column;justify-content:center;min-height:64px;animation:rise .45s ease both}
-.kpi.k0{background:linear-gradient(135deg,#4f46e5,#6366f1)}
-.kpi.k1{background:linear-gradient(135deg,#0284c7,#0ea5e9)}
-.kpi.k2{background:linear-gradient(135deg,#047857,#10b981)}
-.kpi.k3{background:linear-gradient(135deg,#e11d48,#fb7185)}
+.kpi.k0{background:linear-gradient(135deg,#0f766e,#14b8a6)}
+.kpi.k1{background:linear-gradient(135deg,#0e7490,#22d3ee)}
+.kpi.k2{background:linear-gradient(135deg,#b45309,#f59e0b)}
+.kpi.k3{background:linear-gradient(135deg,#be123c,#fb7185)}
 .kpi:nth-child(2){animation-delay:.05s}.kpi:nth-child(3){animation-delay:.1s}.kpi:nth-child(4){animation-delay:.15s}
 .kpi .lab{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.9}
 .kpi .val{font-size:23px;font-weight:800;line-height:1.15;font-variant-numeric:tabular-nums}
@@ -101,16 +102,16 @@ header.hero{background:linear-gradient(115deg,#4338ca 0%,#4f46e5 40%,#4f7fe0 72%
   font-weight:700;font-size:13px;cursor:pointer;transition:.18s;box-shadow:0 1px 4px rgba(31,41,80,.05)}
 .tab:hover{color:var(--brand);border-color:var(--brand2)}
 .tab.active{background:linear-gradient(120deg,var(--brand),var(--brand2));color:#fff;border-color:transparent;
-  box-shadow:0 8px 18px rgba(79,70,229,.30)}
+  box-shadow:0 8px 18px rgba(13,148,136,.32)}
 .filters{display:flex;gap:9px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
 .search{flex:1;min-width:220px;position:relative}
 .search input{width:100%;padding:10px 14px 10px 38px;border:1px solid var(--line);border-radius:11px;font-size:13.5px;
   background:var(--card);color:var(--ink);outline:none;transition:.2s;box-shadow:0 1px 4px rgba(31,41,80,.04)}
-.search input:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.search input:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(20,184,166,.18)}
 .search svg{position:absolute;left:13px;top:11px;opacity:.5}
 select.fil{padding:10px 12px;border:1px solid var(--line);border-radius:11px;font-size:13px;background:var(--card);
   color:var(--ink);cursor:pointer;outline:none;transition:.2s;font-weight:600}
-select.fil:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+select.fil:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(20,184,166,.18)}
 .clr{padding:10px 14px;border:1px solid var(--line);border-radius:11px;font-size:12.5px;font-weight:700;
   background:var(--card);color:var(--muted);cursor:pointer;transition:.2s}
 .clr:hover{color:var(--brand);border-color:var(--brand2)}
@@ -119,27 +120,29 @@ select.fil:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(99,102,241
 .scroll{overflow-x:auto;max-height:calc(100vh - 232px)}
 :fullscreen .scroll{max-height:calc(100vh - 208px)}
 table{width:100%;border-collapse:collapse;font-size:13px}
-thead th{position:sticky;top:0;z-index:1;background:linear-gradient(180deg,#eef1fd,#e7ebfb);color:var(--brand);
+thead th{position:sticky;top:0;z-index:1;background:linear-gradient(180deg,#0f766e,#0d9488);color:#eafff9;
   text-align:left;padding:12px 12px;font-weight:700;font-size:11.5px;white-space:nowrap;cursor:pointer;
-  user-select:none;border-bottom:2px solid #dfe3f6}
-thead th:hover{background:#e3e7fb} thead th .ar{opacity:.5;font-size:9px;margin-left:3px}
+  user-select:none;border-bottom:2px solid #0b6157}
+thead th:hover{background:#0b6157} thead th .ar{opacity:.7;font-size:9px;margin-left:3px}
 tbody td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
-tbody tr{animation:fade .25s ease both} tbody tr:hover{background:#f5f6ff}
+tbody tr{animation:fade .25s ease both}
+tbody tr:nth-child(even){background:var(--zebra)}
+tbody tr:hover{background:var(--hover)}
 .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.sku{font-family:'Consolas','SF Mono',monospace;font-size:11.5px;color:var(--brand);font-weight:600}
+.sku{font-family:'Consolas','SF Mono',monospace;font-size:11.5px;color:#0d9488;font-weight:600}
 .pid{font-family:'Consolas','SF Mono',monospace;font-size:11px;color:var(--muted)}
 .title{max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rank{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;
-  background:#ecebff;color:var(--brand);font-weight:800;font-size:12px}
-.rank.top{background:linear-gradient(135deg,#f59e0b,#f43f5e);color:#fff;box-shadow:0 3px 8px rgba(244,63,94,.28)}
+  background:#d6f3ec;color:#0b6157;font-weight:800;font-size:12px}
+.rank.top{background:linear-gradient(135deg,#f59e0b,#14b8a6);color:#fff;box-shadow:0 3px 8px rgba(13,148,136,.30)}
 .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
 .b-grow{background:var(--growbg);color:var(--grow)} .b-stab{background:var(--stabbg);color:var(--stab)}
-.b-slow{background:var(--slowbg);color:var(--slow)} .b-new{background:#ecebff;color:var(--brand)}
-.act{font-size:12px;font-weight:600;white-space:nowrap}
+.b-slow{background:var(--slowbg);color:var(--slow)} .b-new{background:#d6f3ec;color:var(--brand)}
+.act{font-size:12px;font-weight:600;white-space:nowrap;color:#334b49}
 tr.oos td{background:var(--oosbg) !important} tr.oos .stockcell{color:var(--oos);font-weight:800}
-.chip{display:inline-block;padding:2px 9px;border-radius:7px;background:#ecebff;color:var(--brand);font-size:10.5px;font-weight:600}
+.chip{display:inline-block;padding:2px 9px;border-radius:7px;background:#e4f4f0;color:#0b6157;font-size:10.5px;font-weight:600}
 .count{font-size:12px;color:var(--muted);padding:10px 14px;border-top:1px solid var(--line);
-  background:linear-gradient(180deg,#fafbff,#f4f5fd)}
+  background:linear-gradient(180deg,#f8fbfa,#f1f8f5)}
 footer{margin:14px 4px 6px;color:var(--muted);font-size:11.5px;line-height:1.55}
 @keyframes drop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
