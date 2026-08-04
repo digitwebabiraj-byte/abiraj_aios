@@ -67,8 +67,10 @@ Page Views · Current B2B Orders · Buy Box % (Current) · Session Change · Tie
    a partial, gappy mirror of that report (May 2026 missing, ~half the ASINs absent), which is why it
    can't reproduce the sheet. ⇒ **Build FRRC-style: the owner-supplied Amazon report export is the
    system of record; the DB is not used as the source.** Each future cycle needs a fresh 2-window export.
-1. **Publish audience** — end user confirmed = **Jensika** (`staff.users` id 99). Still need the
-   `ph_task` audience/team this publishes to (Jensika + which other holders?).
+1. ✅ **Publish audience — RESOLVED + PUBLISHED (2026-07-31).** End user **Jensika** (`staff.users`
+   id 99), `assigned_user_team=**ah_priors**`. Live on `tech_team_outputs.ph_task` **id 669**
+   (`order_management_copy` warehouse), guarded `temp_user` INSERT, read-back md5-verified. Business
+   sign-off from Jensika pending.
 2. ✅ **The two 30-day windows — RESOLVED (owner-confirmed 2026-07-31):**
    - **Current cycle:** 2026-06-16 → 2026-07-15
    - **Previous cycle:** 2026-05-17 → 2026-06-15
