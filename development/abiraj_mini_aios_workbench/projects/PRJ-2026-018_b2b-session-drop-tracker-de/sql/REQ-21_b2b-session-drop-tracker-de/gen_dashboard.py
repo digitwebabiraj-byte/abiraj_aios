@@ -49,7 +49,8 @@ def render_rows(rows):
             f'<td>{_z(x["prev_orders"])}</td><td>{_z(x["curr_sessions"])}</td><td>{_z(x["curr_page_views"])}</td>'
             f'<td>{_z(x["curr_orders"])}</td><td>{bb}</td><td>{chg}</td>'
             f'<td><span class="badge {_CLS[x["tier"]]}">{x["tier"].replace(" - "," · ")}</span></td>'
-            f'<td class="status {_STC[x["tier"]]}">{x["status"]}</td><td class="action">{x["action"]}</td></tr>')
+            f'<td class="status {_STC[x["tier"]]}">{x["status"]}</td>'
+            f'<td class="action"><div class="clamp" title="{x["action"].replace(chr(34),"&quot;")}">{x["action"]}</div></td></tr>')
     return "".join(out)
 
 m = DATA["meta"]
@@ -183,7 +184,7 @@ th:first-child,td:first-child{position:sticky;left:0;text-align:left}
 th:first-child,td:first-child{padding-left:20px}
 td:first-child{z-index:1;font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;font-weight:600;letter-spacing:.1px;color:#0f172a;border-right:1px solid #eef2f8}
 thead th:first-child{z-index:4}
-tbody td{padding:12px 14px;text-align:center;white-space:nowrap;border-bottom:1px solid #eef2f8;font-variant-numeric:tabular-nums;color:#334155;background:var(--card)}
+tbody td{padding:7px 14px;text-align:center;white-space:nowrap;border-bottom:1px solid #eef2f8;font-variant-numeric:tabular-nums;color:#334155;background:var(--card)}
 tbody tr:nth-child(even) td{background:#fafbfe}
 tbody tr{opacity:0;transform:translateY(8px)}
 tbody tr.in{opacity:1;transform:none;transition:opacity .5s ease,transform .5s cubic-bezier(.22,1,.36,1)}
@@ -191,7 +192,8 @@ tbody tr:hover td{background:#eff4ff}
 tbody tr:last-child td{border-bottom:0}
 tbody tr.pri td:first-child{box-shadow:inset 3px 0 0 0 #f43f5e}
 .z{color:#cbd5e1}
-td.action{text-align:left;white-space:normal;min-width:340px;max-width:480px;font-size:12px;color:#5b6675;line-height:1.55}
+td.action{text-align:left;white-space:normal;min-width:300px;max-width:520px;font-size:12px;color:#5b6675;vertical-align:middle}
+td.action .clamp{display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45;cursor:help}
 .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:inset 0 0 0 1px rgba(0,0,0,.03)}
 .badge::before{content:"";width:6px;height:6px;border-radius:50%}
 .b3{background:var(--t3b);color:var(--t3)}.b3::before{background:var(--t3)}
@@ -307,7 +309,7 @@ function render(){
     return `<tr class="${x.tier==='Tier 3 - High'?'pri':''}"><td>${x.asin}</td><td>${z(x.prev_sessions)}</td><td>${z(x.prev_page_views)}</td><td>${z(x.prev_orders)}</td>
     <td>${z(x.curr_sessions)}</td><td>${z(x.curr_page_views)}</td><td>${z(x.curr_orders)}</td><td>${bb}</td>
     <td>${chg}</td><td><span class="badge ${cls[x.tier]}">${x.tier.replace(' - ',' · ')}</span></td>
-    <td class="status ${stc[x.tier]}">${x.status}</td><td class="action">${x.action}</td></tr>`;}).join('');
+    <td class="status ${stc[x.tier]}">${x.status}</td><td class="action"><div class="clamp" title="${x.action.replace(/"/g,'&quot;')}">${x.action}</div></td></tr>`;}).join('');
   observe();
 }
 // count-up
