@@ -3,180 +3,169 @@
 <title>Fast Moving Products — Germany · REQ-23-D01</title>
 <style>
 :root{
-  --bg1:#f0f3ff; --bg2:#eafcff; --card:#ffffff; --ink:#161a2e; --muted:#6b7391;
-  --line:#e9ecfa; --brand:#5b21f0; --brand2:#8b5cf6; --accent:#06b6d4;
-  --grow:#059669; --growbg:#d1fae5; --stab:#b45309; --stabbg:#fef3c7;
-  --slow:#dc2626; --slowbg:#fee2e2; --oos:#e11d48; --oosbg:#ffe4ea;
-  --shadow:0 18px 50px rgba(76,29,149,.10),0 4px 12px rgba(76,29,149,.06);
-  --radius:20px;
+  --bg:#eef1f8; --card:#ffffff; --ink:#1e2436; --muted:#6b7488; --line:#e6eaf4;
+  --brand:#4f46e5; --brand2:#6366f1; --sky:#0284c7; --accent:#0891b2;
+  --grow:#047857; --growbg:#d9f7e8; --stab:#a16207; --stabbg:#fdf1cf;
+  --slow:#dc2626; --slowbg:#fde3e3; --oos:#e11d48; --oosbg:#fdeaee;
+  --shadow:0 10px 34px rgba(31,41,80,.09),0 2px 8px rgba(31,41,80,.05); --radius:14px;
 }
-*{box-sizing:border-box}
-html,body{margin:0}
+*{box-sizing:border-box} html,body{margin:0}
 body{font-family:'Segoe UI',Roboto,Helvetica,Arial,system-ui,sans-serif;color:var(--ink);
-  background:
-    radial-gradient(1200px 600px at 12% -8%,rgba(139,92,246,.18),transparent 55%),
-    radial-gradient(1000px 560px at 98% 4%,rgba(6,182,212,.16),transparent 50%),
-    linear-gradient(140deg,var(--bg1),var(--bg2));
-  background-attachment:fixed;min-height:100vh;padding:22px clamp(14px,2.4vw,40px);
-  -webkit-font-smoothing:antialiased}
+  background:radial-gradient(1000px 460px at 10% -10%,rgba(99,102,241,.12),transparent 55%),
+    radial-gradient(900px 460px at 100% -6%,rgba(2,132,199,.10),transparent 52%),var(--bg);
+  background-attachment:fixed;min-height:100vh;padding:14px clamp(12px,2vw,30px);-webkit-font-smoothing:antialiased}
 .wrap{width:100%;max-width:none;margin:0}
-header.hero{background:linear-gradient(120deg,#4c1d95 0%,#6d28d9 42%,#7c3aed 68%,#06b6d4 130%);
-  color:#fff;border-radius:26px;padding:30px 34px;box-shadow:0 22px 60px rgba(76,29,149,.32);
-  position:relative;overflow:hidden;animation:drop .6s ease}
-header.hero::before{content:"";position:absolute;inset:0;
-  background:radial-gradient(600px 300px at 80% -40%,rgba(255,255,255,.22),transparent 60%);pointer-events:none}
-header.hero::after{content:"";position:absolute;right:-40px;bottom:-90px;width:300px;height:300px;
-  background:radial-gradient(circle,rgba(6,182,212,.35),transparent 70%);border-radius:50%}
-.hero h1{margin:0;font-size:30px;letter-spacing:.2px;font-weight:800;position:relative}
-.hero p{margin:9px 0 0;opacity:.94;font-size:14px;max-width:1000px;line-height:1.55;position:relative}
-.badges{margin-top:16px;display:flex;gap:9px;flex-wrap:wrap;position:relative}
-.pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.32);padding:6px 13px;
-  border-radius:999px;font-size:12px;font-weight:600;backdrop-filter:blur(6px)}
-.fsbtn{position:absolute;right:26px;top:26px;background:rgba(255,255,255,.20);border:1px solid rgba(255,255,255,.45);
-  color:#fff;border-radius:12px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;
-  transition:.2s;backdrop-filter:blur(6px);z-index:2}
-.fsbtn:hover{background:rgba(255,255,255,.34);transform:translateY(-1px)}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:24px 0}
-.kpi{border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);position:relative;overflow:hidden;
-  color:#fff;animation:rise .5s ease both}
-.kpi::after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;
-  background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%);border-radius:50%}
-.kpi.k0{background:linear-gradient(135deg,#7c3aed,#a855f7)}
-.kpi.k1{background:linear-gradient(135deg,#2563eb,#22d3ee)}
-.kpi.k2{background:linear-gradient(135deg,#0ea5a4,#34d399)}
-.kpi.k3{background:linear-gradient(135deg,#f43f5e,#fb7185)}
-.kpi:nth-child(2){animation-delay:.06s}.kpi:nth-child(3){animation-delay:.12s}.kpi:nth-child(4){animation-delay:.18s}
-.kpi .lab{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;opacity:.92}
-.kpi .val{font-size:34px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums;line-height:1.1}
-.kpi .sub{font-size:12px;margin-top:3px;opacity:.85}
-.kpi .bar{height:5px;border-radius:5px;margin-top:14px;background:rgba(255,255,255,.55);
-  transform-origin:left;animation:grow .8s ease both}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 18px}
-.tab{background:var(--card);border:1px solid var(--line);color:var(--muted);padding:11px 22px;border-radius:14px;
-  font-weight:700;font-size:14px;cursor:pointer;transition:.2s;box-shadow:0 2px 6px rgba(76,29,149,.06)}
-.tab:hover{color:var(--brand);border-color:var(--brand2);transform:translateY(-1px)}
+header.hero{background:linear-gradient(115deg,#4338ca 0%,#4f46e5 40%,#4f7fe0 72%,#0ea5e9 120%);
+  color:#fff;border-radius:16px;padding:14px 22px;box-shadow:0 12px 34px rgba(67,56,202,.28);
+  position:relative;overflow:hidden;animation:drop .5s ease;display:flex;align-items:center;
+  justify-content:space-between;gap:16px;flex-wrap:wrap}
+.hero h1{margin:0;font-size:20px;font-weight:800;letter-spacing:.2px}
+.hero .sub{font-size:11.5px;opacity:.9;margin-top:2px;max-width:660px}
+.badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px}
+.pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.30);padding:3px 10px;
+  border-radius:999px;font-size:11px;font-weight:600}
+.fsbtn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.42);color:#fff;border-radius:10px;
+  padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap}
+.fsbtn:hover{background:rgba(255,255,255,.32)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}
+.kpi{border-radius:12px;padding:11px 15px;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;justify-content:center;min-height:64px;animation:rise .45s ease both}
+.kpi.k0{background:linear-gradient(135deg,#4f46e5,#6366f1)}
+.kpi.k1{background:linear-gradient(135deg,#0284c7,#0ea5e9)}
+.kpi.k2{background:linear-gradient(135deg,#047857,#10b981)}
+.kpi.k3{background:linear-gradient(135deg,#e11d48,#fb7185)}
+.kpi:nth-child(2){animation-delay:.05s}.kpi:nth-child(3){animation-delay:.1s}.kpi:nth-child(4){animation-delay:.15s}
+.kpi .lab{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.9}
+.kpi .val{font-size:23px;font-weight:800;line-height:1.15;font-variant-numeric:tabular-nums}
+.kpi .sub{font-size:10.5px;opacity:.82}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:2px 0 10px}
+.tab{background:var(--card);border:1px solid var(--line);color:var(--muted);padding:8px 18px;border-radius:11px;
+  font-weight:700;font-size:13px;cursor:pointer;transition:.18s;box-shadow:0 1px 4px rgba(31,41,80,.05)}
+.tab:hover{color:var(--brand);border-color:var(--brand2)}
 .tab.active{background:linear-gradient(120deg,var(--brand),var(--brand2));color:#fff;border-color:transparent;
-  box-shadow:0 10px 22px rgba(91,33,240,.34)}
-.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-.search{flex:1;min-width:240px;position:relative}
-.search input{width:100%;padding:13px 16px 13px 42px;border:1px solid var(--line);border-radius:14px;font-size:14px;
-  background:var(--card);color:var(--ink);outline:none;transition:.2s;box-shadow:0 2px 6px rgba(76,29,149,.05)}
-.search input:focus{border-color:var(--brand2);box-shadow:0 0 0 4px rgba(139,92,246,.16)}
-.search svg{position:absolute;left:14px;top:13px;opacity:.5}
-.hint{font-size:12.5px;color:var(--muted)}
+  box-shadow:0 8px 18px rgba(79,70,229,.30)}
+.filters{display:flex;gap:9px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.search{flex:1;min-width:220px;position:relative}
+.search input{width:100%;padding:10px 14px 10px 38px;border:1px solid var(--line);border-radius:11px;font-size:13.5px;
+  background:var(--card);color:var(--ink);outline:none;transition:.2s;box-shadow:0 1px 4px rgba(31,41,80,.04)}
+.search input:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.search svg{position:absolute;left:13px;top:11px;opacity:.5}
+select.fil{padding:10px 12px;border:1px solid var(--line);border-radius:11px;font-size:13px;background:var(--card);
+  color:var(--ink);cursor:pointer;outline:none;transition:.2s;font-weight:600}
+select.fil:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.clr{padding:10px 14px;border:1px solid var(--line);border-radius:11px;font-size:12.5px;font-weight:700;
+  background:var(--card);color:var(--muted);cursor:pointer;transition:.2s}
+.clr:hover{color:var(--brand);border-color:var(--brand2)}
 .panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);
-  overflow:hidden;animation:fade .4s ease}
-.scroll{overflow-x:auto;max-height:calc(100vh - 120px)}
-table{width:100%;border-collapse:collapse;font-size:13.5px}
-thead th{position:sticky;top:0;z-index:1;background:linear-gradient(180deg,#f6f4ff,#eef0fe);color:var(--brand);
-  text-align:left;padding:14px 13px;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer;
-  user-select:none;border-bottom:2px solid #e4e1fb}
-thead th:hover{background:#e9e6fd}
-thead th .ar{opacity:.5;font-size:10px;margin-left:4px}
-tbody td{padding:12px 13px;border-bottom:1px solid var(--line);vertical-align:middle}
-tbody tr{animation:fade .3s ease both}
-tbody tr:hover{background:#f7f5ff}
+  overflow:hidden;animation:fade .35s ease}
+.scroll{overflow-x:auto;max-height:calc(100vh - 232px)}
+:fullscreen .scroll{max-height:calc(100vh - 208px)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{position:sticky;top:0;z-index:1;background:linear-gradient(180deg,#eef1fd,#e7ebfb);color:var(--brand);
+  text-align:left;padding:12px 12px;font-weight:700;font-size:11.5px;white-space:nowrap;cursor:pointer;
+  user-select:none;border-bottom:2px solid #dfe3f6}
+thead th:hover{background:#e3e7fb} thead th .ar{opacity:.5;font-size:9px;margin-left:3px}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr{animation:fade .25s ease both} tbody tr:hover{background:#f5f6ff}
 .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.sku{font-family:'Consolas','SF Mono',monospace;font-size:12px;color:var(--brand);font-weight:600}
-.pid{font-family:'Consolas','SF Mono',monospace;font-size:11.5px;color:var(--muted)}
-.title{max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rank{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9px;
-  background:#efeaff;color:var(--brand);font-weight:800;font-size:12.5px}
-.rank.top{background:linear-gradient(135deg,#f59e0b,#f43f5e);color:#fff;box-shadow:0 4px 10px rgba(244,63,94,.3)}
-.badge{display:inline-block;padding:4px 11px;border-radius:999px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.sku{font-family:'Consolas','SF Mono',monospace;font-size:11.5px;color:var(--brand);font-weight:600}
+.pid{font-family:'Consolas','SF Mono',monospace;font-size:11px;color:var(--muted)}
+.title{max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;
+  background:#ecebff;color:var(--brand);font-weight:800;font-size:12px}
+.rank.top{background:linear-gradient(135deg,#f59e0b,#f43f5e);color:#fff;box-shadow:0 3px 8px rgba(244,63,94,.28)}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
 .b-grow{background:var(--growbg);color:var(--grow)} .b-stab{background:var(--stabbg);color:var(--stab)}
-.b-slow{background:var(--slowbg);color:var(--slow)} .b-new{background:#ede9fe;color:var(--brand)}
+.b-slow{background:var(--slowbg);color:var(--slow)} .b-new{background:#ecebff;color:var(--brand)}
 .act{font-size:12px;font-weight:600;white-space:nowrap}
-tr.oos td{background:var(--oosbg) !important}
-tr.oos .stockcell{color:var(--oos);font-weight:800}
-.chip{display:inline-block;padding:3px 9px;border-radius:7px;background:#eef0fe;color:#5b21f0;font-size:11px;font-weight:600}
-footer{margin:22px 4px 8px;color:var(--muted);font-size:12px;line-height:1.6}
-.count{font-size:12.5px;color:var(--muted);padding:12px 16px;border-top:1px solid var(--line);
-  background:linear-gradient(180deg,#fbfaff,#f6f4ff)}
-@keyframes drop{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
-@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+tr.oos td{background:var(--oosbg) !important} tr.oos .stockcell{color:var(--oos);font-weight:800}
+.chip{display:inline-block;padding:2px 9px;border-radius:7px;background:#ecebff;color:var(--brand);font-size:10.5px;font-weight:600}
+.count{font-size:12px;color:var(--muted);padding:10px 14px;border-top:1px solid var(--line);
+  background:linear-gradient(180deg,#fafbff,#f4f5fd)}
+footer{margin:14px 4px 6px;color:var(--muted);font-size:11.5px;line-height:1.55}
+@keyframes drop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:560px){.kpis{grid-template-columns:1fr}}
 </style></head>
 <body><div class="wrap">
 <header class="hero">
-  <button class="fsbtn" onclick="fs()">⛶ Full screen</button>
-  <h1>Fast Moving Products — Germany 🇩🇪</h1>
-  <p>Channel-wise top-selling products across Shopify DE, Amazon DE and eBay DE, plus a combined all-channel roll-up. Ranked by 30-day units sold; live warehouse data, per-product revenue in EUR.</p>
-  <div class="badges">
-    <span class="pill">REQ-23-D01 · code fmp</span>
-    <span class="pill">30-day: 2026-07-05 → 2026-08-03</span>
-    <span class="pill">90-day: 2026-05-06 → 2026-08-03</span>
-    <span class="pill">Currency €</span>
-    <span class="pill">Data pulled 2026-08-04</span>
+  <div>
+    <h1>Fast Moving Products — Germany 🇩🇪</h1>
+    <div class="sub">Channel-wise top sellers · Shopify / Amazon / eBay DE + combined · ranked by 30-day units · EUR</div>
+    <div class="badges">
+      <span class="pill">REQ-23-D01 · fmp</span>
+      <span class="pill">30d 2026-07-05 → 2026-08-03</span>
+      <span class="pill">90d 2026-05-06 → 2026-08-03</span>
+      <span class="pill">Data 2026-08-04</span>
+    </div>
   </div>
+  <button class="fsbtn" onclick="fs()">⛶ Full screen</button>
 </header>
 <div class="kpis" id="kpis"></div>
 <div class="tabs" id="tabs"></div>
-<div class="toolbar">
+<div class="filters">
   <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-    <input id="q" placeholder="Search SKU, product name, category, product ID…"></div>
-  <div class="hint">Click any column header to sort · out-of-stock rows in red</div>
+    <input id="q" placeholder="Search SKU, product name, product ID…"></div>
+  <select class="fil" id="fCat"><option value="">All categories</option></select>
+  <select class="fil" id="fTrend"><option value="">All trends</option><option>Growing</option><option>Stable</option><option>Slowing</option></select>
+  <select class="fil" id="fStock"><option value="">All stock</option><option value="in">In stock</option><option value="out">Out of stock</option><option value="low">Low cover (&lt;30d)</option></select>
+  <button class="clr" onclick="clearFilters()">Clear</button>
 </div>
 <div class="panel"><div class="scroll"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
   <div class="count" id="count"></div></div>
 <footer>
-  <b>Sources:</b> order_management.orders + order_item_info + sub_source/source · inventory.products + local_inventory_current_stock_location_wise (raw mcp.ledsone DB, read-only). Product Name &amp; Category are curated catalog labels carried by SKU. <b>Revenue</b> = item_price × quantity (EUR, per-product). <b>Stock Cover Days</b> = Current Stock ÷ (30-day units ÷ 30). <b>Trend</b> = 30-day daily rate vs 90-day daily rate (≥1.30 Growing · 0.80–1.30 Stable · &lt;0.80 Slowing). <b>Action / Final Decision</b> = documented default rules pending Mahima's sign-off. Category coverage ~74%; some eBay/Shopify variant titles are short labels.
+  <b>Sources:</b> order_management.orders + order_item_info + sub_source/source · inventory.products + local_inventory_current_stock_location_wise (raw mcp.ledsone DB, read-only). Product Name &amp; Category are curated catalog labels carried by SKU. <b>Revenue</b> = item_price × quantity (EUR). <b>Cover Days</b> = Stock ÷ (30-day units ÷ 30). <b>Trend/Action</b> = documented default rules pending Mahima's sign-off.
 </footer>
 </div>
 <script>
 const DATA={"shopify": [{"rank": 1, "sku": "LSMS320BI+RPR44WH", "pid": "15163317846281", "title": "Bianco dentro nero", "cat": "Lampshade", "q30": 51, "q90": 51, "rev": 635.69, "orders": 2, "aoq": 25.5, "stock": 492, "scd": 289, "trend": "Growing", "action": "Monitor"}, {"rank": 2, "sku": "LSMS320RE+RPR44WH", "pid": "15163317846281", "title": "DC VOLTAGE Lampadario Moderno a Sospensione Paralume Rosso in Metallo 32cm Forma Curva Lampada da Soffitto a Sospensione Adatta per Soggiorno Cucina Corridoio Bar Ristorante", "cat": "Lampshade", "q30": 50, "q90": 50, "rev": 622.0, "orders": 1, "aoq": 50.0, "stock": 987, "scd": 592, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 3, "sku": "LDMST64E274", "pid": "5478891225255", "title": "1", "cat": "Bulbs", "q30": 29, "q90": 75, "rev": 134.4, "orders": 9, "aoq": 3.22, "stock": 3459, "scd": 3578, "trend": "Stable", "action": "Overstocked – review"}, {"rank": 4, "sku": "CRSF100BM", "pid": "5479679131815", "title": "3.9 Inch Black Ceiling Canopy Kit Ceiling Plate, Modern Steel Canopy Kit Light Fixture for endant Light and Chandelier with All Hardware Includes Loop, Cross Bar and Mounting Screws.", "cat": "Ceiling Rose", "q30": 26, "q90": 35, "rev": 149.5, "orders": 3, "aoq": 8.67, "stock": 3990, "scd": 4604, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 5, "sku": "ENC8459", "pid": "15254086484233", "title": "Grün / Ja", "cat": "Uncategorised", "q30": 25, "q90": 25, "rev": 506.5, "orders": 1, "aoq": 25.0, "stock": 8, "scd": 10, "trend": "Growing", "action": "Reorder soon"}, {"rank": 6, "sku": "COT9ABM", "pid": "8361815638281", "title": "Boîte de jonction étanche IP68 - Connecteur de câble 3 voies - Connecteurs métalliques externes - Rallonge de boîte de jonction électrique - 3 voies pour câbles (1 paquet)", "cat": "Connecter", "q30": 24, "q90": 26, "rev": 99.84, "orders": 3, "aoq": 8.0, "stock": 58, "scd": 72, "trend": "Growing", "action": "Promote / keep stock"}, {"rank": 7, "sku": "LHTHE27BN", "pid": "8337016422665", "title": "Black", "cat": "Lamp Holder", "q30": 22, "q90": 40, "rev": 115.06, "orders": 1, "aoq": 22.0, "stock": 65, "scd": 89, "trend": "Growing", "action": "Promote / keep stock"}, {"rank": 8, "sku": "CCBKNWE12", "pid": "5480982773927", "title": "12W", "cat": "Transformer", "q30": 20, "q90": 20, "rev": 141.8, "orders": 1, "aoq": 20.0, "stock": 551, "scd": 826, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 9, "sku": "CNP1000YB", "pid": "8381418864905", "title": "LEDSone Heavy Chandelier Copper Light Chain 32mm x 17mm for Lighting Ceiling Lights Pendant Hanging Chain (Yellow Brass)", "cat": "Small Categories", "q30": 20, "q90": 20, "rev": 99.8, "orders": 1, "aoq": 20.0, "stock": 139, "scd": 208, "trend": "Growing", "action": "Monitor"}, {"rank": 10, "sku": "LDMST64E278", "pid": "5478891749543", "title": "1 PACK", "cat": "Bulbs", "q30": 18, "q90": 86, "rev": 90.18, "orders": 8, "aoq": 2.25, "stock": 300, "scd": 500, "trend": "Slowing", "action": "Overstocked – review"}, {"rank": 11, "sku": "CRSF100BM+LHNSE27YB+LSHH240BM", "pid": "7012415439015", "title": "24cm Black Inner White Metal Ceiling Lamp Shade - Easy Fit Light Pendant - Modern Ceiling Lighting Shade for Bedroom, Hallway, Office, Cafe, Restaurant -Industrial Light Shade", "cat": "Ceiling Lights with Shade", "q30": 15, "q90": 19, "rev": 214.65, "orders": 1, "aoq": 15.0, "stock": 18, "scd": 36, "trend": "Growing", "action": "Promote / keep stock"}, {"rank": 12, "sku": "12IP67150", "pid": "9192805335305", "title": "12V 150W IP67 Waterproof LED Driver Transformer For Outdoor Lighting", "cat": "Transformer", "q30": 14, "q90": 14, "rev": 183.96, "orders": 7, "aoq": 2.0, "stock": 126, "scd": 270, "trend": "Growing", "action": "Monitor"}, {"rank": 13, "sku": "12IP6730", "pid": "5480392163495", "title": "30W", "cat": "Transformer", "q30": 14, "q90": 21, "rev": 142.86, "orders": 5, "aoq": 2.8, "stock": 70, "scd": 150, "trend": "Growing", "action": "Monitor"}, {"rank": 14, "sku": "LHSHE27BA", "pid": "5481828778151", "title": "Black", "cat": "Lamp Holder", "q30": 13, "q90": 47, "rev": 77.87, "orders": 5, "aoq": 2.6, "stock": 1030, "scd": 2377, "trend": "Stable", "action": "Overstocked – review"}, {"rank": 15, "sku": "CRSF100YB+WSSS70YB+LSFT220BC", "pid": "15624329134345", "title": "Gebürstetes Kupfer / Ohne Leuchtmittel", "cat": "Uncategorised", "q30": 12, "q90": 12, "rev": 188.04, "orders": 1, "aoq": 12.0, "stock": 73, "scd": 182, "trend": "Growing", "action": "Monitor"}, {"rank": 16, "sku": "WSNWBM+LSCY290BM+LDMST64E274", "pid": "15601922507017", "title": "Applique Parete Vintage Industriale Metallo Lampada da Muro Impermeabile Esterno Interno Attacco E27 Luce Retrò per Ingresso, Giardino, Bar, Ristorante (Curvy - Nero)", "cat": "Uncategorised", "q30": 11, "q90": 11, "rev": 211.0, "orders": 3, "aoq": 3.67, "stock": 77, "scd": 210, "trend": "Growing", "action": "Monitor"}, {"rank": 17, "sku": "WSNWBM+LSCY290BM", "pid": "15601922507017", "title": "Kurvig / Nein", "cat": "Uncategorised", "q30": 11, "q90": 11, "rev": 184.58, "orders": 4, "aoq": 2.75, "stock": 77, "scd": 210, "trend": "Growing", "action": "Monitor"}, {"rank": 18, "sku": "LDST185E274", "pid": "15293107896585", "title": "1 Pack", "cat": "Bulbs", "q30": 11, "q90": 23, "rev": 66.88, "orders": 3, "aoq": 3.67, "stock": 1079, "scd": 2943, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 19, "sku": "CRSF100YB+LHNSE27YB+SCRN70YB+LSCY290BS", "pid": "15610680738057", "title": "Brushed Silver", "cat": "Uncategorised", "q30": 10, "q90": 10, "rev": 196.9, "orders": 1, "aoq": 10.0, "stock": 181, "scd": 543, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 20, "sku": "CRSF100BM+PHHT1PBRBM+LSMS320BI", "pid": "8178462523657", "title": "No", "cat": "Half thin Holder Pendant Light", "q30": 10, "q90": 10, "rev": 170.1, "orders": 2, "aoq": 5.0, "stock": 144, "scd": 432, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 21, "sku": "PHUH1HETBM", "pid": "7542206660838", "title": "1m Hemp Pendant holder", "cat": "Hemp Lighting", "q30": 10, "q90": 20, "rev": 167.0, "orders": 2, "aoq": 5.0, "stock": 0, "scd": 0, "trend": "Growing", "action": "Restock immediately"}, {"rank": 22, "sku": "COT9ABM6PK", "pid": "15183418786057", "title": "6 Pack", "cat": "Uncategorised", "q30": 10, "q90": 17, "rev": 89.6, "orders": 3, "aoq": 3.33, "stock": 9, "scd": 27, "trend": "Growing", "action": "Reorder soon"}, {"rank": 23, "sku": "PHUH0.5HETBM", "pid": "8436434862345", "title": "0.5m Hemp Pendant holder", "cat": "Hemp Lighting", "q30": 10, "q90": 38, "rev": 78.9, "orders": 6, "aoq": 1.67, "stock": 18, "scd": 54, "trend": "Slowing", "action": "Maintain stock"}, {"rank": 24, "sku": "CCBKNWE12", "pid": "8279101899017", "title": "12W", "cat": "Transformer", "q30": 10, "q90": 10, "rev": 70.9, "orders": 1, "aoq": 10.0, "stock": 551, "scd": 1653, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 25, "sku": "CCBKNWE7", "pid": "7998061740297", "title": "4-7W Constant Current LED Driver, 300mA IP20 Rated Constant Current LED Driver Transformer, Converts AC85-265V into DC12-26V, IP20 Constant Current DC Transformers", "cat": "Transformer", "q30": 10, "q90": 13, "rev": 60.9, "orders": 1, "aoq": 10.0, "stock": 260, "scd": 780, "trend": "Growing", "action": "Overstocked – review"}], "amazon": [{"rank": 1, "sku": "PHFSH1PBRBM+LSCY290BI", "pid": "B0DLWSWQSS", "title": "LEDSone Industrial Pendant Light Retro Chandelier Ceiling Light Vintage Lamp Ceiling Lighting Metal Shade for Restaurant Living Room Bedroom Kitchen Hallway Bar (Nero interno bianco)", "cat": "Uncategorised", "q30": 31, "q90": 73, "rev": 629.04, "orders": 22, "aoq": 1.41, "stock": 491, "scd": 475, "trend": "Stable", "action": "Overstocked – review"}, {"rank": 2, "sku": "LSDO300BI2PK+RPR44WH2PK", "pid": "B0F83V3KTP", "title": "LEDSone Metall Lampenschirm Retro Industrielle Deckenbeleuchtung Pendelleuchte (Schwarz Innen Weiß, 2 Packung)", "cat": "Uncategorised", "q30": 23, "q90": 23, "rev": 811.67, "orders": 1, "aoq": 23.0, "stock": 17, "scd": 22, "trend": "Growing", "action": "Reorder soon"}, {"rank": 3, "sku": "CRSF100CH+PHCHPCRCH+LSMS320GR", "pid": "B0DYV8RX71", "title": "Lampada a sospensione retrò E27 32 cm, lampada da soffitto in metallo, stile vintage, cavo regolabile - Faretto bianco per cucina, sala da pranzo, bar, caffetteria, ufficio (Verde)", "cat": "Curvy Holder Pendant", "q30": 22, "q90": 62, "rev": 467.79, "orders": 15, "aoq": 1.47, "stock": 200, "scd": 273, "trend": "Stable", "action": "Monitor"}, {"rank": 4, "sku": "LSCP150WH2PK+RPR44WH2PK", "pid": "B0D7W2R3V1", "title": "2Pack Metal Lamp Shades, 15cm White Light Shade, Modern Lampshades for Ceiling Lights, Easy Fit Pendant Light Shades Ceiling for Living Room, Bedroom, Kitchen, Hallway", "cat": "Lampshade", "q30": 22, "q90": 22, "rev": 456.62, "orders": 2, "aoq": 11.0, "stock": 0, "scd": 0, "trend": "Growing", "action": "Restock immediately"}, {"rank": 5, "sku": "CRSF100BM+PHSH1PBRBM+LSCY290BM", "pid": "B0DLWRP73C", "title": "Lámpara colgante industrial retro, lámpara de techo, lámpara vintage, iluminación de techo, pantalla de metal para (Negro, Sin bombilla)", "cat": "Uncategorised", "q30": 19, "q90": 54, "rev": 378.39, "orders": 12, "aoq": 1.58, "stock": 372, "scd": 587, "trend": "Stable", "action": "Overstocked – review"}, {"rank": 6, "sku": "WCB7BM+RPR44WH", "pid": "B09MQRGZMT", "title": "Abat-jour noir en forme de tambour en métal avec cage métallique, style industriel facile à installer pour plafond d'intérieur et cuisine, salon, couloir (noir)", "cat": "Wire Cage", "q30": 18, "q90": 18, "rev": 183.19, "orders": 11, "aoq": 1.64, "stock": 112, "scd": 187, "trend": "Growing", "action": "Monitor"}, {"rank": 7, "sku": "CRSF100CH+PHCHPCRCH+LSMS320OR", "pid": "B09GKT6DJC", "title": "Lampada a sospensione retrò E27 32 cm, lampada da soffitto in metallo, stile vintage, cavo regolabile - Faretto bianco per cucina, sala da pranzo, bar, caffetteria, ufficio (Arancia)", "cat": "Uncategorised", "q30": 12, "q90": 17, "rev": 256.01, "orders": 10, "aoq": 1.2, "stock": 200, "scd": 500, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 8, "sku": "CRSF100BM+PHSH1PBRBM+LSCY290GY", "pid": "B0CN34J7VX", "title": "LEDSone Industrial Pendant Light Retro Chandelier Ceiling Light Vintage Lamp Ceiling Lighting Metal Shade for Restaurant Living Room Bedroom Kitchen Hallway Bar (Grigio)", "cat": "Uncategorised", "q30": 12, "q90": 16, "rev": 229.8, "orders": 9, "aoq": 1.33, "stock": 372, "scd": 930, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 9, "sku": "LSCY210BG3PK+RPR44WH3PK", "pid": "B0CS9PS8J3", "title": "DCVoltage 3 Pack Vintage Metal Lampshade 21cm Easy to Assemble Black Gold Lamp Shade for Living Room Bedroom Kitchen Cafe Restaurant (Style 5)", "cat": "Lampshade", "q30": 11, "q90": 20, "rev": 349.7, "orders": 11, "aoq": 1.0, "stock": 373, "scd": 1017, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 10, "sku": "CRSF100CH+PHCHPCRCH+LSMS320RE", "pid": "B09GKQWSF5", "title": "Lampada a sospensione retrò E27 32 cm, lampada da soffitto in metallo, stile vintage, cavo regolabile - Faretto bianco per cucina, sala da pranzo, bar, caffetteria, ufficio (Rosso)", "cat": "Uncategorised", "q30": 11, "q90": 12, "rev": 231.11, "orders": 11, "aoq": 1.0, "stock": 200, "scd": 545, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 11, "sku": "LSMS320GR+RPR44WH", "pid": "B093H9DJK7", "title": "Industrial Green Lampshade Metal  32cm Easy Fit With Reducer Plate Modern Hanging Pendant Light Shade for Bedroom, Hallway, Office, Kitchen, Dining Room, Cafe, Bar, Restaurtant", "cat": "Lampshade", "q30": 11, "q90": 14, "rev": 122.67, "orders": 7, "aoq": 1.57, "stock": 770, "scd": 2100, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 12, "sku": "CRSF100BM+PHSH1PBRBM+LSCY290GY", "pid": "B0DLWRFKRQ", "title": "LEDSone Industrial Pendant Light Retro Chandelier Ceiling Light Vintage Lamp Ceiling Lighting Metal Shade for Restaurant Living Room Bedroom Kitchen Hallway Bar (Grigio)", "cat": "Uncategorised", "q30": 10, "q90": 10, "rev": 204.33, "orders": 4, "aoq": 2.5, "stock": 372, "scd": 1116, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 13, "sku": "CCBC7", "pid": "B097TVZ186", "title": "7W Konstantstrom-LED-Netzteil Elektronischer Treiber", "cat": "Transformer", "q30": 10, "q90": 10, "rev": 49.5, "orders": 1, "aoq": 10.0, "stock": 263, "scd": 789, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 14, "sku": "CRSF100BM+PHCH1BMRBM+LSCY290BM", "pid": "B0DCVYB6D5", "title": "LEDSone Lámpara colgante de techo estilo retro industrial vintage con pantallas de cúpula curvada en color naranja, soporte E27 (Negro)", "cat": "Special-pr", "q30": 9, "q90": 10, "rev": 181.34, "orders": 5, "aoq": 1.8, "stock": 372, "scd": 1240, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 15, "sku": "CRSF100BM+PHSH1PBRBM+LSCY290GR", "pid": "B0CN34CLZG", "title": "Industriel Suspension Luminaire Rétro Lustre Plafonnier Vintage Lampe Éclairage de Plafond Abat-jour en Métal pour Restaurant Salon Chambre Cuisine Couloir Bar (Vert)", "cat": "Uncategorised", "q30": 9, "q90": 11, "rev": 175.3, "orders": 6, "aoq": 1.5, "stock": 372, "scd": 1240, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 16, "sku": "CRSF100BM+WSHR135BM+LSFT220GY", "pid": "B0C5HM7899", "title": "Applique Murale Vintage Antique en Métal, Applique de Plafond Rétro E27 pour Chambre à Coucher, Salle à Manger, Restaurant, Bar, Galeries (Grey)", "cat": "Wall sconce", "q30": 9, "q90": 10, "rev": 148.92, "orders": 1, "aoq": 9.0, "stock": 61, "scd": 203, "trend": "Growing", "action": "Monitor"}, {"rank": 17, "sku": "LSMS320BG+RPR44WH", "pid": "B0F2F8SKBV", "title": "LEDSONE Endüstriyel Abajur Metal Siyah İç Altın 32 cm Redüktör Plakalı Kolay Uyum Modern Asma Asma Işık Gölgesi Yatak Odası, Koridor, Ofis, Mutfak, Yemek Odası, Kafe, Bar, Restoran için", "cat": "Lampshade", "q30": 9, "q90": 29, "rev": 132.88, "orders": 8, "aoq": 1.12, "stock": 332, "scd": 1107, "trend": "Stable", "action": "Overstocked – review"}, {"rank": 18, "sku": "CCBKNWE7", "pid": "B098QLF674", "title": "4-7W Constant Current LED Driver, 300mA IP20 Rated Constant Current LED Driver Transformer, Converts AC85-265V into DC12-26V, IP20 Constant Current DC Transformers", "cat": "Transformer", "q30": 9, "q90": 11, "rev": 49.49, "orders": 3, "aoq": 3.0, "stock": 260, "scd": 867, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 19, "sku": "PHSF1PWR40WH+LSBS160GR", "pid": "B0DGQK62BD", "title": "LEDSone Modern Teardrop Orange Pendant Shade Industrial Hanging Ceiling Lighting Ideal for Dining Rooms, Bars, Clubs and Restaurants (Verde)", "cat": "Pendant light with shade", "q30": 8, "q90": 8, "rev": 179.12, "orders": 1, "aoq": 8.0, "stock": 0, "scd": 0, "trend": "Growing", "action": "Restock immediately"}, {"rank": 20, "sku": "CRSF100BM+LHNSE27BM+SCRN70YB+LSMS320RE", "pid": "B09LMKNDW7", "title": "Industrial Semi-Flush Mount Ceiling Lights Metal Curve Shade E27 Base Lamp Holder Vintage Style Ceiling Lighting Lamp for Living Hallway Ceiling Metal Large Rustic 32cm Shade Pendant (Red)", "cat": "Curvy ceiling light", "q30": 8, "q90": 20, "rev": 155.93, "orders": 8, "aoq": 1.0, "stock": 475, "scd": 1781, "trend": "Stable", "action": "Overstocked – review"}, {"rank": 21, "sku": "PHHCF1BMRBM", "pid": "B0GF2BBSZL", "title": "LEDSone Heavy Duty Vintage Pendant Light Kit with 1m Hanging Chain E27 Lamp Holder Black 3 Core Cable Adjustable for Custom Length DIY Ceiling Lighting Kit for Home, Kitchen, Bar", "cat": "Herder Holder Pedant", "q30": 8, "q90": 17, "rev": 155.24, "orders": 6, "aoq": 1.33, "stock": 18, "scd": 68, "trend": "Growing", "action": "Promote / keep stock"}, {"rank": 22, "sku": "IMRECPK", "pid": "B0C5TGQTJC", "title": "12V LED Module Light 20 Pcs Red IP65 Waterproof Injection Light for Sign Board, Shop Name, Letter Sign, Backlight Decoration, Energy Saving DIY Lighting (red 20 pack)", "cat": "LED Module", "q30": 8, "q90": 8, "rev": 116.91, "orders": 1, "aoq": 8.0, "stock": 0, "scd": 0, "trend": "Growing", "action": "Restock immediately"}, {"rank": 23, "sku": "WSFS1BMBM", "pid": "B09VZBPGYR", "title": "LEDSOne Aplique de pared industrial, lámpara de pared vintage negra de 180 grados, casquillo E27, tipo de tornillo, lámpara de pared antigua ajustable para restaurantes, cocina, dormitorio.", "cat": "Wall sconce", "q30": 8, "q90": 11, "rev": 92.03, "orders": 4, "aoq": 2.0, "stock": 105, "scd": 394, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 24, "sku": "CRSF100BM2PK+PHHT1PBRBM2PK", "pid": "B0DJFJ2Z4Y", "title": "2 Pack Black Ceiling Pendant Light E27 95cm Adjustable Cable", "cat": "Half thin Holder Pendant Light", "q30": 7, "q90": 17, "rev": 172.29, "orders": 5, "aoq": 1.4, "stock": 72, "scd": 309, "trend": "Stable", "action": "Monitor"}, {"rank": 25, "sku": "CRSF100BM+PHCH1BMRBM+LSCY290GR", "pid": "B0DCVZSW3T", "title": "LEDSone Lámpara de araña moderna vintage con pantalla colgante industrial para techo, ideal para comedor, bar, club, base E27 (verde)", "cat": "Curvy Holder Pendant", "q30": 7, "q90": 12, "rev": 148.32, "orders": 4, "aoq": 1.75, "stock": 372, "scd": 1594, "trend": "Growing", "action": "Overstocked – review"}], "ebay": [{"rank": 1, "sku": "CRSF100BM+PHSH1PBRYB+SCRN70BM+LSOL180BG", "pid": "405554723464", "title": "Combo Default Title.", "cat": "Uncategorised", "q30": 23, "q90": 23, "rev": 455.4, "orders": 1, "aoq": 23.0, "stock": 99, "scd": 129, "trend": "Growing", "action": "Monitor"}, {"rank": 2, "sku": "5IP2050", "pid": "394444713965", "title": "50W", "cat": "Transformer", "q30": 17, "q90": 24, "rev": 169.66, "orders": 15, "aoq": 1.13, "stock": 131, "scd": 231, "trend": "Growing", "action": "Monitor"}, {"rank": 3, "sku": "COS93BM2PK", "pid": "394976085481", "title": "2", "cat": "Connecter", "q30": 12, "q90": 29, "rev": 124.08, "orders": 10, "aoq": 1.2, "stock": 962, "scd": 2405, "trend": "Stable", "action": "Overstocked – review"}, {"rank": 4, "sku": "WJBIP68T13BM2PK", "pid": "167609977844", "title": "Combo Default Title.", "cat": "Junction Box", "q30": 11, "q90": 16, "rev": 131.55, "orders": 5, "aoq": 2.2, "stock": 171, "scd": 466, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 5, "sku": "24IP2048", "pid": "394444713965", "title": "2A 48W", "cat": "Transformer", "q30": 11, "q90": 30, "rev": 108.79, "orders": 9, "aoq": 1.22, "stock": 72, "scd": 196, "trend": "Stable", "action": "Monitor"}, {"rank": 6, "sku": "LHSHE27GB", "pid": "165238748752", "title": "DC Voltage Bottle Lamp Holder Light Bulb Socket E27 Base", "cat": "Lamp Holder", "q30": 11, "q90": 11, "rev": 63.32, "orders": 2, "aoq": 5.5, "stock": 801, "scd": 2185, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 7, "sku": "12IP20150", "pid": "163935836148", "title": "12V 13A 150W, DC Universal Regulated Switching Power Supply, 110V AC to DC 12 Volt LED Driver, Converter, Transformer for LED Strip Light.", "cat": "Transformer", "q30": 10, "q90": 10, "rev": 193.5, "orders": 1, "aoq": 10.0, "stock": 89, "scd": 267, "trend": "Growing", "action": "Monitor"}, {"rank": 8, "sku": "CRSF100CO+CL3TBR+LHSHE27YB", "pid": "165420199216", "title": "Copper / Brown / Yellow Brass", "cat": "Pendant lights without shade", "q30": 10, "q90": 10, "rev": 110.0, "orders": 1, "aoq": 10.0, "stock": 557, "scd": 1671, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 9, "sku": "CL3TBR", "pid": "164828759593", "title": "1 M", "cat": "Cable", "q30": 10, "q90": 10, "rev": 19.5, "orders": 1, "aoq": 10.0, "stock": 557, "scd": 1671, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 10, "sku": "CCGNNWE24", "pid": "394789658453", "title": "LED Trafo 24W Treiber Driver 600mA Elektronisch Netzteil Transformator", "cat": "Transformer", "q30": 9, "q90": 14, "rev": 82.44, "orders": 3, "aoq": 3.0, "stock": 162, "scd": 540, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 11, "sku": "12IP6715", "pid": "394458014499", "title": "15W", "cat": "Transformer", "q30": 9, "q90": 27, "rev": 80.55, "orders": 9, "aoq": 1.0, "stock": 381, "scd": 1270, "trend": "Stable", "action": "Overstocked – review"}, {"rank": 12, "sku": "LHTHE27GB", "pid": "167596164116", "title": "Green Brass", "cat": "Lamp Holder", "q30": 9, "q90": 9, "rev": 69.95, "orders": 5, "aoq": 1.8, "stock": 114, "scd": 380, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 13, "sku": "CRSF100BM+PHRI1PBRBY+LSDO210BB+ICST64E27", "pid": "406891898916", "title": "Nein / Gebürstetes Messing", "cat": "Uncategorised", "q30": 8, "q90": 8, "rev": 199.12, "orders": 1, "aoq": 8.0, "stock": 9, "scd": 34, "trend": "Growing", "action": "Promote / keep stock"}, {"rank": 14, "sku": "WLGI350E27BM", "pid": "407077056567", "title": "350 mm H x 230 mm B ohne Arm", "cat": "Uncategorised", "q30": 8, "q90": 8, "rev": 135.92, "orders": 3, "aoq": 2.67, "stock": 17, "scd": 64, "trend": "Growing", "action": "Promote / keep stock"}, {"rank": 15, "sku": "12IP6730", "pid": "394458014499", "title": "30W", "cat": "Transformer", "q30": 8, "q90": 13, "rev": 113.52, "orders": 5, "aoq": 1.6, "stock": 70, "scd": 262, "trend": "Growing", "action": "Monitor"}, {"rank": 16, "sku": "LSOL180BG+RPR44WH", "pid": "336646664856", "title": "Lampenschirm Metall Schwarz Gold 18cm E27 Pendelleuchte Industrie Vintage Küche", "cat": "Lampshade", "q30": 8, "q90": 8, "rev": 103.92, "orders": 1, "aoq": 8.0, "stock": 273, "scd": 1024, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 17, "sku": "CCBKNWE7", "pid": "394417592862", "title": "4-7W Constant Current LED Driver, 300mA IP20 Rated Constant Current LED Driver Transformer, Converts AC85-265V into DC12-26V, IP20 Constant Current DC Transformers", "cat": "Transformer", "q30": 8, "q90": 12, "rev": 55.92, "orders": 4, "aoq": 2.0, "stock": 260, "scd": 975, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 18, "sku": "CL3RHE", "pid": "165082859660", "title": "1 M", "cat": "Cable", "q30": 8, "q90": 8, "rev": 15.6, "orders": 1, "aoq": 8.0, "stock": 515, "scd": 1931, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 19, "sku": "CRSF100BM+PHHT1PBRBM+LSMS320BI", "pid": "394896227598", "title": "No", "cat": "Half thin Holder Pendant Light", "q30": 7, "q90": 7, "rev": 152.95, "orders": 2, "aoq": 3.5, "stock": 144, "scd": 617, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 20, "sku": "12IP2080", "pid": "397695063556", "title": "80w", "cat": "Transformer", "q30": 7, "q90": 7, "rev": 108.43, "orders": 2, "aoq": 3.5, "stock": 297, "scd": 1273, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 21, "sku": "12IP6736", "pid": "394458014499", "title": "36W", "cat": "Transformer", "q30": 7, "q90": 14, "rev": 107.73, "orders": 5, "aoq": 1.4, "stock": 355, "scd": 1521, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 22, "sku": "CCBKNWE25", "pid": "394417592862", "title": "18-25W 300mA DC54-87V Compact Constant Current LED Driver Electronic Transformer", "cat": "Transformer", "q30": 7, "q90": 13, "rev": 76.93, "orders": 5, "aoq": 1.4, "stock": 320, "scd": 1371, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 23, "sku": "12IP2030", "pid": "394444713965", "title": "30w", "cat": "Transformer", "q30": 7, "q90": 18, "rev": 69.93, "orders": 7, "aoq": 1.0, "stock": 38, "scd": 163, "trend": "Stable", "action": "Monitor"}, {"rank": 24, "sku": "12DE2P2A", "pid": "316699359122", "title": "2A", "cat": "Transformer", "q30": 7, "q90": 7, "rev": 64.08, "orders": 4, "aoq": 1.75, "stock": 793, "scd": 3399, "trend": "Growing", "action": "Overstocked – review"}, {"rank": 25, "sku": "CCBKNWE12", "pid": "405328533644", "title": "12W", "cat": "Transformer", "q30": 7, "q90": 7, "rev": 58.03, "orders": 2, "aoq": 3.5, "stock": 551, "scd": 2361, "trend": "Growing", "action": "Overstocked – review"}], "combined": [{"rank": 1, "sku": "LSMS320BI+RPR44WH", "title": "Bianco dentro nero", "cat": "Lampshade", "amz": 7, "ebay": 0, "shop": 51, "units": 58, "rev": 742.24, "stock": 492, "scd": 254, "decision": "Sufficient stock"}, {"rank": 2, "sku": "LSMS320RE+RPR44WH", "title": "DC VOLTAGE Lampadario Moderno a Sospensione Paralume Rosso in Metallo 32cm Forma Curva Lampada da Soffitto a Sospensione Adatta per Soggiorno Cucina Corridoio Bar Ristorante", "cat": "Lampshade", "amz": 6, "ebay": 0, "shop": 50, "units": 56, "rev": 729.67, "stock": 987, "scd": 529, "decision": "Overstocked – review"}, {"rank": 3, "sku": "12IP6715", "title": "15W", "cat": "Transformer", "amz": 0, "ebay": 33, "shop": 10, "units": 43, "rev": 328.98, "stock": 381, "scd": 266, "decision": "Sufficient stock"}, {"rank": 4, "sku": "CCBKNWE12", "title": "12W", "cat": "Transformer", "amz": 0, "ebay": 7, "shop": 32, "units": 39, "rev": 284.91, "stock": 551, "scd": 424, "decision": "Overstocked – review"}, {"rank": 5, "sku": "LDMST64E274", "title": "1", "cat": "Bulbs", "amz": 0, "ebay": 7, "shop": 32, "units": 39, "rev": 194.45, "stock": 3459, "scd": 2661, "decision": "Overstocked – review"}, {"rank": 6, "sku": "CCBKNWE7", "title": "4-7W Constant Current LED Driver, 300mA IP20 Rated Constant Current LED Driver Transformer, Converts AC85-265V into DC12-26V, IP20 Constant Current DC Transformers", "cat": "Transformer", "amz": 9, "ebay": 9, "shop": 20, "units": 38, "rev": 226.88, "stock": 260, "scd": 205, "decision": "Sufficient stock"}, {"rank": 7, "sku": "PHFSH1PBRBM+LSCY290BI", "title": "LEDSone Industrial Pendant Light Retro Chandelier Ceiling Light Vintage Lamp Ceiling Lighting Metal Shade for Restaurant Living Room Bedroom Kitchen Hallway Bar (Nero interno bianco)", "cat": "Uncategorised", "amz": 31, "ebay": 0, "shop": 0, "units": 31, "rev": 629.04, "stock": 491, "scd": 475, "decision": "Overstocked – review"}, {"rank": 8, "sku": "LDMST64E278", "title": "1 PACK", "cat": "Bulbs", "amz": 0, "ebay": 8, "shop": 23, "units": 31, "rev": 178.37, "stock": 300, "scd": 290, "decision": "Sufficient stock"}, {"rank": 9, "sku": "12IP6730", "title": "30W", "cat": "Transformer", "amz": 0, "ebay": 15, "shop": 15, "units": 30, "rev": 359.06, "stock": 70, "scd": 70, "decision": "Maintain stock"}, {"rank": 10, "sku": "CRSF100BM", "title": "3.9 Inch Black Ceiling Canopy Kit Ceiling Plate, Modern Steel Canopy Kit Light Fixture for endant Light and Chandelier with All Hardware Includes Loop, Cross Bar and Mounting Screws.", "cat": "Ceiling Rose", "amz": 1, "ebay": 3, "shop": 26, "units": 30, "rev": 175.79, "stock": 3990, "scd": 3990, "decision": "Overstocked – review"}, {"rank": 11, "sku": "ENC8459", "title": "Grün / Ja", "cat": "Uncategorised", "amz": 0, "ebay": 0, "shop": 25, "units": 25, "rev": 506.5, "stock": 8, "scd": 10, "decision": "Restock soon"}, {"rank": 12, "sku": "5IP2050", "title": "50W", "cat": "Transformer", "amz": 0, "ebay": 20, "shop": 5, "units": 25, "rev": 231.0, "stock": 131, "scd": 157, "decision": "Sufficient stock"}, {"rank": 13, "sku": "COT9ABM", "title": "Boîte de jonction étanche IP68 - Connecteur de câble 3 voies - Connecteurs métalliques externes - Rallonge de boîte de jonction électrique - 3 voies pour câbles (1 paquet)", "cat": "Connecter", "amz": 0, "ebay": 1, "shop": 24, "units": 25, "rev": 107.93, "stock": 58, "scd": 70, "decision": "Maintain stock"}, {"rank": 14, "sku": "LSDO300BI2PK+RPR44WH2PK", "title": "LEDSone Metall Lampenschirm Retro Industrielle Deckenbeleuchtung Pendelleuchte (Schwarz Innen Weiß, 2 Packung)", "cat": "Uncategorised", "amz": 23, "ebay": 0, "shop": 0, "units": 23, "rev": 811.67, "stock": 17, "scd": 22, "decision": "Restock soon"}, {"rank": 15, "sku": "CRSF100BM+PHSH1PBRYB+SCRN70BM+LSOL180BG", "title": "Combo Default Title.", "cat": "Uncategorised", "amz": 0, "ebay": 23, "shop": 0, "units": 23, "rev": 455.4, "stock": 99, "scd": 129, "decision": "Sufficient stock"}, {"rank": 16, "sku": "12BO48", "title": "LED 48W Power Adapter Driver DC12V LED Transformer for LED Strips/MR16/CCTV", "cat": "Transformer", "amz": 1, "ebay": 10, "shop": 12, "units": 23, "rev": 234.85, "stock": 122, "scd": 159, "decision": "Sufficient stock"}, {"rank": 17, "sku": "LHTHE27BN", "title": "Black", "cat": "Lamp Holder", "amz": 0, "ebay": 1, "shop": 22, "units": 23, "rev": 122.75, "stock": 65, "scd": 85, "decision": "Maintain stock"}, {"rank": 18, "sku": "CRSF100CH+PHCHPCRCH+LSMS320GR", "title": "Lampada a sospensione retrò E27 32 cm, lampada da soffitto in metallo, stile vintage, cavo regolabile - Faretto bianco per cucina, sala da pranzo, bar, caffetteria, ufficio (Verde)", "cat": "Curvy Holder Pendant", "amz": 22, "ebay": 0, "shop": 0, "units": 22, "rev": 467.79, "stock": 200, "scd": 273, "decision": "Sufficient stock"}, {"rank": 19, "sku": "12IP67150", "title": "12V 150W IP67 Waterproof LED Driver Transformer For Outdoor Lighting", "cat": "Transformer", "amz": 0, "ebay": 8, "shop": 14, "units": 22, "rev": 466.82, "stock": 126, "scd": 172, "decision": "Sufficient stock"}, {"rank": 20, "sku": "LSCP150WH2PK+RPR44WH2PK", "title": "2Pack Metal Lamp Shades, 15cm White Light Shade, Modern Lampshades for Ceiling Lights, Easy Fit Pendant Light Shades Ceiling for Living Room, Bedroom, Kitchen, Hallway", "cat": "Lampshade", "amz": 22, "ebay": 0, "shop": 0, "units": 22, "rev": 456.62, "stock": 0, "scd": 0, "decision": "Restock immediately"}, {"rank": 21, "sku": "CRSF100BM+PHSH1PBRBM+LSCY290GY", "title": "LEDSone Industrial Pendant Light Retro Chandelier Ceiling Light Vintage Lamp Ceiling Lighting Metal Shade for Restaurant Living Room Bedroom Kitchen Hallway Bar (Grigio)", "cat": "Uncategorised", "amz": 22, "ebay": 0, "shop": 0, "units": 22, "rev": 434.13, "stock": 372, "scd": 507, "decision": "Overstocked – review"}, {"rank": 22, "sku": "CRSF100BM+PHSH1PBRBM+LSCY290BM", "title": "Lámpara colgante industrial retro, lámpara de techo, lámpara vintage, iluminación de techo, pantalla de metal para (Negro, Sin bombilla)", "cat": "Uncategorised", "amz": 19, "ebay": 0, "shop": 3, "units": 22, "rev": 427.44, "stock": 372, "scd": 507, "decision": "Overstocked – review"}, {"rank": 23, "sku": "12IP6736", "title": "36W", "cat": "Transformer", "amz": 0, "ebay": 17, "shop": 4, "units": 21, "rev": 284.93, "stock": 355, "scd": 507, "decision": "Overstocked – review"}, {"rank": 24, "sku": "CNP1000YB", "title": "LEDSone Heavy Chandelier Copper Light Chain 32mm x 17mm for Lighting Ceiling Lights Pendant Hanging Chain (Yellow Brass)", "cat": "Small Categories", "amz": 0, "ebay": 1, "shop": 20, "units": 21, "rev": 105.15, "stock": 139, "scd": 199, "decision": "Sufficient stock"}, {"rank": 25, "sku": "CRSF100BM+PHCH1BMRBM+LSCY290BM", "title": "LEDSone Lámpara colgante de techo estilo retro industrial vintage con pantallas de cúpula curvada en color naranja, soporte E27 (Negro)", "cat": "Special-pr", "amz": 12, "ebay": 6, "shop": 2, "units": 20, "rev": 394.01, "stock": 372, "scd": 558, "decision": "Overstocked – review"}]};
-const TABS=[
- {k:'shopify',label:'Shopify DE'},{k:'amazon',label:'Amazon DE'},
- {k:'ebay',label:'eBay DE'},{k:'combined',label:'Combined'}];
+const TABS=[{k:'shopify',label:'Shopify DE'},{k:'amazon',label:'Amazon DE'},{k:'ebay',label:'eBay DE'},{k:'combined',label:'Combined'}];
 const COLS={
- channel:[['rank','#','n'],['sku','SKU','t'],['pid','Product ID','t'],['title','Product Name','t'],
-   ['cat','Category','t'],['q30','Sold 30d','n'],['q90','Sold 90d','n'],['rev','Revenue €','m'],
-   ['orders','Orders','n'],['aoq','Avg Ord Qty','n'],['stock','Stock','n'],['scd','Cover Days','n'],
-   ['trend','Trend','badge'],['action','Action','act']],
- combined:[['rank','#','n'],['sku','SKU','t'],['title','Product Name','t'],['cat','Category','t'],
-   ['amz','Amazon','n'],['ebay','eBay','n'],['shop','Shopify','n'],['units','Total Units','n'],
-   ['rev','Total Rev €','m'],['stock','Stock','n'],['scd','Cover Days','n'],['decision','Final Decision','act']]};
-let cur='shopify', sortKey=null, sortDir=1;
+ channel:[['rank','#','n'],['sku','SKU','t'],['pid','Product ID','t'],['title','Product Name','t'],['cat','Category','t'],['q30','Sold 30d','n'],['q90','Sold 90d','n'],['rev','Revenue €','m'],['orders','Orders','n'],['aoq','Avg Ord Qty','n'],['stock','Stock','n'],['scd','Cover Days','n'],['trend','Trend','badge'],['action','Action','act']],
+ combined:[['rank','#','n'],['sku','SKU','t'],['title','Product Name','t'],['cat','Category','t'],['amz','Amazon','n'],['ebay','eBay','n'],['shop','Shopify','n'],['units','Total Units','n'],['rev','Total Rev €','m'],['stock','Stock','n'],['scd','Cover Days','n'],['decision','Final Decision','act']]};
+let cur='shopify',sortKey=null,sortDir=1;
 const eur=v=>'€'+Number(v).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function cols(){return cur==='combined'?COLS.combined:COLS.channel}
+const isCombined=()=>cur==='combined';
+function cols(){return isCombined()?COLS.combined:COLS.channel}
 function badge(t){const m={Growing:['b-grow','↑ Growing'],Stable:['b-stab','Stable'],Slowing:['b-slow','↓ Slowing'],New:['b-new','New']};const x=m[t]||m.New;return '<span class="badge '+x[0]+'">'+x[1]+'</span>';}
 function kpis(){
- const rows=DATA[cur]; const box=document.getElementById('kpis');
- const uKey=cur==='combined'?'units':'q30';
- const units=rows.reduce((a,r)=>a+r[uKey],0);
- const rev=rows.reduce((a,r)=>a+r.rev,0);
- const oos=rows.filter(r=>r.stock===0).length;
- const K=[['Products (top)',rows.length,'ranked SKUs'],
-   ['Units sold (30d)',units.toLocaleString('en-GB'),'across shown products'],
-   ['Revenue (30d)',eur(rev),'item revenue, EUR'],
-   ['Out of stock',oos,'need restock']];
- box.innerHTML=K.map((k,i)=>`<div class="kpi k${i}"><div class="lab">${k[0]}</div><div class="val">${k[1]}</div><div class="sub">${k[2]}</div><div class="bar"></div></div>`).join('');
+ const rows=DATA[cur],box=document.getElementById('kpis'),uKey=isCombined()?'units':'q30';
+ const units=rows.reduce((a,r)=>a+r[uKey],0),rev=rows.reduce((a,r)=>a+r.rev,0),oos=rows.filter(r=>r.stock===0).length;
+ const K=[['Products (top)',rows.length,'ranked SKUs'],['Units sold (30d)',units.toLocaleString('en-GB'),'shown products'],['Revenue (30d)',eur(rev),'item revenue, EUR'],['Out of stock',oos,'need restock']];
+ box.innerHTML=K.map((k,i)=>`<div class="kpi k${i}"><div class="lab">${k[0]}</div><div class="val">${k[1]}</div><div class="sub">${k[2]}</div></div>`).join('');
+}
+function populateFilters(){
+ const cats=[...new Set(DATA[cur].map(r=>r.cat).filter(Boolean))].sort();
+ document.getElementById('fCat').innerHTML='<option value="">All categories</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join('');
+ document.getElementById('fTrend').style.display=isCombined()?'none':'';
 }
 function head(){
  document.getElementById('thead').innerHTML='<tr>'+cols().map(c=>{
-   const ar=sortKey===c[0]?(sortDir>0?'▲':'▼'):'';
-   const cls=(c[2]==='n'||c[2]==='m')?'num':'';
+   const ar=sortKey===c[0]?(sortDir>0?'▲':'▼'):'';const cls=(c[2]==='n'||c[2]==='m')?'num':'';
    return `<th class="${cls}" onclick="sortBy('${c[0]}')">${c[1]}<span class="ar">${ar}</span></th>`;}).join('')+'</tr>';
 }
 function rowsFiltered(){
- let r=DATA[cur].slice(); const q=document.getElementById('q').value.toLowerCase().trim();
- if(q) r=r.filter(o=>[o.sku,o.title,o.cat,o.pid].filter(Boolean).some(v=>String(v).toLowerCase().includes(q)));
- if(sortKey){r.sort((a,b)=>{let x=a[sortKey],y=b[sortKey];
-   if(x===null)x=-1;if(y===null)y=-1;
-   if(typeof x==='number'&&typeof y==='number')return (x-y)*sortDir;
-   return String(x).localeCompare(String(y))*sortDir;});}
+ let r=DATA[cur].slice();
+ const q=document.getElementById('q').value.toLowerCase().trim();
+ const cat=document.getElementById('fCat').value,tr=document.getElementById('fTrend').value,st=document.getElementById('fStock').value;
+ if(q)r=r.filter(o=>[o.sku,o.title,o.pid].filter(Boolean).some(v=>String(v).toLowerCase().includes(q)));
+ if(cat)r=r.filter(o=>o.cat===cat);
+ if(tr&&!isCombined())r=r.filter(o=>o.trend===tr);
+ if(st==='out')r=r.filter(o=>o.stock===0);
+ else if(st==='in')r=r.filter(o=>o.stock>0);
+ else if(st==='low')r=r.filter(o=>o.scd!==null&&o.scd<30);
+ if(sortKey)r.sort((a,b)=>{let x=a[sortKey],y=b[sortKey];if(x===null)x=-1;if(y===null)y=-1;
+   if(typeof x==='number'&&typeof y==='number')return (x-y)*sortDir;return String(x).localeCompare(String(y))*sortDir;});
  return r;
 }
 function body(){
  const rs=rowsFiltered();
  document.getElementById('tbody').innerHTML=rs.map((o,i)=>{
    const oos=o.stock===0?' class="oos"':'';
-   const tds=cols().map(c=>{
-     const k=c[0],ty=c[2];let v=o[k];
+   const tds=cols().map(c=>{const k=c[0],ty=c[2];let v=o[k];
      if(k==='rank')return `<td><span class="rank ${o.rank<=3?'top':''}">${o.rank}</span></td>`;
      if(k==='sku')return `<td><span class="sku">${esc(v)}</span></td>`;
      if(k==='pid')return `<td><span class="pid">${esc(v)}</span></td>`;
@@ -188,19 +177,17 @@ function body(){
      if(k==='stock')return `<td class="num stockcell">${v.toLocaleString('en-GB')}</td>`;
      if(k==='scd')return `<td class="num">${v===null?'—':v.toLocaleString('en-GB')}</td>`;
      if(ty==='n')return `<td class="num">${typeof v==='number'?v.toLocaleString('en-GB'):esc(v)}</td>`;
-     return `<td>${esc(v)}</td>`;
-   }).join('');
-   return `<tr${oos} style="animation-delay:${Math.min(i*18,500)}ms">${tds}</tr>`;
- }).join('');
+     return `<td>${esc(v)}</td>`;}).join('');
+   return `<tr${oos} style="animation-delay:${Math.min(i*15,400)}ms">${tds}</tr>`;}).join('');
  document.getElementById('count').textContent=`Showing ${rs.length} of ${DATA[cur].length} products`;
 }
 function render(){kpis();head();body();}
-function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=(k==='rank')?1:-1;}render();}
-function setTab(k){cur=k;sortKey=null;sortDir=1;
- document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.k===k));render();}
+function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=(k==='rank')?1:-1;}head();body();}
+function clearFilters(){['q','fCat','fTrend','fStock'].forEach(id=>document.getElementById(id).value='');body();}
+function setTab(k){cur=k;sortKey=null;sortDir=1;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.k===k));populateFilters();['q','fCat','fTrend','fStock'].forEach(id=>document.getElementById(id).value='');render();}
 function fs(){const e=document.documentElement;if(!document.fullscreenElement)e.requestFullscreen&&e.requestFullscreen();else document.exitFullscreen();}
 document.getElementById('tabs').innerHTML=TABS.map((t,i)=>`<div class="tab ${i===0?'active':''}" data-k="${t.k}" onclick="setTab('${t.k}')">${t.label}</div>`).join('');
-document.getElementById('q').addEventListener('input',body);
-render();
+['q','fCat','fTrend','fStock'].forEach(id=>document.getElementById(id).addEventListener('input',body));
+populateFilters();render();
 </script>
 </body></html>

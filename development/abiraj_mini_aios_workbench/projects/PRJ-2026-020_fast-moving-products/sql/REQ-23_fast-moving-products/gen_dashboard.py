@@ -2,7 +2,7 @@
 """REQ-23-D01 Fast Moving Products — self-contained HTML dashboard generator.
 Reads the governed payload JSON, computes the same derived fields as the Excel builder,
 and emits one standalone light-theme HTML (no external requests)."""
-import json, os, html
+import json, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 P = json.load(open(os.path.join(HERE, "fmp_payload.json"), encoding="utf-8"))
@@ -31,7 +31,7 @@ def decision(stock, s):
     if s is not None and s > 365: return "Overstocked – review"
     return "Sufficient stock"
 
-def enrich_channel(rows, id_label):
+def enrich_channel(rows):
     out = []
     for i, r in enumerate(rows, 1):
         s = scd(r["current_stock"], r["qty30"]); t = trend(r["qty30"], r["qty90"])
@@ -52,12 +52,8 @@ def enrich_combined(rows):
                     "decision": decision(r["current_stock"], s)})
     return out
 
-DATA = {
-    "shopify": enrich_channel(P["shopify"], "Product ID"),
-    "amazon":  enrich_channel(P["amazon"], "ASIN"),
-    "ebay":    enrich_channel(P["ebay"], "Listing ID"),
-    "combined": enrich_combined(P["combined"]),
-}
+DATA = {"shopify": enrich_channel(P["shopify"]), "amazon": enrich_channel(P["amazon"]),
+        "ebay": enrich_channel(P["ebay"]), "combined": enrich_combined(P["combined"])}
 BLOB = json.dumps(DATA, ensure_ascii=False)
 
 HTML = """<!doctype html>
@@ -65,180 +61,169 @@ HTML = """<!doctype html>
 <title>Fast Moving Products — Germany · REQ-23-D01</title>
 <style>
 :root{
-  --bg1:#f0f3ff; --bg2:#eafcff; --card:#ffffff; --ink:#161a2e; --muted:#6b7391;
-  --line:#e9ecfa; --brand:#5b21f0; --brand2:#8b5cf6; --accent:#06b6d4;
-  --grow:#059669; --growbg:#d1fae5; --stab:#b45309; --stabbg:#fef3c7;
-  --slow:#dc2626; --slowbg:#fee2e2; --oos:#e11d48; --oosbg:#ffe4ea;
-  --shadow:0 18px 50px rgba(76,29,149,.10),0 4px 12px rgba(76,29,149,.06);
-  --radius:20px;
+  --bg:#eef1f8; --card:#ffffff; --ink:#1e2436; --muted:#6b7488; --line:#e6eaf4;
+  --brand:#4f46e5; --brand2:#6366f1; --sky:#0284c7; --accent:#0891b2;
+  --grow:#047857; --growbg:#d9f7e8; --stab:#a16207; --stabbg:#fdf1cf;
+  --slow:#dc2626; --slowbg:#fde3e3; --oos:#e11d48; --oosbg:#fdeaee;
+  --shadow:0 10px 34px rgba(31,41,80,.09),0 2px 8px rgba(31,41,80,.05); --radius:14px;
 }
-*{box-sizing:border-box}
-html,body{margin:0}
+*{box-sizing:border-box} html,body{margin:0}
 body{font-family:'Segoe UI',Roboto,Helvetica,Arial,system-ui,sans-serif;color:var(--ink);
-  background:
-    radial-gradient(1200px 600px at 12% -8%,rgba(139,92,246,.18),transparent 55%),
-    radial-gradient(1000px 560px at 98% 4%,rgba(6,182,212,.16),transparent 50%),
-    linear-gradient(140deg,var(--bg1),var(--bg2));
-  background-attachment:fixed;min-height:100vh;padding:22px clamp(14px,2.4vw,40px);
-  -webkit-font-smoothing:antialiased}
+  background:radial-gradient(1000px 460px at 10% -10%,rgba(99,102,241,.12),transparent 55%),
+    radial-gradient(900px 460px at 100% -6%,rgba(2,132,199,.10),transparent 52%),var(--bg);
+  background-attachment:fixed;min-height:100vh;padding:14px clamp(12px,2vw,30px);-webkit-font-smoothing:antialiased}
 .wrap{width:100%;max-width:none;margin:0}
-header.hero{background:linear-gradient(120deg,#4c1d95 0%,#6d28d9 42%,#7c3aed 68%,#06b6d4 130%);
-  color:#fff;border-radius:26px;padding:30px 34px;box-shadow:0 22px 60px rgba(76,29,149,.32);
-  position:relative;overflow:hidden;animation:drop .6s ease}
-header.hero::before{content:"";position:absolute;inset:0;
-  background:radial-gradient(600px 300px at 80% -40%,rgba(255,255,255,.22),transparent 60%);pointer-events:none}
-header.hero::after{content:"";position:absolute;right:-40px;bottom:-90px;width:300px;height:300px;
-  background:radial-gradient(circle,rgba(6,182,212,.35),transparent 70%);border-radius:50%}
-.hero h1{margin:0;font-size:30px;letter-spacing:.2px;font-weight:800;position:relative}
-.hero p{margin:9px 0 0;opacity:.94;font-size:14px;max-width:1000px;line-height:1.55;position:relative}
-.badges{margin-top:16px;display:flex;gap:9px;flex-wrap:wrap;position:relative}
-.pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.32);padding:6px 13px;
-  border-radius:999px;font-size:12px;font-weight:600;backdrop-filter:blur(6px)}
-.fsbtn{position:absolute;right:26px;top:26px;background:rgba(255,255,255,.20);border:1px solid rgba(255,255,255,.45);
-  color:#fff;border-radius:12px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;
-  transition:.2s;backdrop-filter:blur(6px);z-index:2}
-.fsbtn:hover{background:rgba(255,255,255,.34);transform:translateY(-1px)}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:24px 0}
-.kpi{border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);position:relative;overflow:hidden;
-  color:#fff;animation:rise .5s ease both}
-.kpi::after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;
-  background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%);border-radius:50%}
-.kpi.k0{background:linear-gradient(135deg,#7c3aed,#a855f7)}
-.kpi.k1{background:linear-gradient(135deg,#2563eb,#22d3ee)}
-.kpi.k2{background:linear-gradient(135deg,#0ea5a4,#34d399)}
-.kpi.k3{background:linear-gradient(135deg,#f43f5e,#fb7185)}
-.kpi:nth-child(2){animation-delay:.06s}.kpi:nth-child(3){animation-delay:.12s}.kpi:nth-child(4){animation-delay:.18s}
-.kpi .lab{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;opacity:.92}
-.kpi .val{font-size:34px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums;line-height:1.1}
-.kpi .sub{font-size:12px;margin-top:3px;opacity:.85}
-.kpi .bar{height:5px;border-radius:5px;margin-top:14px;background:rgba(255,255,255,.55);
-  transform-origin:left;animation:grow .8s ease both}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 18px}
-.tab{background:var(--card);border:1px solid var(--line);color:var(--muted);padding:11px 22px;border-radius:14px;
-  font-weight:700;font-size:14px;cursor:pointer;transition:.2s;box-shadow:0 2px 6px rgba(76,29,149,.06)}
-.tab:hover{color:var(--brand);border-color:var(--brand2);transform:translateY(-1px)}
+header.hero{background:linear-gradient(115deg,#4338ca 0%,#4f46e5 40%,#4f7fe0 72%,#0ea5e9 120%);
+  color:#fff;border-radius:16px;padding:14px 22px;box-shadow:0 12px 34px rgba(67,56,202,.28);
+  position:relative;overflow:hidden;animation:drop .5s ease;display:flex;align-items:center;
+  justify-content:space-between;gap:16px;flex-wrap:wrap}
+.hero h1{margin:0;font-size:20px;font-weight:800;letter-spacing:.2px}
+.hero .sub{font-size:11.5px;opacity:.9;margin-top:2px;max-width:660px}
+.badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px}
+.pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.30);padding:3px 10px;
+  border-radius:999px;font-size:11px;font-weight:600}
+.fsbtn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.42);color:#fff;border-radius:10px;
+  padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap}
+.fsbtn:hover{background:rgba(255,255,255,.32)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}
+.kpi{border-radius:12px;padding:11px 15px;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;justify-content:center;min-height:64px;animation:rise .45s ease both}
+.kpi.k0{background:linear-gradient(135deg,#4f46e5,#6366f1)}
+.kpi.k1{background:linear-gradient(135deg,#0284c7,#0ea5e9)}
+.kpi.k2{background:linear-gradient(135deg,#047857,#10b981)}
+.kpi.k3{background:linear-gradient(135deg,#e11d48,#fb7185)}
+.kpi:nth-child(2){animation-delay:.05s}.kpi:nth-child(3){animation-delay:.1s}.kpi:nth-child(4){animation-delay:.15s}
+.kpi .lab{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.9}
+.kpi .val{font-size:23px;font-weight:800;line-height:1.15;font-variant-numeric:tabular-nums}
+.kpi .sub{font-size:10.5px;opacity:.82}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:2px 0 10px}
+.tab{background:var(--card);border:1px solid var(--line);color:var(--muted);padding:8px 18px;border-radius:11px;
+  font-weight:700;font-size:13px;cursor:pointer;transition:.18s;box-shadow:0 1px 4px rgba(31,41,80,.05)}
+.tab:hover{color:var(--brand);border-color:var(--brand2)}
 .tab.active{background:linear-gradient(120deg,var(--brand),var(--brand2));color:#fff;border-color:transparent;
-  box-shadow:0 10px 22px rgba(91,33,240,.34)}
-.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-.search{flex:1;min-width:240px;position:relative}
-.search input{width:100%;padding:13px 16px 13px 42px;border:1px solid var(--line);border-radius:14px;font-size:14px;
-  background:var(--card);color:var(--ink);outline:none;transition:.2s;box-shadow:0 2px 6px rgba(76,29,149,.05)}
-.search input:focus{border-color:var(--brand2);box-shadow:0 0 0 4px rgba(139,92,246,.16)}
-.search svg{position:absolute;left:14px;top:13px;opacity:.5}
-.hint{font-size:12.5px;color:var(--muted)}
+  box-shadow:0 8px 18px rgba(79,70,229,.30)}
+.filters{display:flex;gap:9px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.search{flex:1;min-width:220px;position:relative}
+.search input{width:100%;padding:10px 14px 10px 38px;border:1px solid var(--line);border-radius:11px;font-size:13.5px;
+  background:var(--card);color:var(--ink);outline:none;transition:.2s;box-shadow:0 1px 4px rgba(31,41,80,.04)}
+.search input:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.search svg{position:absolute;left:13px;top:11px;opacity:.5}
+select.fil{padding:10px 12px;border:1px solid var(--line);border-radius:11px;font-size:13px;background:var(--card);
+  color:var(--ink);cursor:pointer;outline:none;transition:.2s;font-weight:600}
+select.fil:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.clr{padding:10px 14px;border:1px solid var(--line);border-radius:11px;font-size:12.5px;font-weight:700;
+  background:var(--card);color:var(--muted);cursor:pointer;transition:.2s}
+.clr:hover{color:var(--brand);border-color:var(--brand2)}
 .panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);
-  overflow:hidden;animation:fade .4s ease}
-.scroll{overflow-x:auto;max-height:calc(100vh - 120px)}
-table{width:100%;border-collapse:collapse;font-size:13.5px}
-thead th{position:sticky;top:0;z-index:1;background:linear-gradient(180deg,#f6f4ff,#eef0fe);color:var(--brand);
-  text-align:left;padding:14px 13px;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer;
-  user-select:none;border-bottom:2px solid #e4e1fb}
-thead th:hover{background:#e9e6fd}
-thead th .ar{opacity:.5;font-size:10px;margin-left:4px}
-tbody td{padding:12px 13px;border-bottom:1px solid var(--line);vertical-align:middle}
-tbody tr{animation:fade .3s ease both}
-tbody tr:hover{background:#f7f5ff}
+  overflow:hidden;animation:fade .35s ease}
+.scroll{overflow-x:auto;max-height:calc(100vh - 232px)}
+:fullscreen .scroll{max-height:calc(100vh - 208px)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{position:sticky;top:0;z-index:1;background:linear-gradient(180deg,#eef1fd,#e7ebfb);color:var(--brand);
+  text-align:left;padding:12px 12px;font-weight:700;font-size:11.5px;white-space:nowrap;cursor:pointer;
+  user-select:none;border-bottom:2px solid #dfe3f6}
+thead th:hover{background:#e3e7fb} thead th .ar{opacity:.5;font-size:9px;margin-left:3px}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr{animation:fade .25s ease both} tbody tr:hover{background:#f5f6ff}
 .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.sku{font-family:'Consolas','SF Mono',monospace;font-size:12px;color:var(--brand);font-weight:600}
-.pid{font-family:'Consolas','SF Mono',monospace;font-size:11.5px;color:var(--muted)}
-.title{max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rank{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9px;
-  background:#efeaff;color:var(--brand);font-weight:800;font-size:12.5px}
-.rank.top{background:linear-gradient(135deg,#f59e0b,#f43f5e);color:#fff;box-shadow:0 4px 10px rgba(244,63,94,.3)}
-.badge{display:inline-block;padding:4px 11px;border-radius:999px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.sku{font-family:'Consolas','SF Mono',monospace;font-size:11.5px;color:var(--brand);font-weight:600}
+.pid{font-family:'Consolas','SF Mono',monospace;font-size:11px;color:var(--muted)}
+.title{max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;
+  background:#ecebff;color:var(--brand);font-weight:800;font-size:12px}
+.rank.top{background:linear-gradient(135deg,#f59e0b,#f43f5e);color:#fff;box-shadow:0 3px 8px rgba(244,63,94,.28)}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
 .b-grow{background:var(--growbg);color:var(--grow)} .b-stab{background:var(--stabbg);color:var(--stab)}
-.b-slow{background:var(--slowbg);color:var(--slow)} .b-new{background:#ede9fe;color:var(--brand)}
+.b-slow{background:var(--slowbg);color:var(--slow)} .b-new{background:#ecebff;color:var(--brand)}
 .act{font-size:12px;font-weight:600;white-space:nowrap}
-tr.oos td{background:var(--oosbg) !important}
-tr.oos .stockcell{color:var(--oos);font-weight:800}
-.chip{display:inline-block;padding:3px 9px;border-radius:7px;background:#eef0fe;color:#5b21f0;font-size:11px;font-weight:600}
-footer{margin:22px 4px 8px;color:var(--muted);font-size:12px;line-height:1.6}
-.count{font-size:12.5px;color:var(--muted);padding:12px 16px;border-top:1px solid var(--line);
-  background:linear-gradient(180deg,#fbfaff,#f6f4ff)}
-@keyframes drop{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
-@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+tr.oos td{background:var(--oosbg) !important} tr.oos .stockcell{color:var(--oos);font-weight:800}
+.chip{display:inline-block;padding:2px 9px;border-radius:7px;background:#ecebff;color:var(--brand);font-size:10.5px;font-weight:600}
+.count{font-size:12px;color:var(--muted);padding:10px 14px;border-top:1px solid var(--line);
+  background:linear-gradient(180deg,#fafbff,#f4f5fd)}
+footer{margin:14px 4px 6px;color:var(--muted);font-size:11.5px;line-height:1.55}
+@keyframes drop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:560px){.kpis{grid-template-columns:1fr}}
 </style></head>
 <body><div class="wrap">
 <header class="hero">
-  <button class="fsbtn" onclick="fs()">⛶ Full screen</button>
-  <h1>Fast Moving Products — Germany 🇩🇪</h1>
-  <p>Channel-wise top-selling products across Shopify DE, Amazon DE and eBay DE, plus a combined all-channel roll-up. Ranked by 30-day units sold; live warehouse data, per-product revenue in EUR.</p>
-  <div class="badges">
-    <span class="pill">REQ-23-D01 · code fmp</span>
-    <span class="pill">30-day: __W30__ → __WE__</span>
-    <span class="pill">90-day: __W90__ → __WE__</span>
-    <span class="pill">Currency €</span>
-    <span class="pill">Data pulled __GEN__</span>
+  <div>
+    <h1>Fast Moving Products — Germany 🇩🇪</h1>
+    <div class="sub">Channel-wise top sellers · Shopify / Amazon / eBay DE + combined · ranked by 30-day units · EUR</div>
+    <div class="badges">
+      <span class="pill">REQ-23-D01 · fmp</span>
+      <span class="pill">30d __W30__ → __WE__</span>
+      <span class="pill">90d __W90__ → __WE__</span>
+      <span class="pill">Data __GEN__</span>
+    </div>
   </div>
+  <button class="fsbtn" onclick="fs()">⛶ Full screen</button>
 </header>
 <div class="kpis" id="kpis"></div>
 <div class="tabs" id="tabs"></div>
-<div class="toolbar">
+<div class="filters">
   <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-    <input id="q" placeholder="Search SKU, product name, category, product ID…"></div>
-  <div class="hint">Click any column header to sort · out-of-stock rows in red</div>
+    <input id="q" placeholder="Search SKU, product name, product ID…"></div>
+  <select class="fil" id="fCat"><option value="">All categories</option></select>
+  <select class="fil" id="fTrend"><option value="">All trends</option><option>Growing</option><option>Stable</option><option>Slowing</option></select>
+  <select class="fil" id="fStock"><option value="">All stock</option><option value="in">In stock</option><option value="out">Out of stock</option><option value="low">Low cover (&lt;30d)</option></select>
+  <button class="clr" onclick="clearFilters()">Clear</button>
 </div>
 <div class="panel"><div class="scroll"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
   <div class="count" id="count"></div></div>
 <footer>
-  <b>Sources:</b> order_management.orders + order_item_info + sub_source/source · inventory.products + local_inventory_current_stock_location_wise (raw mcp.ledsone DB, read-only). Product Name &amp; Category are curated catalog labels carried by SKU. <b>Revenue</b> = item_price × quantity (EUR, per-product). <b>Stock Cover Days</b> = Current Stock ÷ (30-day units ÷ 30). <b>Trend</b> = 30-day daily rate vs 90-day daily rate (≥1.30 Growing · 0.80–1.30 Stable · &lt;0.80 Slowing). <b>Action / Final Decision</b> = documented default rules pending Mahima's sign-off. Category coverage ~74%; some eBay/Shopify variant titles are short labels.
+  <b>Sources:</b> order_management.orders + order_item_info + sub_source/source · inventory.products + local_inventory_current_stock_location_wise (raw mcp.ledsone DB, read-only). Product Name &amp; Category are curated catalog labels carried by SKU. <b>Revenue</b> = item_price × quantity (EUR). <b>Cover Days</b> = Stock ÷ (30-day units ÷ 30). <b>Trend/Action</b> = documented default rules pending Mahima's sign-off.
 </footer>
 </div>
 <script>
 const DATA=__BLOB__;
-const TABS=[
- {k:'shopify',label:'Shopify DE'},{k:'amazon',label:'Amazon DE'},
- {k:'ebay',label:'eBay DE'},{k:'combined',label:'Combined'}];
+const TABS=[{k:'shopify',label:'Shopify DE'},{k:'amazon',label:'Amazon DE'},{k:'ebay',label:'eBay DE'},{k:'combined',label:'Combined'}];
 const COLS={
- channel:[['rank','#','n'],['sku','SKU','t'],['pid','Product ID','t'],['title','Product Name','t'],
-   ['cat','Category','t'],['q30','Sold 30d','n'],['q90','Sold 90d','n'],['rev','Revenue €','m'],
-   ['orders','Orders','n'],['aoq','Avg Ord Qty','n'],['stock','Stock','n'],['scd','Cover Days','n'],
-   ['trend','Trend','badge'],['action','Action','act']],
- combined:[['rank','#','n'],['sku','SKU','t'],['title','Product Name','t'],['cat','Category','t'],
-   ['amz','Amazon','n'],['ebay','eBay','n'],['shop','Shopify','n'],['units','Total Units','n'],
-   ['rev','Total Rev €','m'],['stock','Stock','n'],['scd','Cover Days','n'],['decision','Final Decision','act']]};
-let cur='shopify', sortKey=null, sortDir=1;
+ channel:[['rank','#','n'],['sku','SKU','t'],['pid','Product ID','t'],['title','Product Name','t'],['cat','Category','t'],['q30','Sold 30d','n'],['q90','Sold 90d','n'],['rev','Revenue €','m'],['orders','Orders','n'],['aoq','Avg Ord Qty','n'],['stock','Stock','n'],['scd','Cover Days','n'],['trend','Trend','badge'],['action','Action','act']],
+ combined:[['rank','#','n'],['sku','SKU','t'],['title','Product Name','t'],['cat','Category','t'],['amz','Amazon','n'],['ebay','eBay','n'],['shop','Shopify','n'],['units','Total Units','n'],['rev','Total Rev €','m'],['stock','Stock','n'],['scd','Cover Days','n'],['decision','Final Decision','act']]};
+let cur='shopify',sortKey=null,sortDir=1;
 const eur=v=>'€'+Number(v).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function cols(){return cur==='combined'?COLS.combined:COLS.channel}
+const isCombined=()=>cur==='combined';
+function cols(){return isCombined()?COLS.combined:COLS.channel}
 function badge(t){const m={Growing:['b-grow','↑ Growing'],Stable:['b-stab','Stable'],Slowing:['b-slow','↓ Slowing'],New:['b-new','New']};const x=m[t]||m.New;return '<span class="badge '+x[0]+'">'+x[1]+'</span>';}
 function kpis(){
- const rows=DATA[cur]; const box=document.getElementById('kpis');
- const uKey=cur==='combined'?'units':'q30';
- const units=rows.reduce((a,r)=>a+r[uKey],0);
- const rev=rows.reduce((a,r)=>a+r.rev,0);
- const oos=rows.filter(r=>r.stock===0).length;
- const K=[['Products (top)',rows.length,'ranked SKUs'],
-   ['Units sold (30d)',units.toLocaleString('en-GB'),'across shown products'],
-   ['Revenue (30d)',eur(rev),'item revenue, EUR'],
-   ['Out of stock',oos,'need restock']];
- box.innerHTML=K.map((k,i)=>`<div class="kpi k${i}"><div class="lab">${k[0]}</div><div class="val">${k[1]}</div><div class="sub">${k[2]}</div><div class="bar"></div></div>`).join('');
+ const rows=DATA[cur],box=document.getElementById('kpis'),uKey=isCombined()?'units':'q30';
+ const units=rows.reduce((a,r)=>a+r[uKey],0),rev=rows.reduce((a,r)=>a+r.rev,0),oos=rows.filter(r=>r.stock===0).length;
+ const K=[['Products (top)',rows.length,'ranked SKUs'],['Units sold (30d)',units.toLocaleString('en-GB'),'shown products'],['Revenue (30d)',eur(rev),'item revenue, EUR'],['Out of stock',oos,'need restock']];
+ box.innerHTML=K.map((k,i)=>`<div class="kpi k${i}"><div class="lab">${k[0]}</div><div class="val">${k[1]}</div><div class="sub">${k[2]}</div></div>`).join('');
+}
+function populateFilters(){
+ const cats=[...new Set(DATA[cur].map(r=>r.cat).filter(Boolean))].sort();
+ document.getElementById('fCat').innerHTML='<option value="">All categories</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join('');
+ document.getElementById('fTrend').style.display=isCombined()?'none':'';
 }
 function head(){
  document.getElementById('thead').innerHTML='<tr>'+cols().map(c=>{
-   const ar=sortKey===c[0]?(sortDir>0?'▲':'▼'):'';
-   const cls=(c[2]==='n'||c[2]==='m')?'num':'';
+   const ar=sortKey===c[0]?(sortDir>0?'▲':'▼'):'';const cls=(c[2]==='n'||c[2]==='m')?'num':'';
    return `<th class="${cls}" onclick="sortBy('${c[0]}')">${c[1]}<span class="ar">${ar}</span></th>`;}).join('')+'</tr>';
 }
 function rowsFiltered(){
- let r=DATA[cur].slice(); const q=document.getElementById('q').value.toLowerCase().trim();
- if(q) r=r.filter(o=>[o.sku,o.title,o.cat,o.pid].filter(Boolean).some(v=>String(v).toLowerCase().includes(q)));
- if(sortKey){r.sort((a,b)=>{let x=a[sortKey],y=b[sortKey];
-   if(x===null)x=-1;if(y===null)y=-1;
-   if(typeof x==='number'&&typeof y==='number')return (x-y)*sortDir;
-   return String(x).localeCompare(String(y))*sortDir;});}
+ let r=DATA[cur].slice();
+ const q=document.getElementById('q').value.toLowerCase().trim();
+ const cat=document.getElementById('fCat').value,tr=document.getElementById('fTrend').value,st=document.getElementById('fStock').value;
+ if(q)r=r.filter(o=>[o.sku,o.title,o.pid].filter(Boolean).some(v=>String(v).toLowerCase().includes(q)));
+ if(cat)r=r.filter(o=>o.cat===cat);
+ if(tr&&!isCombined())r=r.filter(o=>o.trend===tr);
+ if(st==='out')r=r.filter(o=>o.stock===0);
+ else if(st==='in')r=r.filter(o=>o.stock>0);
+ else if(st==='low')r=r.filter(o=>o.scd!==null&&o.scd<30);
+ if(sortKey)r.sort((a,b)=>{let x=a[sortKey],y=b[sortKey];if(x===null)x=-1;if(y===null)y=-1;
+   if(typeof x==='number'&&typeof y==='number')return (x-y)*sortDir;return String(x).localeCompare(String(y))*sortDir;});
  return r;
 }
 function body(){
  const rs=rowsFiltered();
  document.getElementById('tbody').innerHTML=rs.map((o,i)=>{
    const oos=o.stock===0?' class="oos"':'';
-   const tds=cols().map(c=>{
-     const k=c[0],ty=c[2];let v=o[k];
+   const tds=cols().map(c=>{const k=c[0],ty=c[2];let v=o[k];
      if(k==='rank')return `<td><span class="rank ${o.rank<=3?'top':''}">${o.rank}</span></td>`;
      if(k==='sku')return `<td><span class="sku">${esc(v)}</span></td>`;
      if(k==='pid')return `<td><span class="pid">${esc(v)}</span></td>`;
@@ -250,20 +235,18 @@ function body(){
      if(k==='stock')return `<td class="num stockcell">${v.toLocaleString('en-GB')}</td>`;
      if(k==='scd')return `<td class="num">${v===null?'—':v.toLocaleString('en-GB')}</td>`;
      if(ty==='n')return `<td class="num">${typeof v==='number'?v.toLocaleString('en-GB'):esc(v)}</td>`;
-     return `<td>${esc(v)}</td>`;
-   }).join('');
-   return `<tr${oos} style="animation-delay:${Math.min(i*18,500)}ms">${tds}</tr>`;
- }).join('');
+     return `<td>${esc(v)}</td>`;}).join('');
+   return `<tr${oos} style="animation-delay:${Math.min(i*15,400)}ms">${tds}</tr>`;}).join('');
  document.getElementById('count').textContent=`Showing ${rs.length} of ${DATA[cur].length} products`;
 }
 function render(){kpis();head();body();}
-function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=(k==='rank')?1:-1;}render();}
-function setTab(k){cur=k;sortKey=null;sortDir=1;
- document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.k===k));render();}
+function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=(k==='rank')?1:-1;}head();body();}
+function clearFilters(){['q','fCat','fTrend','fStock'].forEach(id=>document.getElementById(id).value='');body();}
+function setTab(k){cur=k;sortKey=null;sortDir=1;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.k===k));populateFilters();['q','fCat','fTrend','fStock'].forEach(id=>document.getElementById(id).value='');render();}
 function fs(){const e=document.documentElement;if(!document.fullscreenElement)e.requestFullscreen&&e.requestFullscreen();else document.exitFullscreen();}
 document.getElementById('tabs').innerHTML=TABS.map((t,i)=>`<div class="tab ${i===0?'active':''}" data-k="${t.k}" onclick="setTab('${t.k}')">${t.label}</div>`).join('');
-document.getElementById('q').addEventListener('input',body);
-render();
+['q','fCat','fTrend','fStock'].forEach(id=>document.getElementById(id).addEventListener('input',body));
+populateFilters();render();
 </script>
 </body></html>"""
 
