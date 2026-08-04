@@ -185,7 +185,7 @@ footer{margin:22px 4px 8px;color:var(--muted);font-size:12px;line-height:1.6}
 <div class="panel"><div class="scroll"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
   <div class="count" id="count"></div></div>
 <footer>
-  <b>Sources:</b> public.order_transaction · listing_data · inv_products · location_wise_inv_stock (curated warehouse, read-only). <b>Revenue</b> = item_price × quantity (EUR, per-product). <b>Stock Cover Days</b> = Current Stock ÷ (30-day units ÷ 30). <b>Trend</b> = 30-day daily rate vs 90-day daily rate (≥1.30 Growing · 0.80–1.30 Stable · &lt;0.80 Slowing). <b>Action / Final Decision</b> = documented default rules pending Mahima's sign-off. Category coverage ~74%; some eBay/Shopify variant titles are short labels.
+  <b>Sources:</b> order_management.orders + order_item_info + sub_source/source · inventory.products + local_inventory_current_stock_location_wise (raw mcp.ledsone DB, read-only). Product Name &amp; Category are curated catalog labels carried by SKU. <b>Revenue</b> = item_price × quantity (EUR, per-product). <b>Stock Cover Days</b> = Current Stock ÷ (30-day units ÷ 30). <b>Trend</b> = 30-day daily rate vs 90-day daily rate (≥1.30 Growing · 0.80–1.30 Stable · &lt;0.80 Slowing). <b>Action / Final Decision</b> = documented default rules pending Mahima's sign-off. Category coverage ~74%; some eBay/Shopify variant titles are short labels.
 </footer>
 </div>
 <script>
