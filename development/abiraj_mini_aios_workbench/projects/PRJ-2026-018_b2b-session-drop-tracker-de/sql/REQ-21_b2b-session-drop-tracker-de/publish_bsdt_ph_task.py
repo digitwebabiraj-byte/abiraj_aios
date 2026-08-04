@@ -36,12 +36,9 @@ ROW = {
     "developer":    "Abiraj",
     "assigned_user":      "jensika",
     "assigned_user_team": "ah_priors",
-    "description":  ("B2B Session Drop Tracker for Amazon.de (Germany). Source of record = Amazon.de "
-                     "Seller Central Business Report export (the internal DB reproduces only ~part of it). "
-                     "526 ASINs — Tier 1 Low 506 / Tier 2 Moderate 16 / Tier 3 High 4; 276 with dropped B2B "
-                     "sessions. Windows: previous 2026-05-17→2026-06-15, current 2026-06-16→2026-07-15. "
-                     "Tier = MAX(prev,current) B2B Sessions (T2≥5, T3≥10). Routed to jensika via "
-                     "assigned_user_team='ah_priors'. Read-only."),
+    # description blanked (NULL) so the portal does NOT render a text block above the report —
+    # the report embeds full-screen; the full description lives in the project docs (PROJECT_HOME).
+    "description":  None,
     "phase_level":    1,
     "version_level":  1,
     "version_status": "released",
