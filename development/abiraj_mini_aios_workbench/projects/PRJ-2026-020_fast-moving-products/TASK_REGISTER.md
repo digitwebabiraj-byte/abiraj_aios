@@ -28,7 +28,16 @@ manual run OK + **Start-ScheduledTask → LastTaskResult 0x0** (25 rows/channel)
 Desktop alert on failure. **No `ph_task` publish** (held pending Mahima). See `automation/AUTOMATION_README.md`.
 
 ## Publish record — ph_task
-None yet. Publish held pending Mahima's audience/team confirmation.
+✅ **PUBLISHED 2026-08-04** to `tech_team_outputs.ph_task` (warehouse `order_management_copy`, temp_user) via
+`automation/publish_fmp_ph_task.py` (guarded INSERT … RETURNING + md5 read-back verify).
+
+| id | project_code | task_id | assigned_user | assigned_user_team | version |
+|---|---|---|---|---|---|
+| **673** | fmp | fmp-2026-08-04-DE-Mahi | **Mahi** (staff.users id 40, Active) | **german_priors** | 1 (released) |
+
+HTML = the interactive dashboard (46,028 chars, md5 `04908f28…`, DB read-back md5 matches). ⚠ `german_priors`
+is a **new team value** (portal previously had ah/cppc/ebay/ph_priors) — confirm the portal has a matching tab.
+⚠ Dashboard is JS-rendered; add a no-JS static fallback if the portal tile shows blank.
 
 ## Sign-off
 None yet.
