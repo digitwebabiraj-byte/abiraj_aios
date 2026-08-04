@@ -35,10 +35,7 @@ ROW = {
     "developer": "Abiraj",
     "assigned_user": "Mahi",
     "assigned_user_team": "german_priors",
-    "description": ("Channel-wise top-selling (fast moving) products for Germany across Shopify, Amazon and eBay, "
-                    "plus a combined all-channel roll-up (REQ-23-D01). Interactive dashboard: Category/Trend/Stock "
-                    "filters, search, sortable columns, full-screen. Data from raw mcp.ledsone (EUR). Trend/Action "
-                    "are documented default rules pending Mahima's sign-off."),
+    "description": "",   # portal shows this as a header block — kept blank per request
     "phase_level": 1,
     "version_level": 1,
     "version_status": "released",
@@ -57,26 +54,38 @@ def main():
     if dry:
         print("\n[dry-run] nothing written."); return
 
-    cols = list(ROW.keys()) + ["html_content"]
-    vals = [ROW[k] for k in ROW] + [html]
-    ph = ",".join(["%s"] * len(cols))
-    sql = (f"INSERT INTO tech_team_outputs.ph_task ({', '.join(cols)}, created_at, updated_at) "
-           f"VALUES ({ph}, now(), now()) RETURNING id")
+    # --update <id> refreshes the existing row (html + description); else INSERT a new row.
+    upd_id = None
+    if "--update" in sys.argv:
+        upd_id = int(sys.argv[sys.argv.index("--update") + 1])
+
     conn = psycopg2.connect(**DB)
     try:
         with conn:
             with conn.cursor() as cur:
-                cur.execute(sql, vals)
-                new_id = cur.fetchone()[0]
-                # read back + verify
+                if upd_id:
+                    cur.execute("UPDATE tech_team_outputs.ph_task "
+                                "SET html_content=%s, description=%s, version_level=version_level+1, "
+                                "updated_at=now() WHERE id=%s",
+                                (html, ROW["description"], upd_id))
+                    row_id = upd_id
+                    print(f"\nUPDATED id={row_id} (rows: {cur.rowcount})")
+                else:
+                    cols = list(ROW.keys()) + ["html_content"]
+                    vals = [ROW[k] for k in ROW] + [html]
+                    ph = ",".join(["%s"] * len(cols))
+                    cur.execute(f"INSERT INTO tech_team_outputs.ph_task ({', '.join(cols)}, created_at, updated_at) "
+                                f"VALUES ({ph}, now(), now()) RETURNING id", vals)
+                    row_id = cur.fetchone()[0]
+                    print(f"\nINSERTED id={row_id}")
                 cur.execute("SELECT id, project_code, task_id, assigned_user, assigned_user_team, "
-                            "version_status, length(html_content), md5(html_content) "
-                            "FROM tech_team_outputs.ph_task WHERE id=%s", (new_id,))
+                            "version_status, version_level, length(html_content), md5(html_content), "
+                            "coalesce(description,'') FROM tech_team_outputs.ph_task WHERE id=%s", (row_id,))
                 r = cur.fetchone()
-        print(f"\n✅ INSERTED id={new_id}")
         print("   read-back:", dict(zip(
-            ["id","project_code","task_id","assigned_user","assigned_user_team","version_status","html_len","html_md5"], r)))
-        print("   md5 match:", r[7] == md5)
+            ["id","project_code","task_id","assigned_user","assigned_user_team","version_status",
+             "version_level","html_len","html_md5","description"], r)))
+        print("   md5 match:", r[8] == md5, "| description blank:", r[9] == "")
     finally:
         conn.close()
 
