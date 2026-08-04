@@ -7,7 +7,7 @@ Pipeline: fmp_fetch_raw.py (raw psycopg2 fetch -> fmp_payload.json) -> build_fmp
 -> gen_dashboard.py (html). Gates the fresh payload before overwriting the delivered outputs;
 on any failure it leaves the last-good outputs untouched and writes an alert.
 """
-import os, sys, json, shutil, subprocess, datetime
+import os, sys, json, shutil, subprocess, datetime, hashlib, traceback
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PROJ = os.path.dirname(HERE)
@@ -59,11 +59,10 @@ def main():
     for c in CHANNELS:
         if counts[c] < ROW_FLOOR:
             alert(f"row-floor gate: {c} has {counts[c]} < {ROW_FLOOR}"); return 1
-    if os.path.exists(LASTGOOD):
-        prev = json.load(open(LASTGOOD, encoding="utf-8"))
-        for c in CHANNELS:
-            if prev.get(c, 0) and counts[c] < COLLAPSE_FRAC * prev[c]:
-                alert(f"collapse gate: {c} {counts[c]} < {COLLAPSE_FRAC:.0%} of last-good {prev[c]}"); return 1
+    prev = _lastgood_counts()
+    for c in CHANNELS:
+        if prev.get(c, 0) and counts[c] < COLLAPSE_FRAC * prev[c]:
+            alert(f"collapse gate: {c} {counts[c]} < {COLLAPSE_FRAC:.0%} of last-good {prev[c]}"); return 1
 
     # 3. build xlsx + dashboard
     try:
@@ -71,20 +70,42 @@ def main():
     except Exception as e:
         alert(f"build failed: {e}"); return 1
 
-    # 4. publish outputs to evidence/final_outputs (atomic-ish copy)
+    # 4. publish outputs to evidence/final_outputs (+ md5 self-check)
     os.makedirs(OUT, exist_ok=True)
+    md5s = {}
     for fn in ("REQ-23-D01_fast_moving_products.xlsx", "REQ-23-D01_fast_moving_products.html"):
         src = os.path.join(SQL, fn)
         if not os.path.exists(src):
             alert(f"expected output missing: {fn}"); return 1
+        data = open(src, "rb").read()
+        if len(data) < 4000:                       # sanity: a real build is far larger
+            alert(f"output too small ({len(data)}B): {fn} — refusing to publish"); return 1
+        md5s[fn] = hashlib.md5(data).hexdigest()
         shutil.copyfile(src, os.path.join(OUT, fn))
-    json.dump(counts, open(LASTGOOD, "w", encoding="utf-8"))
+    json.dump({"counts": counts, "md5": md5s, "at": f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}"},
+              open(LASTGOOD, "w", encoding="utf-8"))
     if os.path.exists(ALERT):
         os.remove(ALERT)
-    log(f"OK — refreshed Excel + dashboard for window {payload['meta']['win30_start']}"
-        f" -> {payload['meta']['win_end']}. ph_task publish NOT run (held for Mahima).")
+    log(f"OK — refreshed Excel (md5 {md5s['REQ-23-D01_fast_moving_products.xlsx'][:8]}) + dashboard "
+        f"(md5 {md5s['REQ-23-D01_fast_moving_products.html'][:8]}) for window "
+        f"{payload['meta']['win30_start']} -> {payload['meta']['win_end']}. ph_task publish NOT run (held for Mahima).")
     log("=== FMP weekly refresh done ===")
     return 0
 
+def _lastgood_counts():
+    """Back-compat: last_good may be the old flat {chan:count} or the new {counts:{...}} shape."""
+    if not os.path.exists(LASTGOOD):
+        return {}
+    d = json.load(open(LASTGOOD, encoding="utf-8"))
+    return d.get("counts", d)
+
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except SystemExit:
+        raise
+    except Exception:                              # universal crash handler (fleet standard)
+        tb = traceback.format_exc()
+        alert("FMP weekly crashed — see fmp_status.txt\n" + tb.splitlines()[-1])
+        log("CRASH:\n" + tb)
+        sys.exit(1)
