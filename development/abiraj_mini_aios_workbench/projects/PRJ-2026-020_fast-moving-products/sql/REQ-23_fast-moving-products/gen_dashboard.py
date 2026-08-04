@@ -117,21 +117,22 @@ select.fil:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(20,184,166
 .clr:hover{color:var(--brand);border-color:var(--brand2)}
 .panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);
   overflow:hidden;animation:fade .35s ease}
-.scroll{overflow-x:auto;max-height:calc(100vh - 232px)}
+.scroll{overflow-x:hidden;overflow-y:auto;max-height:calc(100vh - 232px)}
 :fullscreen .scroll{max-height:calc(100vh - 208px)}
-table{width:100%;border-collapse:collapse;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
 thead th{position:sticky;top:0;z-index:1;background:linear-gradient(180deg,#0f766e,#0d9488);color:#eafff9;
-  text-align:left;padding:12px 12px;font-weight:700;font-size:11.5px;white-space:nowrap;cursor:pointer;
-  user-select:none;border-bottom:2px solid #0b6157}
-thead th:hover{background:#0b6157} thead th .ar{opacity:.7;font-size:9px;margin-left:3px}
-tbody td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+  text-align:left;padding:12px 10px;font-weight:700;font-size:11.5px;white-space:nowrap;cursor:pointer;
+  user-select:none;border-bottom:2px solid #0b6157;overflow:hidden;text-overflow:ellipsis}
+thead th.num{text-align:right} thead th:hover{background:#0b6157} thead th .ar{opacity:.7;font-size:9px;margin-left:2px}
+tbody td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:middle;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 tbody tr{animation:fade .25s ease both}
 tbody tr:nth-child(even){background:var(--zebra)}
 tbody tr:hover{background:var(--hover)}
 .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .sku{font-family:'Consolas','SF Mono',monospace;font-size:11.5px;color:#0d9488;font-weight:600}
 .pid{font-family:'Consolas','SF Mono',monospace;font-size:11px;color:var(--muted)}
-.title{max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.title{max-width:none}
 .rank{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;
   background:#d6f3ec;color:#0b6157;font-weight:800;font-size:12px}
 .rank.top{background:linear-gradient(135deg,#f59e0b,#14b8a6);color:#fff;box-shadow:0 3px 8px rgba(13,148,136,.30)}
@@ -184,8 +185,8 @@ footer{margin:14px 4px 6px;color:var(--muted);font-size:11.5px;line-height:1.55}
 const DATA=__BLOB__;
 const TABS=[{k:'shopify',label:'Shopify DE'},{k:'amazon',label:'Amazon DE'},{k:'ebay',label:'eBay DE'},{k:'combined',label:'Combined'}];
 const COLS={
- channel:[['rank','#','n'],['sku','SKU','t'],['pid','Product ID','t'],['title','Product Name','t'],['cat','Category','t'],['q30','Sold 30d','n'],['q90','Sold 90d','n'],['rev','Revenue €','m'],['orders','Orders','n'],['aoq','Avg Ord Qty','n'],['stock','Stock','n'],['scd','Cover Days','n'],['trend','Trend','badge'],['action','Action','act']],
- combined:[['rank','#','n'],['sku','SKU','t'],['title','Product Name','t'],['cat','Category','t'],['amz','Amazon','n'],['ebay','eBay','n'],['shop','Shopify','n'],['units','Total Units','n'],['rev','Total Rev €','m'],['stock','Stock','n'],['scd','Cover Days','n'],['decision','Final Decision','act']]};
+ channel:[['rank','#','n',3.5],['sku','SKU','t',12],['pid','Product ID','t',8],['title','Product Name','t',19],['cat','Category','t',8.5],['q30','Sold 30d','n',6],['q90','Sold 90d','n',6],['rev','Revenue €','m',7.5],['orders','Orders','n',5],['aoq','Avg Ord Qty','n',6.5],['stock','Stock','n',5.5],['scd','Cover Days','n',6.5],['trend','Trend','badge',8],['action','Action','act',9]],
+ combined:[['rank','#','n',4],['sku','SKU','t',14],['title','Product Name','t',22],['cat','Category','t',10],['amz','Amazon','n',7],['ebay','eBay','n',7],['shop','Shopify','n',7],['units','Total Units','n',8],['rev','Total Rev €','m',9],['stock','Stock','n',6],['scd','Cover Days','n',7],['decision','Final Decision','act',11]]};
 let cur='shopify',sortKey=null,sortDir=1;
 const eur=v=>'€'+Number(v).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -206,7 +207,7 @@ function populateFilters(){
 function head(){
  document.getElementById('thead').innerHTML='<tr>'+cols().map(c=>{
    const ar=sortKey===c[0]?(sortDir>0?'▲':'▼'):'';const cls=(c[2]==='n'||c[2]==='m')?'num':'';
-   return `<th class="${cls}" onclick="sortBy('${c[0]}')">${c[1]}<span class="ar">${ar}</span></th>`;}).join('')+'</tr>';
+   return `<th class="${cls}" style="width:${c[3]}%" onclick="sortBy('${c[0]}')">${c[1]}<span class="ar">${ar}</span></th>`;}).join('')+'</tr>';
 }
 function rowsFiltered(){
  let r=DATA[cur].slice();
