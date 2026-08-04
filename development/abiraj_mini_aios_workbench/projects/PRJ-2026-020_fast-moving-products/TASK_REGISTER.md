@@ -20,8 +20,15 @@ The workbook is a **layout mock-up with sample rows** — it defines columns/tab
 - Read the AIOS KB and map every column live against `ledsone` / warehouse (fill `SYSTEM_REFERENCE.md` + coverage %).
 - Reviewer gates: Sajeesan (technical), Tamil Selvan (queryability), Mahima (business).
 
+## Automation
+✅ **AUTOMATED 2026-08-04** — Windows task **`FMP_Weekly_Fast_Moving_Products`**, **every Tuesday 10:30**
+(free fleet slot). Fail-closed runner `automation/fmp_weekly_run.py`: fetch raw `mcp.ledsone` →
+row-floor + collapse gates → rebuild Excel + dashboard → publish to `evidence/final_outputs`. Proven:
+manual run OK + **Start-ScheduledTask → LastTaskResult 0x0** (25 rows/channel). Git-ignored secrets;
+Desktop alert on failure. **No `ph_task` publish** (held pending Mahima). See `automation/AUTOMATION_README.md`.
+
 ## Publish record — ph_task
-None yet. No publish, no git commit of outputs, until built and signed off.
+None yet. Publish held pending Mahima's audience/team confirmation.
 
 ## Sign-off
 None yet.

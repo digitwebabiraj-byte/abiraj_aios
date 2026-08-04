@@ -13,3 +13,8 @@ __pycache__/
 automation/*.log
 automation/*_status.txt
 automation/*_last_good.json
+
+# transient build byproducts written into the sql working dir (canonical copies live in evidence/final_outputs)
+sql/REQ-23_fast-moving-products/REQ-23-D01_fast_moving_products.xlsx
+sql/REQ-23_fast-moving-products/REQ-23-D01_fast_moving_products.html
+sql/REQ-23_fast-moving-products/fmp_payload.json
