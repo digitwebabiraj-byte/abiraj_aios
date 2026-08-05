@@ -304,7 +304,7 @@ h1 span{background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-bac
 
 /* ---------- table ---------- */
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
-.scroll{overflow:auto;height:clamp(640px, calc(100vh - 205px), 1800px)}
+.scroll{overflow:auto;height:clamp(720px, calc(100vh - 168px), 2200px)}
 table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px}
 thead th{position:sticky;top:0;z-index:2;background:#eef4f9;backdrop-filter:saturate(1.1);
   border-bottom:1px solid var(--line);text-align:left;padding:13px 16px;font-size:11px;letter-spacing:.5px;
@@ -349,6 +349,7 @@ td.action{color:var(--ink2)}
       <span class="tagpill"><b>__MARKET__</b> · units</span>
       <span class="tagpill">Rolling <b>__WINDOW__</b>d · to <b>__THROUGH__</b></span>
       <span class="tagpill">Source: <b>raw ledsone</b></span>
+      <button class="btn" onclick="dl()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Download CSV</button>
       <button class="btn" onclick="fs()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg>Full screen</button>
     </div>
   </div>
@@ -396,6 +397,18 @@ const CNT={miss:__MISS__,mkt:__MKT__,shop:__SHOP__,total:__TOTAL__};
 let filt='all', sortK='t', sortDir=-1;
 const CLS={'Missing channel':'miss','Marketplace winner':'mkt','Shopify winner':'shop'};
 const MAXCH=Math.max(...DATA.map(d=>Math.max(d.sh,d.am,d.eb)),1);
+let CURRENT=DATA;
+function dl(){
+  const head=['SKU','Shopify','Amazon','eBay','Total','Opportunity','Action'];
+  const esc=v=>{v=String(v);return /[",
+]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  const lines=[head.join(',')].concat(CURRENT.map(d=>[d.s,d.sh,d.am,d.eb,d.t,d.o,d.a].map(esc).join(',')));
+  const blob=new Blob(['﻿'+lines.join('
+')],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download='channel_opportunity___THROUGH__.csv';document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+}
 document.getElementById('dist').innerHTML=
   `<i class="d-miss" style="width:${CNT.miss/CNT.total*100}%"></i>`+
   `<i class="d-mkt" style="width:${CNT.mkt/CNT.total*100}%"></i>`+
@@ -413,6 +426,7 @@ function chcell(v,cl){
 function render(){
   const q=document.getElementById('q').value.trim().toLowerCase();
   let rows=DATA.filter(d=>(filt==='all'||d.o===filt)&&(!q||d.s.toLowerCase().includes(q)||d.a.toLowerCase().includes(q)));
+  CURRENT=rows;
   rows.sort((a,b)=>{let x=a[sortK],y=b[sortK];if(typeof x==='string')return x.localeCompare(y)*sortDir;return (x-y)*sortDir;});
   document.getElementById('count').innerHTML=`<b style="color:var(--ink2)">${rows.length}</b> of ${DATA.length} shown`;
   const tb=document.getElementById('tb');
