@@ -32,8 +32,18 @@ Marketplace-winner ≥60% & Shopify ≤20% · combos kept in · columns = the 6 
 Decision sheet retained at `prompts/discovery/REQ-24_.../DECISION_SHEET_for_Mahima.md` — Mahima may still
 review/adjust later; the report re-runs on any change. These are now APPROVED defaults, not invented.
 
+## Publish record — ph_task (PUBLISHED 2026-08-05 on owner instruction)
+✅ Inserted into `tech_team_outputs.ph_task` (host `149.28.134.54:5435`, DB `order_management_copy`, temp_user)
+via guarded `automation/publish_chop_ph_task.py` (dry-run preview → `--commit` INSERT … RETURNING + md5 read-back).
+
+| id | project_code | task_id | assigned_user | assigned_user_team | team | version | html md5 |
+|---|---|---|---|---|---|---|---|
+| **699** | chop | chop-2026-08-05-DE-Mahi | **Mahi** (staff.users id 40) | **german_priors** | Development | 1 (released) | `367ca934…` (DB read-back MATCH) |
+
+HTML = the full-screen interactive dashboard (50,222 chars). Conventions mirror fmp id 673. ⚠ Dashboard is
+JS-rendered — renders on the portal like fmp; add a static fallback only if Mahi's tile shows blank.
+
 ## Still open (do NOT block the delivered build)
-- Publish audience — NOT published (default off). Likely `german_priors` when authorised.
 - Automation — NOT scheduled (default off). Weekly refresh available on request (fmp pattern).
 - Confirm provisional identity `PRJ-2026-021` / `REQ-24` / code `chop` (cosmetic).
 - Optional later reviewer gates: Sajeesan (technical), Tamil Selvan (queryability), Mahima (business).
