@@ -39,5 +39,13 @@ HTML = the interactive dashboard (46,028 chars, md5 `04908f28…`, DB read-back 
 is a **new team value** (portal previously had ah/cppc/ebay/ph_priors) — confirm the portal has a matching tab.
 ⚠ Dashboard is JS-rendered; add a no-JS static fallback if the portal tile shows blank.
 
+## Business decisions (Mahima)
+- ✅ **Grain = SKU-wise** — confirmed by **Mahima 2026-08-05**. One row per SKU, sales summed across all its
+  listings (eBay `12IP6715` = 32 units, not the split 9). This is what's built & published (per-SKU, not per-listing).
+
+## Still open (Mahima)
+Revenue basis (gross vs net-of-discount vs ex-VAT) · Trend/Action/Final-Decision thresholds · window
+(rolling 30/90-day vs fixed calendar month) · confirm `german_priors` is a live portal tab · provisional IDs.
+
 ## Sign-off
-None yet.
+Partial — grain confirmed SKU-wise (Mahima 2026-08-05). Full acceptance pending the open items above.
