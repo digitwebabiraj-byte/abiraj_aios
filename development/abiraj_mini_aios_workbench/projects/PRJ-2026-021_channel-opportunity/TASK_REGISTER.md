@@ -19,6 +19,9 @@ and the Action vocabulary, not data.
   from the **RAW `mcp.ledsone` `order_management`** schema (Germany=market_place '10'; channels via
   `source.source_name`; clean-SKU = strip `-IDE`), classifies Opportunity/Action, renders the Excel.
   Knowledge/query patterns from the AIOS KB (`docs.ledsone.co.uk`, `text-to-sql-multi`).
+- Outputs: `evidence/final_outputs/REQ-24_.../REQ-24-D01_channel_opportunity.xlsx` **and** a self-contained
+  interactive **HTML dashboard** (`…_channel_opportunity.html`) — full-width light theme, KPI cards, filter
+  by Opportunity class, search, sortable columns, inline channel bars. No external resources.
 - Output: `evidence/final_outputs/REQ-24_channel-opportunity/REQ-24-D01_channel_opportunity.xlsx`
   (Notes & Method + Channel Opportunity, 285 rows). Reconciliation note in `evidence/logs_or_screenshots/`.
 

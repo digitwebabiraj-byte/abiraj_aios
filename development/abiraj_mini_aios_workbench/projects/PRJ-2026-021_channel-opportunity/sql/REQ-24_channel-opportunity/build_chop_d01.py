@@ -31,6 +31,7 @@ RAW  = sys.argv[1] if len(sys.argv) > 1 else None
 OUT_DIR = os.path.abspath(os.path.join(HERE, "..", "..", "evidence", "final_outputs",
                                        "REQ-24_channel-opportunity"))
 OUT_XLSX = os.path.join(OUT_DIR, "REQ-24-D01_channel_opportunity.xlsx")
+OUT_HTML = os.path.join(OUT_DIR, "REQ-24-D01_channel_opportunity.html")
 
 FLOOR = 10
 WINDOW_DAYS = 90
@@ -178,18 +179,155 @@ def build():
     ws.auto_filter.ref = f"A1:G{ws.max_row}"
 
     wb.save(OUT_XLSX)
+    total_base = len(rows)
+    write_dashboard(opps, total_base)
 
     # ---- console summary ----
     from collections import Counter
     cnt = Counter(o["opportunity"] for o in opps)
     print("saved:", OUT_XLSX)
-    print("total opportunity rows:", len(opps))
+    print("saved:", OUT_HTML)
+    print("total opportunity rows:", len(opps), "/ base SKUs:", total_base)
     for k in ("Missing channel", "Shopify winner", "Marketplace winner"):
         print(f"  {k}: {cnt.get(k,0)}")
-    print("top 8 by total units:")
-    for o in sorted(opps, key=lambda x: -x["total_u"])[:8]:
-        print(f"  {o['sku']:<16} sh={o['shopify_u']:<4} am={o['amazon_u']:<4} eb={o['ebay_u']:<4} "
-              f"tot={o['total_u']:<4} {o['opportunity']:<18} {o['action']}")
+
+
+def write_dashboard(opps, total_base):
+    """Self-contained interactive HTML dashboard (full-screen, light theme)."""
+    data = json.dumps([{"s": o["sku"], "sh": o["shopify_u"], "am": o["amazon_u"],
+                        "eb": o["ebay_u"], "t": o["total_u"], "o": o["opportunity"],
+                        "a": o["action"]} for o in sorted(opps, key=lambda x: -x["total_u"])])
+    from collections import Counter
+    c = Counter(o["opportunity"] for o in opps)
+    html = _HTML.replace("__DATA__", data) \
+               .replace("__TOTAL__", str(len(opps))).replace("__BASE__", f"{total_base:,}") \
+               .replace("__MISS__", str(c.get("Missing channel", 0))) \
+               .replace("__MKT__", str(c.get("Marketplace winner", 0))) \
+               .replace("__SHOP__", str(c.get("Shopify winner", 0))) \
+               .replace("__THROUGH__", DATA_THROUGH).replace("__WINDOW__", str(WINDOW_DAYS)) \
+               .replace("__MARKET__", MARKET)
+    open(OUT_HTML, "w", encoding="utf-8").write(html)
+
+
+_HTML = r"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Channel Opportunity — REQ-24-D01</title>
+<style>
+:root{
+  --bg:#eef3f8; --panel:#ffffff; --ink:#0f2233; --muted:#5b7085; --line:#e2e9f0;
+  --accent:#0ea5a4; --accent2:#0891b2;
+  --miss:#f59e0b; --miss-bg:#fef3e2; --mkt:#2563eb; --mkt-bg:#e8eefe; --shop:#16a34a; --shop-bg:#e7f6ec;
+  --sh:#16a34a; --am:#f59e0b; --eb:#2563eb;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.wrap{max-width:1500px;margin:0 auto;padding:22px 26px 60px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:18px}
+h1{margin:0;font-size:24px;letter-spacing:-.3px}
+h1 .tag{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);font-size:13px;margin-top:4px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:18px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 2px rgba(15,34,51,.04)}
+.kpi .n{font-size:30px;font-weight:700;letter-spacing:-.5px}
+.kpi .l{color:var(--muted);font-size:12px;margin-top:2px;text-transform:uppercase;letter-spacing:.4px}
+.kpi.b-miss{border-top:3px solid var(--miss)} .kpi.b-mkt{border-top:3px solid var(--mkt)}
+.kpi.b-shop{border-top:3px solid var(--shop)} .kpi.b-acc{border-top:3px solid var(--accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;
+  padding:7px 14px;font-size:13px;cursor:pointer;font-weight:600;transition:.15s}
+.chip:hover{border-color:var(--accent)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip.on.miss{background:var(--miss);border-color:var(--miss)}
+.chip.on.mkt{background:var(--mkt);border-color:var(--mkt)}
+.chip.on.shop{background:var(--shop);border-color:var(--shop)}
+.search{margin-left:auto;flex:1;min-width:200px;max-width:340px}
+.search input{width:100%;padding:9px 13px;border:1px solid var(--line);border-radius:10px;font-size:14px;background:var(--panel)}
+.search input:focus{outline:2px solid var(--accent);border-color:transparent}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(15,34,51,.05)}
+.scroll{overflow:auto;max-height:calc(100vh - 320px)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead th{position:sticky;top:0;background:#f3f7fb;border-bottom:2px solid var(--line);
+  text-align:left;padding:11px 14px;font-size:12px;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;cursor:pointer;white-space:nowrap}
+thead th.num{text-align:right} thead th:hover{color:var(--accent)}
+tbody td{padding:10px 14px;border-bottom:1px solid #eef2f6}
+tbody tr:hover{background:#f7fbfc}
+td.sku{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:600}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.bar{display:inline-block;height:8px;border-radius:4px;vertical-align:middle;margin-right:7px}
+.z{color:#c2cede} .sh-c{color:var(--sh);font-weight:600} .am-c{color:var(--am);font-weight:600} .eb-c{color:var(--eb);font-weight:600}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.badge.miss{background:var(--miss-bg);color:#b45309} .badge.mkt{background:var(--mkt-bg);color:#1d4ed8} .badge.shop{background:var(--shop-bg);color:#15803d}
+td.action{color:var(--muted)}
+.count{color:var(--muted);font-size:12.5px;margin:10px 2px 0}
+footer{color:var(--muted);font-size:12px;margin-top:16px;line-height:1.6}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+</style></head><body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Channel <span class="tag">Opportunity</span></h1>
+      <div class="sub">Products selling well in one channel but weak or missing in others · __MARKET__ · units · rolling __WINDOW__ days · data through __THROUGH__ · source: raw ledsone (order_management)</div>
+    </div>
+  </header>
+  <div class="kpis">
+    <div class="kpi b-acc"><div class="n">__TOTAL__</div><div class="l">Opportunities</div></div>
+    <div class="kpi b-miss"><div class="n">__MISS__</div><div class="l">Missing channel</div></div>
+    <div class="kpi b-mkt"><div class="n">__MKT__</div><div class="l">Marketplace winner</div></div>
+    <div class="kpi b-shop"><div class="n">__SHOP__</div><div class="l">Shopify winner</div></div>
+    <div class="kpi"><div class="n">__BASE__</div><div class="l">Base SKUs scanned</div></div>
+  </div>
+  <div class="toolbar">
+    <span class="chip on" data-f="all" onclick="setF(this,'all')">All</span>
+    <span class="chip miss" data-f="Missing channel" onclick="setF(this,'Missing channel')">Missing channel</span>
+    <span class="chip mkt" data-f="Marketplace winner" onclick="setF(this,'Marketplace winner')">Marketplace winner</span>
+    <span class="chip shop" data-f="Shopify winner" onclick="setF(this,'Shopify winner')">Shopify winner</span>
+    <div class="search"><input id="q" placeholder="Search SKU or action…" oninput="render()"></div>
+  </div>
+  <div class="count" id="count"></div>
+  <div class="panel"><div class="scroll"><table>
+    <thead><tr>
+      <th onclick="sortBy('s')">SKU</th>
+      <th class="num" onclick="sortBy('sh')">Shopify</th>
+      <th class="num" onclick="sortBy('am')">Amazon</th>
+      <th class="num" onclick="sortBy('eb')">eBay</th>
+      <th class="num" onclick="sortBy('t')">Total</th>
+      <th onclick="sortBy('o')">Opportunity</th>
+      <th onclick="sortBy('a')">Action</th>
+    </tr></thead>
+    <tbody id="tb"></tbody>
+  </table></div></div>
+  <footer>
+    <b>Method (documented defaults — owner-locked, pending Mahima review):</b>
+    one row per clean base SKU (strip <code>-IDE</code> suffix); a SKU is flagged only if its top channel sold ≥10 units.
+    <b>Missing channel</b> = 0 units in ≥1 channel · <b>Shopify winner</b> = Shopify ≥50% of units ·
+    <b>Marketplace winner</b> = Amazon+eBay ≥60% and Shopify ≤20%. Read-only; every figure traces to the live database. REQ-24-D01.
+  </footer>
+</div>
+<script>
+const DATA=__DATA__;
+let filt='all', sortK='t', sortDir=-1;
+const cls={'Missing channel':'miss','Marketplace winner':'mkt','Shopify winner':'shop'};
+const MAX=Math.max(...DATA.map(d=>Math.max(d.sh,d.am,d.eb)),1);
+function setF(el,f){filt=f;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');render();}
+function sortBy(k){if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=(k==='s'||k==='o'||k==='a')?1:-1;}render();}
+function cell(v,klass){if(!v)return '<td class="num z">0</td>';
+  const w=Math.max(4,Math.round(v/MAX*46));
+  return `<td class="num"><span class="bar" style="width:${w}px;background:var(--${klass})"></span><span class="${klass}-c">${v}</span></td>`;}
+function render(){
+  const q=document.getElementById('q').value.trim().toLowerCase();
+  let rows=DATA.filter(d=>(filt==='all'||d.o===filt)&&(!q||d.s.toLowerCase().includes(q)||d.a.toLowerCase().includes(q)));
+  rows.sort((a,b)=>{let x=a[sortK],y=b[sortK];if(typeof x==='string')return x.localeCompare(y)*sortDir;return (x-y)*sortDir;});
+  document.getElementById('count').textContent=`${rows.length} of ${DATA.length} opportunities`;
+  document.getElementById('tb').innerHTML=rows.map(d=>{const k=cls[d.o];
+    return `<tr><td class="sku">${d.s}</td>${cell(d.sh,'sh')}${cell(d.am,'am')}${cell(d.eb,'eb')}`
+      +`<td class="num"><b>${d.t}</b></td>`
+      +`<td><span class="badge ${k}">${d.o}</span></td><td class="action">${d.a}</td></tr>`;}).join('');
+}
+render();
+</script>
+</body></html>"""
 
 
 if __name__ == "__main__":
