@@ -38,10 +38,12 @@ via guarded `automation/publish_chop_ph_task.py` (dry-run preview → `--commit`
 
 | id | project_code | task_id | assigned_user | assigned_user_team | team | version | html md5 |
 |---|---|---|---|---|---|---|---|
-| **699** | chop | chop-2026-08-05-DE-Mahi | **Mahi** (staff.users id 40) | **german_priors** | Development | 1 (released) | `367ca934…` (DB read-back MATCH) |
+| **699** | chop | chop-2026-08-05-DE-Mahi | **Mahi** (staff.users id 40) | **german_priors** | Development | **2 (released)** | `24a88ec9…` (DB read-back MATCH) |
 
-HTML = the full-screen interactive dashboard (50,222 chars). Conventions mirror fmp id 673. ⚠ Dashboard is
-JS-rendered — renders on the portal like fmp; add a static fallback only if Mahi's tile shows blank.
+HTML = the full-screen interactive dashboard (~50k chars). Conventions mirror fmp id 673.
+**v2 (2026-08-05):** layout fix for the embedded portal view — replaced the `100vh` app-shell (which left the
+table ~3 rows tall inside the portal's own scroll) with a **tall clamped table** (`height:clamp(600px,
+calc(100vh-300px),1600px)`) + compact KPIs, so ~12–15 rows show at once on Mahi's desktop. ⚠ JS-rendered.
 
 ## Still open (do NOT block the delivered build)
 - Automation — NOT scheduled (default off). Weekly refresh available on request (fmp pattern).
