@@ -186,13 +186,13 @@ const CLS={'Missing channel':'miss','Marketplace winner':'mkt','Shopify winner':
 const MAXCH=Math.max(...DATA.map(d=>Math.max(d.sh,d.am,d.eb)),1);
 let CURRENT=DATA;
 function dl(){
-  const head=['SKU','Shopify','Amazon','eBay','Total','Opportunity','Action'];
-  const esc=v=>{v=String(v);return /[",
-]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
-  const lines=[head.join(',')].concat(CURRENT.map(d=>[d.s,d.sh,d.am,d.eb,d.t,d.o,d.a].map(esc).join(',')));
-  const blob=new Blob(['﻿'+lines.join('
-')],{type:'text/csv;charset=utf-8'});
-  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  var NL=String.fromCharCode(10), BOM=String.fromCharCode(65279);
+  var head=['SKU','Shopify','Amazon','eBay','Total','Opportunity','Action'];
+  var esc=function(v){v=String(v);return (v.indexOf(',')>=0||v.indexOf('"')>=0||v.indexOf(NL)>=0)?'"'+v.replace(/"/g,'""')+'"':v;};
+  var lines=[head.join(',')];
+  CURRENT.forEach(function(d){lines.push([d.s,d.sh,d.am,d.eb,d.t,d.o,d.a].map(esc).join(','));});
+  var blob=new Blob([BOM+lines.join(NL)],{type:'text/csv;charset=utf-8'});
+  var url=URL.createObjectURL(blob);var a=document.createElement('a');
   a.href=url;a.download='channel_opportunity_2026-08-04.csv';document.body.appendChild(a);a.click();
   document.body.removeChild(a);URL.revokeObjectURL(url);
 }
