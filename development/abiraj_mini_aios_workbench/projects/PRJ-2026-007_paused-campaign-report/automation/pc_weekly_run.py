@@ -90,7 +90,17 @@ def _num(pat, s, d=None):
     return m.group(1) if m else d
 
 def derive_row(cn, ag, asin, sku, reason, pause_date, days):
-    m = re.match(r"\s*Rule\s*(\d)", reason or "")
+    reason = reason or ""
+    # Newer automation logs the reason as a JSON blob whose inner "reason" field
+    # still holds the old "Rule N - ..." prose. Unwrap it so the rule parser (and
+    # the dashboard's rule tabs / colours) work; a raw-JSON reason otherwise parses
+    # to rn=0, which the template has no RULES entry for and which blanked the All view.
+    if reason.lstrip().startswith("{"):
+        try:
+            reason = (json.loads(reason).get("reason") or reason)
+        except (ValueError, TypeError):
+            pass
+    m = re.match(r"\s*Rule\s*(\d)", reason)
     rn = int(m.group(1)) if m else 0
     chips = []
     try:
