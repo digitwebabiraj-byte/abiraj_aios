@@ -57,4 +57,6 @@ Not automated (not built). A weekly refresh would follow the fmp pattern if requ
 None yet.
 
 ## Sign-off
-None yet.
+🟢 **SIGNED OFF by Mahima (Business Validator) — 2026-08-05.** REQ-24-D01 accepted; the previously-provisional
+default rules are now the confirmed rule set (Germany · units · 90d · FLOOR 10 · 50/60/20 · combos kept).
+Closure note: `closure/REQ-24_channel-opportunity/README.md`. Project CLOSED — no open blockers.

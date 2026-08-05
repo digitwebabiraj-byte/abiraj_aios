@@ -11,7 +11,7 @@ Marketplace winner / Missing channel) and recommends an **Action** (Improve Amaz
 Shopify promotion / Create eBay listing …).
 
 ## Status
-🟢 **BUILT & DELIVERED 2026-08-05 — pending Mahima sign-off.** Germany, UNITS metric, rolling 90 days,
+🟢 **SIGNED OFF & CLOSED 2026-08-05 (Mahima).** Published to `ph_task` id 699 (v7). Built & delivered same day — Germany, UNITS metric, rolling 90 days,
 sourced from the **RAW `mcp.ledsone` DB** (`order_management`, clean-SKU = strip `-IDE`, data through
 2026-08-04); knowledge/query patterns from the AIOS KB (`docs.ledsone.co.uk`). Excel
 `REQ-24-D01_channel_opportunity.xlsx` holds **283 opportunity rows** (270 Missing channel · 10 Marketplace
