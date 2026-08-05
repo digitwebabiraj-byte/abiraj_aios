@@ -38,7 +38,7 @@ via guarded `automation/publish_chop_ph_task.py` (dry-run preview → `--commit`
 
 | id | project_code | task_id | assigned_user | assigned_user_team | team | version | html md5 |
 |---|---|---|---|---|---|---|---|
-| **699** | chop | chop-2026-08-05-DE-Mahi | **Mahi** (staff.users id 40) | **german_priors** | Development | **5 (released)** | `e7510838…` (DB read-back MATCH) |
+| **699** | chop | chop-2026-08-05-DE-Mahi | **Mahi** (staff.users id 40) | **german_priors** | Development | **6 (released)** (DB read-back MATCH) |
 
 HTML = the full-screen interactive dashboard (~50k chars). Conventions mirror fmp id 673.
 **v2 (2026-08-05):** layout fix for the embedded portal view — replaced the `100vh` app-shell (which left the
