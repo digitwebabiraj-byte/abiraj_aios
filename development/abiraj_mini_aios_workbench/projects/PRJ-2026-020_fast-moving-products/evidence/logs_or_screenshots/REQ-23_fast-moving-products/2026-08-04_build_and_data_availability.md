@@ -52,6 +52,14 @@ Amazon top rows identical bar ≤€0.01 rounding). Mapping used:
 - **Automation-ready:** the shared LED credentials reach this raw host (169.58.91.229), so `fmp_fetch_raw.py`
   can run on a schedule (unlike the warehouse, which had no reachable credentials).
 
+## Grain correction — TRUE per-SKU (2026-08-04)
+The spec uses **SKU** as the row identifier (Product ID is a reference column), so each row is **one SKU with
+its sales summed across all its listings**. The initial build grouped by (SKU × listing-id), which on **eBay**
+split a SKU across its many `item_id`s and — after the top-25 cut — showed only the single biggest listing's
+slice. Fixed: all channels now `GROUP BY sku`; the **Product ID column shows a representative listing** (the
+one with the most 30-day units). Impact: eBay `12IP6715` corrected from **9 → 32 units** (13 listings summed;
+new eBay #1); Shopify/Amazon unchanged (≈1 listing per SKU; variants stay separate as distinct SKUs).
+
 ## Reproducibility
 - Canonical query: `sql/REQ-23_.../fmp_query_warehouse.sql` (run on the warehouse → one JSON payload).
 - Payload snapshot 2026-08-04: `sql/REQ-23_.../fmp_payload_2026-08-04.json` (+ `fmp_payload_snapshot.py`).
