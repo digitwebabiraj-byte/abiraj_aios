@@ -199,11 +199,13 @@ def write_dashboard(opps, total_base):
                         "a": o["action"]} for o in sorted(opps, key=lambda x: -x["total_u"])])
     from collections import Counter
     c = Counter(o["opportunity"] for o in opps)
+    units = sum(o["total_u"] for o in opps)
     html = _HTML.replace("__DATA__", data) \
                .replace("__TOTAL__", str(len(opps))).replace("__BASE__", f"{total_base:,}") \
                .replace("__MISS__", str(c.get("Missing channel", 0))) \
                .replace("__MKT__", str(c.get("Marketplace winner", 0))) \
                .replace("__SHOP__", str(c.get("Shopify winner", 0))) \
+               .replace("__UNITS__", f"{units:,}") \
                .replace("__THROUGH__", DATA_THROUGH).replace("__WINDOW__", str(WINDOW_DAYS)) \
                .replace("__MARKET__", MARKET)
     open(OUT_HTML, "w", encoding="utf-8").write(html)
@@ -215,120 +217,218 @@ _HTML = r"""<!doctype html>
 <title>Channel Opportunity — REQ-24-D01</title>
 <style>
 :root{
-  --bg:#eef3f8; --panel:#ffffff; --ink:#0f2233; --muted:#5b7085; --line:#e2e9f0;
-  --accent:#0ea5a4; --accent2:#0891b2;
-  --miss:#f59e0b; --miss-bg:#fef3e2; --mkt:#2563eb; --mkt-bg:#e8eefe; --shop:#16a34a; --shop-bg:#e7f6ec;
-  --sh:#16a34a; --am:#f59e0b; --eb:#2563eb;
+  --bg:#f4f7fb; --bg2:#eaf0f7; --panel:#ffffff; --ink:#0d1b2a; --ink2:#33475b; --muted:#6b7f95;
+  --line:#e6edf4; --line2:#eef3f8;
+  --brand:#0d9488; --brand2:#0e7490; --brand-soft:#e6f7f5;
+  --miss:#f59e0b; --miss-d:#b45309; --miss-bg:#fef4e6;
+  --mkt:#3b82f6;  --mkt-d:#1d4ed8;  --mkt-bg:#eaf1fe;
+  --shop:#22c55e; --shop-d:#15803d; --shop-bg:#e9f8ee;
+  --sh:#22c55e; --am:#f59e0b; --eb:#3b82f6;
+  --shadow:0 1px 2px rgba(13,27,42,.05),0 8px 24px -12px rgba(13,27,42,.14);
+  --radius:16px;
 }
 *{box-sizing:border-box}
-html,body{margin:0;height:100%}
-body{background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,Segoe UI,Roboto,Arial,sans-serif}
-.wrap{max-width:1500px;margin:0 auto;padding:22px 26px 60px}
-header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:18px}
-h1{margin:0;font-size:24px;letter-spacing:-.3px}
-h1 .tag{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.sub{color:var(--muted);font-size:13px;margin-top:4px}
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:18px}
-.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 2px rgba(15,34,51,.04)}
-.kpi .n{font-size:30px;font-weight:700;letter-spacing:-.5px}
-.kpi .l{color:var(--muted);font-size:12px;margin-top:2px;text-transform:uppercase;letter-spacing:.4px}
-.kpi.b-miss{border-top:3px solid var(--miss)} .kpi.b-mkt{border-top:3px solid var(--mkt)}
-.kpi.b-shop{border-top:3px solid var(--shop)} .kpi.b-acc{border-top:3px solid var(--accent)}
-.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
-.chip{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;
-  padding:7px 14px;font-size:13px;cursor:pointer;font-weight:600;transition:.15s}
-.chip:hover{border-color:var(--accent)}
-.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-.chip.on.miss{background:var(--miss);border-color:var(--miss)}
-.chip.on.mkt{background:var(--mkt);border-color:var(--mkt)}
-.chip.on.shop{background:var(--shop);border-color:var(--shop)}
-.search{margin-left:auto;flex:1;min-width:200px;max-width:340px}
-.search input{width:100%;padding:9px 13px;border:1px solid var(--line);border-radius:10px;font-size:14px;background:var(--panel)}
-.search input:focus{outline:2px solid var(--accent);border-color:transparent}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(15,34,51,.05)}
-.scroll{overflow:auto;max-height:calc(100vh - 320px)}
-table{width:100%;border-collapse:collapse;font-size:13.5px}
-thead th{position:sticky;top:0;background:#f3f7fb;border-bottom:2px solid var(--line);
-  text-align:left;padding:11px 14px;font-size:12px;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;cursor:pointer;white-space:nowrap}
-thead th.num{text-align:right} thead th:hover{color:var(--accent)}
-tbody td{padding:10px 14px;border-bottom:1px solid #eef2f6}
-tbody tr:hover{background:#f7fbfc}
-td.sku{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:600}
-td.num{text-align:right;font-variant-numeric:tabular-nums}
-.bar{display:inline-block;height:8px;border-radius:4px;vertical-align:middle;margin-right:7px}
-.z{color:#c2cede} .sh-c{color:var(--sh);font-weight:600} .am-c{color:var(--am);font-weight:600} .eb-c{color:var(--eb);font-weight:600}
-.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
-.badge.miss{background:var(--miss-bg);color:#b45309} .badge.mkt{background:var(--mkt-bg);color:#1d4ed8} .badge.shop{background:var(--shop-bg);color:#15803d}
-td.action{color:var(--muted)}
-.count{color:var(--muted);font-size:12.5px;margin:10px 2px 0}
-footer{color:var(--muted);font-size:12px;margin-top:16px;line-height:1.6}
-@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+html,body{margin:0;height:100%;overflow:hidden}
+body{
+  background:
+    radial-gradient(1200px 500px at 82% -12%, #dff3f0 0%, rgba(223,243,240,0) 60%),
+    radial-gradient(900px 480px at -8% 8%, #e7eefb 0%, rgba(231,238,251,0) 55%),
+    var(--bg);
+  color:var(--ink);
+  font:14px/1.5 "Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.app{display:flex;flex-direction:column;height:100vh;max-width:1680px;margin:0 auto;padding:20px 26px 16px}
+
+/* ---------- header ---------- */
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 8px 20px -8px rgba(13,148,136,.7)}
+.logo svg{width:24px;height:24px}
+h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.4px}
+h1 span{background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);font-size:12.5px;margin-top:3px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.tagpill{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 12px;
+  font-size:12px;font-weight:600;color:var(--ink2);box-shadow:var(--shadow)}
+.tagpill b{color:var(--brand2)}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:8px 12px;font-size:12.5px;
+  font-weight:700;color:var(--ink2);cursor:pointer;box-shadow:var(--shadow);display:inline-flex;align-items:center;gap:7px}
+.btn:hover{border-color:var(--brand);color:var(--brand2)}
+.btn svg{width:15px;height:15px}
+
+/* ---------- KPIs ---------- */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:14px}
+.kpi{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 18px;box-shadow:var(--shadow);overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--brand)}
+.kpi.k-miss::before{background:var(--miss)} .kpi.k-mkt::before{background:var(--mkt)}
+.kpi.k-shop::before{background:var(--shop)} .kpi.k-base::before{background:#94a3b8}
+.kpi .row{display:flex;align-items:center;justify-content:space-between}
+.kpi .n{font-size:31px;font-weight:800;letter-spacing:-1px;line-height:1}
+.kpi .l{color:var(--muted);font-size:11.5px;margin-top:7px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.kpi .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--brand-soft);color:var(--brand2)}
+.kpi.k-miss .ic{background:var(--miss-bg);color:var(--miss-d)}
+.kpi.k-mkt .ic{background:var(--mkt-bg);color:var(--mkt-d)}
+.kpi.k-shop .ic{background:var(--shop-bg);color:var(--shop-d)}
+.kpi.k-base .ic{background:#eef2f6;color:#64748b}
+.kpi .ic svg{width:18px;height:18px}
+
+/* ---------- distribution bar ---------- */
+.dist{display:flex;height:12px;border-radius:999px;overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.dist i{display:block;height:100%}
+.dist .d-miss{background:linear-gradient(90deg,#fbbf24,#f59e0b)}
+.dist .d-mkt{background:linear-gradient(90deg,#60a5fa,#3b82f6)}
+.dist .d-shop{background:linear-gradient(90deg,#4ade80,#22c55e)}
+
+/* ---------- toolbar ---------- */
+.toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--ink2);border-radius:999px;
+  padding:8px 15px;font-size:13px;cursor:pointer;font-weight:700;box-shadow:var(--shadow);transition:.15s;
+  display:inline-flex;align-items:center;gap:8px}
+.chip .dot{width:9px;height:9px;border-radius:50%}
+.chip .dot.miss{background:var(--miss)} .chip .dot.mkt{background:var(--mkt)} .chip .dot.shop{background:var(--shop)} .chip .dot.all{background:var(--brand)}
+.chip .c{background:var(--bg2);border-radius:999px;padding:1px 8px;font-size:11.5px;color:var(--muted)}
+.chip:hover{transform:translateY(-1px)}
+.chip.on{color:#fff;border-color:transparent}
+.chip.on .c{background:rgba(255,255,255,.25);color:#fff}
+.chip.on[data-f="all"]{background:linear-gradient(135deg,var(--brand),var(--brand2))}
+.chip.on.miss{background:linear-gradient(135deg,#fbbf24,#f59e0b)} .chip.on.miss .dot{background:#fff}
+.chip.on.mkt{background:linear-gradient(135deg,#60a5fa,#3b82f6)} .chip.on.mkt .dot{background:#fff}
+.chip.on.shop{background:linear-gradient(135deg,#4ade80,#22c55e)} .chip.on.shop .dot{background:#fff}
+.search{margin-left:auto;position:relative;min-width:230px;max-width:360px;flex:1}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted)}
+.search input{width:100%;padding:10px 14px 10px 36px;border:1px solid var(--line);border-radius:11px;font-size:13.5px;background:var(--panel);box-shadow:var(--shadow)}
+.search input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+
+/* ---------- table ---------- */
+.card{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:0}
+.scroll{overflow:auto;flex:1;min-height:0}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px}
+thead th{position:sticky;top:0;z-index:2;background:#f8fafc;backdrop-filter:saturate(1.1);
+  border-bottom:1px solid var(--line);text-align:left;padding:13px 16px;font-size:11px;letter-spacing:.5px;
+  color:var(--muted);text-transform:uppercase;font-weight:700;cursor:pointer;white-space:nowrap;user-select:none}
+thead th.num{text-align:right} thead th:hover{color:var(--brand2)}
+thead th .ar{opacity:.4;font-size:10px;margin-left:3px}
+tbody td{padding:11px 16px;border-bottom:1px solid var(--line2);vertical-align:middle}
+tbody tr{transition:background .12s} tbody tr:hover{background:#f6fbfb}
+td.rank{color:#aab8c6;font-variant-numeric:tabular-nums;font-size:12px;width:44px}
+td.sku{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-weight:700;color:var(--ink);letter-spacing:-.2px}
+.cov{display:inline-flex;gap:4px;margin-left:9px;vertical-align:middle}
+.cov i{width:7px;height:7px;border-radius:50%;background:#dbe4ec}
+.cov i.on-sh{background:var(--sh)} .cov i.on-am{background:var(--am)} .cov i.on-eb{background:var(--eb)}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cellbar{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end}
+.cellbar .bar{height:7px;border-radius:4px;min-width:3px}
+.cellbar .v{min-width:26px;text-align:right;font-weight:700}
+.v.sh{color:var(--shop-d)} .v.am{color:var(--miss-d)} .v.eb{color:var(--mkt-d)} .v.z{color:#c6d0da;font-weight:500}
+td.tot b{font-size:14px}
+.badge{display:inline-flex;align-items:center;gap:7px;padding:4px 11px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.badge .dot{width:7px;height:7px;border-radius:50%}
+.badge.miss{background:var(--miss-bg);color:var(--miss-d)} .badge.miss .dot{background:var(--miss)}
+.badge.mkt{background:var(--mkt-bg);color:var(--mkt-d)} .badge.mkt .dot{background:var(--mkt)}
+.badge.shop{background:var(--shop-bg);color:var(--shop-d)} .badge.shop .dot{background:var(--shop)}
+td.action{color:var(--ink2)}
+.footbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 4px 2px;color:var(--muted);font-size:11.5px}
+.footbar code{background:var(--bg2);padding:1px 6px;border-radius:5px;font-size:11px}
+.empty{padding:60px;text-align:center;color:var(--muted)}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}.app{padding:14px}}
+@media(max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}}
 </style></head><body>
-<div class="wrap">
-  <header>
-    <div>
-      <h1>Channel <span class="tag">Opportunity</span></h1>
-      <div class="sub">Products selling well in one channel but weak or missing in others · __MARKET__ · units · rolling __WINDOW__ days · data through __THROUGH__ · source: raw ledsone (order_management)</div>
+<div class="app">
+  <div class="top">
+    <div class="brand">
+      <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 4-6"/></svg></div>
+      <div>
+        <h1>Channel <span>Opportunity</span></h1>
+        <div class="sub">Products selling well in one channel but weak or missing in the others — where to create or promote a listing.</div>
+      </div>
     </div>
-  </header>
+    <div class="meta">
+      <span class="tagpill"><b>__MARKET__</b> · units</span>
+      <span class="tagpill">Rolling <b>__WINDOW__</b>d · to <b>__THROUGH__</b></span>
+      <span class="tagpill">Source: <b>raw ledsone</b></span>
+      <button class="btn" onclick="fs()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg>Full screen</button>
+    </div>
+  </div>
+
   <div class="kpis">
-    <div class="kpi b-acc"><div class="n">__TOTAL__</div><div class="l">Opportunities</div></div>
-    <div class="kpi b-miss"><div class="n">__MISS__</div><div class="l">Missing channel</div></div>
-    <div class="kpi b-mkt"><div class="n">__MKT__</div><div class="l">Marketplace winner</div></div>
-    <div class="kpi b-shop"><div class="n">__SHOP__</div><div class="l">Shopify winner</div></div>
-    <div class="kpi"><div class="n">__BASE__</div><div class="l">Base SKUs scanned</div></div>
+    <div class="kpi"><div class="row"><div class="n">__TOTAL__</div><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></div></div><div class="l">Opportunities found</div></div>
+    <div class="kpi k-miss"><div class="row"><div class="n">__MISS__</div><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20" opacity=".25"/><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></div></div><div class="l">Missing channel</div></div>
+    <div class="kpi k-mkt"><div class="row"><div class="n">__MKT__</div><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z" opacity=".2"/><path d="M7 15l3-3 2 2 5-6"/></svg></div></div><div class="l">Marketplace winner</div></div>
+    <div class="kpi k-shop"><div class="row"><div class="n">__SHOP__</div><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg></div></div><div class="l">Shopify winner</div></div>
+    <div class="kpi k-base"><div class="row"><div class="n">__BASE__</div><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/></svg></div></div><div class="l">Base SKUs scanned</div></div>
   </div>
+
+  <div class="dist" id="dist" title="Share of opportunities by class"></div>
+
   <div class="toolbar">
-    <span class="chip on" data-f="all" onclick="setF(this,'all')">All</span>
-    <span class="chip miss" data-f="Missing channel" onclick="setF(this,'Missing channel')">Missing channel</span>
-    <span class="chip mkt" data-f="Marketplace winner" onclick="setF(this,'Marketplace winner')">Marketplace winner</span>
-    <span class="chip shop" data-f="Shopify winner" onclick="setF(this,'Shopify winner')">Shopify winner</span>
-    <div class="search"><input id="q" placeholder="Search SKU or action…" oninput="render()"></div>
+    <span class="chip on" data-f="all" onclick="setF(this,'all')"><span class="dot all"></span>All <span class="c">__TOTAL__</span></span>
+    <span class="chip miss" data-f="Missing channel" onclick="setF(this,'Missing channel')"><span class="dot miss"></span>Missing channel <span class="c">__MISS__</span></span>
+    <span class="chip mkt" data-f="Marketplace winner" onclick="setF(this,'Marketplace winner')"><span class="dot mkt"></span>Marketplace winner <span class="c">__MKT__</span></span>
+    <span class="chip shop" data-f="Shopify winner" onclick="setF(this,'Shopify winner')"><span class="dot shop"></span>Shopify winner <span class="c">__SHOP__</span></span>
+    <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input id="q" placeholder="Search SKU or action…" oninput="render()"></div>
   </div>
-  <div class="count" id="count"></div>
-  <div class="panel"><div class="scroll"><table>
+
+  <div class="card"><div class="scroll"><table>
     <thead><tr>
-      <th onclick="sortBy('s')">SKU</th>
-      <th class="num" onclick="sortBy('sh')">Shopify</th>
-      <th class="num" onclick="sortBy('am')">Amazon</th>
-      <th class="num" onclick="sortBy('eb')">eBay</th>
-      <th class="num" onclick="sortBy('t')">Total</th>
-      <th onclick="sortBy('o')">Opportunity</th>
-      <th onclick="sortBy('a')">Action</th>
+      <th style="width:44px">#</th>
+      <th onclick="sortBy('s')">SKU<span class="ar" id="ar-s"></span></th>
+      <th class="num" onclick="sortBy('sh')">Shopify<span class="ar" id="ar-sh"></span></th>
+      <th class="num" onclick="sortBy('am')">Amazon<span class="ar" id="ar-am"></span></th>
+      <th class="num" onclick="sortBy('eb')">eBay<span class="ar" id="ar-eb"></span></th>
+      <th class="num" onclick="sortBy('t')">Total<span class="ar" id="ar-t">▾</span></th>
+      <th onclick="sortBy('o')">Opportunity<span class="ar" id="ar-o"></span></th>
+      <th onclick="sortBy('a')">Recommended action<span class="ar" id="ar-a"></span></th>
     </tr></thead>
     <tbody id="tb"></tbody>
   </table></div></div>
-  <footer>
-    <b>Method (documented defaults — owner-locked, pending Mahima review):</b>
-    one row per clean base SKU (strip <code>-IDE</code> suffix); a SKU is flagged only if its top channel sold ≥10 units.
-    <b>Missing channel</b> = 0 units in ≥1 channel · <b>Shopify winner</b> = Shopify ≥50% of units ·
-    <b>Marketplace winner</b> = Amazon+eBay ≥60% and Shopify ≤20%. Read-only; every figure traces to the live database. REQ-24-D01.
-  </footer>
+
+  <div class="footbar">
+    <div>Defaults (owner-locked, pending Mahima): clean base SKU (strip <code>-IDE</code>) · flagged if top channel ≥10 units · Missing = 0 in ≥1 channel · Shopify-winner ≥50% · Marketplace-winner ≥60% &amp; Shopify ≤20%. Read-only; every figure from the live DB.</div>
+    <div id="count"></div>
+  </div>
 </div>
 <script>
 const DATA=__DATA__;
+const CNT={miss:__MISS__,mkt:__MKT__,shop:__SHOP__,total:__TOTAL__};
 let filt='all', sortK='t', sortDir=-1;
-const cls={'Missing channel':'miss','Marketplace winner':'mkt','Shopify winner':'shop'};
-const MAX=Math.max(...DATA.map(d=>Math.max(d.sh,d.am,d.eb)),1);
+const CLS={'Missing channel':'miss','Marketplace winner':'mkt','Shopify winner':'shop'};
+const MAXCH=Math.max(...DATA.map(d=>Math.max(d.sh,d.am,d.eb)),1);
+document.getElementById('dist').innerHTML=
+  `<i class="d-miss" style="width:${CNT.miss/CNT.total*100}%"></i>`+
+  `<i class="d-mkt" style="width:${CNT.mkt/CNT.total*100}%"></i>`+
+  `<i class="d-shop" style="width:${CNT.shop/CNT.total*100}%"></i>`;
+function fs(){const e=document.documentElement;if(!document.fullscreenElement){e.requestFullscreen&&e.requestFullscreen();}else{document.exitFullscreen&&document.exitFullscreen();}}
 function setF(el,f){filt=f;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');render();}
-function sortBy(k){if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=(k==='s'||k==='o'||k==='a')?1:-1;}render();}
-function cell(v,klass){if(!v)return '<td class="num z">0</td>';
-  const w=Math.max(4,Math.round(v/MAX*46));
-  return `<td class="num"><span class="bar" style="width:${w}px;background:var(--${klass})"></span><span class="${klass}-c">${v}</span></td>`;}
+function sortBy(k){if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=(k==='s'||k==='o'||k==='a')?1:-1;}
+  document.querySelectorAll('.ar').forEach(a=>a.textContent='');
+  document.getElementById('ar-'+k).textContent=sortDir<0?'▾':'▴';render();}
+function chcell(v,cl){
+  if(!v)return '<td class="num"><span class="cellbar"><span class="v z">0</span></span></td>';
+  const w=Math.max(3,Math.round(v/MAXCH*54));
+  return `<td class="num"><span class="cellbar"><span class="bar" style="width:${w}px;background:var(--${cl})"></span><span class="v ${cl}">${v}</span></span></td>`;
+}
 function render(){
   const q=document.getElementById('q').value.trim().toLowerCase();
   let rows=DATA.filter(d=>(filt==='all'||d.o===filt)&&(!q||d.s.toLowerCase().includes(q)||d.a.toLowerCase().includes(q)));
   rows.sort((a,b)=>{let x=a[sortK],y=b[sortK];if(typeof x==='string')return x.localeCompare(y)*sortDir;return (x-y)*sortDir;});
-  document.getElementById('count').textContent=`${rows.length} of ${DATA.length} opportunities`;
-  document.getElementById('tb').innerHTML=rows.map(d=>{const k=cls[d.o];
-    return `<tr><td class="sku">${d.s}</td>${cell(d.sh,'sh')}${cell(d.am,'am')}${cell(d.eb,'eb')}`
-      +`<td class="num"><b>${d.t}</b></td>`
-      +`<td><span class="badge ${k}">${d.o}</span></td><td class="action">${d.a}</td></tr>`;}).join('');
+  document.getElementById('count').innerHTML=`<b style="color:var(--ink2)">${rows.length}</b> of ${DATA.length} shown`;
+  const tb=document.getElementById('tb');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="8" class="empty">No matching SKUs.</td></tr>';return;}
+  tb.innerHTML=rows.map((d,i)=>{const k=CLS[d.o];
+    const cov=`<span class="cov"><i class="${d.sh?'on-sh':''}"></i><i class="${d.am?'on-am':''}"></i><i class="${d.eb?'on-eb':''}"></i></span>`;
+    return `<tr><td class="rank">${i+1}</td>`
+      +`<td class="sku">${d.s}${cov}</td>`
+      +chcell(d.sh,'sh')+chcell(d.am,'am')+chcell(d.eb,'eb')
+      +`<td class="num tot"><b>${d.t}</b></td>`
+      +`<td><span class="badge ${k}"><span class="dot"></span>${d.o}</span></td>`
+      +`<td class="action">${d.a}</td></tr>`;}).join('');
 }
 render();
 </script>
 </body></html>"""
-
 
 if __name__ == "__main__":
     build()
