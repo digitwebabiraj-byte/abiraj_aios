@@ -115,6 +115,8 @@ select.fil:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(20,184,166
 .clr{padding:10px 14px;border:1px solid var(--line);border-radius:11px;font-size:12.5px;font-weight:700;
   background:var(--card);color:var(--muted);cursor:pointer;transition:.2s}
 .clr:hover{color:var(--brand);border-color:var(--brand2)}
+.clr.dl{background:linear-gradient(120deg,var(--brand),var(--brand2));color:#fff;border-color:transparent}
+.clr.dl:hover{filter:brightness(1.06);color:#fff}
 .panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);
   overflow:hidden;animation:fade .35s ease}
 .scroll{overflow-x:hidden;overflow-y:auto;max-height:calc(100vh - 235px)}
@@ -174,6 +176,7 @@ footer{margin:6px 4px 4px;color:var(--muted);font-size:10px;line-height:1.4;opac
   <select class="fil" id="fTrend"><option value="">All trends</option><option>Growing</option><option>Stable</option><option>Slowing</option></select>
   <select class="fil" id="fStock"><option value="">All stock</option><option value="in">In stock</option><option value="out">Out of stock</option><option value="low">Low cover (&lt;30d)</option></select>
   <button class="clr" onclick="clearFilters()">Clear</button>
+  <button class="clr dl" onclick="downloadCSV()">⬇ CSV</button>
 </div>
 <div class="panel"><div class="scroll"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
   <div class="count" id="count"></div></div>
@@ -183,6 +186,7 @@ footer{margin:6px 4px 4px;color:var(--muted);font-size:10px;line-height:1.4;opac
 </div>
 <script>
 const DATA=__BLOB__;
+const GEN="__GEN__";
 const TABS=[{k:'shopify',label:'Shopify DE'},{k:'amazon',label:'Amazon DE'},{k:'ebay',label:'eBay DE'},{k:'combined',label:'Combined'}];
 const COLS={
  channel:[['rank','#','n',3.5],['sku','SKU','t',12],['pid','Product ID','t',8],['title','Product Name','t',19],['cat','Category','t',8.5],['q30','Sold 30d','n',6],['q90','Sold 90d','n',6],['rev','Revenue €','m',7.5],['orders','Orders','n',5],['aoq','Avg Ord Qty','n',6.5],['stock','Stock','n',5.5],['scd','Cover Days','n',6.5],['trend','Trend','badge',8],['action','Action','act',9]],
@@ -246,6 +250,16 @@ function body(){
 function render(){kpis();head();body();}
 function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=(k==='rank')?1:-1;}head();body();}
 function clearFilters(){['q','fCat','fTrend','fStock'].forEach(id=>document.getElementById(id).value='');body();}
+function downloadCSV(){
+ const rs=rowsFiltered(), cs=cols();
+ const NL=String.fromCharCode(10), CR=String.fromCharCode(13), BOM=String.fromCharCode(0xFEFF);
+ const q=v=>{v=(v===null||v===undefined)?'':String(v);return (v.indexOf('"')>=0||v.indexOf(',')>=0||v.indexOf(NL)>=0)?'"'+v.split('"').join('""')+'"':v;};
+ const lines=[cs.map(c=>q(c[1])).join(',')];
+ rs.forEach(o=>lines.push(cs.map(c=>q(o[c[0]])).join(',')));
+ const blob=new Blob([BOM+lines.join(CR+NL)],{type:'text/csv;charset=utf-8'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+ a.download='fmp_'+cur+'_DE_'+GEN+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+}
 function setTab(k){cur=k;sortKey=null;sortDir=1;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.k===k));populateFilters();['q','fCat','fTrend','fStock'].forEach(id=>document.getElementById(id).value='');render();}
 function fs(){const e=document.documentElement;if(!document.fullscreenElement)e.requestFullscreen&&e.requestFullscreen();else document.exitFullscreen();}
 document.getElementById('tabs').innerHTML=TABS.map((t,i)=>`<div class="tab ${i===0?'active':''}" data-k="${t.k}" onclick="setTab('${t.k}')">${t.label}</div>`).join('');
