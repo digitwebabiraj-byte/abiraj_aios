@@ -118,9 +118,11 @@ select.fil:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(20,184,166
 .clr.dl{background:linear-gradient(120deg,var(--brand),var(--brand2));color:#fff;border-color:transparent}
 .clr.dl:hover{filter:brightness(1.06);color:#fff}
 .panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);
-  overflow:hidden;animation:fade .35s ease}
-.scroll{overflow-x:hidden;overflow-y:auto;max-height:calc(100vh - 235px)}
-:fullscreen .scroll{max-height:calc(100vh - 205px)}
+  overflow:visible;animation:fade .35s ease}
+thead th:first-child{border-top-left-radius:var(--radius)} thead th:last-child{border-top-right-radius:var(--radius)}
+/* No inner cap and no scroll container: the table renders all rows and the host
+   (portal iframe / page) scrolls once; the sticky header then sticks to the page top. */
+.scroll{overflow:visible}
 table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
 thead th{position:sticky;top:0;z-index:1;background:linear-gradient(180deg,#0f766e,#0d9488);color:#eafff9;
   text-align:left;padding:8px 10px;font-weight:700;font-size:11px;white-space:nowrap;cursor:pointer;
