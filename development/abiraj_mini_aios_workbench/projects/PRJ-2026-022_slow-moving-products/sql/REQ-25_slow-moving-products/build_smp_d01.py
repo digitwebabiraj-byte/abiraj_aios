@@ -339,8 +339,9 @@ let cur='shopify',sortKey=null,sortDir=1;
 const rowsOf=()=>DATA[cur]||[];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const badge=r=>{const m={never:['b-never','No sales history'],high:['b-high','High stock, no demand 90d'],dead90:['b-dead90','No demand 90d'],slowing:['b-slowing','Slowing down']};const x=m[r.cls]||['b-dead90',r.reason];return '<span class="badge '+x[0]+'" title="'+esc(r.reason)+'">'+esc(x[1])+'</span>';};
-function kpis(){const rs=rowsOf();const units=rs.reduce((a,r)=>a+r.stock,0),z90=rs.filter(r=>r.q90===0).length,never=rs.filter(r=>r.dws===null).length;
-const K=[['Slow-moving SKUs',rs.length.toLocaleString('en-GB'),'0 sold in 30d'],['Units tied up',units.toLocaleString('en-GB'),'German stock'],['Zero 90-day sales',z90.toLocaleString('en-GB'),'no recent demand'],['Never sold',never.toLocaleString('en-GB'),'dead stock']];
+function kpis(rs){const tot=rowsOf().length;const units=rs.reduce((a,r)=>a+r.stock,0),z90=rs.filter(r=>r.q90===0).length,never=rs.filter(r=>r.dws===null).length;
+const flt=rs.length!==tot;const suf=flt?'filtered':'';
+const K=[['Slow-moving SKUs',rs.length.toLocaleString('en-GB'),flt?`of ${tot.toLocaleString('en-GB')} in tab`:'0 sold in 30d'],['Units tied up',units.toLocaleString('en-GB'),suf||'German stock'],['Zero 90-day sales',z90.toLocaleString('en-GB'),suf||'no recent demand'],['Never sold',never.toLocaleString('en-GB'),suf||'dead stock']];
 document.getElementById('kpis').innerHTML=K.map((k,i)=>`<div class="kpi k${i}"><div class="lab">${k[0]}</div><div class="val">${k[1]}</div><div class="s">${k[2]}</div></div>`).join('');}
 function fillReasons(){const rs=[...new Set(rowsOf().map(r=>r.reason))];document.getElementById('fReason').innerHTML='<option value="">All reasons</option>'+rs.map(r=>`<option>${esc(r)}</option>`).join('');}
 function head(){document.getElementById('thead').innerHTML='<tr>'+COLS.map(c=>{const ar=sortKey===c[0]?(sortDir>0?'▲':'▼'):'';const cls=c[2]==='n'?'num':'';return `<th class="${cls}" style="width:${c[3]}%" onclick="sortBy('${c[0]}')">${c[1]}<span class="ar">${ar}</span></th>`;}).join('')+'</tr>';}
@@ -354,7 +355,7 @@ else if(rec==='sold90')r=r.filter(o=>o.q90>0);
 if(sortKey)r.sort((a,b)=>{let x=a[sortKey],y=b[sortKey];if(x===null)x=(sortDir>0?1e12:-1);if(y===null)y=(sortDir>0?1e12:-1);if(typeof x==='number'&&typeof y==='number')return (x-y)*sortDir;return String(x).localeCompare(String(y))*sortDir;});
 return r;}
 function topN(){const v=document.getElementById('fTop').value;return v==='all'?Infinity:parseInt(v,10);}
-function body(){const rs=filtered();const N=topN();const cap=Math.min(N,5000);const H=rs.slice(0,cap);
+function body(){const rs=filtered();kpis(rs);const N=topN();const cap=Math.min(N,5000);const H=rs.slice(0,cap);
 document.getElementById('tbody').innerHTML=H.map(o=>{const nv=o.dws===null?' class="never"':'';
 const tds=COLS.map(c=>{const k=c[0],ty=c[2];let v=o[k];
 if(k==='sku')return `<td><span class="sku">${esc(v)}</span></td>`;
@@ -367,7 +368,7 @@ if(ty==='n')return `<td class="num">${typeof v==='number'?v.toLocaleString('en-G
 return `<td>${esc(v)}</td>`;}).join('');return `<tr${nv}>${tds}</tr>`;}).join('');
 const capped=rs.length>H.length;const why=(N!==Infinity&&N<=rs.length)?` (Top ${N} by stock)`:(capped?' (first 5,000 — download CSV for all)':'');
 document.getElementById('count').textContent=`Showing ${H.length.toLocaleString('en-GB')}${why} of ${rs.length.toLocaleString('en-GB')} matching · ${rowsOf().length.toLocaleString('en-GB')} slow-moving in this tab`;}
-function render(){kpis();head();body();}
+function render(){head();body();}
 function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=(k==='stock'||k==='dws')?-1:1;}head();body();}
 function clr(){['q','fReason','fRec'].forEach(id=>document.getElementById(id).value='');document.getElementById('fTop').value='100';body();}
 function setTab(k){cur=k;sortKey=null;sortDir=1;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.k===k));['q','fReason','fRec'].forEach(id=>document.getElementById(id).value='');document.getElementById('fTop').value='100';fillReasons();render();}
@@ -378,7 +379,8 @@ const lines=[H.join(',')];rs.forEach(o=>lines.push([o.sku,o.title,o.stock,o.last
 const b=new Blob([BOM+lines.join(CR+NL)],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='slow_moving_'+cur+'_DE_'+GEN+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);}
 function fs(){const e=document.documentElement;if(!document.fullscreenElement)e.requestFullscreen&&e.requestFullscreen();else document.exitFullscreen();}
 document.getElementById('tabs').innerHTML=TABS.map((t,i)=>`<div class="tab ${i===0?'active':''}" data-k="${t.k}" onclick="setTab('${t.k}')">${t.label}<span class="n">${(DATA[t.k]||[]).length.toLocaleString('en-GB')}</span></div>`).join('');
-['q','fReason','fRec','fTop'].forEach(id=>document.getElementById(id).addEventListener('input',body));
+document.getElementById('q').addEventListener('input',body);
+['fReason','fRec','fTop'].forEach(id=>document.getElementById(id).addEventListener('change',body));
 fillReasons();render();
 </script></body></html>"""
     html=(html.replace("__BLOB__",blob).replace("__GEN__",meta["generated"]))
