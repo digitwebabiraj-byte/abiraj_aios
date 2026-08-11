@@ -29,8 +29,17 @@ The workbook is a **layout mock-up with sample rows** — it defines columns/Rea
 (fail-closed runner, row-floor + collapse gates, git-ignored secrets, Desktop alert on failure).
 
 ## Publish record — ph_task
-❌ **Not published.** On sign-off, likely audience = `german_priors` (same as FMP #020, Mahi / staff.users
-id 40). No publish, and no publish-related git write, until the audience is named and each recipient verified.
+✅ **PUBLISHED 2026-08-11** to `tech_team_outputs.ph_task` (warehouse `order_management_copy`, temp_user @
+149.28.134.54:5435) via `automation/publish_smp_ph_task.py` (guarded INSERT … RETURNING + md5 read-back).
+
+| id | project_code | task_id | assigned_user | assigned_user_team | team | version |
+|---|---|---|---|---|---|---|
+| **735** | smp | smp-2026-08-11-DE-Mahi | **Mahima** | **german_priors** | Development | 1 (released) |
+
+HTML = the interactive teal dashboard (4,448,223 chars, md5 `d75c40c8…`, DB read-back md5 matches). Same
+`german_priors` audience as Fast Moving #020 (id 673). ⚠ Dashboard is JS-rendered and large (~4.4 MB — it
+embeds all 13,344 Combined rows); if the portal tile is slow/blank, publish a lighter build (cap embedded
+Combined rows) or a no-JS static fallback. Re-publish/refresh via `--update 735`.
 
 ## Business decisions (Mahima)
 - Pending — none confirmed yet. (Grain SKU-wise is carried over from FMP #020, confirmed by Mahima 2026-08-05.)
