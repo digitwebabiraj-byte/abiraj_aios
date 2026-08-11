@@ -6,18 +6,21 @@ All numbers are 100% live from **raw `mcp.ledsone`**; nothing is fabricated. Whe
 exists a cell renders a documented sentinel, never a guess.
 
 ## 1. What the system produces
-A single per-SKU list of **slow-moving German inventory** — SKUs holding stock in the Germany warehouse
-that sold **0 units in the last 30 days** — rendered two ways from one data layer:
-- **Excel** `SlowMovingProducts_DE.xlsx`: `Notes` tab (scope + rules) + `Slow Moving` tab (the 9-column table).
-- **HTML dashboard** `slow_moving_dashboard.html`: KPI tiles + searchable/sortable table.
+Slow-moving German inventory rendered in the **same 4-tab shape as Fast Moving #020** — one data layer, two files:
+- **Excel** `REQ-25-D01_slow_moving_products.xlsx`: `Notes & Method` + **`Shopify DE` · `Amazon DE` · `eBay DE` · `Combined`** tabs (the 9-column table each).
+- **HTML dashboard** `REQ-25-D01_slow_moving_products.html`: tab bar + KPI tiles + search / Reason / Recency filters + sortable sticky table + CSV export.
 
-Row order: **Stock Qty descending** (largest tied-up stock first).
+Row order in every tab: **Stock Qty descending** (largest tied-up stock first).
 
-## 2. Universe & filters (the "slow" definition)
+## 2. Universe, tabs & the "slow" definition
 - Universe = SKUs with `SUM(stock) > 0` where `warehouse_location = 'Germany'` → **14,404 SKUs**.
-- Slow-moving filter (PROVISIONAL default): **Last 30 Days Sales = 0** → **13,344 rows**.
+- **Channel tabs** (Shopify/Amazon/eBay DE): SKU sold on that channel at some point but **0 units on that
+  channel in the last 30 days**; sales figures shown are that channel's only. Rows: Shopify **1,495** ·
+  Amazon **1,168** · eBay **3,295**.
+- **Combined tab**: **0 units sold on ANY channel in the last 30 days**, including never-sold dead stock;
+  sales figures are all-channel. Rows: **13,344**.
 - Sales scope: `orders.market_place = '10'` (Germany), `orders.status = 'Completed'`,
-  `sub_source.source_id IN (1,2,3)` (Amazon / eBay / Shopify).
+  `sub_source.source_id IN (1,2,3)` (Amazon=1 / eBay=2 / Shopify=3).
 
 ## 3. Column → source map
 

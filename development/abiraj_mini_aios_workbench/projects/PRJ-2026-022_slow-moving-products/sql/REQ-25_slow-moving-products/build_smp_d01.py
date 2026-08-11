@@ -22,31 +22,29 @@ from openpyxl.utils import get_column_letter
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT  = os.path.abspath(os.path.join(HERE, "..", "..", "evidence", "final_outputs", "REQ-25_slow-moving-products"))
 
-SQL = r"""
-WITH stk AS (
-  SELECT p.sku, MAX(p.title) title, SUM(COALESCE(s.stock,0)) stock
-  FROM inventory.products p
-  JOIN inventory.local_inventory_current_stock_location_wise s ON s.inventory_id=p.id
-  WHERE s.warehouse_location='Germany' GROUP BY p.sku HAVING SUM(COALESCE(s.stock,0))>0
-),
-sales AS (
-  SELECT oi.item_sku sku, MAX(o.order_date::date) last_sale,
-    SUM(CASE WHEN o.order_date::date>=CURRENT_DATE-30 THEN COALESCE(NULLIF(oi.item_quantity,'')::numeric,0) ELSE 0 END) q30,
-    SUM(CASE WHEN o.order_date::date>=CURRENT_DATE-90 THEN COALESCE(NULLIF(oi.item_quantity,'')::numeric,0) ELSE 0 END) q90
-  FROM order_management.orders o
-  JOIN order_management.sub_source ss ON ss.id=o.sub_source_id
-  JOIN order_management.order_item_info oi ON oi.order_id=o.id
-  WHERE o.market_place='10' AND o.status='Completed' AND ss.source_id IN (1,2,3)
-    AND oi.item_sku IS NOT NULL AND oi.item_sku<>''
-  GROUP BY oi.item_sku
-)
-SELECT stk.sku, stk.title, stk.stock::int,
-  s.last_sale, COALESCE(s.q30,0)::int q30, COALESCE(s.q90,0)::int q90,
-  CASE WHEN s.last_sale IS NULL THEN NULL ELSE (CURRENT_DATE - s.last_sale) END dws
-FROM stk LEFT JOIN sales s ON s.sku=stk.sku
-WHERE COALESCE(s.q30,0)=0            -- SLOW = nothing sold in the last 30 days (provisional)
-ORDER BY stk.stock DESC, dws DESC NULLS LAST;
+# Germany-stocked SKUs (universe) — sku -> title, stock
+SQL_STOCK = r"""
+SELECT p.sku, MAX(p.title) title, SUM(COALESCE(s.stock,0))::int stock
+FROM inventory.products p
+JOIN inventory.local_inventory_current_stock_location_wise s ON s.inventory_id=p.id
+WHERE s.warehouse_location='Germany'
+GROUP BY p.sku HAVING SUM(COALESCE(s.stock,0))>0;
 """
+
+# Per (SKU, channel) sales: last sale (all-time on that channel) + rolling 30/90d units.
+SQL_SALES = r"""
+SELECT oi.item_sku sku, ss.source_id chan,
+  MAX(o.order_date::date) last_sale,
+  SUM(CASE WHEN o.order_date::date>=CURRENT_DATE-30 THEN COALESCE(NULLIF(oi.item_quantity,'')::numeric,0) ELSE 0 END)::int q30,
+  SUM(CASE WHEN o.order_date::date>=CURRENT_DATE-90 THEN COALESCE(NULLIF(oi.item_quantity,'')::numeric,0) ELSE 0 END)::int q90
+FROM order_management.orders o
+JOIN order_management.sub_source ss ON ss.id=o.sub_source_id
+JOIN order_management.order_item_info oi ON oi.order_id=o.id
+WHERE o.market_place='10' AND o.status='Completed' AND ss.source_id IN (1,2,3)
+  AND oi.item_sku IS NOT NULL AND oi.item_sku<>''
+GROUP BY oi.item_sku, ss.source_id;
+"""
+CHAN = {1: "amazon", 2: "ebay", 3: "shopify"}
 
 def clean_name(sku, title):
     if not title or title.strip().lower().startswith("combo default"):
@@ -64,23 +62,54 @@ def rule_engine(stock, q90, dws):
         return ("No demand in 90 days", "Create bundle / promote", "dead90")
     return ("Slowing down (no sale in 30 days)", "Improve listing / promote", "slowing")
 
-def fetch():
+def _row(sku, title, stock, last_sale, q30, q90, today):
+    dws = None if last_sale is None else (today - last_sale).days
+    reason, action, cls = rule_engine(stock, q90, dws)
+    return {"sku": sku, "title": title, "stock": stock,
+            "last_sale": last_sale.isoformat() if last_sale else None,
+            "q30": q30, "q90": q90, "dws": dws,
+            "reason": reason, "action": action, "cls": cls}
+
+def fetch(today):
     conn = psycopg2.connect(host=os.environ["LED_PGHOST"], user=os.environ["LED_PGUSER"],
         password=os.environ["LED_PGPASSWORD"], dbname=os.environ.get("LED_PGDATABASE","ledsone"),
         port=os.environ.get("LED_PGPORT","5432"), connect_timeout=30)
     try:
-        cur = conn.cursor(); cur.execute(SQL); recs = cur.fetchall()
+        cur = conn.cursor()
+        cur.execute(SQL_STOCK); stock_rows = cur.fetchall()
+        cur.execute(SQL_SALES); sales_rows = cur.fetchall()
     finally:
         conn.close()
-    rows = []
-    for sku, title, stock, last_sale, q30, q90, dws in recs:
-        reason, action, cls = rule_engine(stock, q90, dws)
-        rows.append({"sku": sku, "title": clean_name(sku, title), "stock": stock,
-                     "last_sale": last_sale.isoformat() if last_sale else None,
-                     "q30": q30, "q90": q90,
-                     "dws": int(dws) if dws is not None else None,
-                     "reason": reason, "action": action, "cls": cls})
-    return rows
+
+    stk = {sku: (clean_name(sku, title), stock) for sku, title, stock in stock_rows}
+    # per-channel sales keyed by (sku, chan); combined aggregate keyed by sku
+    perchan = {}                      # (sku,chan) -> [last_sale, q30, q90]
+    comb = {}                         # sku -> [last_sale, q30, q90]
+    for sku, chan, last_sale, q30, q90 in sales_rows:
+        if sku not in stk:            # only SKUs holding German stock
+            continue
+        perchan[(sku, chan)] = [last_sale, q30, q90]
+        c = comb.setdefault(sku, [None, 0, 0])
+        if last_sale and (c[0] is None or last_sale > c[0]): c[0] = last_sale
+        c[1] += q30; c[2] += q90
+
+    data = {"amazon": [], "ebay": [], "shopify": [], "combined": []}
+    # channel tabs: sold on that channel before, but 0 units there in last 30 days
+    for (sku, chan), (last_sale, q30, q90) in perchan.items():
+        if q30 != 0:
+            continue
+        title, stock = stk[sku]
+        data[CHAN[chan]].append(_row(sku, title, stock, last_sale, q30, q90, today))
+    # combined tab: not selling ANYWHERE in last 30d (incl. never-sold dead stock)
+    for sku, (title, stock) in stk.items():
+        c = comb.get(sku, [None, 0, 0])
+        if c[1] != 0:
+            continue
+        data["combined"].append(_row(sku, title, stock, c[0], c[1], c[2], today))
+
+    for k in data:                    # sort like FMP: biggest tied-up stock first
+        data[k].sort(key=lambda r: (-r["stock"], -(r["dws"] if r["dws"] is not None else 10**9)))
+    return data
 
 # ============================== EXCEL ==============================
 FONT = "Arial"
@@ -101,19 +130,15 @@ INT = '#,##0'
 HEADERS = ["SKU","Product Name","Stock Qty","Last Sale Date","Sold Qty (30 Days)",
            "Sold Qty (90 Days)","Days Without Sale","Reason","Action"]
 
-def data_sheet(wb, rows, meta):
-    ws = wb.create_sheet("Slow Moving")
+def data_sheet(wb, sheet_name, title_txt, sub_txt, rows):
+    ws = wb.create_sheet(sheet_name)
     ncols = len(HEADERS)
     ws.merge_cells(start_row=1,start_column=1,end_row=1,end_column=ncols)
-    t = ws.cell(row=1,column=1,value="Slow Moving Products – Germany (DE)")
+    t = ws.cell(row=1,column=1,value=title_txt)
     t.font=TITLE_F; t.fill=TITLE_FILL; t.alignment=Alignment(horizontal="left",vertical="center")
     ws.row_dimensions[1].height=24
     ws.merge_cells(start_row=2,start_column=1,end_row=2,end_column=ncols)
-    ws.cell(row=2,column=1, value=(
-        f"SKUs holding German stock with 0 units sold in the last 30 days  |  "
-        f"{meta['rows']:,} products  |  Sorted by Stock Qty desc  |  "
-        f"Days Without Sale = today − last sale (all-time)  |  Live data pulled {meta['generated']}"
-    )).font=SUB_F
+    ws.cell(row=2,column=1, value=sub_txt).font=SUB_F
     hr = 3
     for i,h in enumerate(HEADERS,1):
         c = ws.cell(row=hr,column=i,value=h); c.font=HEAD_F; c.fill=HEAD_FILL; c.alignment=CEN; c.border=BORDER
@@ -139,7 +164,7 @@ def data_sheet(wb, rows, meta):
     for i,w in enumerate(widths,1): ws.column_dimensions[get_column_letter(i)].width=w
     return ws
 
-def notes_sheet(wb, rows, meta):
+def notes_sheet(wb, data, meta):
     ws=wb.create_sheet("Notes & Method",0)
     ws.column_dimensions['A'].width=26; ws.column_dimensions['B'].width=110
     def put(a,b,head=False):
@@ -149,15 +174,22 @@ def notes_sheet(wb, rows, meta):
         else: ca.font=Font(name=FONT,size=10,bold=True,color="4B2A6A")
         cb=ws.cell(row=r,column=2,value=b); cb.alignment=Alignment(wrap_text=True,vertical="top")
         ws.row_dimensions[r].height=max(15,14*(1+len(str(b))//95))
+    rows = data["combined"]
     never=sum(1 for r in rows if r["dws"] is None); z90=sum(1 for r in rows if r["q90"]==0)
     put("REQ-25-D01 Slow Moving Products",
         "Products holding stock in the Germany warehouse that are NOT selling. Inverse of Fast Moving "
         "Products (#020). Prepared for Mahima.", head=True)
-    put("Scope","Germany (DE), all 3 channels (Amazon/eBay/Shopify) consolidated per SKU. Order status = "
-                 "Completed. One row per SKU, sales summed across all its listings.")
+    put("Tabs","Shopify DE / Amazon DE / eBay DE = SKUs that sold on that channel before but 0 units there "
+               "in the last 30 days (sales figures are channel-only). Combined = SKUs with 0 units sold on ANY "
+               "channel in the last 30 days, including never-sold dead stock (sales figures all-channel).")
+    put("Scope","Germany (DE), 3 channels (Amazon=1 / eBay=2 / Shopify=3). Order status = Completed. "
+                 "One row per SKU; on channel tabs the sales are that channel's, on Combined they are summed.")
+    put("Row counts",
+        f"Shopify DE {len(data['shopify']):,}  ·  Amazon DE {len(data['amazon']):,}  ·  "
+        f"eBay DE {len(data['ebay']):,}  ·  Combined {len(rows):,}. Sorted by Stock Qty descending.")
     put("Slow-moving rule [DEFAULT – confirm]",
-        f"A SKU is 'slow moving' if it holds German stock (>0) AND sold 0 units in the last 30 days. "
-        f"This run: {meta['rows']:,} products, sorted by Stock Qty descending.")
+        "A SKU is 'slow moving' if it holds German stock (>0) AND sold 0 units in the last 30 days "
+        "(on the channel for a channel tab; on any channel for Combined).")
     put("Windows","Last 30 Days / Last 90 Days sales are rolling windows ending yesterday. Last Sale Date "
                   "and Days Without Sale use ALL-TIME history.")
     put("Data sources","RAW mcp.ledsone DB (read-only). Sales/units: order_management.orders + "
@@ -177,29 +209,36 @@ def notes_sheet(wb, rows, meta):
     put("Known caveats","(1) Reason/Action thresholds above are Claude's documented DEFAULTS, NOT yet agreed "
         "by Mahima. (2) Combo SKUs whose inv title reads 'Combo Default Title.' fall back to the SKU as the "
         "name. (3) Stock is live 'as of today', not as-of any window. (4) This report has no money column.")
-    put("Rows in red",f"Highlighted rows have NEVER sold on record ({never:,} of {meta['rows']:,}; "
+    put("Rows in red",f"Highlighted rows have NEVER sold on record (Combined: {never:,} of {len(rows):,}; "
                       f"{z90:,} have zero 90-day sales).")
     return ws
 
-def build_xlsx(rows, meta):
+CHAN_LABEL = {"amazon": "Amazon DE", "ebay": "eBay DE", "shopify": "Shopify DE"}
+
+def build_xlsx(data, meta):
     wb=Workbook(); wb.remove(wb.active)
-    data_sheet(wb, rows, meta)
-    notes_sheet(wb, rows, meta)
-    # order: Notes & Method first (inserted at index 0), then Slow Moving
+    g = meta["generated"]
+    for key in ("shopify", "amazon", "ebay"):
+        rows = data[key]; lbl = CHAN_LABEL[key]
+        data_sheet(wb, lbl, f"Slow Moving Products – {lbl} (Germany)",
+            (f"SKUs holding German stock that sold on {lbl} before but 0 units there in the last 30 days"
+             f"  |  {len(rows):,} products  |  Sorted by Stock Qty desc  |  "
+             f"Sales figures are {lbl}-only  |  Live data pulled {g}"), rows)
+    rows = data["combined"]
+    data_sheet(wb, "Combined", "Slow Moving Products – Combined / All Channels (Germany)",
+        (f"SKUs holding German stock with 0 units sold on ANY channel in the last 30 days (incl. never-sold "
+         f"dead stock)  |  {len(rows):,} products  |  Sorted by Stock Qty desc  |  Sales figures are all-channel"
+         f"  |  Live data pulled {g}"), rows)
+    notes_sheet(wb, data, meta)       # Notes & Method inserted at index 0
     path=os.path.join(OUT,"REQ-25-D01_slow_moving_products.xlsx"); wb.save(path); return path
 
 # ============================== HTML ==============================
-def build_html(rows, meta):
-    never=sum(1 for r in rows if r["dws"] is None); z90=sum(1 for r in rows if r["q90"]==0)
-    units=sum(r["stock"] for r in rows)
-    data=[{"sku":r["sku"],"title":r["title"] or "","stock":r["stock"],
-           "last":r["last_sale"] or "","q30":r["q30"],"q90":r["q90"],
-           "dws":r["dws"],"reason":r["reason"],"action":r["action"],"cls":r["cls"]} for r in rows]
-    blob=json.dumps(data, ensure_ascii=False)
-    kpis=json.dumps([["Slow-moving SKUs",f"{len(rows):,}","0 sold in 30d"],
-                     ["Units tied up",f"{units:,}","German stock"],
-                     ["Zero 90-day sales",f"{z90:,}","no recent demand"],
-                     ["Never sold",f"{never:,}","dead stock"]])
+def build_html(data, meta):
+    def pack(rows):
+        return [{"sku":r["sku"],"title":r["title"] or "","stock":r["stock"],
+                 "last":r["last_sale"] or "","q30":r["q30"],"q90":r["q90"],
+                 "dws":r["dws"],"reason":r["reason"],"action":r["action"],"cls":r["cls"]} for r in rows]
+    blob=json.dumps({k:pack(v) for k,v in data.items()}, ensure_ascii=False)
     html=r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Slow Moving Products — Germany · REQ-25-D01</title>
@@ -232,6 +271,12 @@ display:flex;flex-direction:column;justify-content:center;animation:rise .45s ea
 .kpi .lab{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;opacity:.9}
 .kpi .val{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
 .kpi .s{font-size:9.5px;opacity:.85}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 6px}
+.tab{background:var(--card);border:1px solid var(--line);color:var(--muted);padding:6px 15px;border-radius:9px;
+font-weight:700;font-size:12.5px;cursor:pointer;transition:.18s;box-shadow:0 1px 4px rgba(60,20,90,.05)}
+.tab:hover{color:var(--brand);border-color:var(--brand2)}
+.tab.active{background:linear-gradient(120deg,var(--brand),var(--brand2));color:#fff;border-color:transparent;box-shadow:0 8px 18px rgba(109,40,217,.32)}
+.tab .n{opacity:.7;font-weight:600;margin-left:5px}
 .note{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:6px 12px;border-radius:9px;font-size:11.5px;margin:0 0 6px}
 .filters{display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
 .search{flex:1;min-width:220px;position:relative}
@@ -272,8 +317,9 @@ footer{margin:6px 4px 4px;color:var(--muted);font-size:10px;line-height:1.4;opac
 <div class="sub">Stock that isn't selling · Amazon / eBay / Shopify DE · 0 units sold in last 30 days</div>
 <div class="badges"><span class="pill">REQ-25-D01 · smp</span><span class="pill">DE · all channels</span><span class="pill">Data __GEN__</span></div>
 </div><button class="fsbtn" onclick="fs()">⛶ Full screen</button></header>
+<div class="tabs" id="tabs"></div>
 <div class="kpis" id="kpis"></div>
-<div class="note"><b>Provisional:</b> "Reason" and "Action" use documented default rules pending Mahima's sign-off. Slow-moving = 0 units sold in the last 30 days.</div>
+<div class="note"><b>Provisional:</b> "Reason" and "Action" use documented default rules pending Mahima's sign-off. Slow-moving = 0 units sold in the last 30 days (on the selected channel; Combined = any channel).</div>
 <div class="filters">
 <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
 <input id="q" placeholder="Search SKU or product name…"></div>
@@ -285,15 +331,19 @@ footer{margin:6px 4px 4px;color:var(--muted);font-size:10px;line-height:1.4;opac
 <footer><b>Sources:</b> order_management.orders + order_item_info + sub_source · inventory.products + local_inventory_current_stock_location_wise (raw mcp.ledsone DB, read-only, Germany). <b>Days Without Sale</b> = today − last sale (all-time); "Never" = no sale on record. <b>Reason/Action</b> = documented default rules pending Mahima's sign-off.</footer>
 </div>
 <script>
-const DATA=__BLOB__,GEN="__GEN__",KP=__KPIS__;
+const DATA=__BLOB__,GEN="__GEN__";
+const TABS=[{k:'shopify',label:'Shopify DE'},{k:'amazon',label:'Amazon DE'},{k:'ebay',label:'eBay DE'},{k:'combined',label:'Combined'}];
 const COLS=[['sku','SKU','t',12],['title','Product Name','t',26],['stock','Stock','n',7],['last','Last Sale','t',10],['q30','Sold 30d','n',7],['q90','Sold 90d','n',7],['dws','Days No Sale','n',9],['reason','Reason','badge',15],['action','Action','act',13]];
-let sortKey=null,sortDir=1;
+let cur='shopify',sortKey=null,sortDir=1;
+const rowsOf=()=>DATA[cur]||[];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const badge=r=>{const m={never:['b-never','No sales history'],high:['b-high','High stock, no demand 90d'],dead90:['b-dead90','No demand 90d'],slowing:['b-slowing','Slowing down']};const x=m[r.cls]||['b-dead90',r.reason];return '<span class="badge '+x[0]+'" title="'+esc(r.reason)+'">'+esc(x[1])+'</span>';};
-function kpis(){document.getElementById('kpis').innerHTML=KP.map((k,i)=>`<div class="kpi k${i}"><div class="lab">${k[0]}</div><div class="val">${k[1]}</div><div class="s">${k[2]}</div></div>`).join('');}
-function fillReasons(){const rs=[...new Set(DATA.map(r=>r.reason))];document.getElementById('fReason').innerHTML='<option value="">All reasons</option>'+rs.map(r=>`<option>${esc(r)}</option>`).join('');}
+function kpis(){const rs=rowsOf();const units=rs.reduce((a,r)=>a+r.stock,0),z90=rs.filter(r=>r.q90===0).length,never=rs.filter(r=>r.dws===null).length;
+const K=[['Slow-moving SKUs',rs.length.toLocaleString('en-GB'),'0 sold in 30d'],['Units tied up',units.toLocaleString('en-GB'),'German stock'],['Zero 90-day sales',z90.toLocaleString('en-GB'),'no recent demand'],['Never sold',never.toLocaleString('en-GB'),'dead stock']];
+document.getElementById('kpis').innerHTML=K.map((k,i)=>`<div class="kpi k${i}"><div class="lab">${k[0]}</div><div class="val">${k[1]}</div><div class="s">${k[2]}</div></div>`).join('');}
+function fillReasons(){const rs=[...new Set(rowsOf().map(r=>r.reason))];document.getElementById('fReason').innerHTML='<option value="">All reasons</option>'+rs.map(r=>`<option>${esc(r)}</option>`).join('');}
 function head(){document.getElementById('thead').innerHTML='<tr>'+COLS.map(c=>{const ar=sortKey===c[0]?(sortDir>0?'▲':'▼'):'';const cls=c[2]==='n'?'num':'';return `<th class="${cls}" style="width:${c[3]}%" onclick="sortBy('${c[0]}')">${c[1]}<span class="ar">${ar}</span></th>`;}).join('')+'</tr>';}
-function filtered(){let r=DATA.slice();const q=document.getElementById('q').value.toLowerCase().trim();const rea=document.getElementById('fReason').value;const rec=document.getElementById('fRec').value;
+function filtered(){let r=rowsOf().slice();const q=document.getElementById('q').value.toLowerCase().trim();const rea=document.getElementById('fReason').value;const rec=document.getElementById('fRec').value;
 if(q)r=r.filter(o=>[o.sku,o.title].some(v=>String(v).toLowerCase().includes(q)));
 if(rea)r=r.filter(o=>o.reason===rea);
 if(rec==='never')r=r.filter(o=>o.dws===null);
@@ -313,30 +363,33 @@ if(k==='dws')return `<td class="num dwscell">${v===null?'Never':v.toLocaleString
 if(k==='last')return `<td>${v?esc(v):'—'}</td>`;
 if(ty==='n')return `<td class="num">${typeof v==='number'?v.toLocaleString('en-GB'):esc(v)}</td>`;
 return `<td>${esc(v)}</td>`;}).join('');return `<tr${nv}>${tds}</tr>`;}).join('');
-document.getElementById('count').textContent=`Showing ${H.length.toLocaleString('en-GB')}${rs.length>H.length?' of '+rs.length.toLocaleString('en-GB')+' (first 5,000 — refine filters or download CSV for all)':''} of ${DATA.length.toLocaleString('en-GB')} slow-moving products`;}
+document.getElementById('count').textContent=`Showing ${H.length.toLocaleString('en-GB')}${rs.length>H.length?' of '+rs.length.toLocaleString('en-GB')+' (first 5,000 — refine filters or download CSV for all)':''} of ${rowsOf().length.toLocaleString('en-GB')} slow-moving products`;}
 function render(){kpis();head();body();}
 function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=(k==='stock'||k==='dws')?-1:1;}head();body();}
 function clr(){['q','fReason','fRec'].forEach(id=>document.getElementById(id).value='');body();}
+function setTab(k){cur=k;sortKey=null;sortDir=1;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.k===k));['q','fReason','fRec'].forEach(id=>document.getElementById(id).value='');fillReasons();render();}
 function csv(){const rs=filtered();const NL=String.fromCharCode(10),CR=String.fromCharCode(13),BOM=String.fromCharCode(0xFEFF);
 const q=v=>{v=(v===null||v===undefined)?'':String(v);return (v.indexOf('"')>=0||v.indexOf(',')>=0||v.indexOf(NL)>=0)?'"'+v.split('"').join('""')+'"':v;};
 const H=['SKU','Product Name','Stock Qty','Last Sale Date','Sold Qty (30 Days)','Sold Qty (90 Days)','Days Without Sale','Reason','Action'];
 const lines=[H.join(',')];rs.forEach(o=>lines.push([o.sku,o.title,o.stock,o.last,o.q30,o.q90,o.dws===null?'Never':o.dws,o.reason,o.action].map(q).join(',')));
-const b=new Blob([BOM+lines.join(CR+NL)],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='slow_moving_DE_'+GEN+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);}
+const b=new Blob([BOM+lines.join(CR+NL)],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='slow_moving_'+cur+'_DE_'+GEN+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);}
 function fs(){const e=document.documentElement;if(!document.fullscreenElement)e.requestFullscreen&&e.requestFullscreen();else document.exitFullscreen();}
+document.getElementById('tabs').innerHTML=TABS.map((t,i)=>`<div class="tab ${i===0?'active':''}" data-k="${t.k}" onclick="setTab('${t.k}')">${t.label}<span class="n">${(DATA[t.k]||[]).length.toLocaleString('en-GB')}</span></div>`).join('');
 ['q','fReason','fRec'].forEach(id=>document.getElementById(id).addEventListener('input',body));
 fillReasons();render();
 </script></body></html>"""
-    html=(html.replace("__BLOB__",blob).replace("__KPIS__",kpis).replace("__GEN__",meta["generated"]))
+    html=(html.replace("__BLOB__",blob).replace("__GEN__",meta["generated"]))
     path=os.path.join(OUT,"REQ-25-D01_slow_moving_products.html"); open(path,"w",encoding="utf-8").write(html); return path
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    rows = fetch()
     today = datetime.date.today()
-    meta = {"generated": today.isoformat(), "rows": len(rows),
+    data = fetch(today)
+    meta = {"generated": today.isoformat(),
+            "rows": {k: len(v) for k, v in data.items()},
             "win30_start": (today-datetime.timedelta(days=30)).isoformat(),
             "win90_start": (today-datetime.timedelta(days=90)).isoformat(),
             "win_end": (today-datetime.timedelta(days=1)).isoformat()}
-    json.dump({"meta": meta, "rows": rows}, open(os.path.join(HERE,"smp_payload.json"),"w",encoding="utf-8"), ensure_ascii=False, indent=1)
-    xp = build_xlsx(rows, meta); hp = build_html(rows, meta)
-    print("rows:", len(rows)); print("xlsx:", xp); print("html:", hp)
+    json.dump({"meta": meta, "data": data}, open(os.path.join(HERE,"smp_payload.json"),"w",encoding="utf-8"), ensure_ascii=False, indent=1)
+    xp = build_xlsx(data, meta); hp = build_html(data, meta)
+    print("rows per tab:", meta["rows"]); print("xlsx:", xp); print("html:", hp)
