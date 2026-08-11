@@ -301,7 +301,7 @@ thead th.num{text-align:center}thead th:hover{background:#0f766e}thead th .ar{op
 tbody td{padding:7px 12px;border-bottom:1px solid var(--line);vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 tbody tr:nth-child(even){background:var(--zebra)}tbody tr:hover{background:var(--hover)}
 .num{text-align:center;font-variant-numeric:tabular-nums}
-.sku{font-family:'Consolas','SF Mono',monospace;font-size:11.5px;color:#0d9488;font-weight:600}
+.sku{font-family:'Consolas','SF Mono',monospace;font-size:13px;color:#0f5e57;font-weight:800;letter-spacing:.3px}
 .title{max-width:none;color:#3f3652}.act{font-size:12px;font-weight:600;color:#4b3b5e;white-space:nowrap}
 .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:10.5px;font-weight:700;white-space:nowrap;line-height:1.4}
 .b-never{background:#ffe1e8;color:#be123c}.b-high{background:#fdeecb;color:#b45309}
