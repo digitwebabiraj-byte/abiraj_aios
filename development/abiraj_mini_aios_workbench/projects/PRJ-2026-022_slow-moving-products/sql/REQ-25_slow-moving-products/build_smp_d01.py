@@ -320,9 +320,7 @@ footer{margin:6px 4px 4px;color:var(--muted);font-size:10px;line-height:1.4;opac
 <div class="badges"><span class="pill">REQ-25-D01 · smp</span><span class="pill">DE · all channels</span><span class="pill">Data __GEN__</span></div>
 </div><button class="fsbtn" onclick="fs()">⛶ Full screen</button></header>
 <div class="tabs" id="tabs"></div>
-<div class="kpis" id="kpis"></div>
-<div class="note"><b>Provisional:</b> "Reason" and "Action" use documented default rules pending Mahima's sign-off. Slow-moving = 0 units sold in the last 30 days (on the selected channel; Combined = any channel).</div>
-<div class="filters">
+<div class="kpis" id="kpis"></div><div class="filters">
 <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
 <input id="q" placeholder="Search SKU or product name…"></div>
 <select class="fil" id="fReason"><option value="">All reasons</option></select>
