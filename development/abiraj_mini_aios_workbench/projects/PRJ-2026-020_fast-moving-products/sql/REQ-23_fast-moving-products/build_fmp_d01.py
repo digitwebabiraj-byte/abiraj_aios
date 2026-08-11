@@ -176,7 +176,7 @@ def notes_sheet(wb):
         return r
     rows=[
         ("REQ-23-D01 Fast Moving Products","Channel-wise top-selling products for Germany (DE) across Shopify, Amazon and eBay, plus a combined all-channel roll-up. Prepared for Mahima."),
-        ("Scope","Germany (DE) only. Currency = EUR (€). Order status = Completed. Ranked by 30-day units sold (top 25 per channel / combined)."),
+        ("Scope","Germany (DE) only. Currency = EUR (€). Order status = Completed. Ranked by 30-day units sold (top 100 per channel / combined)."),
         ("Windows","30-day = last 30 complete days; 90-day = last 90 complete days; both ending the last complete day. This run: 30d "+META['win30_start']+" → "+META['win_end']+", 90d "+META['win90_start']+" → "+META['win_end']+". Live data pulled "+META['generated']+"."),
         ("Data sources","RAW mcp.ledsone DB (read-only). Sales/units/orders: order_management.orders + order_item_info, joined to sub_source/source for channel (Amazon=1/eBay=2/Shopify=3), market_place='10' (Germany), status='Completed'. Current Stock: inventory.products + inventory.local_inventory_current_stock_location_wise, warehouse_location='Germany'. Product Name & Category are curated catalog labels carried by SKU (raw combo titles are placeholders; category has no per-SKU raw home)."),
         ("Sales Revenue €","= SUM(item_price × quantity) in the marketplace currency (EUR). This is gross item revenue and is the per-product figure; it intentionally differs from order_total (which includes shipping/fees and cannot be attributed to a single SKU in multi-item orders)."),

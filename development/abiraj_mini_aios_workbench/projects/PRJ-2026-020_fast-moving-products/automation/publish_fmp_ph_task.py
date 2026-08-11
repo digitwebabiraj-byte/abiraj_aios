@@ -29,7 +29,7 @@ HTML_PATH = os.path.join(HERE, "..", "evidence", "final_outputs",
 ROW = {
     "project_name": "Fast Moving Products — Germany (Shopify / Amazon / eBay DE) — channel-wise top-selling products — LEDsONE analytics platform",
     "project_code": "fmp",
-    "task_name": "Fast Moving Products (Germany) — REQ-23-D01 — top 25 per channel + combined — data as of 2026-08-03",
+    "task_name": "Fast Moving Products (Germany) — REQ-23-D01 — top 100 per channel + combined",
     "task_id": "fmp-2026-08-04-DE-Mahi",
     "team": "Development",
     "developer": "Abiraj",
@@ -65,9 +65,9 @@ def main():
             with conn.cursor() as cur:
                 if upd_id:
                     cur.execute("UPDATE tech_team_outputs.ph_task "
-                                "SET html_content=%s, description=%s, version_level=version_level+1, "
+                                "SET html_content=%s, description=%s, task_name=%s, version_level=version_level+1, "
                                 "updated_at=now() WHERE id=%s",
-                                (html, ROW["description"], upd_id))
+                                (html, ROW["description"], ROW["task_name"], upd_id))
                     row_id = upd_id
                     print(f"\nUPDATED id={row_id} (rows: {cur.rowcount})")
                 else:

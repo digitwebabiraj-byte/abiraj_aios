@@ -45,10 +45,10 @@ comb AS (SELECT sku, SUM(CASE WHEN chan=1 THEN q30 ELSE 0 END) amz, SUM(CASE WHE
    SUM(CASE WHEN chan=3 THEN q30 ELSE 0 END) shop, SUM(q30) tu, SUM(r30)::numeric(12,2) tr
    FROM base GROUP BY sku HAVING SUM(q30)>0)
 SELECT json_build_object(
- 'amazon',(SELECT json_agg(row_to_json(x)) FROM (SELECT a.sku,amz_pid.pid product_id,a.q30 qty30,a.q90 qty90,a.rev30,a.o30 orders30,COALESCE(stk.stock,0) current_stock FROM amz a LEFT JOIN amz_pid ON amz_pid.sku=a.sku LEFT JOIN stk ON stk.sku=a.sku ORDER BY a.q30 DESC,a.rev30 DESC LIMIT 25) x),
- 'ebay',(SELECT json_agg(row_to_json(x)) FROM (SELECT e.sku,eby_pid.pid product_id,e.q30 qty30,e.q90 qty90,e.rev30,e.o30 orders30,COALESCE(stk.stock,0) current_stock FROM eby e LEFT JOIN eby_pid ON eby_pid.sku=e.sku LEFT JOIN stk ON stk.sku=e.sku ORDER BY e.q30 DESC,e.rev30 DESC LIMIT 25) x),
- 'shopify',(SELECT json_agg(row_to_json(x)) FROM (SELECT s.sku,shp_pid.pid product_id,s.q30 qty30,s.q90 qty90,s.rev30,s.o30 orders30,COALESCE(stk.stock,0) current_stock FROM shp s LEFT JOIN shp_pid ON shp_pid.sku=s.sku LEFT JOIN stk ON stk.sku=s.sku ORDER BY s.q30 DESC,s.rev30 DESC LIMIT 25) x),
- 'combined',(SELECT json_agg(row_to_json(x)) FROM (SELECT c.sku,c.amz,c.ebay,c.shop,c.tu total_units,c.tr total_rev,COALESCE(stk.stock,0) current_stock FROM comb c LEFT JOIN stk ON stk.sku=c.sku ORDER BY c.tu DESC,c.tr DESC LIMIT 25) x),
+ 'amazon',(SELECT json_agg(row_to_json(x)) FROM (SELECT a.sku,amz_pid.pid product_id,a.q30 qty30,a.q90 qty90,a.rev30,a.o30 orders30,COALESCE(stk.stock,0) current_stock FROM amz a LEFT JOIN amz_pid ON amz_pid.sku=a.sku LEFT JOIN stk ON stk.sku=a.sku ORDER BY a.q30 DESC,a.rev30 DESC LIMIT 100) x),
+ 'ebay',(SELECT json_agg(row_to_json(x)) FROM (SELECT e.sku,eby_pid.pid product_id,e.q30 qty30,e.q90 qty90,e.rev30,e.o30 orders30,COALESCE(stk.stock,0) current_stock FROM eby e LEFT JOIN eby_pid ON eby_pid.sku=e.sku LEFT JOIN stk ON stk.sku=e.sku ORDER BY e.q30 DESC,e.rev30 DESC LIMIT 100) x),
+ 'shopify',(SELECT json_agg(row_to_json(x)) FROM (SELECT s.sku,shp_pid.pid product_id,s.q30 qty30,s.q90 qty90,s.rev30,s.o30 orders30,COALESCE(stk.stock,0) current_stock FROM shp s LEFT JOIN shp_pid ON shp_pid.sku=s.sku LEFT JOIN stk ON stk.sku=s.sku ORDER BY s.q30 DESC,s.rev30 DESC LIMIT 100) x),
+ 'combined',(SELECT json_agg(row_to_json(x)) FROM (SELECT c.sku,c.amz,c.ebay,c.shop,c.tu total_units,c.tr total_rev,COALESCE(stk.stock,0) current_stock FROM comb c LEFT JOIN stk ON stk.sku=c.sku ORDER BY c.tu DESC,c.tr DESC LIMIT 100) x),
  'meta',json_build_object('generated',CURRENT_DATE::text,'win30_start',(CURRENT_DATE-30)::text,'win90_start',(CURRENT_DATE-90)::text,'win_end',(CURRENT_DATE-1)::text)
 ) payload;
 """
