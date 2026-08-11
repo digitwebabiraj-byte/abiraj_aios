@@ -143,7 +143,7 @@ tbody tr:hover{background:var(--hover)}
 .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
 .b-grow{background:var(--growbg);color:var(--grow)} .b-stab{background:var(--stabbg);color:var(--stab)}
 .b-slow{background:var(--slowbg);color:var(--slow)} .b-new{background:#d6f3ec;color:var(--brand)}
-.act{font-size:12px;font-weight:600;white-space:nowrap;color:#334b49}
+.act{font-size:12px;font-weight:600;white-space:normal;overflow:visible;text-overflow:clip;color:#334b49;line-height:1.25}
 tr.oos td{background:var(--oosbg) !important} tr.oos .stockcell{color:var(--oos);font-weight:800}
 .chip{display:inline-block;padding:2px 9px;border-radius:7px;background:#e4f4f0;color:#0b6157;font-size:10.5px;font-weight:600}
 .count{font-size:11px;color:var(--muted);padding:5px 12px;border-top:1px solid var(--line);
@@ -191,8 +191,8 @@ const DATA=__BLOB__;
 const GEN="__GEN__";
 const TABS=[{k:'shopify',label:'Shopify DE'},{k:'amazon',label:'Amazon DE'},{k:'ebay',label:'eBay DE'},{k:'combined',label:'Combined'}];
 const COLS={
- channel:[['rank','#','n',3.5],['sku','SKU','t',12],['pid','Product ID','t',8],['title','Product Name','t',19],['cat','Category','t',8.5],['q30','Sold 30d','n',6],['q90','Sold 90d','n',6],['rev','Revenue €','m',7.5],['orders','Orders','n',5],['aoq','Avg Ord Qty','n',6.5],['stock','Stock','n',5.5],['scd','Cover Days','n',6.5],['trend','Trend','badge',8],['action','Action','act',9]],
- combined:[['rank','#','n',4],['sku','SKU','t',14],['title','Product Name','t',22],['cat','Category','t',10],['amz','Amazon','n',7],['ebay','eBay','n',7],['shop','Shopify','n',7],['units','Total Units','n',8],['rev','Total Rev €','m',9],['stock','Stock','n',6],['scd','Cover Days','n',7],['decision','Final Decision','act',11]]};
+ channel:[['rank','#','n',3.2],['sku','SKU','t',10.5],['pid','Product ID','t',9.5],['title','Product Name','t',14],['cat','Category','t',8],['q30','Sold 30d','n',5.6],['q90','Sold 90d','n',5.6],['rev','Revenue €','m',7],['orders','Orders','n',4.6],['aoq','Avg Ord Qty','n',6],['stock','Stock','n',5],['scd','Cover Days','n',6],['trend','Trend','badge',7],['action','Action','act',13]],
+ combined:[['rank','#','n',3.5],['sku','SKU','t',13],['title','Product Name','t',20],['cat','Category','t',9.5],['amz','Amazon','n',6.5],['ebay','eBay','n',6.5],['shop','Shopify','n',6.5],['units','Total Units','n',7.5],['rev','Total Rev €','m',8.5],['stock','Stock','n',5.5],['scd','Cover Days','n',6.5],['decision','Final Decision','act',14]]};
 let cur='shopify',sortKey=null,sortDir=1;
 const eur=v=>'€'+Number(v).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -235,10 +235,10 @@ function body(){
    const oos=o.stock===0?' class="oos"':'';
    const tds=cols().map(c=>{const k=c[0],ty=c[2];let v=o[k];
      if(k==='rank')return `<td><span class="rank ${o.rank<=3?'top':''}">${o.rank}</span></td>`;
-     if(k==='sku')return `<td><span class="sku">${esc(v)}</span></td>`;
-     if(k==='pid')return `<td><span class="pid">${esc(v)}</span></td>`;
+     if(k==='sku')return `<td title="${esc(v)}"><span class="sku">${esc(v)}</span></td>`;
+     if(k==='pid')return `<td title="${esc(v)}"><span class="pid">${esc(v)}</span></td>`;
      if(k==='title')return `<td class="title" title="${esc(v)}">${esc(v)}</td>`;
-     if(k==='cat')return `<td><span class="chip">${esc(v)}</span></td>`;
+     if(k==='cat')return `<td title="${esc(v)}"><span class="chip">${esc(v)}</span></td>`;
      if(ty==='badge')return `<td>${badge(v)}</td>`;
      if(ty==='act')return `<td class="act">${esc(v)}</td>`;
      if(ty==='m')return `<td class="num">${eur(v)}</td>`;
