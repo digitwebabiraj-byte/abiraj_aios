@@ -59,3 +59,12 @@ claude_desktop_config.json
 
 # Temporary local intake (kept outside version control)
 PH_Segmentation_Intake/
+
+# credential batch files (never commit real secrets)
+*_secrets.bat
+secrets.bat
+
+# SMP automation runtime artifacts
+development/abiraj_mini_aios_workbench/projects/PRJ-2026-022_slow-moving-products/automation/smp_run.log
+development/abiraj_mini_aios_workbench/projects/PRJ-2026-022_slow-moving-products/automation/smp_status.txt
+development/abiraj_mini_aios_workbench/projects/PRJ-2026-022_slow-moving-products/automation/smp_last_good.json

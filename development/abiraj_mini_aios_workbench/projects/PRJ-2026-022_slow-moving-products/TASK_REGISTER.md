@@ -25,8 +25,12 @@ The workbook is a **layout mock-up with sample rows** — it defines columns/Rea
 - Reviewer gates: Sajeesan (technical), Tamil Selvan (queryability), Mahima (business).
 
 ## Automation
-❌ **Not automated.** On sign-off, mirror the FMP pattern → Windows task `SMP_Weekly_Slow_Moving_Products`
-(fail-closed runner, row-floor + collapse gates, git-ignored secrets, Desktop alert on failure).
+✅ **AUTOMATED 2026-08-11** — Windows task **`SMP_Monthly_Slow_Moving_Products`**, **the 4th of each month at
+10:00** (free fleet slot; SEG=3rd, ERA=5th). Fail-closed runner `automation/smp_monthly_run.py`: rebuild from
+raw `mcp.ledsone` (back up last-good → build → row-floor + collapse gates → size-check) → **refresh portal
+`ph_task` id 735** via `publish_smp_ph_task.py --update 735` (only if PGPASSWORD present). Desktop `SMP_ALERT.txt`
+on failure; git-ignored `smp_secrets.bat` (LED_* + temp_user). Proven: manual run + **Start-ScheduledTask →
+LastTaskResult 0x0**. Next run 2026-09-04 10:00. Register/re-register: `automation/register_smp_task.ps1`.
 
 ## Publish record — ph_task
 ✅ **PUBLISHED 2026-08-11** to `tech_team_outputs.ph_task` (warehouse `order_management_copy`, temp_user @

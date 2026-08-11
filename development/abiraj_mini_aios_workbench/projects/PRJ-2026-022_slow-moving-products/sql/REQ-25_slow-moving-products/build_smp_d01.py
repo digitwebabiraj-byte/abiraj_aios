@@ -107,8 +107,9 @@ def fetch(today):
             continue
         data["combined"].append(_row(sku, title, stock, c[0], c[1], c[2], today))
 
-    for k in data:                    # sort like FMP: biggest tied-up stock first
-        data[k].sort(key=lambda r: (-r["stock"], -(r["dws"] if r["dws"] is not None else 10**9)))
+    for k in data:                    # sort like FMP: biggest tied-up stock first.
+        # SKU is the final tiebreaker so the output is byte-stable across runs (DB row order isn't).
+        data[k].sort(key=lambda r: (-r["stock"], -(r["dws"] if r["dws"] is not None else 10**9), r["sku"]))
     return data
 
 # ============================== EXCEL ==============================
