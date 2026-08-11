@@ -325,6 +325,7 @@ footer{margin:6px 4px 4px;color:var(--muted);font-size:10px;line-height:1.4;opac
 <input id="q" placeholder="Search SKU or product name…"></div>
 <select class="fil" id="fReason"><option value="">All reasons</option></select>
 <select class="fil" id="fRec"><option value="">All recency</option><option value="never">Never sold</option><option value="90">90+ days no sale</option><option value="60">60+ days no sale</option><option value="sold90">Sold within 90d</option></select>
+<select class="fil" id="fTop" title="How many rows to show (ranked by Stock Qty)"><option value="25">Top 25</option><option value="50">Top 50</option><option value="100" selected>Top 100</option><option value="500">Top 500</option><option value="all">Show all</option></select>
 <button class="clr" onclick="clr()">Clear</button><button class="clr dl" onclick="csv()">⬇ CSV</button>
 </div>
 <div class="panel"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table><div class="count" id="count"></div></div>
@@ -352,7 +353,8 @@ else if(rec==='60')r=r.filter(o=>o.dws!==null&&o.dws>=60);
 else if(rec==='sold90')r=r.filter(o=>o.q90>0);
 if(sortKey)r.sort((a,b)=>{let x=a[sortKey],y=b[sortKey];if(x===null)x=(sortDir>0?1e12:-1);if(y===null)y=(sortDir>0?1e12:-1);if(typeof x==='number'&&typeof y==='number')return (x-y)*sortDir;return String(x).localeCompare(String(y))*sortDir;});
 return r;}
-function body(){const rs=filtered();const H=rs.slice(0,5000);
+function topN(){const v=document.getElementById('fTop').value;return v==='all'?Infinity:parseInt(v,10);}
+function body(){const rs=filtered();const N=topN();const cap=Math.min(N,5000);const H=rs.slice(0,cap);
 document.getElementById('tbody').innerHTML=H.map(o=>{const nv=o.dws===null?' class="never"':'';
 const tds=COLS.map(c=>{const k=c[0],ty=c[2];let v=o[k];
 if(k==='sku')return `<td><span class="sku">${esc(v)}</span></td>`;
@@ -363,11 +365,12 @@ if(k==='dws')return `<td class="num dwscell">${v===null?'Never':v.toLocaleString
 if(k==='last')return `<td>${v?esc(v):'—'}</td>`;
 if(ty==='n')return `<td class="num">${typeof v==='number'?v.toLocaleString('en-GB'):esc(v)}</td>`;
 return `<td>${esc(v)}</td>`;}).join('');return `<tr${nv}>${tds}</tr>`;}).join('');
-document.getElementById('count').textContent=`Showing ${H.length.toLocaleString('en-GB')}${rs.length>H.length?' of '+rs.length.toLocaleString('en-GB')+' (first 5,000 — refine filters or download CSV for all)':''} of ${rowsOf().length.toLocaleString('en-GB')} slow-moving products`;}
+const capped=rs.length>H.length;const why=(N!==Infinity&&N<=rs.length)?` (Top ${N} by stock)`:(capped?' (first 5,000 — download CSV for all)':'');
+document.getElementById('count').textContent=`Showing ${H.length.toLocaleString('en-GB')}${why} of ${rs.length.toLocaleString('en-GB')} matching · ${rowsOf().length.toLocaleString('en-GB')} slow-moving in this tab`;}
 function render(){kpis();head();body();}
 function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=(k==='stock'||k==='dws')?-1:1;}head();body();}
-function clr(){['q','fReason','fRec'].forEach(id=>document.getElementById(id).value='');body();}
-function setTab(k){cur=k;sortKey=null;sortDir=1;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.k===k));['q','fReason','fRec'].forEach(id=>document.getElementById(id).value='');fillReasons();render();}
+function clr(){['q','fReason','fRec'].forEach(id=>document.getElementById(id).value='');document.getElementById('fTop').value='100';body();}
+function setTab(k){cur=k;sortKey=null;sortDir=1;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.k===k));['q','fReason','fRec'].forEach(id=>document.getElementById(id).value='');document.getElementById('fTop').value='100';fillReasons();render();}
 function csv(){const rs=filtered();const NL=String.fromCharCode(10),CR=String.fromCharCode(13),BOM=String.fromCharCode(0xFEFF);
 const q=v=>{v=(v===null||v===undefined)?'':String(v);return (v.indexOf('"')>=0||v.indexOf(',')>=0||v.indexOf(NL)>=0)?'"'+v.split('"').join('""')+'"':v;};
 const H=['SKU','Product Name','Stock Qty','Last Sale Date','Sold Qty (30 Days)','Sold Qty (90 Days)','Days Without Sale','Reason','Action'];
@@ -375,7 +378,7 @@ const lines=[H.join(',')];rs.forEach(o=>lines.push([o.sku,o.title,o.stock,o.last
 const b=new Blob([BOM+lines.join(CR+NL)],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='slow_moving_'+cur+'_DE_'+GEN+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);}
 function fs(){const e=document.documentElement;if(!document.fullscreenElement)e.requestFullscreen&&e.requestFullscreen();else document.exitFullscreen();}
 document.getElementById('tabs').innerHTML=TABS.map((t,i)=>`<div class="tab ${i===0?'active':''}" data-k="${t.k}" onclick="setTab('${t.k}')">${t.label}<span class="n">${(DATA[t.k]||[]).length.toLocaleString('en-GB')}</span></div>`).join('');
-['q','fReason','fRec'].forEach(id=>document.getElementById(id).addEventListener('input',body));
+['q','fReason','fRec','fTop'].forEach(id=>document.getElementById(id).addEventListener('input',body));
 fillReasons();render();
 </script></body></html>"""
     html=(html.replace("__BLOB__",blob).replace("__GEN__",meta["generated"]))
