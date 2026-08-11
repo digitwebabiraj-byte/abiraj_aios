@@ -103,6 +103,7 @@ WITH returns_agg AS (
     mode() WITHIN GROUP (ORDER BY reason) AS top_reason,
     mode() WITHIN GROUP (ORDER BY CASE WHEN sub_source_name ILIKE '%%ledsone%%'   THEN 'LEDSone'
                                        WHEN sub_source_name ILIKE '%%dcvoltage%%' THEN 'DCVoltage'
+                                       WHEN sub_source_name ILIKE '%%neighbour%%' THEN 'Neighbour Market'
                                        ELSE sub_source_name END) AS account,
     COUNT(DISTINCT sub_source_name) AS n_accounts
   FROM public.amazon_returns
@@ -168,7 +169,8 @@ def render_dashboards(rows, ws, we, run_label):
                    .replace("__NCRIT__", str(c["CRITICAL"])).replace("__NHIGH__", str(c["HIGH"]))
                    .replace("__NOK__", str(c["OK"])).replace("__NNA__", str(c["NA"]))
                    .replace("__NLED__", str(sum(1 for x in rws if x["acc"] == "LEDSone")))
-                   .replace("__NDCV__", str(sum(1 for x in rws if x["acc"] == "DCVoltage"))))
+                   .replace("__NDCV__", str(sum(1 for x in rws if x["acc"] == "DCVoltage")))
+                   .replace("__NNBM__", str(sum(1 for x in rws if x["acc"] == "Neighbour Market"))))
         if "__" in re.sub(r"[^_A-Z]", "", html) and re.search(r"__[A-Z]+__", html):
             die(2, f"template placeholder left unreplaced for {ph}")
         p = os.path.join(OUTDIR, re.sub(r"[^A-Za-z0-9()]+", "_", ph) + ".html")
@@ -244,7 +246,7 @@ def main():
         if bad: die(2, f"bucket arithmetic mismatch on {len(bad)} ASIN(s): {bad[:5]}")
         span = [r["asin"] for r in rows if r["n_accounts"] > 1]
         if span: die(2, f"{len(span)} ASIN(s) span both accounts, grain unsafe: {span[:5]}")
-        unk = [r["asin"] for r in rows if r["account"] not in ("LEDSone", "DCVoltage")]
+        unk = [r["asin"] for r in rows if r["account"] not in ("LEDSone", "DCVoltage", "Neighbour Market")]
         if unk: die(2, f"{len(unk)} ASIN(s) have an unrecognised account tag: {unk[:5]}")
         log.info("Integrity OK: bucket arithmetic 0 fail | 0 account-spanning | 0 unmapped account")
 
@@ -310,13 +312,22 @@ def main():
                     log.info("  %-6s id=%-4s %-18s rows=%-3s md5=%s", how, rid, b["ph"], b["rows"], b["md5"][:8])
         log.info("PUBLISHED + COMMITTED: %d rows md5-verified", len(pub))
 
+        # Verify only the rows THIS run published. Older rows a portfolio holder has
+        # since marked 'completed', and any foreign rows filed under this project_code,
+        # are none of our business here - checking them made the job false-fail monthly.
+        pub_ids = [rid for rid, _, _ in pub]
         with conn.cursor() as cur:
-            cur.execute("""SELECT count(*), bool_and(assigned_user_team=%s), bool_and(version_status='released')
-                           FROM tech_team_outputs.ph_task WHERE project_code=%s""", (TEAM_TAG, PROJECT_CODE))
-            n, tag_ok, rel_ok = cur.fetchone()
-        if not (tag_ok and rel_ok):
-            die(4, f"post-publish verify failed: rows={n} ph_priors={tag_ok} released={rel_ok}")
-        log.info("Post-publish verify OK: %d live frrc rows | ph_priors + released intact", n)
+            cur.execute("""SELECT count(*),
+                                  bool_and(assigned_user_team=%s),
+                                  bool_and(version_status IN ('released','completed'))
+                           FROM tech_team_outputs.ph_task
+                           WHERE project_code=%s AND id = ANY(%s)""",
+                        (TEAM_TAG, PROJECT_CODE, pub_ids))
+            n, tag_ok, status_ok = cur.fetchone()
+        if not (n == len(pub_ids) and tag_ok and status_ok):
+            die(4, f"post-publish verify failed: verified={n}/{len(pub_ids)} "
+                   f"ph_priors={tag_ok} status_ok={status_ok}")
+        log.info("Post-publish verify OK: %d rows published this run | ph_priors + released/completed intact", n)
         log.info("Run complete.")
 
     except SystemExit:

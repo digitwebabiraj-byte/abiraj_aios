@@ -137,9 +137,10 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
       <div class="keys">
         <span>LEDSone<b>__NLED__</b></span>
         <span>DCVoltage<b>__NDCV__</b></span>
+        <span>Neighbour Market<b>__NNBM__</b></span>
       </div>
     </div>
-    <div class="foot">Live Postgres · amazon_returns (FBA) + order_transaction (FBA-UK Completed) · data as of __RUN__. Shows only your ASINs, across both Amazon accounts.</div>
+    <div class="foot">Live Postgres · amazon_returns (FBA) + order_transaction (FBA-UK Completed) · data as of __RUN__. Shows only your ASINs, across all Amazon accounts.</div>
   </aside>
 
   <main class="main">
@@ -165,6 +166,7 @@ td.act .note{display:block;margin-top:5px;font-size:11px;color:var(--crit)}
         <option value="ALL">All accounts</option>
         <option value="LEDSone">LEDSone</option>
         <option value="DCVoltage">DCVoltage</option>
+        <option value="Neighbour Market">Neighbour Market</option>
       </select>
       <select class="sort" id="sort">
         <option value="sev">Worst first</option>
