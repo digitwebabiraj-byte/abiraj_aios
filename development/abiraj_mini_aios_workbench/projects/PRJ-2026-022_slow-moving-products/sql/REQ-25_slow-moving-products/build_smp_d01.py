@@ -339,9 +339,9 @@ let cur='shopify',sortKey=null,sortDir=1;
 const rowsOf=()=>DATA[cur]||[];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const badge=r=>{const m={never:['b-never','No sales history'],high:['b-high','High stock, no demand 90d'],dead90:['b-dead90','No demand 90d'],slowing:['b-slowing','Slowing down']};const x=m[r.cls]||['b-dead90',r.reason];return '<span class="badge '+x[0]+'" title="'+esc(r.reason)+'">'+esc(x[1])+'</span>';};
-function kpis(rs){const tot=rowsOf().length;const units=rs.reduce((a,r)=>a+r.stock,0),z90=rs.filter(r=>r.q90===0).length,never=rs.filter(r=>r.dws===null).length;
-const flt=rs.length!==tot;const suf=flt?'filtered':'';
-const K=[['Slow-moving SKUs',rs.length.toLocaleString('en-GB'),flt?`of ${tot.toLocaleString('en-GB')} in tab`:'0 sold in 30d'],['Units tied up',units.toLocaleString('en-GB'),suf||'German stock'],['Zero 90-day sales',z90.toLocaleString('en-GB'),suf||'no recent demand'],['Never sold',never.toLocaleString('en-GB'),suf||'dead stock']];
+function kpis(rs,matchTotal){const tot=rowsOf().length;const units=rs.reduce((a,r)=>a+r.stock,0),z90=rs.filter(r=>r.q90===0).length,never=rs.filter(r=>r.dws===null).length;
+const shown=rs.length;const scope=(shown<matchTotal)?`shown (of ${matchTotal.toLocaleString('en-GB')})`:(matchTotal<tot?`of ${tot.toLocaleString('en-GB')} in tab`:'in this tab');
+const K=[['Slow-moving SKUs',shown.toLocaleString('en-GB'),scope],['Units tied up',units.toLocaleString('en-GB'),'stock, shown rows'],['Zero 90-day sales',z90.toLocaleString('en-GB'),'no recent demand'],['Never sold',never.toLocaleString('en-GB'),'dead stock']];
 document.getElementById('kpis').innerHTML=K.map((k,i)=>`<div class="kpi k${i}"><div class="lab">${k[0]}</div><div class="val">${k[1]}</div><div class="s">${k[2]}</div></div>`).join('');}
 function fillReasons(){const rs=[...new Set(rowsOf().map(r=>r.reason))];document.getElementById('fReason').innerHTML='<option value="">All reasons</option>'+rs.map(r=>`<option>${esc(r)}</option>`).join('');}
 function head(){document.getElementById('thead').innerHTML='<tr>'+COLS.map(c=>{const ar=sortKey===c[0]?(sortDir>0?'▲':'▼'):'';const cls=c[2]==='n'?'num':'';return `<th class="${cls}" style="width:${c[3]}%" onclick="sortBy('${c[0]}')">${c[1]}<span class="ar">${ar}</span></th>`;}).join('')+'</tr>';}
@@ -355,7 +355,7 @@ else if(rec==='sold90')r=r.filter(o=>o.q90>0);
 if(sortKey)r.sort((a,b)=>{let x=a[sortKey],y=b[sortKey];if(x===null)x=(sortDir>0?1e12:-1);if(y===null)y=(sortDir>0?1e12:-1);if(typeof x==='number'&&typeof y==='number')return (x-y)*sortDir;return String(x).localeCompare(String(y))*sortDir;});
 return r;}
 function topN(){const v=document.getElementById('fTop').value;return v==='all'?Infinity:parseInt(v,10);}
-function body(){const rs=filtered();kpis(rs);const N=topN();const cap=Math.min(N,5000);const H=rs.slice(0,cap);
+function body(){const rs=filtered();const N=topN();const cap=Math.min(N,5000);const H=rs.slice(0,cap);kpis(H,rs.length);
 document.getElementById('tbody').innerHTML=H.map(o=>{const nv=o.dws===null?' class="never"':'';
 const tds=COLS.map(c=>{const k=c[0],ty=c[2];let v=o[k];
 if(k==='sku')return `<td><span class="sku">${esc(v)}</span></td>`;
