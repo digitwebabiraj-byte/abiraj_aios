@@ -1,0 +1,6 @@
+# never commit real credentials or run artefacts
+esdt_secrets.bat
+esdt_run.log
+esdt_status.txt
+esdt_last_good.json
+*.bak

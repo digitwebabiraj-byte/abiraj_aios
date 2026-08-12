@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>eBay UK — Top 50 Sales Drop · ELECTRICALSONE</title>
+<style>
+:root{
+  --bg:#eef2f7; --panel:#ffffff; --ink:#0f2033; --muted:#64748b; --line:#e7ecf3;
+  --accent:#2563eb; --accent-soft:#eaf1ff;
+  --crit:#e5484d; --crit-bg:#fdecec; --high:#f5820b; --high-bg:#fdf0e1;
+  --med:#d9a400; --med-bg:#fbf6e0; --stable:#2fa96b; --stable-bg:#e7f6ee;
+  --shadow:0 1px 2px rgba(16,32,51,.04),0 8px 24px rgba(16,32,51,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:linear-gradient(180deg,#f6f9fd,var(--bg));color:var(--ink);
+  font:14px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;padding:14px;
+  min-height:100%}
+.wrap{max-width:1620px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:11px}
+/* ---------- HERO (top section) ---------- */
+.hero{position:relative;border-radius:16px;padding:11px 18px;overflow:hidden;
+  background:
+    radial-gradient(1200px 220px at 12% -60%,rgba(37,99,235,.13),transparent 60%),
+    radial-gradient(900px 260px at 105% -20%,rgba(229,72,77,.09),transparent 55%),
+    linear-gradient(180deg,#ffffff, #fbfdff);
+  border:1px solid #e3ebf6;box-shadow:0 1px 2px rgba(16,32,51,.04),0 12px 34px rgba(21,52,96,.07)}
+.hero::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;
+  background:linear-gradient(90deg,#2563eb,#4f7bf0 40%,#e5484d)}
+.herobar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:nowrap}
+.brand{display:flex;gap:13px;align-items:center;min-width:0;flex:1 1 auto}
+.title{min-width:0;flex:1 1 auto}
+.tools{flex:0 0 auto}
+@media(max-width:620px){.herobar{flex-wrap:wrap}}
+.logo{width:44px;height:44px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;
+  font-size:22px;background:linear-gradient(145deg,#2563eb,#1e40af);
+  box-shadow:0 5px 13px rgba(37,99,235,.30),inset 0 1px 0 rgba(255,255,255,.35)}
+.title h1{margin:0;font-size:20px;font-weight:800;letter-spacing:-.02em;color:#12233b;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.title p{margin:3px 0 0;color:var(--muted);font-size:12.5px;display:flex;align-items:center;flex-wrap:nowrap;gap:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.title p .perpill{flex:none}
+.title p b{color:#2b3b50}
+.perpill{display:inline-block;background:#eef3fb;border:1px solid #e0e8f4;color:#4a6076;
+  font-size:11px;font-weight:600;padding:1px 9px;border-radius:999px;font-variant-numeric:tabular-nums}
+.badge{display:inline-flex;align-items:center;gap:7px;background:#eafaf0;color:#1c7a4c;font-weight:700;
+  font-size:12px;padding:6px 12px;border-radius:999px;border:1px solid #cdeeda}
+.badge .ld{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.55);
+  animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button,select,input{font:inherit;color:var(--ink)}
+.btn{border:1px solid #dbe3ee;background:rgba(255,255,255,.9);border-radius:11px;padding:9px 14px;cursor:pointer;
+  box-shadow:0 1px 2px rgba(16,32,51,.05);transition:.15s;display:inline-flex;gap:2px;align-items:center;font-weight:650}
+.btn:hover{border-color:#bcc9db;transform:translateY(-1px);box-shadow:0 6px 16px rgba(16,32,51,.10)}
+.btn.primary{background:linear-gradient(145deg,#2b6ef0,#2158d8);color:#fff;border-color:#2158d8;box-shadow:0 6px 16px rgba(37,99,235,.28)}
+.btn.primary:hover{filter:brightness(1.05)}
+.kpis{display:flex;flex-wrap:wrap;align-items:stretch;margin-top:10px;padding-top:9px;border-top:1px solid #e6ecf5}
+.kpi{flex:1 1 0;min-width:0;padding:0 18px;border-left:1px solid #e9eef6}
+.kpi:first-child{padding-left:2px;border-left:0}
+@media(max-width:760px){.kpi{flex:1 1 42%;padding:6px 14px;border-left:0}}
+.kpi .k{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .k::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--kc,#c7d3e4);flex:none}
+.kpi .v{font-size:19px;font-weight:800;margin-top:3px;letter-spacing:-.02em;line-height:1.1;color:#14243b}
+.kpi .s{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi.danger .v{color:var(--crit)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
+  overflow:hidden;display:flex;flex-direction:column}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line)}
+.search{flex:1;min-width:150px;display:flex;align-items:center;gap:8px;background:#f7f9fc;border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.search input{border:0;background:transparent;outline:0;width:100%}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;cursor:pointer;font-weight:600;font-size:12.5px;color:var(--muted)}
+.chip[data-active="1"]{color:#fff;border-color:transparent}
+.chip.all[data-active="1"]{background:var(--accent)}
+.chip.critical[data-active="1"]{background:var(--crit)}
+.chip.high[data-active="1"]{background:var(--high)}
+.chip.medium[data-active="1"]{background:var(--med)}
+.chip.stable[data-active="1"]{background:var(--stable)}
+/* bounded, robust table height (works standalone AND in a short portal iframe);
+   inner scroll keeps the sticky header fixed while rows scroll */
+.tablewrap{height:clamp(500px,90vh,1500px);overflow:auto}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:13px}
+thead th{position:sticky;top:0;z-index:2;background:#f4f7fb;text-align:left;padding:11px 12px;font-weight:700;color:#334155;white-space:nowrap;border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+thead th.num{text-align:right}
+thead th .ar{opacity:.35;font-size:11px;margin-left:3px}
+thead th[data-dir] .ar{opacity:1;color:var(--accent)}
+tbody td{padding:9px 12px;border-bottom:1px solid #f1f4f8;white-space:nowrap;vertical-align:middle}
+tbody tr{cursor:pointer;transition:background .12s}
+tbody tr:hover{background:#f4f9ff}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.prodcell{display:flex;align-items:center;gap:10px;min-width:300px;max-width:440px;white-space:normal}
+.thumb{width:44px;height:44px;border-radius:9px;object-fit:cover;background:#eef2f7;border:1px solid var(--line);flex:none}
+.thumb.ph{display:flex;align-items:center;justify-content:center;color:#9aa7b6;font-size:16px}
+.ptxt{line-height:1.25}
+.ptxt .pt{color:#1f2d3d}
+.ptxt .pi{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+.sku{font-weight:700;letter-spacing:-.01em}
+.loss{color:var(--crit);font-weight:700}
+.losscell{min-width:118px}
+.mbar{height:6px;border-radius:4px;background:#eceff4;position:relative;margin-top:5px;overflow:hidden}
+.mbar>.rem{position:absolute;left:0;top:0;bottom:0;background:#8fb4f6}
+.mbar>.now{position:absolute;left:0;top:0;bottom:0;background:#2fa96b}
+.dropcell{font-weight:700;border-radius:8px;text-align:center}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-weight:700;font-size:12px}
+.pill.critical{background:var(--crit-bg);color:var(--crit)}
+.pill.high{background:var(--high-bg);color:#b4610a}
+.pill.medium{background:var(--med-bg);color:#9a7500}
+.pill.stable{background:var(--stable-bg);color:#1c7a4c}
+.dot{width:7px;height:7px;border-radius:50%}
+.dot.critical{background:var(--crit)}.dot.high{background:var(--high)}.dot.medium{background:var(--med)}.dot.stable{background:var(--stable)}
+.rankcell{font-weight:800;color:#334155}
+.na{color:#9aa7b6}
+.action{color:#334155}
+.reason{color:var(--muted);font-size:12px}
+footer.foot{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;padding:4px 6px;flex-wrap:wrap;gap:8px}
+.count{color:var(--muted);font-weight:600;font-size:12.5px;margin-left:auto}
+.fsel{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;font-weight:600;font-size:12.5px;color:#334155;cursor:pointer;max-width:190px}
+.fsel:hover{border-color:#cfd9e6}
+.ftog{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-weight:600;font-size:12.5px;color:var(--muted);cursor:pointer}
+.ftog:hover{border-color:#cfd9e6}
+.ftog[data-on="1"]{background:var(--ink);color:#fff;border-color:transparent}
+.ftog.clear{color:#94a3b8}
+.fslider{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--muted);
+  border:1px solid var(--line);border-radius:10px;padding:6px 12px;background:#fff}
+.fslider input[type=range]{width:104px;accent-color:var(--accent);cursor:pointer}
+.fslider .lv{color:var(--ink);font-variant-numeric:tabular-nums;min-width:44px;text-align:right}
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba:15,32,51,.28;background:rgba(15,32,51,.34);opacity:0;pointer-events:none;transition:.2s;z-index:40}
+.scrim.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(460px,94vw);background:var(--panel);box-shadow:-10px 0 40px rgba(16,32,51,.18);
+  transform:translateX(100%);transition:transform .24s cubic-bezier(.4,0,.2,1);z-index:50;display:flex;flex-direction:column}
+.drawer.open{transform:none}
+.dhead{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:11px;align-items:flex-start}
+.dhead img{width:52px;height:52px;border-radius:11px;object-fit:cover;border:1px solid var(--line);background:#eef2f7;flex:none}
+.dhead .dt{font-weight:700;font-size:13.5px;line-height:1.28}
+.dhead .ds{color:var(--muted);font-size:12px;margin-top:3px}
+.dclose{margin-left:auto;border:0;background:#f1f4f8;border-radius:9px;width:30px;height:30px;cursor:pointer;font-size:15px;color:#5a6b7b;flex:none}
+.dbody{padding:11px 16px;overflow:auto;display:flex;flex-direction:column;gap:10px}
+.dhero{display:flex;gap:10px}
+.dhero .box{flex:1;background:#f8fafd;border:1px solid var(--line);border-radius:11px;padding:9px 11px}
+.dhero .lab{color:var(--muted);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.dhero .big{font-size:19px;font-weight:750;margin-top:2px}
+.cmp{display:flex;flex-direction:column;gap:7px}
+.cmp .row{display:grid;grid-template-columns:80px 1fr;gap:9px;align-items:center}
+.cmp .rl{color:var(--muted);font-size:11.5px;font-weight:600}
+.pair{display:flex;flex-direction:column;gap:5px}
+.pair{gap:4px!important}
+.pb{height:13px;border-radius:5px;background:#eef2f7;position:relative;overflow:hidden}
+.pb>span{position:absolute;left:0;top:0;bottom:0;border-radius:5px}
+.pb .pv{position:absolute;right:7px;top:0;bottom:0;display:flex;align-items:center;font-size:11px;font-weight:700;color:#274257}
+.pb.prev>span{background:#c9d6ea}
+.pb.now>span{background:#7fb1f4}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.mini .m{background:#f8fafd;border:1px solid var(--line);border-radius:10px;padding:7px 8px;text-align:center}
+.mini .m .l{color:var(--muted);font-size:10.5px;font-weight:600}
+.mini .m .n{font-size:15px;font-weight:750;margin-top:1px}
+.callout{background:var(--accent-soft);border:1px solid #d7e4ff;border-radius:11px;padding:9px 12px}
+.callout .r{color:var(--accent);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+.callout .a{font-weight:700;margin-top:4px}
+.callout .rr{color:var(--muted);font-size:12.5px;margin-top:2px}
+.dlink{color:var(--accent);text-decoration:none;font-weight:600}.dlink:hover{text-decoration:underline}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="herobar">
+      <div class="brand">
+        <div class="logo">📉</div>
+        <div class="title">
+          <h1>eBay UK — Top&nbsp;50 Sales Drop</h1>
+          <p>Account <b>ELECTRICALSONE</b> · last 30 days vs previous 30 days <span class="perpill" id="periods"></span></p>
+        </div>
+      </div>
+      <div class="tools">
+        <span class="badge"><span class="ld"></span>Live ledsone data</span>
+        <button class="btn" id="csvBtn">⬇&nbsp; Export CSV</button>
+        <button class="btn primary" id="fsBtn">⛶&nbsp; Full screen</button>
+      </div>
+    </div>
+    <div class="kpis" id="kpis"></div>
+  </section>
+  <div class="panel">
+    <div class="controls">
+      <div class="search">🔎<input id="q" placeholder="Search SKU, product, item ID, action…"/></div>
+      <div class="chips" id="chips">
+        <div class="chip all" data-p="all" data-active="1">All</div>
+        <div class="chip critical" data-p="critical">🔴 Critical</div>
+        <div class="chip high" data-p="high">🟠 High</div>
+        <div class="chip medium" data-p="medium">🟡 Medium</div>
+        <div class="chip stable" data-p="stable">🟢 Stable</div>
+      </div>
+      <select class="fsel" id="actionF" title="Filter by recommended action"><option value="all">All actions</option></select>
+      <select class="fsel" id="adF" title="Advertising status">
+        <option value="all">All PPC</option><option value="ad">Advertised</option><option value="noad">Not advertised</option></select>
+      <button class="ftog" id="stockF" title="Show only out-of-stock SKUs">📦 Out of stock</button>
+      <button class="ftog clear" id="clearF" title="Clear all filters">✕ Clear</button>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="tablewrap">
+      <table id="tbl"><thead><tr id="head"></tr></thead><tbody id="body"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer"></aside>
+
+<script>
+const DATA = {"rows": [{"rank": 1, "sku": "LSCA2L600SG+LDMC35E144APK", "item_id": "266937611471", "product": "Modern Gold K9 Crystal Chandelier Ceiling Light Luxury Pendant Lamp Fixture[Yes,60cm]", "image": "https://i.ebayimg.com/images/g/bKoAAeSwXbZqDB2E/s-l1600.jpg", "prev": 515.78, "cur": 0.0, "loss": -515.78, "drop": -100.0, "ctr": 0.28, "cvr": 0.0, "roas": 0.0, "stock": 1, "prio": "critical", "reason": "CTR drop \u2014 listing appeal", "action": "Main Image + Title Review", "cur_units": 0, "prev_units": 2, "cur_impr": 94983, "prev_impr": 46024, "cur_views": 264, "prev_views": 192, "cur_ppc_sales": 0.0, "cur_ppc_spend": 14.97, "prev_ppc_sales": 737.23, "prev_ppc_spend": 55.29}, {"rank": 2, "sku": "ENC92", "item_id": "267366810173", "product": "Modern Amber Glass Easy Fit Ceiling Pendant Light Adjustable Hanging Lamp Shade[Yes]", "image": "https://i.ebayimg.com/00/s/MTYwMFgxNjAw/z/odIAAeSw4yponXL-/$_1.JPG?set_id=2", "prev": 267.9, "cur": 0.0, "loss": -267.9, "drop": -100.0, "ctr": 0.61, "cvr": 0.0, "roas": null, "stock": 126, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 10, "cur_impr": 3963, "prev_impr": 5592, "cur_views": 24, "prev_views": 28, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 0.0, "prev_ppc_spend": 0.0}, {"rank": 3, "sku": "LSCA2L600SG+LDMC35E144GPK", "item_id": "266937611471", "product": "Modern Gold K9 Crystal Chandelier Ceiling Light Luxury Pendant Lamp Fixture[Yes,60cm]", "image": "https://i.ebayimg.com/images/g/bKoAAeSwXbZqDB2E/s-l1600.jpg", "prev": 257.89, "cur": 0.0, "loss": -257.89, "drop": -100.0, "ctr": 0.28, "cvr": 0.0, "roas": 0.0, "stock": 1, "prio": "critical", "reason": "CTR drop \u2014 listing appeal", "action": "Main Image + Title Review", "cur_units": 0, "prev_units": 1, "cur_impr": 94983, "prev_impr": 46024, "cur_views": 264, "prev_views": 192, "cur_ppc_sales": 0.0, "cur_ppc_spend": 14.97, "prev_ppc_sales": 737.23, "prev_ppc_spend": 55.29}, {"rank": 4, "sku": "PLHIBM", "item_id": "266196441440", "product": "Industrial Vintage Ceiling Light Iron Steampunk Retro Pendant Lamp E27 Lighting[Black,No]", "image": "https://i.ebayimg.com/00/s/MTAwMFgxMDAw/z/JLMAAOSw-PdlosCC/$_57.JPG?set_id=8800005007", "prev": 177.56, "cur": 0.0, "loss": -177.56, "drop": -100.0, "ctr": 0.09, "cvr": 0.0, "roas": 9.61, "stock": 86, "prio": "critical", "reason": "Conversion drop \u2014 price / offer", "action": "Price & Offer Review", "cur_units": 0, "prev_units": 4, "cur_impr": 90093, "prev_impr": 37171, "cur_views": 80, "prev_views": 28, "cur_ppc_sales": 218.42, "cur_ppc_spend": 22.73, "prev_ppc_sales": 159.8, "prev_ppc_spend": 1.98}, {"rank": 5, "sku": "24IP67100", "item_id": "267068731282", "product": "DC12V/24V LED Driver Waterproof IP67 240V Power Supply Transformer for LED Strip[DC24V,100W]", "image": "https://i.ebayimg.com/images/g/7yoAAOSwOz9nOzAc/s-l1600.jpg", "prev": 153.23, "cur": 0.0, "loss": -153.23, "drop": -100.0, "ctr": 0.22, "cvr": 0.0, "roas": 9.14, "stock": 3, "prio": "critical", "reason": "Conversion drop \u2014 price / offer", "action": "Price & Offer Review", "cur_units": 0, "prev_units": 7, "cur_impr": 215541, "prev_impr": 229477, "cur_views": 465, "prev_views": 539, "cur_ppc_sales": 498.39, "cur_ppc_spend": 54.55, "prev_ppc_sales": 333.7, "prev_ppc_spend": 49.94}, {"rank": 6, "sku": "LSCA400SG+LDMC35E1443PK", "item_id": "266410293825", "product": "Modern Ceiling Pendant Light Shade Acrylic Crystal Easy Fit Gold Chandelier Lamp[Yes,40cm chandelier]", "image": "https://i.ebayimg.com/images/g/hI0AAeSwPmNqDZOV/s-l1600.jpg", "prev": 153.12, "cur": 0.0, "loss": -153.12, "drop": -100.0, "ctr": 0.45, "cvr": 0.0, "roas": null, "stock": 16, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 1, "cur_impr": 6944, "prev_impr": 11808, "cur_views": 31, "prev_views": 57, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 153.12, "prev_ppc_spend": 13.02}, {"rank": 7, "sku": "WCDTBM+RPR44WH", "item_id": "266196360366", "product": "Industrial Geometric Light Shade Wire Cage Style Frame Ceiling Pendant Lampshade[Black]", "image": "https://i.ebayimg.com/images/g/G18AAeSwlKlqECPn/s-l1600.jpg", "prev": 238.58, "cur": 90.81, "loss": -147.77, "drop": -61.9, "ctr": 0.3, "cvr": 7.14, "roas": 10.98, "stock": 4055, "prio": "critical", "reason": "Conversion drop \u2014 price / offer", "action": "Price & Offer Review", "cur_units": 9, "prev_units": 22, "cur_impr": 42596, "prev_impr": 11629, "cur_views": 126, "prev_views": 27, "cur_ppc_sales": 33.6, "cur_ppc_spend": 3.06, "prev_ppc_sales": 0.0, "prev_ppc_spend": 0.0}, {"rank": 8, "sku": "PL4HBM+ICST64E274PK", "item_id": "267637657476", "product": "4 Light Industrial Pipe Chandelier E27 Ceiling Pendant Vintage Steampunk Lamp[Yes,Black]", "image": "https://i.ebayimg.com/00/s/MTIyOFgxNTAw/z/l8IAAeSwgIRp3M-w/$_57.JPG?set_id=880000500F", "prev": 142.04, "cur": 0.0, "loss": -142.04, "drop": -100.0, "ctr": 0.3, "cvr": 0.0, "roas": null, "stock": 0, "prio": "critical", "reason": "Out of stock", "action": "Stock \u2014 restock urgently", "cur_units": 0, "prev_units": 4, "cur_impr": 10221, "prev_impr": 14293, "cur_views": 31, "prev_views": 49, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 136.68, "prev_ppc_spend": 12.02}, {"rank": 9, "sku": "CRSF100RO+WSNW170RO+SCRN70RO+LSFT220RO+ICST64E27", "item_id": "265660320119", "product": "Industrial Wall Light Metal Shade E27 Vintage Sconce Lamp Multi Colour UK[Rose Gold,With Bulb]", "image": "https://i.ebayimg.com/00/s/MTIwMFgxMjAw/z/-WEAAOSwkf5iZYvL/$_1.JPG?set_id=880000500F", "prev": 129.54, "cur": 0.0, "loss": -129.54, "drop": -100.0, "ctr": 1.14, "cvr": 0.0, "roas": null, "stock": 0, "prio": "critical", "reason": "Out of stock", "action": "Stock \u2014 restock urgently", "cur_units": 0, "prev_units": 6, "cur_impr": 1399, "prev_impr": 791, "cur_views": 16, "prev_views": 14, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 0.0, "prev_ppc_spend": 0.0}, {"rank": 10, "sku": "12UK3P5A+SLW4", "item_id": "266190303273", "product": "12V Power Supply Adapter CCTV Charger 2/4/6/8 Splitter 2A/5A Cable Connector PSU[12V 5A  Adapter+4 Way Splitter Cable]", "image": "https://i.ebayimg.com/images/g/eVsAAOSwuf5lnoYs/s-l1600.jpg", "prev": 103.39, "cur": 0.0, "loss": -103.39, "drop": -100.0, "ctr": 0.42, "cvr": 0.0, "roas": 10.33, "stock": 113, "prio": "critical", "reason": "Conversion drop \u2014 price / offer", "action": "Price & Offer Review", "cur_units": 0, "prev_units": 7, "cur_impr": 90517, "prev_impr": 79460, "cur_views": 381, "prev_views": 300, "cur_ppc_sales": 488.8, "cur_ppc_spend": 47.34, "prev_ppc_sales": 376.86, "prev_ppc_spend": 41.81}, {"rank": 11, "sku": "12IP6736", "item_id": "266196171251", "product": "DC12V IP67 Waterproof 10W-250W LED Driver Transformer Power Supply For Outdoor[36W]", "image": "https://i.ebayimg.com/00/s/MTUwMFgxNTAw/z/-toAAOSwzHhltNSh/$_57.JPG?set_id=8800005007", "prev": 123.74, "cur": 24.88, "loss": -98.86, "drop": -79.9, "ctr": 0.26, "cvr": 0.2, "roas": 10.55, "stock": 1724, "prio": "critical", "reason": "Conversion drop \u2014 price / offer", "action": "Price & Offer Review", "cur_units": 2, "prev_units": 10, "cur_impr": 389902, "prev_impr": 247230, "cur_views": 996, "prev_views": 380, "cur_ppc_sales": 852.2, "cur_ppc_spend": 80.77, "prev_ppc_sales": 291.65, "prev_ppc_spend": 41.24}, {"rank": 12, "sku": "12IP20720", "item_id": "267213772077", "product": "AC240V to DC5/12/24 IP20 LED Driver Switch Power supply Lighting Transformer PSU[1 Pack,12V 60A 720W]", "image": "https://i.ebayimg.com/images/g/HWYAAOSwZ6Bn9OHD/s-l1600.jpg", "prev": 90.86, "cur": 0.0, "loss": -90.86, "drop": -100.0, "ctr": 0.18, "cvr": 0.0, "roas": 18.27, "stock": 0, "prio": "critical", "reason": "Out of stock", "action": "Stock \u2014 restock urgently", "cur_units": 0, "prev_units": 2, "cur_impr": 121345, "prev_impr": 96755, "cur_views": 217, "prev_views": 283, "cur_ppc_sales": 382.13, "cur_ppc_spend": 20.91, "prev_ppc_sales": 346.65, "prev_ppc_spend": 27.45}, {"rank": 13, "sku": "CRSF100BM+WSSS70BM+LSFT220BG", "item_id": "267676372573", "product": "Modern Industrial Semi Flush Ceiling Light Black Metal Shade E27 Hallway Kitchen[No,Black and Gold 22cm-I]", "image": "https://i.ebayimg.com/images/g/ezoAAeSw0F5qDtJ7/s-l1600.jpg", "prev": 89.45, "cur": 0.0, "loss": -89.45, "drop": -100.0, "ctr": 0.15, "cvr": 0.0, "roas": null, "stock": 95, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 5, "cur_impr": 4006, "prev_impr": 6028, "cur_views": 6, "prev_views": 11, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 80.5, "prev_ppc_spend": 6.04}, {"rank": 14, "sku": "HLLK100BM", "item_id": "265660320113", "product": "Open/Close Metal Kitchen Cabinet Door Handle Cupboard Drawer Furniture Pull Knob[Handle Knob Long - 100]", "image": "https://i.ebayimg.com/images/g/CUsAAOSwnz9bsOm4/s-l1600.jpg", "prev": 87.84, "cur": 0.0, "loss": -87.84, "drop": -100.0, "ctr": 0.23, "cvr": 0.0, "roas": null, "stock": 325, "prio": "critical", "reason": "Conversion drop \u2014 price / offer", "action": "Price & Offer Review", "cur_units": 0, "prev_units": 16, "cur_impr": 6460, "prev_impr": 3696, "cur_views": 15, "prev_views": 10, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 79.04, "prev_ppc_spend": 7.83}, {"rank": 15, "sku": "LSGLULCL2PK+RPM40WH2PK", "item_id": "267699594743", "product": "2 Pack Modern Ribbed Glass Pendant Light Shades Easy Fit Ceiling Lampshades", "image": "https://i.ebayimg.com/images/g/asQAAeSwpRhqL6VX/s-l1600.jpg", "prev": 83.56, "cur": 0.0, "loss": -83.56, "drop": -100.0, "ctr": 0.05, "cvr": 0.0, "roas": 0.0, "stock": 2, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 4, "cur_impr": 77737, "prev_impr": 120733, "cur_views": 41, "prev_views": 57, "cur_ppc_sales": 0.0, "cur_ppc_spend": 4.28, "prev_ppc_sales": 115.52, "prev_ppc_spend": 5.86}, {"rank": 16, "sku": "HLLK100BMAPK", "item_id": "265805858780", "product": "Kitchen Cabinet Door Handles Drawer Cupboard Interior Modern Bird Bar Handle[Handle Knob Long 100,10 Pcs]", "image": "https://i.ebayimg.com/00/s/MTUwMFgxNTAw/z/V-wAAOSw1~VnF0Fz/$_57.JPG?set_id=880000500F", "prev": 80.94, "cur": 0.0, "loss": -80.94, "drop": -100.0, "ctr": 0.43, "cvr": 0.0, "roas": 10.1, "stock": 32, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 3, "cur_impr": 4914, "prev_impr": 6418, "cur_views": 21, "prev_views": 28, "cur_ppc_sales": 8.99, "cur_ppc_spend": 0.89, "prev_ppc_sales": 75.27, "prev_ppc_spend": 7.45}, {"rank": 17, "sku": "CRSF2003BM+WCRNBM3PK", "item_id": "266196406700", "product": "Industrial Hemp Rope Pendant Light Metal Fitting Cage Retro Ceiling Lamp Light[Three Out Let,No]", "image": "https://i.ebayimg.com/images/g/jeMAAeSwTy5qcvkI/s-l1600.jpg", "prev": 78.58, "cur": 0.0, "loss": -78.58, "drop": -100.0, "ctr": 0.27, "cvr": 0.0, "roas": 0.0, "stock": 149, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 2, "cur_impr": 5471, "prev_impr": 24124, "cur_views": 15, "prev_views": 78, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.07, "prev_ppc_sales": 170.34, "prev_ppc_spend": 16.95}, {"rank": 18, "sku": "12IP20600", "item_id": "265640826938", "product": "12V Switching Regulated Power Supply Transformer 12W-720W LED Driver  UK PSU[600W]", "image": "https://i.ebayimg.com/images/g/EUUAAOSwpFZlxePg/s-l1600.jpg", "prev": 116.67, "cur": 38.89, "loss": -77.78, "drop": -66.7, "ctr": 0.22, "cvr": 0.22, "roas": 13.31, "stock": 24, "prio": "critical", "reason": "CTR drop \u2014 listing appeal", "action": "Main Image + Title Review", "cur_units": 1, "prev_units": 3, "cur_impr": 216106, "prev_impr": 173122, "cur_views": 465, "prev_views": 460, "cur_ppc_sales": 460.15, "cur_ppc_spend": 34.56, "prev_ppc_sales": 463.94, "prev_ppc_spend": 37.75}, {"rank": 19, "sku": "BL1S0200BM2PK+LDCRLE1452PK", "item_id": "267489060140", "product": "Modern Minimalist Pendant Ceiling Light Black Aluminium Hanging Lamp Adjustable[E14 Crystal Bulb + 20cm Aluminium Tube(2 Pack)]", "image": "https://i.ebayimg.com/00/s/MTI1NFgxMjU0/z/8B8AAeSwldpp~aQg/$_57.JPG?set_id=880000500F", "prev": 77.67, "cur": 0.0, "loss": -77.67, "drop": -100.0, "ctr": 0.07, "cvr": 0.0, "roas": 3.93, "stock": 71, "prio": "critical", "reason": "CTR drop \u2014 listing appeal", "action": "Main Image + Title Review", "cur_units": 0, "prev_units": 3, "cur_impr": 154427, "prev_impr": 34522, "cur_views": 106, "prev_views": 82, "cur_ppc_sales": 66.73, "cur_ppc_spend": 16.99, "prev_ppc_sales": 120.37, "prev_ppc_spend": 24.26}, {"rank": 20, "sku": "CRSF100BM+PHSH1PBRBM+LSMS320BI+ICST64E27", "item_id": "267300002472", "product": "Vintage Industrial Black Pendant Light Retro Hanging Lamp E27 Ceiling Lighting[Yes]", "image": "https://i.ebayimg.com/images/g/DuoAAeSw3fxqROGj/s-l1600.jpg", "prev": 77.16, "cur": 0.0, "loss": -77.16, "drop": -100.0, "ctr": 0.06, "cvr": 0.0, "roas": 0.0, "stock": 542, "prio": "critical", "reason": "CTR drop \u2014 listing appeal", "action": "Main Image + Title Review", "cur_units": 0, "prev_units": 4, "cur_impr": 29959, "prev_impr": 25033, "cur_views": 19, "prev_views": 24, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.82, "prev_ppc_sales": 81.48, "prev_ppc_spend": 4.6}, {"rank": 21, "sku": "PHCD1PBRBW+LSTM310BM+ICST64E27", "item_id": "267673224243", "product": "Vintage Industrial Ceiling Pendant Light Black Metal Shade Retro Hanging Lamp[Yes,Type 2]", "image": "https://i.ebayimg.com/images/g/HnUAAeSw5zhqCtjj/s-l1600.jpg", "prev": 74.67, "cur": 0.0, "loss": -74.67, "drop": -100.0, "ctr": 0.05, "cvr": 0.0, "roas": 0.0, "stock": 135, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 3, "cur_impr": 36575, "prev_impr": 72955, "cur_views": 19, "prev_views": 87, "cur_ppc_sales": 0.0, "cur_ppc_spend": 2.46, "prev_ppc_sales": 109.11, "prev_ppc_spend": 19.89}, {"rank": 22, "sku": "WSBWBS+ICST64E27", "item_id": "266289119308", "product": "Vintage Industrial Cage Wall Light E27 Retro Rustic Metal Wall Lamp UK[Yes]", "image": "https://i.ebayimg.com/images/g/BH8AAOSwtWJkgDmg/s-l1600.jpg", "prev": 73.56, "cur": 0.0, "loss": -73.56, "drop": -100.0, "ctr": 0.28, "cvr": 0.0, "roas": null, "stock": 73, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 4, "cur_impr": 2118, "prev_impr": 2822, "cur_views": 6, "prev_views": 6, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 66.2, "prev_ppc_spend": 0.0}, {"rank": 23, "sku": "PHCD1PBRBW+LSCY290BL", "item_id": "267706221987", "product": "Industrial Vintage Pendant Light E27 Metal Shade Ceiling Lamp Kitchen Island UK[Blue]", "image": "https://i.ebayimg.com/00/s/MTUwMFgxNTAw/z/k~EAAeSwE2hqOPOm/$_57.JPG?set_id=880000500F", "prev": 68.67, "cur": 0.0, "loss": -68.67, "drop": -100.0, "ctr": 0.07, "cvr": 0.0, "roas": 0.0, "stock": 590, "prio": "critical", "reason": "CTR drop \u2014 listing appeal", "action": "Main Image + Title Review", "cur_units": 0, "prev_units": 3, "cur_impr": 65431, "prev_impr": 45367, "cur_views": 44, "prev_views": 91, "cur_ppc_sales": 0.0, "cur_ppc_spend": 3.84, "prev_ppc_sales": 159.6, "prev_ppc_spend": 20.43}, {"rank": 24, "sku": "PHCD1PBRBW+LSCY290GR", "item_id": "267706221987", "product": "Industrial Vintage Pendant Light E27 Metal Shade Ceiling Lamp Kitchen Island UK[Green]", "image": "https://i.ebayimg.com/00/s/MTUwMFgxNTAw/z/k~EAAeSwE2hqOPOm/$_57.JPG?set_id=880000500F", "prev": 68.67, "cur": 0.0, "loss": -68.67, "drop": -100.0, "ctr": 0.07, "cvr": 0.0, "roas": 0.0, "stock": 590, "prio": "critical", "reason": "CTR drop \u2014 listing appeal", "action": "Main Image + Title Review", "cur_units": 0, "prev_units": 3, "cur_impr": 65431, "prev_impr": 45367, "cur_views": 44, "prev_views": 91, "cur_ppc_sales": 0.0, "cur_ppc_spend": 3.84, "prev_ppc_sales": 159.6, "prev_ppc_spend": 20.43}, {"rank": 25, "sku": "LDMST64E276APK", "item_id": "267073162939", "product": "Vintage LED Edison Bulb E27/B22 Dimmable Filament Antique Retro Industrial Light[Warm White,10 Pack,Pear (ST64),E27,6W]", "image": "https://i.ebayimg.com/00/s/MTI1NFgxMjU0/z/G~AAAeSwws5qVxHX/$_57.JPG?set_id=880000500F", "prev": 103.74, "cur": 36.4, "loss": -67.34, "drop": -64.9, "ctr": 0.76, "cvr": 0.07, "roas": 11.39, "stock": 306, "prio": "critical", "reason": "Conversion drop \u2014 price / offer", "action": "Price & Offer Review", "cur_units": 1, "prev_units": 3, "cur_impr": 181899, "prev_impr": 102577, "cur_views": 1376, "prev_views": 667, "cur_ppc_sales": 537.3, "cur_ppc_spend": 47.18, "prev_ppc_sales": 375.52, "prev_ppc_spend": 21.61}, {"rank": 26, "sku": "ENC6374", "item_id": "265634986318", "product": "Industrial 3way Ceiling Light Morden Kitchen Hanging vintage Metal Pendant Lamp[Brushed Silver - 2,No]", "image": "https://i.ebayimg.com/images/g/VZgAAeSwraVqbFiB/s-l1600.jpg", "prev": 65.78, "cur": 0.0, "loss": -65.78, "drop": -100.0, "ctr": 0.15, "cvr": 0.0, "roas": null, "stock": 37, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 2, "cur_impr": 23128, "prev_impr": 43532, "cur_views": 34, "prev_views": 76, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 59.2, "prev_ppc_spend": 6.45}, {"rank": 27, "sku": "24IP201802PK", "item_id": "267213772077", "product": "AC240V to DC5/12/24 IP20 LED Driver Switch Power supply Lighting Transformer PSU[2 Pack,24V 7.5A 180W]", "image": "https://i.ebayimg.com/images/g/HWYAAOSwZ6Bn9OHD/s-l1600.jpg", "prev": 62.0, "cur": 0.0, "loss": -62.0, "drop": -100.0, "ctr": 0.27, "cvr": 0.0, "roas": 41.21, "stock": 45, "prio": "critical", "reason": "CTR drop \u2014 listing appeal", "action": "Main Image + Title Review", "cur_units": 0, "prev_units": 2, "cur_impr": 52178, "prev_impr": 53140, "cur_views": 139, "prev_views": 213, "cur_ppc_sales": 253.05, "cur_ppc_spend": 6.14, "prev_ppc_sales": 189.95, "prev_ppc_spend": 13.21}, {"rank": 28, "sku": "LDMT45E2745PK", "item_id": "267073162939", "product": "Vintage LED Edison Bulb E27/B22 Dimmable Filament Antique Retro Industrial Light[Warm White,5 Pack,Tubular (T45),E27,4W]", "image": "https://i.ebayimg.com/00/s/MTI1NFgxMjU0/z/G~AAAeSwws5qVxHX/$_57.JPG?set_id=880000500F", "prev": 59.81, "cur": 0.0, "loss": -59.81, "drop": -100.0, "ctr": 0.68, "cvr": 0.0, "roas": 11.39, "stock": 818, "prio": "critical", "reason": "Conversion drop \u2014 price / offer", "action": "Price & Offer Review", "cur_units": 0, "prev_units": 3, "cur_impr": 235626, "prev_impr": 162556, "cur_views": 1591, "prev_views": 1017, "cur_ppc_sales": 537.3, "cur_ppc_spend": 47.18, "prev_ppc_sales": 375.52, "prev_ppc_spend": 21.61}, {"rank": 29, "sku": "12IP20480", "item_id": "265640826938", "product": "12V Switching Regulated Power Supply Transformer 12W-720W LED Driver  UK PSU[480W]", "image": "https://i.ebayimg.com/images/g/EUUAAOSwpFZlxePg/s-l1600.jpg", "prev": 89.67, "cur": 29.89, "loss": -59.78, "drop": -66.7, "ctr": 0.2, "cvr": 0.31, "roas": 7.29, "stock": 241, "prio": "critical", "reason": "Conversion drop \u2014 price / offer", "action": "Price & Offer Review", "cur_units": 1, "prev_units": 3, "cur_impr": 163928, "prev_impr": 119982, "cur_views": 326, "prev_views": 247, "cur_ppc_sales": 207.1, "cur_ppc_spend": 28.42, "prev_ppc_sales": 273.99, "prev_ppc_spend": 24.54}, {"rank": 30, "sku": "LSGLCY120CO2PK+RPM40WH2PK", "item_id": "266929449611", "product": "Morden Glass Ceiling Light Shade Replacement Pendant & Chandelier Lampshade UK[Pack 2,Copper Barrel]", "image": "https://i.ebayimg.com/00/s/MTUwMFgxNTAw/z/JJMAAOSw19Nmqg0-/$_57.JPG?set_id=8800005007", "prev": 59.56, "cur": 0.0, "loss": -59.56, "drop": -100.0, "ctr": 0.13, "cvr": 0.0, "roas": null, "stock": 40, "prio": "critical", "reason": "CTR drop \u2014 listing appeal", "action": "Main Image + Title Review", "cur_units": 0, "prev_units": 4, "cur_impr": 16512, "prev_impr": 19369, "cur_views": 21, "prev_views": 49, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 54.8, "prev_ppc_spend": 5.2}, {"rank": 31, "sku": "CRFF5504BM+WCRNBM4PK+ICST64E274PK", "item_id": "266196406700", "product": "Industrial Hemp Rope Pendant Light Metal Fitting Cage Retro Ceiling Lamp Light[Rectangle 4 Out Let,Yes]", "image": "https://i.ebayimg.com/images/g/jeMAAeSwTy5qcvkI/s-l1600.jpg", "prev": 59.29, "cur": 0.0, "loss": -59.29, "drop": -100.0, "ctr": 0.27, "cvr": 0.0, "roas": 0.0, "stock": 111, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 1, "cur_impr": 5471, "prev_impr": 24124, "cur_views": 15, "prev_views": 78, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.07, "prev_ppc_sales": 170.34, "prev_ppc_spend": 16.95}, {"rank": 32, "sku": "CNT900CH", "item_id": "265863564065", "product": "Heavy Duty Pendant Light Chain 38mm x 16mm for Chandeliers Lighting fixtures DIY[Chrome]", "image": "https://i.ebayimg.com/images/g/hLoAAOSwCjVkol2x/s-l1600.jpg", "prev": 63.92, "cur": 7.99, "loss": -55.93, "drop": -87.5, "ctr": 0.2, "cvr": 3.7, "roas": 10.11, "stock": 125, "prio": "critical", "reason": "CTR drop \u2014 listing appeal", "action": "Main Image + Title Review", "cur_units": 1, "prev_units": 8, "cur_impr": 13529, "prev_impr": 12642, "cur_views": 27, "prev_views": 45, "cur_ppc_sales": 15.98, "cur_ppc_spend": 1.58, "prev_ppc_sales": 67.11, "prev_ppc_spend": 6.64}, {"rank": 33, "sku": "LSCY290CB+RPR44WH", "item_id": "266223215729", "product": "Industrial Retro Metal Ceiling Light Shade Easy Fit Pendant Lampshade Kitchen[Cyan Blue]", "image": "https://i.ebayimg.com/00/s/MTYwMFgxNjAw/z/1i0AAeSwtCRpr-wF/$_1.PNG?set_id=2", "prev": 55.56, "cur": 0.0, "loss": -55.56, "drop": -100.0, "ctr": 0.07, "cvr": 0.0, "roas": 10.88, "stock": 408, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 4, "cur_impr": 59889, "prev_impr": 123473, "cur_views": 40, "prev_views": 98, "cur_ppc_sales": 62.97, "cur_ppc_spend": 5.79, "prev_ppc_sales": 119.58, "prev_ppc_spend": 12.02}, {"rank": 34, "sku": "CRSF100GB+PHCHPBRGB", "item_id": "266196440480", "product": "Vintage Brass Pendant Light Fitting Retro Hanging Lamp Holder E27 Ceiling Rose[Green Brass]", "image": "https://i.ebayimg.com/images/g/QlYAAeSwKuhp5aFt/s-l1600.jpg", "prev": 54.95, "cur": 0.0, "loss": -54.95, "drop": -100.0, "ctr": 0.61, "cvr": 0.0, "roas": null, "stock": 109, "prio": "critical", "reason": "Conversion drop \u2014 price / offer", "action": "Price & Offer Review", "cur_units": 0, "prev_units": 5, "cur_impr": 1806, "prev_impr": 1513, "cur_views": 11, "prev_views": 5, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 0.0, "prev_ppc_spend": 0.0}, {"rank": 35, "sku": "ENC4274", "item_id": "267156668445", "product": "Modern Amber Glass Ceiling Pendant Light Adjustable Hanging Lamp Kitchen Shade[Bell,Yes]", "image": "https://i.ebayimg.com/images/g/iDMAAeSwEIpqWHAH/s-l1600.jpg", "prev": 53.78, "cur": 0.0, "loss": -53.78, "drop": -100.0, "ctr": 0.32, "cvr": 0.0, "roas": null, "stock": 2, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 2, "cur_impr": 16506, "prev_impr": 38773, "cur_views": 53, "prev_views": 71, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 104.42, "prev_ppc_spend": 9.23}, {"rank": 36, "sku": "BL1S0300BM2PK+LDCRLE1452PK", "item_id": "267489060140", "product": "Modern Minimalist Pendant Ceiling Light Black Aluminium Hanging Lamp Adjustable[30cm + Blub Style II (Pack 2)]", "image": "https://i.ebayimg.com/00/s/MTI1NFgxMjU0/z/8B8AAeSwldpp~aQg/$_57.JPG?set_id=880000500F", "prev": 51.78, "cur": 0.0, "loss": -51.78, "drop": -100.0, "ctr": 0.07, "cvr": 0.0, "roas": 3.93, "stock": 55, "prio": "critical", "reason": "CTR drop \u2014 listing appeal", "action": "Main Image + Title Review", "cur_units": 0, "prev_units": 2, "cur_impr": 154427, "prev_impr": 34522, "cur_views": 106, "prev_views": 82, "cur_ppc_sales": 66.73, "cur_ppc_spend": 16.99, "prev_ppc_sales": 120.37, "prev_ppc_spend": 24.26}, {"rank": 37, "sku": "LSCYRO300WH2PK+RPR44WH2PK", "item_id": "267453002570", "product": "2 Pack Modern Crystal Ceiling Pendant Light Shade Easy Fit Hanging Lampshade UK[30 cm White]", "image": "https://i.ebayimg.com/images/g/ul4AAeSwRNxpCJHl/s-l1600.jpg", "prev": 49.78, "cur": 0.0, "loss": -49.78, "drop": -100.0, "ctr": 0.25, "cvr": 0.0, "roas": 13.31, "stock": 0, "prio": "critical", "reason": "Out of stock", "action": "Stock \u2014 restock urgently", "cur_units": 0, "prev_units": 2, "cur_impr": 65950, "prev_impr": 50299, "cur_views": 165, "prev_views": 207, "cur_ppc_sales": 19.43, "cur_ppc_spend": 1.46, "prev_ppc_sales": 175.9, "prev_ppc_spend": 13.21}, {"rank": 38, "sku": "ENC904", "item_id": "266102089152", "product": "Vintage Industrial Plug In Lamp Wall Lights Indoor Cone Shade With Dimmer Switch[Yes,Brushed Copper]", "image": "https://i.ebayimg.com/images/g/q2wAAeSwQl1qOkrw/s-l1600.jpg", "prev": 49.58, "cur": 0.0, "loss": -49.58, "drop": -100.0, "ctr": 0.19, "cvr": 0.0, "roas": null, "stock": 630, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 2, "cur_impr": 4682, "prev_impr": 12860, "cur_views": 9, "prev_views": 49, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 68.89, "prev_ppc_spend": 6.27}, {"rank": 39, "sku": "ENC10062", "item_id": "267677347537", "product": "2 Pack Industrial Pendant Ceiling Lights Black Metal E27 Retro Hanging Lamps[Yes]", "image": "https://i.ebayimg.com/00/s/MTUwMFgxNTAw/z/AKcAAeSwqClqD~lT/$_57.JPG?set_id=880000500F", "prev": 48.89, "cur": 0.0, "loss": -48.89, "drop": -100.0, "ctr": 0.27, "cvr": 0.0, "roas": null, "stock": 67, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 1, "cur_impr": 4458, "prev_impr": 9563, "cur_views": 12, "prev_views": 29, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 92.9, "prev_ppc_spend": 4.15}, {"rank": 40, "sku": "12RPIP454002", "item_id": "266190328455", "product": "DC 12V Volt AC220-240V LED Driver IP45 Power Supply PSU 60W-400W LED Transformer[400W (Type-2)]", "image": "https://i.ebayimg.com/images/g/AHkAAOSwE4dknUrO/s-l1600.jpg", "prev": 48.38, "cur": 0.0, "loss": -48.38, "drop": -100.0, "ctr": 0.11, "cvr": 0.0, "roas": 0.0, "stock": 8, "prio": "critical", "reason": "CTR drop \u2014 listing appeal", "action": "Main Image + Title Review", "cur_units": 0, "prev_units": 2, "cur_impr": 30767, "prev_impr": 20080, "cur_views": 34, "prev_views": 30, "cur_ppc_sales": 0.0, "cur_ppc_spend": 2.61, "prev_ppc_sales": 45.96, "prev_ppc_spend": 5.48}, {"rank": 41, "sku": "PHSG1PBRYB+SCRN70BM+LSCG185AR", "item_id": "267156668445", "product": "Modern Amber Glass Ceiling Pendant Light Adjustable Hanging Lamp Kitchen Shade[Cone,No]", "image": "https://i.ebayimg.com/images/g/iDMAAeSwEIpqWHAH/s-l1600.jpg", "prev": 47.78, "cur": 0.0, "loss": -47.78, "drop": -100.0, "ctr": 0.32, "cvr": 0.0, "roas": null, "stock": 126, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 2, "cur_impr": 16506, "prev_impr": 38773, "cur_views": 53, "prev_views": 71, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 104.42, "prev_ppc_spend": 9.23}, {"rank": 42, "sku": "CRSF100BM+PHSH1PBRYB+LSSS300GY", "item_id": "266200562753", "product": "Vintage Industrial Pendant Ceiling Light E27 Modern Metal Shade Hanging Lamp[No,Grey]", "image": "https://i.ebayimg.com/images/g/OjsAAeSwPHhpz2Sl/s-l1600.jpg", "prev": 63.56, "cur": 16.89, "loss": -46.67, "drop": -73.4, "ctr": 0.14, "cvr": 1.11, "roas": 11.75, "stock": 212, "prio": "critical", "reason": "CTR drop \u2014 listing appeal", "action": "Main Image + Title Review", "cur_units": 1, "prev_units": 4, "cur_impr": 64873, "prev_impr": 22474, "cur_views": 90, "prev_views": 43, "cur_ppc_sales": 105.01, "cur_ppc_spend": 8.94, "prev_ppc_sales": 117.28, "prev_ppc_spend": 9.45}, {"rank": 43, "sku": "LSGG200AR+SCRN70FG", "item_id": "267250225585", "product": "Vintage Amber Glass Ceiling Light Shade \u2013 Retro Style Easy Fit Pendant Lampshade[Globe]", "image": "https://i.ebayimg.com/images/g/bNkAAOSwvvRoJG8C/s-l1600.jpg", "prev": 45.78, "cur": 0.0, "loss": -45.78, "drop": -100.0, "ctr": 0.26, "cvr": 0.0, "roas": null, "stock": 2, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 2, "cur_impr": 23370, "prev_impr": 86819, "cur_views": 60, "prev_views": 141, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 60.28, "prev_ppc_spend": 13.72}, {"rank": 44, "sku": "24IP20360", "item_id": "267213772077", "product": "AC240V to DC5/12/24 IP20 LED Driver Switch Power supply Lighting Transformer PSU[1 Pack,24V 15A 360W]", "image": "https://i.ebayimg.com/images/g/HWYAAOSwZ6Bn9OHD/s-l1600.jpg", "prev": 91.56, "cur": 45.78, "loss": -45.78, "drop": -50.0, "ctr": 0.26, "cvr": 0.52, "roas": 16.73, "stock": 142, "prio": "critical", "reason": "Conversion drop \u2014 price / offer", "action": "Price & Offer Review", "cur_units": 2, "prev_units": 4, "cur_impr": 146939, "prev_impr": 129507, "cur_views": 387, "prev_views": 390, "cur_ppc_sales": 331.07, "cur_ppc_spend": 19.79, "prev_ppc_sales": 307.24, "prev_ppc_spend": 23.51}, {"rank": 45, "sku": "ENC9386", "item_id": "267614360952", "product": "Industrial Crystal Pendant Light Modern Hanging Glass Shade Kitchen Ceiling Lamp[Black,Yes]", "image": "https://i.ebayimg.com/images/g/17UAAeSwUCVpvM7O/s-l1600.jpg", "prev": 44.89, "cur": 0.0, "loss": -44.89, "drop": -100.0, "ctr": 0.79, "cvr": 0.0, "roas": null, "stock": 2, "prio": "critical", "reason": "Conversion drop \u2014 price / offer", "action": "Price & Offer Review", "cur_units": 0, "prev_units": 1, "cur_impr": 7002, "prev_impr": 970, "cur_views": 55, "prev_views": 6, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 44.89, "prev_ppc_spend": 4.26}, {"rank": 46, "sku": "24IP20240", "item_id": "266190476182", "product": "DC 5V/12V/24V LED Transformer 240V 12W-720W LED Power Supply IP20 LED Driver PSU[24V 240W 10A]", "image": "https://i.ebayimg.com/images/g/xXMAAOSwel5lpmtM/s-l1600.jpg", "prev": 43.89, "cur": 0.0, "loss": -43.89, "drop": -100.0, "ctr": 0.26, "cvr": 0.0, "roas": 16.73, "stock": 24, "prio": "critical", "reason": "Conversion drop \u2014 price / offer", "action": "Price & Offer Review", "cur_units": 0, "prev_units": 2, "cur_impr": 146939, "prev_impr": 129507, "cur_views": 387, "prev_views": 390, "cur_ppc_sales": 331.07, "cur_ppc_spend": 19.79, "prev_ppc_sales": 307.24, "prev_ppc_spend": 23.51}, {"rank": 47, "sku": "12IP67100", "item_id": "265700829684", "product": "12V PSU LED Driver Switching Regulated Power Supply Transformer 10W-350W UK[DC 12V 8.33A 100W]", "image": "https://i.ebayimg.com/images/g/UTMAAOSw8L1lQMkP/s-l1600.jpg", "prev": 131.34, "cur": 87.56, "loss": -43.78, "drop": -33.3, "ctr": 0.19, "cvr": 0.69, "roas": 8.6, "stock": 289, "prio": "high", "reason": "Conversion drop \u2014 price / offer", "action": "Price & Offer Review", "cur_units": 4, "prev_units": 6, "cur_impr": 297029, "prev_impr": 264548, "cur_views": 577, "prev_views": 588, "cur_ppc_sales": 622.6, "cur_ppc_spend": 72.39, "prev_ppc_sales": 333.7, "prev_ppc_spend": 55.1}, {"rank": 48, "sku": "LHRIE14BM", "item_id": "266027916399", "product": "E27 E14 Pendant Light Bulb Holder Screw Edison Socket Plastic Ceiling,Wall Lamp[E14 Holder 2,1 Pc]", "image": "https://i.ebayimg.com/00/s/MTUwMFgxNTAw/z/3lQAAOSw2~Jlqj~y/$_57.PNG?set_id=8800005007", "prev": 47.92, "cur": 5.99, "loss": -41.93, "drop": -87.5, "ctr": 0.74, "cvr": 0.25, "roas": 1.12, "stock": 1248, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 1, "prev_units": 8, "cur_impr": 53477, "prev_impr": 74205, "cur_views": 397, "prev_views": 438, "cur_ppc_sales": 4.99, "cur_ppc_spend": 4.44, "prev_ppc_sales": 101.52, "prev_ppc_spend": 17.62}, {"rank": 49, "sku": "WCBTC140FG2PK+RPR44WH2PK", "item_id": "267642098133", "product": "2 Pack Crystal Jewel Pendant Lampshade Drum Ceiling Light Easy Fit Living Room[14 cm Cage]", "image": "https://i.ebayimg.com/00/s/MTUwMFgxNTAw/z/~rwAAeSwe5lp7Ouc/$_57.PNG?set_id=880000500F", "prev": 41.78, "cur": 0.0, "loss": -41.78, "drop": -100.0, "ctr": 0.1, "cvr": 0.0, "roas": 0.0, "stock": 1, "prio": "critical", "reason": "Visibility / SEO drop (impressions \u2193)", "action": "SEO Review \u2014 title, keywords, item specifics", "cur_units": 0, "prev_units": 2, "cur_impr": 74169, "prev_impr": 115174, "cur_views": 77, "prev_views": 106, "cur_ppc_sales": 0.0, "cur_ppc_spend": 9.3, "prev_ppc_sales": 59.55, "prev_ppc_spend": 12.87}, {"rank": 50, "sku": "CRSF100CO+PHMU1PBRCO+LSDO210BC+ICST64E27", "item_id": "266194895854", "product": "Hanging Pendant Light Modern Vintage Industrial Loft Metal Ceiling Lamp Shade[Brushed Copper,Yes]", "image": "https://i.ebayimg.com/images/g/TBkAAeSwplNn2k7o/s-l1600.jpg", "prev": 41.58, "cur": 0.0, "loss": -41.58, "drop": -100.0, "ctr": 0.05, "cvr": 0.0, "roas": null, "stock": 0, "prio": "critical", "reason": "Out of stock", "action": "Stock \u2014 restock urgently", "cur_units": 0, "prev_units": 2, "cur_impr": 9889, "prev_impr": 16135, "cur_views": 5, "prev_views": 6, "cur_ppc_sales": 0.0, "cur_ppc_spend": 0.0, "prev_ppc_sales": 39.5, "prev_ppc_spend": 3.59}], "generated": "2026-08-12 13:34", "cur": ["2026-07-13", "2026-08-12"], "prev": ["2026-06-13", "2026-07-13"]};
+const COLS = [
+  {k:'rank',  t:'#',        num:true,  cls:'rankcell'},
+  {k:'product',t:'Product', cls:'prodcell'},
+  {k:'prev',  t:'Prev £',   num:true},
+  {k:'cur',   t:'Curr £',   num:true},
+  {k:'loss',  t:'Loss £ (prev→now)', num:true, cls:'losscell'},
+  {k:'drop',  t:'Drop %',   num:true},
+  {k:'ctr',   t:'CTR %',    num:true},
+  {k:'cvr',   t:'CVR %',    num:true},
+  {k:'roas',  t:'ROAS',     num:true},
+  {k:'stock', t:'Stock',    num:true},
+  {k:'prio',  t:'Priority'},
+  {k:'action',t:'Action'},
+];
+const PLABEL={critical:'Critical',high:'High',medium:'Medium',stable:'Stable'};
+const gbp=v=>'£'+Number(v).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const gbp0=v=>'£'+Number(v).toLocaleString('en-GB',{maximumFractionDigits:0});
+const num=v=>Number(v).toLocaleString('en-GB');
+const pct=v=>(v==null?'<span class="na">n/a</span>':Number(v).toFixed(1)+'%');
+const pct2=v=>(v==null?'<span class="na">n/a</span>':Number(v).toFixed(2)+'%');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const maxPrev=Math.max(...DATA.rows.map(x=>x.prev));
+// If embedded in the portal (iframe), render the table at full height and let the portal scroll.
+try{ if(window.self!==window.top) document.documentElement.classList.add('embedded'); }catch(e){ document.documentElement.classList.add('embedded'); }
+let state={q:'',prio:'all',sort:'rank',dir:1,action:'all',ad:'all',stock0:false,minloss:0};
+
+function view(){
+  let r=DATA.rows.filter(x=>state.prio==='all'||x.prio===state.prio);
+  if(state.q){const q=state.q.toLowerCase();
+    r=r.filter(x=>(x.sku+' '+x.product+' '+x.item_id+' '+x.action+' '+x.reason).toLowerCase().includes(q));}
+  if(state.action!=='all') r=r.filter(x=>x.action===state.action);
+  if(state.ad==='ad')   r=r.filter(x=>x.cur_ppc_spend>0||x.prev_ppc_spend>0);
+  if(state.ad==='noad') r=r.filter(x=>!(x.cur_ppc_spend>0||x.prev_ppc_spend>0));
+  if(state.stock0)      r=r.filter(x=>x.stock===0);
+  if(state.minloss>0)   r=r.filter(x=>Math.abs(x.loss)>=state.minloss);
+  const s=state.sort,d=state.dir;
+  r=r.slice().sort((a,b)=>{let x=a[s],y=b[s];
+    if(x==null)x=(d>0?Infinity:-Infinity);if(y==null)y=(d>0?Infinity:-Infinity);
+    if(typeof x==='string')return d*x.localeCompare(y);return d*(x-y);});
+  return r;
+}
+function kpis(r){
+  const lost=r.reduce((s,x)=>s+x.loss,0),prev=r.reduce((s,x)=>s+x.prev,0),cur=r.reduce((s,x)=>s+x.cur,0);
+  const crit=r.filter(x=>x.prio==='critical').length;
+  const avg=r.length?r.reduce((s,x)=>s+x.drop,0)/r.length:0;
+  const mx=r.reduce((m,x)=>x.loss<m.loss?x:m,{loss:0,sku:'—'});
+  const K=[
+    {k:'SKUs shown',v:r.length,s:'of '+DATA.rows.length+' in report',c:'#2563eb'},
+    {k:'Total lost',v:gbp(Math.abs(lost)),s:gbp(prev)+' → '+gbp(cur),d:1,c:'#e5484d'},
+    {k:'Critical',v:crit,s:'drop ≥ 50%',d:1,c:'#e5484d'},
+    {k:'Avg drop',v:avg.toFixed(1)+'%',s:'across shown rows',c:'#f5820b'},
+    {k:'Biggest loss',v:gbp(Math.abs(mx.loss)),s:esc(mx.sku),c:'#d9a400'},
+    {k:'Current sales',v:gbp(cur),s:'was '+gbp(prev),c:'#2fa96b'},
+  ];
+  document.getElementById('kpis').innerHTML=K.map(x=>
+    `<div class="kpi ${x.d?'danger':''}" style="--kc:${x.c}">
+       <div class="k">${x.k}</div>
+       <div class="v">${x.v}</div><div class="s" title="${x.s}">${x.s}</div></div>`).join('');
+}
+function head(){
+  document.getElementById('head').innerHTML=COLS.map(c=>{
+    const dir=state.sort===c.k?(state.dir>0?'asc':'desc'):'';
+    const ar=state.sort===c.k?(state.dir>0?'▲':'▼'):'⇅';
+    return `<th class="${c.num?'num':''}" data-k="${c.k}" ${dir?`data-dir="${dir}"`:''}>${esc(c.t)}<span class="ar">${ar}</span></th>`;
+  }).join('');
+  document.querySelectorAll('#head th').forEach(th=>th.onclick=()=>{
+    const k=th.dataset.k;if(state.sort===k)state.dir*=-1;else{state.sort=k;state.dir=1;}render();});
+}
+function dropStyle(v){ // light red scale by magnitude (0..100)
+  const m=Math.min(Math.abs(v),100)/100, a=(0.08+m*0.42).toFixed(2);
+  return `background:rgba(229,72,77,${a});color:${m>0.6?'#fff':'#8a1f22'}`;
+}
+function thumb(x,cls){
+  if(x.image) return `<img class="${cls}" loading="lazy" referrerpolicy="no-referrer" src="${esc(x.image)}" onerror="this.classList.add('ph');this.removeAttribute('src');this.textContent='▦'">`;
+  return `<div class="${cls} ph">▦</div>`;
+}
+function cell(c,x){
+  const v=x[c.k];
+  switch(c.k){
+    case 'rank': return v;
+    case 'product': return `${thumb(x,'thumb')}<div class="ptxt"><div class="pt sku">${esc(x.sku)}</div><div class="pi">${esc(x.product)}</div></div>`;
+    case 'prev': case 'cur': return gbp(v);
+    case 'loss': {
+      const remPct=Math.max(0,Math.min(100,x.prev? x.prev/maxPrev*100:0));
+      const nowPct=Math.max(0,Math.min(100,x.prev? x.cur/maxPrev*100:0));
+      return `<span class="loss">-${gbp(Math.abs(v))}</span>
+        <div class="mbar" title="prev ${gbp(x.prev)} → now ${gbp(x.cur)}">
+          <span class="rem" style="width:${remPct}%"></span><span class="now" style="width:${nowPct}%"></span></div>`;
+    }
+    case 'drop': return `<span class="dropcell" style="${dropStyle(v)};padding:3px 8px;display:inline-block">${Number(v).toFixed(1)}%</span>`;
+    case 'ctr': case 'cvr': return pct2(v);
+    case 'roas': return v==null?'<span class="na">n/a</span>':Number(v).toFixed(2);
+    case 'stock': return v===0?'<span class="loss">0</span>':num(v);
+    case 'prio': return `<span class="pill ${x.prio}"><span class="dot ${x.prio}"></span>${PLABEL[x.prio]}</span>`;
+    case 'action': return `<div class="action">${esc(x.action)}</div><div class="reason">${esc(x.reason)}</div>`;
+    default: return esc(v);
+  }
+}
+function render(){
+  const r=view();kpis(r);head();
+  document.getElementById('count').textContent=r.length+' shown';
+  const b=document.getElementById('body');
+  b.innerHTML=r.map((x,i)=>`<tr data-i="${DATA.rows.indexOf(x)}">`+COLS.map(c=>
+    `<td class="${c.num?'num':''} ${c.cls||''}">${cell(c,x)}</td>`).join('')+'</tr>').join('');
+  b.querySelectorAll('tr').forEach(tr=>tr.onclick=()=>openDrawer(DATA.rows[+tr.dataset.i]));
+}
+// ---- detail drawer ----
+function pair(label,prev,cur,fmt){
+  const mx=Math.max(prev,cur,1);
+  const wp=(prev/mx*100).toFixed(1),wc=(cur/mx*100).toFixed(1);
+  return `<div class="row"><div class="rl">${label}</div><div class="pair">
+     <div class="pb prev"><span style="width:${wp}%"></span><div class="pv">prev ${fmt(prev)}</div></div>
+     <div class="pb now"><span style="width:${wc}%"></span><div class="pv">now ${fmt(cur)}</div></div>
+   </div></div>`;
+}
+function openDrawer(x){
+  const d=document.getElementById('drawer');
+  const ctr=x.ctr==null?'n/a':x.ctr.toFixed(2)+'%', cvr=x.cvr==null?'n/a':x.cvr.toFixed(2)+'%', roas=x.roas==null?'n/a':x.roas.toFixed(2);
+  d.innerHTML=`
+   <div class="dhead">
+     ${x.image?`<img referrerpolicy="no-referrer" loading="lazy" src="${esc(x.image)}" onerror="this.style.visibility='hidden'">`:`<div style="width:72px;height:72px;border-radius:12px;background:#eef2f7;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:#9aa7b6;font-size:22px">▦</div>`}
+     <div><div class="dt">${esc(x.product)}</div>
+       <div class="ds"><span class="sku">${esc(x.sku)}</span> · Item <a class="dlink" target="_blank" rel="noopener" href="https://www.ebay.co.uk/itm/${esc(x.item_id)}">${esc(x.item_id)}</a></div>
+       <div style="margin-top:6px"><span class="pill ${x.prio}"><span class="dot ${x.prio}"></span>${PLABEL[x.prio]}</span></div>
+     </div>
+     <button class="dclose" onclick="closeDrawer()">✕</button>
+   </div>
+   <div class="dbody">
+     <div class="dhero">
+       <div class="box"><div class="lab">Sales lost</div><div class="big loss">-${gbp(Math.abs(x.loss))}</div><div class="ds">${gbp(x.prev)} → ${gbp(x.cur)}</div></div>
+       <div class="box"><div class="lab">Drop</div><div class="big" style="color:var(--crit)">${x.drop.toFixed(1)}%</div><div class="ds">vs previous 30 days</div></div>
+     </div>
+     <div class="cmp">
+       ${pair('Sales £',x.prev,x.cur,gbp0)}
+       ${pair('Units sold',x.prev_units,x.cur_units,num)}
+       ${pair('Impressions',x.prev_impr,x.cur_impr,num)}
+       ${pair('Views / clicks',x.prev_views,x.cur_views,num)}
+       ${pair('PPC spend',x.prev_ppc_spend,x.cur_ppc_spend,gbp0)}
+       ${pair('PPC sales',x.prev_ppc_sales,x.cur_ppc_sales,gbp0)}
+     </div>
+     <div class="mini">
+       <div class="m"><div class="l">CTR</div><div class="n">${ctr}</div></div>
+       <div class="m"><div class="l">CVR</div><div class="n">${cvr}</div></div>
+       <div class="m"><div class="l">ROAS</div><div class="n">${roas}</div></div>
+       <div class="m"><div class="l">Stock (UK)</div><div class="n" style="color:${x.stock===0?'var(--crit)':'inherit'}">${num(x.stock)}</div></div>
+       <div class="m"><div class="l">Prev units</div><div class="n">${num(x.prev_units)}</div></div>
+       <div class="m"><div class="l">Now units</div><div class="n">${num(x.cur_units)}</div></div>
+     </div>
+     <div class="callout"><div class="r">Why · ${esc(x.reason)}</div><div class="a">${esc(x.action)}</div>
+       <div class="rr">Recommended next step for this SKU.</div></div>
+   </div>`;
+  d.classList.add('open');document.getElementById('scrim').classList.add('open');
+}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('scrim').classList.remove('open');}
+document.getElementById('scrim').onclick=closeDrawer;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
+function csv(){
+  const r=view();const H=['Rank','SKU','Item ID','Product','Prev £','Curr £','Loss £','Drop %','CTR %','CVR %','ROAS','Stock','Priority','Reason','Action'];
+  const F=x=>[x.rank,x.sku,x.item_id,x.product,x.prev,x.cur,x.loss,x.drop,x.ctr??'n/a',x.cvr??'n/a',x.roas??'n/a',x.stock,PLABEL[x.prio],x.reason,x.action];
+  const lines=[H.join(',')].concat(r.map(x=>F(x).map(v=>{v=String(v).replace(/"/g,'""');return /[",\n]/.test(v)?`"${v}"`:v;}).join(',')));
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));
+  a.download='ebay_uk_top50_sales_drop.csv';a.click();
+}
+document.getElementById('q').oninput=e=>{state.q=e.target.value;render();};
+document.getElementById('chips').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;
+  state.prio=c.dataset.p;document.querySelectorAll('.chip').forEach(k=>k.dataset.active=(k===c?'1':''));render();};
+// --- extra filters ---
+const actions=[...new Set(DATA.rows.map(x=>x.action))].sort();
+const aF=document.getElementById('actionF');
+actions.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;aF.appendChild(o);});
+aF.onchange=e=>{state.action=e.target.value;render();};
+document.getElementById('adF').onchange=e=>{state.ad=e.target.value;render();};
+const stockBtn=document.getElementById('stockF');
+stockBtn.onclick=()=>{state.stock0=!state.stock0;stockBtn.dataset.on=state.stock0?'1':'';render();};
+document.getElementById('clearF').onclick=()=>{
+  state={q:'',prio:'all',sort:state.sort,dir:state.dir,action:'all',ad:'all',stock0:false,minloss:0};
+  document.getElementById('q').value='';aF.value='all';document.getElementById('adF').value='all';
+  stockBtn.dataset.on='';
+  document.querySelectorAll('.chip').forEach(k=>k.dataset.active=(k.dataset.p==='all'?'1':''));render();};
+document.getElementById('csvBtn').onclick=csv;
+document.getElementById('fsBtn').onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen();};
+(()=>{const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const fmt=s=>{const p=s.split('-');return (+p[2])+' '+MON[+p[1]-1];};
+  const el=document.getElementById('periods');
+  el.textContent=fmt(DATA.cur[0])+' – '+fmt(DATA.cur[1])+' '+DATA.cur[1].slice(0,4);
+  el.title='Current '+DATA.cur[0]+' → '+DATA.cur[1]+'   ·   Previous '+DATA.prev[0]+' → '+DATA.prev[1];})();
+render();
+</script>
+</body>
+</html>
