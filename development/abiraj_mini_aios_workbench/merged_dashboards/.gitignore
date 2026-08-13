@@ -1,0 +1,5 @@
+# Generated artifacts — regenerate with:
+#   python emitters/eppr_emit.py && python emitters/esnm_emit.py && python emitters/era_emit.py
+#   python build_merged.py
+emitters/*_merge.json
+ebay_listings_eppr_esnm/*.html
