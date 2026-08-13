@@ -121,6 +121,7 @@ img.thumb{width:34px;height:34px;object-fit:contain;border-radius:6px;background
 <div class="panel"><div class="ptop">
   <div class="controls">
     <input id="q" class="inp" type="search" placeholder="Search SKU or title…">
+    <select id="mkt" class="inp"></select>
     <select id="acct" class="inp"></select>
   </div>
   <div class="sub" id="count"></div></div>
@@ -128,16 +129,17 @@ img.thumb{width:34px;height:34px;object-fit:contain;border-radius:6px;background
 <script>
 const DATA=__DATA__, COLORS=DATA.colors, TASKS=DATA.tasks;
 let active=0;
-const ui={q:'',acct:'',sortCol:null,sortDir:-1};
+const ui={q:'',acct:'',mkt:'',sortCol:null,sortDir:-1};
 let view=[];
 function T(){return TASKS[active];}
 function colIdx(pred){return T().cols.findIndex(pred);}
 function computeView(){
  const cols=T().cols, rows=T().rows;
- const skuI=colIdx(c=>c.key==='sku'), titI=colIdx(c=>c.key==='title'||c.name==='Product Title'), acI=colIdx(c=>c.key==='account');
+ const skuI=colIdx(c=>c.key==='sku'), titI=colIdx(c=>c.key==='title'||c.name==='Product Title'), acI=colIdx(c=>c.key==='account'), mkI=colIdx(c=>c.key==='market'||c.name==='Marketplace');
  let v=rows;
  if(ui.q){const q=ui.q.toLowerCase();
   v=v.filter(r=>(skuI>=0&&(''+(r[skuI]??'')).toLowerCase().includes(q))||(titI>=0&&(''+(r[titI]??'')).toLowerCase().includes(q)));}
+ if(ui.mkt&&mkI>=0){v=v.filter(r=>(''+(r[mkI]??''))===ui.mkt);}
  if(ui.acct&&acI>=0){v=v.filter(r=>(''+(r[acI]??''))===ui.acct);}
  if(ui.sortCol!=null){const ci=ui.sortCol,dir=ui.sortDir,typ=cols[ci].type;
   v=v.slice().sort((a,b)=>{let x=a[ci],y=b[ci];
@@ -207,12 +209,14 @@ function paint(){const cols=T().cols,ROWS=view;const body=document.getElementByI
   cols.forEach((c,i)=>{const td=makeCell(c,r[i],cur);if(c.pin&&stickyOffs[i]!=null)td.style.left=stickyOffs[i]+'px';tr.appendChild(td);});frag.appendChild(tr);}
  body.appendChild(frag);const bot=document.createElement('tr');bot.className='spacer';
  bot.innerHTML=`<td colspan="${nCol}" style="height:${(ROWS.length-end)*ROWH}px"></td>`;body.appendChild(bot);}
-function buildAccountOptions(){const acI=colIdx(c=>c.key==='account');const sel=document.getElementById('acct');
- if(acI<0){sel.style.display='none';sel.innerHTML='';return;}sel.style.display='';
- const vals=[...new Set(T().rows.map(r=>(''+(r[acI]??'')).trim()).filter(Boolean))].sort();
- sel.innerHTML='<option value="">All accounts</option>'+vals.map(v=>`<option value="${v.replace(/"/g,'&quot;')}">${v}</option>`).join('');}
+function buildSelect(id,colPred,allLabel){const ci=colIdx(colPred);const sel=document.getElementById(id);
+ if(ci<0){sel.style.display='none';sel.innerHTML='';return;}sel.style.display='';
+ const vals=[...new Set(T().rows.map(r=>(''+(r[ci]??'')).trim()).filter(Boolean))].sort();
+ sel.innerHTML=`<option value="">${allLabel}</option>`+vals.map(v=>`<option value="${v.replace(/"/g,'&quot;')}">${v}</option>`).join('');}
+function buildAccountOptions(){buildSelect('acct',c=>c.key==='account','All accounts');
+ buildSelect('mkt',c=>c.key==='market'||c.name==='Marketplace','All markets');}
 function renderTable(){
- ui.q='';ui.acct='';ui.sortCol=null;ui.sortDir=-1;document.getElementById('q').value='';
+ ui.q='';ui.acct='';ui.mkt='';ui.sortCol=null;ui.sortDir=-1;document.getElementById('q').value='';
  ccyMI=colIdx(c=>c.key==='market'||c.name==='Marketplace');ccyAI=colIdx(c=>c.key==='account');
  const tot=(T().summary||[]).map(s=>`<span class="sep">·</span>${s.name} <b class="tot">${s.disp}</b>`).join(' ');
  document.getElementById('summary').innerHTML=`<b>${T().label}</b> <span class="sep">·</span>${T().count.toLocaleString()} listings ${tot} <span class="sep">·</span>as of <b class="tot">${T().as_of||'?'}</b>`;
@@ -220,6 +224,7 @@ function renderTable(){
 let ticking=false;SCROLLER.addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(()=>{paint();ticking=false;});}});
 document.getElementById('q').addEventListener('input',e=>{ui.q=e.target.value;applyView();});
 document.getElementById('acct').addEventListener('change',e=>{ui.acct=e.target.value;applyView();});
+document.getElementById('mkt').addEventListener('change',e=>{ui.mkt=e.target.value;applyView();});
 document.getElementById('csv').onclick=()=>{const cols=T().cols;
  const head=cols.map(c=>c.name).join(',');
  const lines=view.map(r=>cols.map((c,i)=>{let v=r[i]??'';v=(''+v).replace(/"/g,'""');return /[",\n]/.test(v)?`"${v}"`:v;}).join(','));
