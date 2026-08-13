@@ -2,8 +2,11 @@
   "title": "eBay Listings — Unified Dashboard",
   "colors": { "EPPR": "#3a2f6b", "ESNM": "#0f5c57", "ERA": "#b45309" },
   "tasks": [
-    { "task": "EPPR", "file": "emitters/eppr_merge.json", "headline": ["units", "revenue", "net"] },
-    { "task": "ESNM", "file": "emitters/esnm_merge.json", "headline": ["s_30", "s_90"] },
-    { "task": "ERA",  "file": "emitters/era_merge.json",  "headline": ["r_returns", "r_refund", "r_cost"] }
+    { "task": "EPPR", "file": "emitters/eppr_merge.json", "headline": ["units", "revenue", "net"],
+      "filters": ["market", "brand", "status"] },
+    { "task": "ESNM", "file": "emitters/esnm_merge.json", "headline": ["s_30", "s_90"],
+      "filters": ["account", "brand", "s_action"] },
+    { "task": "ERA",  "file": "emitters/era_merge.json",  "headline": ["r_returns", "r_refund", "r_cost"],
+      "filters": ["account", "r_reason"] }
   ]
 }

@@ -54,9 +54,14 @@ for t in REG["tasks"]:
         summary.append({"name": c["name"], "disp": disp})
     summary = summary[:3]
 
+    # filter dropdowns: registry lists column keys; keep those present in this task
+    have = {c["key"]: c["name"] for c in cols}
+    tfilters = [{"key": k, "name": have[k]} for k in t.get("filters", []) if k in have]
+
     tasks.append({"code": d["task"], "label": d.get("label", d["task"]),
                   "owner": d.get("owner", ""), "as_of": d.get("as_of", ""),
-                  "count": len(rows), "cols": cols, "summary": summary, "rows": rows})
+                  "count": len(rows), "cols": cols, "summary": summary,
+                  "filters": tfilters, "rows": rows})
     print(f"loaded {d['task']}: {len(rows):,} rows, {len(cols)} cols, as_of {d.get('as_of')}")
 
 meta = {"title": REG.get("title", "Unified Dashboard"),
@@ -121,26 +126,25 @@ img.thumb{width:34px;height:34px;object-fit:contain;border-radius:6px;background
 <div class="panel"><div class="ptop">
   <div class="controls">
     <input id="q" class="inp" type="search" placeholder="Search SKU or title…">
-    <select id="mkt" class="inp"></select>
-    <select id="acct" class="inp"></select>
+    <span id="filters" class="controls"></span>
   </div>
   <div class="sub" id="count"></div></div>
  <div class="scroll"><table><thead><tr id="hrow"></tr></thead><tbody id="body"></tbody></table></div></div></div>
 <script>
 const DATA=__DATA__, COLORS=DATA.colors, TASKS=DATA.tasks;
 let active=0;
-const ui={q:'',acct:'',mkt:'',sortCol:null,sortDir:-1};
+const ui={q:'',f:{},sortCol:null,sortDir:-1};
 let view=[];
 function T(){return TASKS[active];}
 function colIdx(pred){return T().cols.findIndex(pred);}
 function computeView(){
  const cols=T().cols, rows=T().rows;
- const skuI=colIdx(c=>c.key==='sku'), titI=colIdx(c=>c.key==='title'||c.name==='Product Title'), acI=colIdx(c=>c.key==='account'), mkI=colIdx(c=>c.key==='market'||c.name==='Marketplace');
+ const skuI=colIdx(c=>c.key==='sku'), titI=colIdx(c=>c.key==='title'||c.name==='Product Title');
  let v=rows;
  if(ui.q){const q=ui.q.toLowerCase();
   v=v.filter(r=>(skuI>=0&&(''+(r[skuI]??'')).toLowerCase().includes(q))||(titI>=0&&(''+(r[titI]??'')).toLowerCase().includes(q)));}
- if(ui.mkt&&mkI>=0){v=v.filter(r=>(''+(r[mkI]??''))===ui.mkt);}
- if(ui.acct&&acI>=0){v=v.filter(r=>(''+(r[acI]??''))===ui.acct);}
+ T().filters.forEach(f=>{const val=ui.f[f.key];if(!val)return;const ci=colIdx(c=>c.key===f.key);
+  if(ci>=0)v=v.filter(r=>(''+(r[ci]??''))===val);});
  if(ui.sortCol!=null){const ci=ui.sortCol,dir=ui.sortDir,typ=cols[ci].type;
   v=v.slice().sort((a,b)=>{let x=a[ci],y=b[ci];
    if(typ==='num'||typ==='money'||typ==='pct'){x=Number(x);y=Number(y);const xn=isNaN(x),yn=isNaN(y);
@@ -209,22 +213,21 @@ function paint(){const cols=T().cols,ROWS=view;const body=document.getElementByI
   cols.forEach((c,i)=>{const td=makeCell(c,r[i],cur);if(c.pin&&stickyOffs[i]!=null)td.style.left=stickyOffs[i]+'px';tr.appendChild(td);});frag.appendChild(tr);}
  body.appendChild(frag);const bot=document.createElement('tr');bot.className='spacer';
  bot.innerHTML=`<td colspan="${nCol}" style="height:${(ROWS.length-end)*ROWH}px"></td>`;body.appendChild(bot);}
-function buildSelect(id,colPred,allLabel){const ci=colIdx(colPred);const sel=document.getElementById(id);
- if(ci<0){sel.style.display='none';sel.innerHTML='';return;}sel.style.display='';
- const vals=[...new Set(T().rows.map(r=>(''+(r[ci]??'')).trim()).filter(Boolean))].sort();
- sel.innerHTML=`<option value="">${allLabel}</option>`+vals.map(v=>`<option value="${v.replace(/"/g,'&quot;')}">${v}</option>`).join('');}
-function buildAccountOptions(){buildSelect('acct',c=>c.key==='account','All accounts');
- buildSelect('mkt',c=>c.key==='market'||c.name==='Marketplace','All markets');}
+function buildFilters(){const host=document.getElementById('filters');host.innerHTML='';
+ T().filters.forEach(f=>{const ci=colIdx(c=>c.key===f.key);if(ci<0)return;
+  const vals=[...new Set(T().rows.map(r=>(''+(r[ci]??'')).trim()).filter(Boolean))].sort();
+  if(!vals.length)return;
+  const sel=document.createElement('select');sel.className='inp';
+  sel.innerHTML=`<option value="">All ${f.name}</option>`+vals.map(v=>`<option value="${v.replace(/"/g,'&quot;')}">${v}</option>`).join('');
+  sel.onchange=()=>{ui.f[f.key]=sel.value;applyView();};host.appendChild(sel);});}
 function renderTable(){
- ui.q='';ui.acct='';ui.mkt='';ui.sortCol=null;ui.sortDir=-1;document.getElementById('q').value='';
+ ui.q='';ui.f={};ui.sortCol=null;ui.sortDir=-1;document.getElementById('q').value='';
  ccyMI=colIdx(c=>c.key==='market'||c.name==='Marketplace');ccyAI=colIdx(c=>c.key==='account');
  const tot=(T().summary||[]).map(s=>`<span class="sep">·</span>${s.name} <b class="tot">${s.disp}</b>`).join(' ');
  document.getElementById('summary').innerHTML=`<b>${T().label}</b> <span class="sep">·</span>${T().count.toLocaleString()} listings ${tot} <span class="sep">·</span>as of <b class="tot">${T().as_of||'?'}</b>`;
- buildAccountOptions();buildHeader();updateCount();}
+ buildFilters();buildHeader();updateCount();}
 let ticking=false;SCROLLER.addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(()=>{paint();ticking=false;});}});
 document.getElementById('q').addEventListener('input',e=>{ui.q=e.target.value;applyView();});
-document.getElementById('acct').addEventListener('change',e=>{ui.acct=e.target.value;applyView();});
-document.getElementById('mkt').addEventListener('change',e=>{ui.mkt=e.target.value;applyView();});
 document.getElementById('csv').onclick=()=>{const cols=T().cols;
  const head=cols.map(c=>c.name).join(',');
  const lines=view.map(r=>cols.map((c,i)=>{let v=r[i]??'';v=(''+v).replace(/"/g,'""');return /[",\n]/.test(v)?`"${v}"`:v;}).join(','));
