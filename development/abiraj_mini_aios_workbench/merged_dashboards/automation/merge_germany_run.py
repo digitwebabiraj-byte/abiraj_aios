@@ -38,10 +38,15 @@ def die(msg):
 
 def run_build(name, script_dir, script):
     import time
-    for attempt in (1, 2, 3):                      # ledsone pool blips intermittently -> retry
+    # FMP/SMP connect to LEDSONE without an explicit port -> libpq would use PGPORT (the WAREHOUSE
+    # 5435) and fail. Strip PGPORT so they default to 5432 (ledsone). LED_* are what they read.
+    benv = dict(os.environ); benv.pop("PGPORT", None)
+    if benv.get("LED_PGPORT"):
+        benv["PGPORT"] = benv["LED_PGPORT"]        # 5432
+    for attempt in (1, 2, 3):
         log("%s: running its live build (%s), attempt %d…" % (name, script, attempt))
         r = subprocess.run([sys.executable, os.path.join(script_dir, script)],
-                           cwd=script_dir, capture_output=True, text=True)
+                           cwd=script_dir, env=benv, capture_output=True, text=True)
         if r.returncode == 0:
             return
         log("  %s attempt %d failed: %s" % (name, attempt, (r.stderr or r.stdout).strip()[-200:]))
