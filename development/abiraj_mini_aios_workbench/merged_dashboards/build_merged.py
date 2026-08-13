@@ -82,7 +82,9 @@ h1{font-size:18px;margin:0}.sub{color:var(--muted);font-size:12.5px;margin-top:2
 .hint{color:var(--muted);font-size:12.5px;margin:10px 0 4px}
 .btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:8px 12px;font-size:12.5px;cursor:pointer}
 .btn:hover{border-color:var(--accent)}
-.tabs{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0 12px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px 16px;flex-wrap:wrap;margin:10px 0}
+.filt{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tabs{display:flex;flex-wrap:wrap;gap:9px;margin:0}
 .tab{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);background:var(--panel);
  border-radius:11px;padding:10px 15px;font-size:13.5px;font-weight:600;cursor:pointer;color:var(--ink);transition:.12s}
 .tab:hover{border-color:var(--accent)}
@@ -95,11 +97,10 @@ h1{font-size:18px;margin:0}.sub{color:var(--muted);font-size:12.5px;margin-top:2
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:0;
  flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
 @media (max-width:760px), (max-height:900px){
- .wrap{padding:7px} .hint{display:none} #sub{display:none} .summary{display:none}
- h1{font-size:14px} .top{margin-bottom:0}
- .tabs{margin:6px 0 5px} .tab{padding:5px 11px;font-size:12.5px} .tdot{width:8px;height:8px}
- .ptop{padding:6px 9px} .inp{padding:5px 9px} th,td{padding:5px 9px} tbody td{height:34px}
- thead th{font-size:12px}
+ .wrap{padding:7px} .hint{display:none} #sub{display:none}
+ h1{font-size:14px} .top{margin-bottom:0} .bar{margin:6px 0}
+ .tab{padding:5px 11px;font-size:12.5px} .tdot{width:8px;height:8px}
+ .inp{padding:5px 9px} th,td{padding:5px 9px} tbody td{height:34px} thead th{font-size:12px}
 }
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .inp{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 10px;font-size:12.5px}
@@ -130,14 +131,15 @@ img.thumb{width:34px;height:34px;object-fit:contain;border-radius:6px;background
 <div class="top"><div><h1 id="h1"></h1><div class="sub" id="sub"></div></div>
  <div style="display:flex;gap:8px"><button class="btn" id="csv">Export CSV</button></div></div>
 <div class="hint"><b>Pick a task tab.</b> Each tab shows that task's own listings and its own count — a task may cover more or fewer rows than another, that's normal. The left identity columns stay pinned; the right side is that task's data.</div>
-<div class="tabs" id="tabs"></div>
-<div class="summary" id="summary"></div>
-<div class="panel"><div class="ptop">
-  <div class="controls">
+<div class="bar">
+  <div class="tabs" id="tabs"></div>
+  <div class="filt">
     <input id="q" class="inp" type="search" placeholder="Search SKU or title…">
     <span id="filters" class="controls"></span>
+    <span class="sub" id="count"></span>
   </div>
-  <div class="sub" id="count"></div></div>
+</div>
+<div class="panel">
  <div class="scroll"><table><thead><tr id="hrow"></tr></thead><tbody id="body"></tbody></table></div></div></div>
 <script>
 const DATA=__DATA__, COLORS=DATA.colors, TASKS=DATA.tasks;
@@ -162,7 +164,8 @@ function computeView(){
  view=v;
 }
 function updateCount(){const t=T().count,n=view.length;
- document.getElementById('count').innerHTML=(n===t?`${t.toLocaleString()} listings`:`showing <b>${n.toLocaleString()}</b> of ${t.toLocaleString()}`);}
+ const base=(n===t?`${t.toLocaleString()} listings`:`showing <b>${n.toLocaleString()}</b> of ${t.toLocaleString()}`);
+ document.getElementById('count').innerHTML=base+` · as of <b>${T().as_of||'?'}</b>`;}
 function updateArrows(){document.querySelectorAll('#hrow th').forEach((th,i)=>{const a=th.querySelector('.ar');
  if(a)a.textContent=(ui.sortCol===i?(ui.sortDir<0?'▼':'▲'):'');});}
 function applyView(){SCROLLER.scrollTop=0;computeView();paint();updateCount();updateArrows();}
@@ -232,8 +235,6 @@ function buildFilters(){const host=document.getElementById('filters');host.inner
 function renderTable(){
  ui.q='';ui.f={};ui.sortCol=null;ui.sortDir=-1;document.getElementById('q').value='';
  ccyMI=colIdx(c=>c.key==='market'||c.name==='Marketplace');ccyAI=colIdx(c=>c.key==='account');
- const tot=(T().summary||[]).map(s=>`<span class="sep">·</span>${s.name} <b class="tot">${s.disp}</b>`).join(' ');
- document.getElementById('summary').innerHTML=`<b>${T().label}</b> <span class="sep">·</span>${T().count.toLocaleString()} listings ${tot} <span class="sep">·</span>as of <b class="tot">${T().as_of||'?'}</b>`;
  buildFilters();buildHeader();updateCount();}
 let ticking=false;SCROLLER.addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(()=>{paint();ticking=false;});}});
 document.getElementById('q').addEventListener('input',e=>{ui.q=e.target.value;applyView();});
