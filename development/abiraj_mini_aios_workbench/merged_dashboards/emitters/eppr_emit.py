@@ -7,7 +7,7 @@ import json, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BASE = os.path.abspath(os.path.join(HERE, "..", "..", "projects"))
-SRC = os.path.join(BASE, r"PRJ-2026-016_ebay-product-performance-analysis\evidence\final_outputs\REQ-19_ebay-product-performance-analysis\eppr_d01_data.json")
+SRC = os.environ.get("EPPR_SRC") or os.path.join(BASE, r"PRJ-2026-016_ebay-product-performance-analysis\evidence\final_outputs\REQ-19_ebay-product-performance-analysis\eppr_d01_data.json")
 OUT = os.path.join(HERE, "eppr_merge.json")
 
 d = json.load(open(SRC, encoding="utf-8"))
