@@ -9,8 +9,11 @@ source tasks** — it reuses their build functions read-only and writes only int
    `build_records()` (live DB pull, **no publish**) → fresh EPPR data.
 2. **ESNM** — imports `build_esnm_d01` + `render_esnm_dashboard`, redirects outputs, runs
    `fetch()`/`assemble()` + `build()` + `render.main()` (live pull, **no publish**) → fresh ESNM data.
-3. **ERA** — v1 carries the last-good `era_merge.json` (see caveat).
-4. Runs the emitters (`EPPR_SRC`/`ESNM_SRC` env → fresh files) then `build_merged.py`.
+3. Runs the emitters (`EPPR_SRC`/`ESNM_SRC` env → fresh files) then `build_merged.py`.
+
+**ERA was removed from this merge** (2026-08-13): it's a different nature (per-SKU/bundles, no Item ID,
+emits HTML only — no data file, can't refresh live like the other two). ERA still has its own working
+dashboard. The merge is now the two consistent, live-refreshable per-listing tasks.
 5. Fail-closed gates (row floors, HTML size); writes `merge_status.txt`; `MERGE_ALERT.txt` on failure.
 
 Run: `python merge_monthly_run.py` · dry-run: `python merge_monthly_run.py --dry-run`

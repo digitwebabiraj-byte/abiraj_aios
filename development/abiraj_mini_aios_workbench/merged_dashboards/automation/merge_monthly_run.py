@@ -92,15 +92,6 @@ def refresh_esnm(workdir):
     log("ESNM: %d rows" % len(rows))
     return R.OUT_JSON
 
-# ------------------------------------------------------------------ ERA (v1: last-good)
-def refresh_era(workdir):
-    # v1: ERA's live data is not cleanly tabular from its build; carry last-good era_merge.json.
-    last = os.path.join(EMIT_DIR, "era_merge.json")
-    if not os.path.exists(last):
-        die("ERA: no existing era_merge.json to carry (run era_emit.py once first)")
-    log("ERA: carrying last-good era_merge.json (live refresh is a flagged follow-up)")
-    return last  # emitter output already exists; nothing to re-emit
-
 # ------------------------------------------------------------------ run one emitter with a source override
 def run_emitter(script, src_env, src_path):
     import subprocess
@@ -117,9 +108,8 @@ def main():
     try:
         eppr_json = refresh_eppr(work)
         esnm_json = refresh_esnm(work)
-        refresh_era(work)
 
-        # emit standard files from the FRESH sources (EPPR/ESNM) — ERA already current on disk
+        # emit standard files from the FRESH live sources
         run_emitter("eppr_emit.py", "EPPR_SRC", eppr_json)
         run_emitter("esnm_emit.py", "ESNM_SRC", esnm_json)
 
