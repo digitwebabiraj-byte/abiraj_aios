@@ -128,6 +128,17 @@ def main():
         if not os.path.exists(html) or os.path.getsize(html) < 1_000_000:
             die("built HTML missing or too small")
         md5 = hashlib.md5(open(html, "rb").read()).hexdigest()[:10]
+
+        # refresh the portal rows in place (only if publish creds present)
+        if os.environ.get("PGPASSWORD"):
+            r = subprocess.run([sys.executable, os.path.join(HERE, "publish_merge_ph_task.py"), "--refresh"],
+                               cwd=HERE, capture_output=True, text=True)
+            if r.returncode != 0:
+                die("portal refresh failed (build OK): %s" % (r.stderr or r.stdout)[-300:])
+            log("portal rows refreshed: " + (r.stdout or "").strip().splitlines()[-1])
+        else:
+            log("PGPASSWORD not set — built HTML only, skipped portal refresh")
+
         with open(STATUS, "w", encoding="utf-8") as f:
             f.write("OK %s | html %d bytes | md5 %s\n" %
                     (datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), os.path.getsize(html), md5))
