@@ -94,8 +94,10 @@ h1{font-size:18px;margin:0}.sub{color:var(--muted);font-size:12.5px;margin-top:2
 .summary b.tot{color:var(--ink)}.summary .sep{color:var(--line);margin:0 5px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:0;
  flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
-@media (max-width:760px), (max-height:620px){
- .wrap{padding:9px} .hint{display:none} h1{font-size:16px} .summary{margin:8px 0 6px} th,td{padding:7px 9px}
+@media (max-width:760px), (max-height:860px){
+ .wrap{padding:8px} .hint{display:none} #sub{display:none} h1{font-size:15px}
+ .top{margin-bottom:0} .tabs{margin:8px 0 6px} .tab{padding:7px 12px}
+ .summary{margin:6px 0 5px} .ptop{padding:8px 10px} th,td{padding:6px 9px} tbody td{height:38px}
 }
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .inp{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 10px;font-size:12.5px}
