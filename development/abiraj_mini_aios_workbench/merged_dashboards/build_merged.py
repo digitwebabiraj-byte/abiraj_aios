@@ -74,8 +74,9 @@ PAGE = r"""<!doctype html><html data-theme="light"><head><meta charset="utf-8">
 :root{--bg:#f4f6fa;--panel:#fff;--ink:#0f1b2d;--muted:#64748b;--line:#e2e8f0;--head:#12213b;
  --accent:#2563eb;--chip:#eef2ff;--chipink:#3730a3;--pos:#059669;--neg:#dc2626;--stick:#fff;}
 *{box-sizing:border-box}
+html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-.wrap{padding:18px}
+.wrap{padding:14px;display:flex;flex-direction:column;height:100vh;min-height:0}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
 h1{font-size:18px;margin:0}.sub{color:var(--muted);font-size:12.5px;margin-top:2px}
 .hint{color:var(--muted);font-size:12.5px;margin:10px 0 4px}
@@ -91,7 +92,11 @@ h1{font-size:18px;margin:0}.sub{color:var(--muted);font-size:12.5px;margin-top:2
 .tab.active{box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 26%,transparent);border-color:var(--accent)}
 .summary{margin:12px 0 8px;color:var(--muted);font-size:12.5px}
 .summary b.tot{color:var(--ink)}.summary .sep{color:var(--line);margin:0 5px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:0;
+ flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+@media (max-width:760px), (max-height:620px){
+ .wrap{padding:9px} .hint{display:none} h1{font-size:16px} .summary{margin:8px 0 6px} th,td{padding:7px 9px}
+}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .inp{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 10px;font-size:12.5px}
 .inp:focus{outline:none;border-color:var(--accent)}
@@ -100,7 +105,7 @@ thead th{cursor:pointer;user-select:none}
 thead th.fix{cursor:pointer}
 thead th .ar{font-size:9px;margin-left:4px;opacity:.9}
 .ptop{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);gap:10px;flex-wrap:wrap}
-.scroll{overflow:auto;max-height:66vh}
+.scroll{overflow:auto;flex:1 1 auto;min-height:120px}
 table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}
 th,td{padding:9px 12px;font-size:12.5px;white-space:nowrap;border-bottom:1px solid var(--line);text-align:left;
  max-width:170px;overflow:hidden;text-overflow:ellipsis}
