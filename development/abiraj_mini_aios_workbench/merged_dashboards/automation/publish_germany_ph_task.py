@@ -19,9 +19,9 @@ DB_CONFIG = {
     "user":     os.getenv("PGUSER", "temp_user"),
     "password": os.getenv("PGPASSWORD"),
 }
-PROJECT_NAME = "Germany Products — Unified Dashboard"
+PROJECT_NAME = "Merged — Germany Products"
 PROJECT_CODE = "gpfs"
-TASK_NAME    = "Germany Products — Unified (Fast Moving + Slow/No-Moving)"
+TASK_NAME    = "Merged — Germany Products (Fast + Slow Moving)"
 DESCRIPTION  = ("One page combining two Germany per-SKU reports — Fast Moving (FMP) and "
                 "Slow / No-Moving (SMP). Pick a task tab to see that task's own products; search, "
                 "sort and filter within each. Refreshes live monthly. A combined VIEW of the two "

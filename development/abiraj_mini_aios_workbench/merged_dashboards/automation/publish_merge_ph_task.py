@@ -21,9 +21,9 @@ DB_CONFIG = {
     "password": os.getenv("PGPASSWORD"),
 }
 
-PROJECT_NAME = "eBay Listings — Unified Dashboard"
+PROJECT_NAME = "Merged — eBay Listings"
 PROJECT_CODE = "elud"
-TASK_NAME    = "eBay Listings — Unified (Performance + Slow/No-Moving)"
+TASK_NAME    = "Merged — eBay Listings (Performance + Slow/No-Moving)"
 DESCRIPTION  = ("One page combining two eBay per-listing reports — Product Performance (EPPR) and "
                 "Slow / No-Moving (ESNM). Pick a task tab to see that task's own listings; search, "
                 "sort and filter within each. Refreshes live monthly. A combined VIEW of the two "
@@ -84,8 +84,9 @@ def refresh_all(dry):
     conn = psycopg2.connect(**DB_CONFIG)
     try:
         with conn, conn.cursor() as cur:
-            cur.execute("UPDATE tech_team_outputs.ph_task SET html_content=%s, updated_at=now() "
-                        "WHERE project_code=%s", (html, PROJECT_CODE))
+            cur.execute("UPDATE tech_team_outputs.ph_task SET html_content=%s, project_name=%s, "
+                        "task_name=%s, description=%s, updated_at=now() WHERE project_code=%s",
+                        (html, PROJECT_NAME, TASK_NAME, DESCRIPTION, PROJECT_CODE))
             n = cur.rowcount
             cur.execute("SELECT bool_and(md5(html_content)=%s) FROM tech_team_outputs.ph_task "
                         "WHERE project_code=%s", (md5(html), PROJECT_CODE))
