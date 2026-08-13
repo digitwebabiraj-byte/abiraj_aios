@@ -4,3 +4,5 @@
 emitters/*_merge.json
 ebay_listings_eppr_esnm/*.html
 germany_products_fmp_smp/*.html
+automation/*_status.txt
+automation/*.log
