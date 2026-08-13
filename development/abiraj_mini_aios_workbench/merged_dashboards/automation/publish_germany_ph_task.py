@@ -19,9 +19,9 @@ DB_CONFIG = {
     "user":     os.getenv("PGUSER", "temp_user"),
     "password": os.getenv("PGPASSWORD"),
 }
-PROJECT_NAME = "Germany Products — Fast & Slow"
+PROJECT_NAME = "Germany Products — Unified Dashboard"
 PROJECT_CODE = "gpfs"
-TASK_NAME    = "Germany Products — Fast & Slow (Fast Moving + Slow/No-Moving)"
+TASK_NAME    = "Germany Products — Unified (Fast Moving + Slow/No-Moving)"
 DESCRIPTION  = ("One page combining two Germany per-SKU reports — Fast Moving (FMP) and "
                 "Slow / No-Moving (SMP). Pick a task tab to see that task's own products; search, "
                 "sort and filter within each. Refreshes live monthly. A combined VIEW of the two "
@@ -78,8 +78,9 @@ def refresh_all(dry):
     conn = psycopg2.connect(**DB_CONFIG)
     try:
         with conn, conn.cursor() as cur:
-            cur.execute("UPDATE tech_team_outputs.ph_task SET html_content=%s, updated_at=now() "
-                        "WHERE project_code=%s", (html, PROJECT_CODE))
+            cur.execute("UPDATE tech_team_outputs.ph_task SET html_content=%s, project_name=%s, "
+                        "task_name=%s, description=%s, updated_at=now() WHERE project_code=%s",
+                        (html, PROJECT_NAME, TASK_NAME, DESCRIPTION, PROJECT_CODE))
             n = cur.rowcount
             cur.execute("SELECT bool_and(md5(html_content)=%s) FROM tech_team_outputs.ph_task "
                         "WHERE project_code=%s", (md5(html), PROJECT_CODE))
