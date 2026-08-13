@@ -70,7 +70,8 @@ def refresh_esnm(workdir):
     sys.path.insert(0, ESNM_SQL)
     import build_esnm_d01 as B
     import render_esnm_dashboard as R
-    R.OUT_JSON = os.path.join(workdir, "esnm_d01_data.json")   # redirect the data-file write
+    R.OUT_JSON = os.path.join(workdir, "esnm_d01_data.json")   # redirect ALL writes into our workdir
+    R.OUT_HTML = os.path.join(workdir, "_esnm_throwaway.html") # (was leaking into the ESNM task folder)
     B.OUT_XLSX = os.path.join(workdir, "_esnm_throwaway.xlsx")
     anchor = month_end_before(datetime.date.today())
     B.set_anchor(anchor); R.B = B
