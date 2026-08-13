@@ -8,11 +8,12 @@ cover different listings / different counts — that's expected and correct).
 Reads registry.json + each task's standard <code>_merge.json (per MERGE_DATA_SPEC.md).
 Adding a task = its emitter output + one registry line. Sources are never touched.
 """
-import json, os, hashlib
+import json, os, sys, hashlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-REG = json.load(open(os.path.join(HERE, "registry.json"), encoding="utf-8"))
-OUT = os.path.join(HERE, "ebay_listings_eppr_esnm", "merged_eppr_esnm_dashboard.html")
+REG_PATH = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "registry.json")
+REG = json.load(open(REG_PATH, encoding="utf-8"))
+OUT = os.path.join(HERE, REG.get("output", "ebay_listings_eppr_esnm/merged_eppr_esnm_dashboard.html"))
 
 def num(x):
     try: return float(x)
@@ -65,7 +66,7 @@ for t in REG["tasks"]:
     print(f"loaded {d['task']}: {len(rows):,} rows, {len(cols)} cols, as_of {d.get('as_of')}")
 
 meta = {"title": REG.get("title", "Unified Dashboard"),
-        "colors": REG.get("colors", {}), "tasks": tasks}
+        "colors": REG.get("colors", {}), "currency": REG.get("currency", "£"), "tasks": tasks}
 
 PAGE = r"""<!doctype html><html data-theme="light"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -202,7 +203,7 @@ let ccyMI=-1,ccyAI=-1;
 function rowCurrency(r){
  if(ccyMI>=0){const m=(''+(r[ccyMI]??'')).toLowerCase();if(m.includes('german'))return '€';if(m.includes('uk')||m.includes('gb'))return '£';}
  if(ccyAI>=0){const a=(''+(r[ccyAI]??'')).toLowerCase();if(a.includes('german')||/\bde\b/.test(a))return '€';if(a.includes('uk'))return '£';}
- return '£';}
+ return DATA.currency||'£';}
 function makeCell(c,val,cur){const td=document.createElement('td');td.className=(c.pin?'fix ':'')+cls(c);
  if(c.type==='img'){td.className+=' imgc';td.innerHTML=val?`<img class="thumb" src="${val}" loading="lazy">`:'';}
  else if(c.key==='title'||c.name==='Product Title'){td.className+=' title';const t=val||'—';td.textContent=t;td.title=t;}

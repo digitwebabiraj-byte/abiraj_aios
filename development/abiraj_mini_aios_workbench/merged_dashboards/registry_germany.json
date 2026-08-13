@@ -1,0 +1,12 @@
+{
+  "title": "Germany Products — Fast & Slow",
+  "output": "germany_products_fmp_smp/merged_germany_products_dashboard.html",
+  "currency": "€",
+  "colors": { "FMP": "#0f5c57", "SMP": "#b45309" },
+  "tasks": [
+    { "task": "FMP", "file": "emitters/fmp_merge.json", "headline": ["f_units", "f_rev"],
+      "filters": ["category", "f_dec"] },
+    { "task": "SMP", "file": "emitters/smp_merge.json", "headline": ["s_stock", "s_90"],
+      "filters": ["s_reason", "s_action"] }
+  ]
+}
