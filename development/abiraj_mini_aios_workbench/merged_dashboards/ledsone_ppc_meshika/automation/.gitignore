@@ -1,0 +1,3 @@
+# Never commit run artefacts.
+meshika_merge_status.json
+meshika_merge_run.log
