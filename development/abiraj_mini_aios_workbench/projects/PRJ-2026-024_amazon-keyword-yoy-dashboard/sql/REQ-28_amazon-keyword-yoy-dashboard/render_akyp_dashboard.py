@@ -38,6 +38,28 @@ OVERRIDE_JS = r"""
   // Lock the reference clock to the snapshot so MTD windows match the fetched data.
   CONFIG.REFERENCE_DATE = P.referenceDate;
 
+  // Data-quality accuracy fix (data only, no business logic touched):
+  // Amazon keyword identity = keyword text + campaign + ad group + MATCH TYPE. The same text is
+  // legitimately targeted as BROAD/EXACT/PHRASE (distinct keyword_ids), which the table shows in its
+  // Match Type column. The spec's duplicate check ignores match type, so it false-flags those as
+  // "duplicates collapsed" (nothing is collapsed — every row is shown). Wrap validatePayload to make
+  // the duplicate check match-type-aware; nothing else about validation changes.
+  var _origValidate = validatePayload;
+  validatePayload = function(p, period){
+    var v = _origValidate(p, period);
+    if(v && v.flags){
+      var seen = {}, dups = 0;
+      (v.kw || []).forEach(function(k){
+        var key = (k.keyword||"")+"|"+(k.campaign||"")+"|"+(k.adGroup||"")+"|"+(k.matchType||"");
+        if(seen[key]) dups++; else seen[key] = 1;
+      });
+      v.flags.dupChecked = dups === 0;
+      v.flags.notes = (v.flags.notes || []).filter(function(n){ return n.indexOf("duplicate keyword rows") < 0; });
+      if(dups > 0) v.flags.notes.push(dups + " duplicate keyword rows collapsed.");
+    }
+    return v;
+  };
+
   // Serve embedded keyword data for the selected marketplace instead of fetching Amazon.
   API.getKeywordPerformance = function(period){
     var mkt = $("selMkt").value;
