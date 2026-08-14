@@ -9,6 +9,15 @@ The spec is the render **template**. `render_akyp_dashboard.py` embeds the live 
 appends a thin delivery layer (embedded data instead of the spec's live Amazon API; account/period
 locked; demo/CSV/sync hidden). No spec calculation or rendering code is altered.
 
+## UI fixes applied to the template (2026-08-14)
+Two presentation-only fixes were made to this template's render code (no data/business-logic change):
+- **KPI delta:** arrow now reflects the numeric direction (▲ increase / ▼ decrease) while colour still
+  reflects good/bad — so e.g. PPC Spend −85.5% shows a green ▼ and ACOS +55.8% a red ▲ (previously the
+  arrow was tied to good/bad, giving a green ▲ next to a negative number).
+- **Top-10 bar chart:** switched from a centre-axis layout (whose value labels overlapped the keyword
+  column) to a clean left-aligned magnitude bar with the value at the bar's end.
+The user's original untouched copy remains in Downloads; this working template drives the deliverable.
+
 ## Honesty
 Every value in the spec (demo keywords like "pendant lamp shade", the simulated figures) is
 illustrative and is **never** shipped. All delivered figures are live from

@@ -209,20 +209,26 @@ def main():
     for script in ("render_dashboard.py", "render_xlsx.py"):
         runpy.run_path(os.path.join(SQLDIR, script), run_name="__main__")
 
-    # ---- publish: refresh the live ph_task row so the portal never lags the files -------------
-    # Same task_id every week, so this REPLACES the row rather than adding one (no unique on
-    # task_id -> delete+insert in one transaction, see eppa_publish_ph_task.publish).
+    # ---- publish: refresh Meshika's MERGED ph_task row (Amazon tab + this eBay tab) -----------
+    # This report is now delivered to Meshika as one tab of the merged "Advertising Dashboards"
+    # page, not as its own ph_task row. EPPA's data pipeline above is unchanged; only the publish
+    # target changed: we rebuild the merged page (which reads the eBay deliverable just rendered
+    # above + the Amazon deliverable) and refresh the single merged row. The merged publisher
+    # removes the old standalone eBay row once, so Meshika keeps exactly one row.
     published = None
     if not PUBLISH:
         log("--dry-run: every gate passed and the files were rebuilt; ph_task NOT touched")
     elif os.environ.get("PGPASSWORD"):
-        sys.path.insert(0, HERE)
-        from eppa_publish_ph_task import publish          # noqa: E402
-        row_id, version, md5 = publish(quiet=True)
-        published = dict(ph_task_id=row_id, version_level=version, html_md5=md5)
-        log("published to ph_task id=%d version=%d md5=%s" % (row_id, version, md5))
+        MERGE_PUB = os.path.abspath(os.path.join(
+            PROJ, "..", "..", "merged_dashboards", "ledsone_ppc_meshika", "automation"))
+        sys.path.insert(0, MERGE_PUB)
+        from publish_merged_meshika import publish        # noqa: E402
+        published = publish(commit=True, quiet=True)
+        if published:
+            log("merged page published to ph_task id=%d version=%d md5=%s"
+                % (published["ph_task_id"], published["version_level"], published["html_md5"]))
     else:
-        log("WARN: PGPASSWORD not set — files rebuilt but ph_task NOT refreshed")
+        log("WARN: PGPASSWORD not set — files rebuilt but merged ph_task NOT refreshed")
 
     log("REFRESH OK — %d campaigns | %d pause (%d stock / %d rule1 / %d rule2) | £%.2f at risk"
         % (kpis["scope"], kpis["paused"], kpis["stock"], kpis["r1"], kpis["r2"],

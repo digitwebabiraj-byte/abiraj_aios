@@ -104,8 +104,9 @@
   .delta.up{color:var(--green);background:var(--green-bg)}
   .delta.down{color:var(--red);background:var(--red-bg)}
   .delta.flat{color:var(--grey);background:var(--grey-bg)}
-  .delta.up::before{content:"\25B2 "}
-  .delta.down::before{content:"\25BC "}
+  /* arrow reflects the numeric DIRECTION (inc/dec); colour (up/down) reflects good/bad */
+  .delta.inc::before{content:"\25B2 "}
+  .delta.dec::before{content:"\25BC "}
 
   /* two-column layout for charts */
   .grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
@@ -868,10 +869,11 @@ function renderKPIs(){
     {name:"ACOS", cur:(isFinite(cAC)?pctRaw(cAC):"—"), prev:(isFinite(pAC)?pctRaw(pAC):"—"), ch:change(cAC,pAC), invert:true}
   ];
   $("kpiGrid").innerHTML = cards.map(c=>{
-    const cls=changeClass(c.ch,c.invert);
+    const cls=changeClass(c.ch,c.invert);   // colour: good=green(up) / bad=red(down)
+    const dir=(c.ch==null||!isFinite(c.ch)||Math.abs(c.ch)<0.05)?"":(c.ch>0?"inc":"dec"); // arrow by sign
     const dtxt = c.ch==null?"—":(c.ch===Infinity?"NEW":pct(c.ch));
     return '<div class="kpi"><div class="name">'+c.name+'</div>'+
-      '<div class="delta '+cls+'">'+dtxt+'</div>'+
+      '<div class="delta '+cls+' '+dir+'">'+dtxt+'</div>'+
       '<div class="big">'+c.cur+'</div>'+
       '<div class="prev">Prev yr: <b>'+c.prev+'</b> &middot; '+fmtShort(p.prevStart)+'–'+fmtShort(p.prevEnd)+'</div></div>';
   }).join("");
@@ -1105,28 +1107,22 @@ function renderBar(){
   const valOf=(k)=> sort==="sales"? k.cSales : (sort==="spend"? k.cSpend : (k.cSales-k.pSales));
   const vals=list.map(valOf);
   const maxAbs=Math.max(1,...vals.map(v=>Math.abs(v)));
-  const rowH=26, W=560, labW=150, padR=64, H=list.length*rowH+8;
-  const zero= (sort==="sales"||sort==="spend")? labW : labW + (W-labW-padR)* (0/1); // for signed we center at labW
+  // clean left-aligned magnitude layout: keyword column · bar from a fixed axis · value at bar end
+  const rowH=28, W=640, labW=182, padR=80, H=list.length*rowH+8;
   const axStart=labW, axEnd=W-padR, axW=axEnd-axStart;
   let bars="";
   list.forEach((k,i)=>{
     const v=valOf(k); const y=i*rowH+4;
-    let bx,bw,col;
-    if(sort==="sales"||sort==="spend"){
-      bw=(v/maxAbs)*axW; bx=axStart; col=sort==="spend"?"#20558a":"#1a8f4c";
-    } else {
-      const half=axW/2; const cx=axStart+half;
-      bw=(Math.abs(v)/maxAbs)*half; col=v<0?"#c8352b":"#1a8f4c";
-      bx= v<0? cx-bw : cx;
-    }
+    const bw=Math.max(2,(Math.abs(v)/maxAbs)*axW);
+    const col = sort==="spend"?"#20558a" : sort==="sales"?"#1a8f4c" : (v<0?"#c8352b":"#1a8f4c");
     const valTxt=(sort==="sales"||sort==="spend")? money(v) : ((v>=0?"+":"−")+money(Math.abs(v)));
-    bars+='<g><text x="'+(labW-8)+'" y="'+(y+rowH/2+3)+'" text-anchor="end" font-size="10.5" fill="#1b2733">'+esc(truncate(k.keyword,20))+'</text>'+
-      '<rect x="'+bx+'" y="'+(y+3)+'" width="'+Math.max(1,bw)+'" height="'+(rowH-10)+'" rx="3" fill="'+col+'"/>'+
-      '<text x="'+((sort==="sales"||sort==="spend")? (bx+bw+5) : (v<0? bx-5 : bx+bw+5))+'" y="'+(y+rowH/2+3)+'" text-anchor="'+((v<0&&sort!=="sales"&&sort!=="spend")?"end":"start")+'" font-size="10" font-weight="700" fill="'+col+'">'+valTxt+'</text></g>';
+    bars+='<g>'+
+      '<text x="'+(labW-10)+'" y="'+(y+rowH/2+3)+'" text-anchor="end" font-size="10.5" fill="#48586a">'+esc(truncate(k.keyword,24))+'</text>'+
+      '<rect x="'+axStart+'" y="'+(y+4)+'" width="'+bw+'" height="'+(rowH-11)+'" rx="3" fill="'+col+'"/>'+
+      '<text x="'+(axStart+bw+6)+'" y="'+(y+rowH/2+3)+'" text-anchor="start" font-size="10" font-weight="700" fill="'+col+'">'+valTxt+'</text>'+
+      '</g>';
   });
-  let axis="";
-  if(!(sort==="sales"||sort==="spend")){ const cx=axStart+axW/2; axis='<line x1="'+cx+'" y1="0" x2="'+cx+'" y2="'+H+'" stroke="#d7dee6"/>'; }
-  host.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Top keywords bar chart">'+axis+bars+'</svg>';
+  host.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Top keywords bar chart">'+bars+'</svg>';
 }
 function truncate(s,n){ return s.length>n? s.slice(0,n-1)+"…" : s; }
 

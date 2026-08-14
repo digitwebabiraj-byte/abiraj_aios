@@ -1,6 +1,4 @@
-# never commit real credentials or run artefacts
+# Never commit credentials or run artefacts.
 akyp_secrets.bat
+akyp_status.json
 akyp_run.log
-akyp_status.txt
-akyp_last_good.json
-*.bak
