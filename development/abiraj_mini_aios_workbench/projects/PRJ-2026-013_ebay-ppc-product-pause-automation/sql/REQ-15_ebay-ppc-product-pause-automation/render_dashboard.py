@@ -246,7 +246,10 @@ CSS = r"""
 html,body{height:100%}
 body{
   font-family:var(--f-ui);font-size:var(--t-md);line-height:var(--lh-body);color:var(--text);
-  background:var(--bg);overflow:hidden;
+  /* overflow-y auto, NOT hidden: the ph_task portal embeds this page in a short panel where
+     100dvh collapses. Letting the page scroll means the table keeps its min-height and the host
+     panel scrolls, instead of the whole report being squeezed into one visible row. */
+  background:var(--bg);overflow-x:hidden;overflow-y:auto;
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   font-feature-settings:"kern" 1,"liga" 1,"calt" 1;text-rendering:optimizeLegibility;
   font-variant-numeric:tabular-nums;
@@ -265,7 +268,9 @@ body{
   animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
 /* ============================================================ shell */
-.app{display:flex;flex-direction:column;height:100dvh}
+/* min-height, not height: fills a full screen but is allowed to grow taller than a short embed
+   so the table below can hold its minimum height instead of collapsing. */
+.app{display:flex;flex-direction:column;min-height:100dvh}
 
 header{
   background:
@@ -387,10 +392,14 @@ html.js .js-only{display:flex}
 .pane{flex:1;overflow:auto;padding:0 var(--s5) var(--s5);display:none;scrollbar-width:thin}
 
 /* The log pane does not scroll itself — its card does. That single change is what makes the
-   sticky header work: the header now shares a scroll container with the rows it labels. */
-.pane[data-t="log"]{flex-direction:column;overflow:hidden;padding-bottom:var(--s4)}
+   sticky header work: the header now shares a scroll container with the rows it labels.
+   overflow:visible (not hidden) so the pane never adds a second scrollbar around the card. */
+.pane[data-t="log"]{flex-direction:column;overflow:visible;padding-bottom:var(--s4)}
 
-.pane[data-t="log"] .card{flex:1;min-height:0;overflow:auto}
+/* min-height guarantees ~11 rows even when the page is embedded in a short portal panel — the
+   fix for the table shrinking to a single visible row. On a tall standalone screen flex:1 still
+   lets it fill the viewport; max-height caps it there so it scrolls internally, header pinned. */
+.pane[data-t="log"] .card{flex:1;min-height:640px;max-height:calc(100dvh - 40px);overflow:auto}
 .pane::-webkit-scrollbar{width:10px;height:10px}
 .pane::-webkit-scrollbar-thumb{background:var(--line);border-radius:100px;
   border:2px solid var(--bg)}

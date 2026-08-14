@@ -202,56 +202,39 @@ def main():
     html = open(HTML, encoding="utf-8").read()
     md5 = hashlib.md5(html.encode("utf-8")).hexdigest()
 
+    # ---- dry-run preview (read-only) ----------------------------------------
     conn = connect()
     try:
         with conn.cursor() as cur:
             row = build_row()
             existing = preflight(cur, row["task_id"], row["assigned_user"],
                                  row["assigned_user_team"])
-
-            print()
-            print("=" * 78)
-            print("ROW TO BE WRITTEN")
-            print("=" * 78)
-            for k, v in row.items():
-                v = str(v)
-                print("  %-19s %s" % (k, v if len(v) <= 92 else v[:89] + "..."))
-            print("  %-19s %d bytes (%.1f KB), md5 %s" % ("html_content", len(html),
-                                                          len(html) / 1024, md5))
-            print()
-
-            if not args.commit:
-                print("DRY RUN — nothing written. Re-run with --commit to publish.")
-                if existing:
-                    print("NOTE: %d existing row(s) on this task_id would be DELETED and replaced."
-                          % len(existing))
-                return
-
-            # one transaction: delete-by-task_id then insert. No ON CONFLICT — no unique exists.
-            with conn:
-                with conn.cursor() as c2:
-                    c2.execute("DELETE FROM tech_team_outputs.ph_task WHERE task_id=%s",
-                               (row["task_id"],))
-                    deleted = c2.rowcount
-                    cols = list(row) + ["html_content"]
-                    c2.execute(
-                        "INSERT INTO tech_team_outputs.ph_task (%s) VALUES (%s) RETURNING id"
-                        % (", ".join(cols), ", ".join(["%s"] * len(cols))),
-                        [row[k] for k in row] + [html])
-                    new_id = c2.fetchone()[0]
-            print("COMMITTED — deleted %d, inserted id %d" % (deleted, new_id))
-
-        # independent re-read on a fresh cursor
-        with conn.cursor() as cur:
-            cur.execute("SELECT id, project_code, task_id, assigned_user, assigned_user_team, "
-                        "version_status, LENGTH(html_content), MD5(html_content) "
-                        "FROM tech_team_outputs.ph_task WHERE task_id=%s", (IDENTITY["task_id"],))
-            for r in cur.fetchall():
-                print("VERIFIED id=%s code=%s user=%s team=%s status=%s bytes=%s md5=%s"
-                      % (r[0], r[1], r[3], r[4], r[5], r[6], r[7]))
-                print("  md5 matches the file: %s" % ("YES" if r[7] == md5 else "*** NO ***"))
+        print()
+        print("=" * 78)
+        print("ROW TO BE WRITTEN")
+        print("=" * 78)
+        for k, v in row.items():
+            v = str(v)
+            print("  %-19s %s" % (k, v if len(v) <= 92 else v[:89] + "..."))
+        print("  %-19s %d bytes (%.1f KB), md5 %s"
+              % ("html_content", len(html), len(html) / 1024, md5))
+        print()
     finally:
         conn.close()
+
+    if not args.commit:
+        print("DRY RUN — nothing written. Re-run with --commit to publish.")
+        if existing:
+            print("NOTE: %d existing row(s) on this task_id would be DELETED and replaced."
+                  % len(existing))
+        return
+
+    # ---- the write: delegate to publish() — the SAME function the weekly job uses, so a manual
+    # publish and the automated one behave identically (version_level BUMPS, md5 is re-verified).
+    # An earlier inline INSERT here reset version_level to 1; that divergence is now removed.
+    new_id, version, got_md5 = publish()
+    print("VERIFIED id=%s version=%s md5=%s — matches the file: %s"
+          % (new_id, version, got_md5, "YES" if got_md5 == md5 else "*** NO ***"))
 
 
 if __name__ == "__main__":
