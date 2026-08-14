@@ -38,9 +38,9 @@ EPPA = EPPA_LIVE if os.path.exists(EPPA_LIVE) else EPPA_SNAPSHOT
 OUT = os.path.join(HERE, "merged_ledsone_ppc_meshika_dashboard.html")
 
 # Plain, self-explanatory names for the end user (Meshika).
-PAGE_TITLE = "Meshika — Advertising Dashboards"
+PAGE_TITLE = "Meshika — Amazon Keyword YoY + eBay PPC Pause"
 BRAND_MAIN = "Meshika"
-BRAND_SUB = "Amazon + eBay ad reports · combined in one page"
+BRAND_SUB = "Amazon Keyword YoY + eBay PPC Pause · combined in one page"
 SWITCH_HINT = "Switch report:"
 
 TABS = [

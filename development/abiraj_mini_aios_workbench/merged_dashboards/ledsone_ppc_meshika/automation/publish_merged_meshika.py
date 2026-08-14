@@ -31,7 +31,7 @@ DB = {
 }
 
 IDENTITY = dict(
-    project_name="Advertising Dashboards — Meshika",
+    project_name="Meshika — Amazon Keyword YoY + eBay PPC Pause",
     project_code="meshika_ads",
     task_id="meshika_advertising_dashboards",
     team="Development",
@@ -41,9 +41,9 @@ IDENTITY = dict(
     phase_level=1,
     version_status="released",
 )
-TASK_NAME = "Advertising Dashboards — Amazon Keyword YoY + eBay PPC Pause (Meshika)"
+TASK_NAME = "Amazon Keyword YoY + eBay PPC Pause (Meshika)"
 DESCRIPTION = (
-    "One page combining Meshika's two advertising dashboards, switch by the tabs at the top: "
+    "One page combining Meshika's two reports, switch by the tabs at the top: "
     "(1) Amazon Ads — Keyword Year-on-Year (amazon Ledsone, UK/US/CA/DE/FR/IT; keyword-level "
     "sales/spend/orders/clicks/impressions vs the same window last year, with per-keyword "
     "diagnosis, priority and recommended action); (2) eBay Ads — Pause Report (LEDSone eBay UK "
