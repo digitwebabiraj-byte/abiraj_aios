@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon PPC Keyword YoY Performance Dashboard</title>
+<style>
+  :root{
+    --navy:#0e2340; --navy2:#16324f; --ink:#1b2733; --muted:#5c6b7a;
+    --line:#e2e8f0; --line2:#eef2f6; --bg:#f6f8fb; --card:#ffffff;
+    --green:#1a8f4c; --green-bg:#e7f6ec; --red:#c8352b; --red-bg:#fdeceb;
+    --amber:#b8791a; --amber-bg:#fdf3e2; --grey:#6b7784; --grey-bg:#eef1f4;
+    --blue:#20558a; --accent:#0e2340;
+    --shadow:0 1px 2px rgba(16,32,58,.06),0 4px 14px rgba(16,32,58,.05);
+    --mono:"SFMono-Regular",ui-monospace,"Menlo","Consolas",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--ink);background:var(--bg);font-size:13px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  .num{font-variant-numeric:tabular-nums;font-family:var(--mono)}
+  h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.01em}
+  a{color:var(--blue)}
+  button{font-family:inherit;cursor:pointer}
+  .wrap{max-width:1560px;margin:0 auto;padding:0 20px 60px}
+
+  /* ---------- Top header band ---------- */
+  .topband{background:linear-gradient(180deg,var(--navy),var(--navy2));color:#fff}
+  .topband .inner{max-width:1560px;margin:0 auto;padding:16px 20px 18px}
+  .brandrow{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .brand h1{font-size:18px;color:#fff;line-height:1.2}
+  .brand .sub{color:#a9c2dd;font-size:11.5px;margin-top:3px;letter-spacing:.02em;text-transform:uppercase}
+  .statuschips{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:7px 11px;min-width:96px}
+  .chip.wide{min-width:164px}
+  .chip .k{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#9fb8d6}
+  .chip .v{font-size:13px;font-weight:700;color:#fff;margin-top:2px}
+  .chip .v.small{font-size:11.5px}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .dot.on{background:#38d07f;box-shadow:0 0 0 3px rgba(56,208,127,.2)}
+  .dot.off{background:#e06666;box-shadow:0 0 0 3px rgba(224,102,102,.2)}
+  .dot.demo{background:#f0b429;box-shadow:0 0 0 3px rgba(240,180,41,.2)}
+  .dot.csv{background:#3d7fca;box-shadow:0 0 0 3px rgba(61,127,202,.2)}
+
+  /* demo banner */
+  .demobar{display:none;background:var(--amber-bg);border-bottom:1px solid #f0d9a8;color:#7a5410}
+  .demobar.show{display:block}
+  .demobar .inner{max-width:1560px;margin:0 auto;padding:8px 20px;font-size:12px;font-weight:600;display:flex;gap:8px;align-items:center}
+
+  /* csv upload bar */
+  .csvbar{display:none;background:#eef4fb;border-bottom:1px solid #d3e1f0}
+  .csvbar.show{display:block}
+  .csvbar .inner{max-width:1560px;margin:0 auto;padding:12px 20px;display:flex;gap:14px;align-items:stretch;flex-wrap:wrap}
+  .csvdrop{flex:1;min-width:230px;border:1.5px dashed #9fbcdd;border-radius:10px;background:#fff;padding:11px 14px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:.12s}
+  .csvdrop:hover{border-color:#3d7fca;background:#f7fbff}
+  .csvdrop.drag{border-color:#3d7fca;background:#eaf3fe;box-shadow:0 0 0 3px rgba(61,127,202,.12)}
+  .csvdrop.loaded{border-style:solid;border-color:#1a8f4c;background:#f2fbf5}
+  .csvdrop .ic{width:34px;height:34px;border-radius:9px;background:#eaf1f9;color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:17px;flex:0 0 auto}
+  .csvdrop.loaded .ic{background:var(--green-bg);color:var(--green)}
+  .csvdrop .tt{font-size:12.5px;font-weight:700;color:var(--ink)}
+  .csvdrop .ds{font-size:11px;color:var(--muted);margin-top:2px}
+  .csvdrop .clear{margin-left:auto;border:none;background:#f0f3f7;border-radius:6px;padding:4px 8px;font-size:11px;color:var(--muted);display:none}
+  .csvdrop.loaded .clear{display:inline-block}
+  .csvtip{flex-basis:100%;font-size:11.5px;color:#3f5a78;font-weight:600;display:flex;align-items:center;gap:7px}
+  .csvtip b{color:var(--navy)}
+
+  /* ---------- Sticky filter bar ---------- */
+  .filterbar{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 2px 8px rgba(16,32,58,.04)}
+  .filterbar .inner{max-width:1560px;margin:0 auto;padding:10px 20px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+  .fgroup{display:flex;flex-direction:column;gap:3px}
+  .fgroup label{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  select,input[type=date],input[type=search],input[type=number]{font-family:inherit;font-size:12.5px;padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);min-height:34px}
+  select:focus,input:focus{outline:2px solid #b9d2ef;outline-offset:0;border-color:#7fa8d6}
+  .customdates{display:none;gap:8px}
+  .customdates.show{display:flex}
+  .btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:7px;padding:8px 13px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;min-height:34px}
+  .btn:hover{background:#f4f7fb}
+  .btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+  .btn.primary:hover{background:#0a1c34}
+  .btn.ghost{background:transparent}
+  .spacer{flex:1}
+  .toggle{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--muted)}
+  .switch{position:relative;width:38px;height:21px;background:#cbd5e1;border-radius:20px;transition:.15s;flex:0 0 auto}
+  .switch.on{background:var(--green)}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:17px;height:17px;background:#fff;border-radius:50%;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+  .switch.on::after{left:19px}
+
+  /* ---------- Sections ---------- */
+  .section{margin-top:22px}
+  .sec-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:11px;flex-wrap:wrap}
+  .sec-head h2{font-size:14px;color:var(--navy);letter-spacing:.01em;text-transform:uppercase}
+  .sec-head .datehint{font-size:11px;color:var(--muted);font-weight:600}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+  .pad{padding:16px}
+
+  /* KPI grid */
+  .kpigrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:11px;padding:13px 14px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .kpi .name{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .kpi .big{font-size:23px;font-weight:800;margin-top:6px;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .kpi .prev{font-size:11px;color:var(--muted);margin-top:5px;font-variant-numeric:tabular-nums}
+  .kpi .prev b{color:#48586a;font-weight:700}
+  .kpi .delta{position:absolute;top:13px;right:14px;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;padding:3px 7px;border-radius:6px}
+  .delta.up{color:var(--green);background:var(--green-bg)}
+  .delta.down{color:var(--red);background:var(--red-bg)}
+  .delta.flat{color:var(--grey);background:var(--grey-bg)}
+  .delta.up::before{content:"\25B2 "}
+  .delta.down::before{content:"\25BC "}
+
+  /* two-column layout for charts */
+  .grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
+  .grid2b{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+  .charttools{display:flex;gap:8px;align-items:center}
+  .legend{display:flex;gap:14px;font-size:11px;color:var(--muted);font-weight:600;margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .swatch{width:14px;height:3px;border-radius:2px;display:inline-block}
+
+  svg{display:block;width:100%;height:auto;overflow:visible}
+  .tip{position:fixed;pointer-events:none;background:#0e2340;color:#fff;border-radius:8px;padding:8px 10px;font-size:11.5px;box-shadow:0 6px 20px rgba(0,0,0,.25);z-index:90;opacity:0;transition:opacity .08s;min-width:150px;font-variant-numeric:tabular-nums}
+  .tip b{color:#cfe0f2}
+  .tip .r{display:flex;justify-content:space-between;gap:14px;margin-top:2px}
+
+  /* diagnosis summary strip */
+  .diagstrip{display:flex;gap:9px;flex-wrap:wrap}
+  .diagpill{border:1px solid var(--line);border-radius:9px;padding:8px 11px;background:#fff;display:flex;flex-direction:column;min-width:96px;cursor:pointer;transition:.12s}
+  .diagpill:hover{border-color:#b9cbe0;box-shadow:var(--shadow)}
+  .diagpill.active{border-color:var(--navy);box-shadow:0 0 0 2px rgba(14,35,64,.12)}
+  .diagpill .c{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+  .diagpill .l{font-size:10px;color:var(--muted);margin-top:4px;font-weight:600}
+
+  /* badges */
+  .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;letter-spacing:.01em;white-space:nowrap}
+  .bg-growth{background:var(--green-bg);color:var(--green)}
+  .bg-stable{background:var(--grey-bg);color:#4a5765}
+  .bg-decline{background:var(--red-bg);color:var(--red)}
+  .bg-warn{background:var(--amber-bg);color:var(--amber)}
+  .bg-info{background:#e8f0fa;color:var(--blue)}
+  .bg-paused{background:#ecebf0;color:#5b5470}
+  .prio{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:800;letter-spacing:.03em}
+  .p-SEVERE{background:#7a1a14;color:#fff}
+  .p-HIGH{background:var(--red-bg);color:var(--red)}
+  .p-MODERATE{background:var(--amber-bg);color:var(--amber)}
+  .p-STABLE{background:var(--grey-bg);color:#4a5765}
+  .p-GROWTH{background:var(--green-bg);color:var(--green)}
+
+  /* table */
+  .tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:var(--shadow);max-height:640px}
+  table.kw{border-collapse:separate;border-spacing:0;width:100%;font-size:12px}
+  table.kw th,table.kw td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line2)}
+  table.kw thead th{position:sticky;top:0;background:var(--navy);color:#fff;z-index:5;font-size:10px;letter-spacing:.03em;font-weight:700;text-align:right;vertical-align:bottom;padding-top:9px;padding-bottom:9px;cursor:pointer}
+  table.kw thead th .per{display:block;font-size:8.5px;color:#9fb8d6;font-weight:600;letter-spacing:.02em;margin-top:2px}
+  table.kw th.l,table.kw td.l{text-align:left}
+  table.kw td.kwname{font-weight:700;color:var(--ink);text-align:left;position:sticky;left:0;background:#fff;z-index:2}
+  table.kw tr:nth-child(even) td.kwname{background:#fafcfe}
+  table.kw tbody tr:nth-child(even) td{background:#fafcfe}
+  table.kw tbody tr:hover td{background:#eef5fd}
+  table.kw td .sub{font-size:10px;color:var(--muted);font-weight:400}
+  .cell-up{color:var(--green);font-weight:700}
+  .cell-down{color:var(--red);font-weight:700}
+  .cell-flat{color:var(--grey)}
+  .grpsep{border-left:1px solid var(--line)}
+  .totrow td{background:#f0f4f9 !important;font-weight:800;border-top:2px solid var(--navy)}
+
+  /* top movers */
+  .moverlist{display:flex;flex-direction:column}
+  .mover{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 0;border-bottom:1px solid var(--line2)}
+  .mover:last-child{border-bottom:none}
+  .mover .kw{font-weight:700;font-size:12.5px}
+  .mover .meta{font-size:11px;color:var(--muted);margin-top:2px}
+  .mover .right{text-align:right}
+  .mover .amt{font-weight:800;font-variant-numeric:tabular-nums;font-size:13px}
+  .mover .pct{font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}
+  .mover .cause{font-size:10.5px;color:var(--amber);font-weight:600;margin-top:3px}
+  .mover .act{font-size:10.5px;color:var(--blue);margin-top:2px}
+
+  /* data quality + empty */
+  .dq{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .dqitem{display:flex;align-items:center;gap:8px;font-size:12px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:#fff}
+  .dqitem .ic{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex:0 0 auto}
+  .dqitem.ok .ic{background:var(--green)} .dqitem.bad .ic{background:var(--red)} .dqitem.warnq .ic{background:var(--amber)}
+  .dqitem.bad{background:var(--red-bg);border-color:#f2c4bf}
+  .dqitem.warnq{background:var(--amber-bg);border-color:#f0d9a8}
+
+  .empty{display:none;text-align:center;padding:48px 24px}
+  .empty.show{display:block}
+  .empty .em-ic{font-size:40px;color:#c2ccd8}
+  .empty h3{font-size:16px;color:var(--navy);margin-top:10px}
+  .empty p{color:var(--muted);margin:6px 0}
+  .empty .rng2{font-family:var(--mono);font-weight:700;color:var(--ink);margin-top:8px}
+
+  .footnote{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5}
+  .hidden{display:none !important}
+  .thr{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .thr .fgroup input{width:100%}
+  @media(max-width:1180px){.kpigrid{grid-template-columns:repeat(2,1fr)}.grid2,.grid2b{grid-template-columns:1fr}.dq{grid-template-columns:1fr 1fr}.thr{grid-template-columns:1fr 1fr}}
+  @media(max-width:640px){.kpigrid{grid-template-columns:1fr}.dq{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ============ TOP HEADER BAND ============ -->
+<div class="topband">
+  <div class="inner">
+    <div class="brandrow">
+      <div class="brand">
+        <h1>Amazon PPC Keyword YoY Performance Dashboard</h1>
+        <div class="sub">Keyword-level year-over-year sales, spend &amp; efficiency &middot; ups &amp; downs, diagnosed</div>
+      </div>
+      <div class="statuschips">
+        <div class="chip"><div class="k">Account</div><div class="v" id="hdAccount">LEDSone</div></div>
+        <div class="chip"><div class="k">Marketplace</div><div class="v" id="hdMkt">UK</div></div>
+        <div class="chip"><div class="k">Currency</div><div class="v" id="hdCur">GBP (£)</div></div>
+        <div class="chip"><div class="k">Period Type</div><div class="v small" id="hdPtype">Month-to-Date</div></div>
+        <div class="chip"><div class="k">Last Synced</div><div class="v small" id="hdSync">—</div></div>
+        <div class="chip"><div class="k">Data Status</div><div class="v small" id="hdStatus"><span class="dot off"></span>Not synced</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DEMO BANNER ============ -->
+<div class="demobar" id="demoBar">
+  <div class="inner"><span>⚠</span><span>DEMO DATA — these are simulated figures for previewing the interface, not live Amazon data. Turn off "Demo data" and press "Sync from Amazon" to load real figures from your backend.</span></div>
+</div>
+
+<!-- ============ STICKY FILTER BAR ============ -->
+<div class="filterbar">
+  <div class="inner">
+    <div class="fgroup">
+      <label>Data Source</label>
+      <select id="selSource">
+        <option value="api">Amazon API</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label>Account</label>
+      <select id="selAccount">
+        <option value="LEDSone">LEDSone</option>
+        <option value="DC Voltage">DC Voltage</option>
+        <option value="Neighbour Market">Neighbour Market</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label>Marketplace</label>
+      <select id="selMkt">
+        <option value="UK">UK</option><option value="US">US</option><option value="CA">CA</option>
+        <option value="DE">DE</option><option value="FR">FR</option><option value="IT">IT</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label>Analysis Period</label>
+      <select id="selPeriod">
+        <option value="mtd">Current Month / MTD</option>
+        <option value="prevmonth">Previous Month</option>
+        <option value="last7">Last 7 Days</option>
+        <option value="last14">Last 14 Days</option>
+        <option value="last30">Last 30 Days</option>
+        <option value="custom">Custom Date Range</option>
+      </select>
+    </div>
+    <div class="fgroup customdates" id="customWrap">
+      <div class="fgroup"><label>From</label><input type="date" id="selFrom"></div>
+      <div class="fgroup"><label>To</label><input type="date" id="selTo"></div>
+    </div>
+    <div class="fgroup">
+      <label>Campaign</label>
+      <select id="selCampaign"><option value="">All campaigns</option></select>
+    </div>
+    <div class="fgroup">
+      <label>Ad Group</label>
+      <select id="selAdGroup"><option value="">All ad groups</option></select>
+    </div>
+    <div class="fgroup">
+      <label>Diagnosis</label>
+      <select id="selDiag"><option value="">All diagnoses</option></select>
+    </div>
+    <div class="fgroup">
+      <label>Priority</label>
+      <select id="selPrio">
+        <option value="">All priorities</option>
+        <option value="SEVERE">Severe</option><option value="HIGH">High</option>
+        <option value="MODERATE">Moderate</option><option value="STABLE">Stable</option>
+        <option value="GROWTH">Growth</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label>Status</label>
+      <select id="selStatus"><option value="">All statuses</option><option value="active">Active</option><option value="paused">Paused</option></select>
+    </div>
+    <div class="fgroup" style="min-width:190px">
+      <label>Search keyword / campaign / ad group</label>
+      <input type="search" id="selSearch" placeholder="Type to filter…">
+    </div>
+
+    <div class="spacer"></div>
+
+    <label class="toggle" id="autoSyncWrap" title="Automatically re-sync every 5 minutes">
+      Auto&nbsp;Sync <span class="switch" id="autoSyncSw"></span>
+    </label>
+    <label class="toggle" id="demoWrap" title="Preview the UI with simulated data">
+      Demo&nbsp;data <span class="switch" id="demoSw"></span>
+    </label>
+    <button class="btn ghost" id="btnThresholds" title="Configure priority thresholds">⚙ Thresholds</button>
+    <button class="btn" id="btnExport">⤓ Export CSV</button>
+    <button class="btn primary" id="btnSync">⟳ Sync from Amazon</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- threshold config (hidden by default) -->
+  <div class="section hidden" id="thrPanel">
+    <div class="card pad">
+      <div class="sec-head"><h2>Priority thresholds (sales decline %)</h2><span class="datehint">Configurable — changes re-classify all keywords instantly</span></div>
+      <div class="thr">
+        <div class="fgroup"><label>Severe ≥</label><input type="number" id="thSevere" value="50" min="0" max="100"></div>
+        <div class="fgroup"><label>High ≥</label><input type="number" id="thHigh" value="30" min="0" max="100"></div>
+        <div class="fgroup"><label>Moderate ≥</label><input type="number" id="thMod" value="20" min="0" max="100"></div>
+        <div class="fgroup"><label>Growth = sales change &gt;</label><input type="number" id="thGrowth" value="0" min="-100" max="100"></div>
+      </div>
+      <div class="footnote">Severe = decline ≥ Severe%. High = decline in [High%, Severe%). Moderate = decline in [Moderate%, High%). Stable = decline &lt; Moderate%. Growth = sales change &gt; Growth%.</div>
+    </div>
+  </div>
+
+  <!-- EMPTY / CONNECTION STATE -->
+  <div class="section">
+    <div class="card">
+      <div class="empty" id="emptyState">
+        <div class="em-ic">⚡</div>
+        <h3 id="emptyTitle">Amazon data connection unavailable</h3>
+        <p id="emptyMsg">Press <b>Sync from Amazon</b> to load keyword performance for the selected period.</p>
+        <div class="rng2" id="emptyRanges"></div>
+        <p style="margin-top:14px"><button class="btn primary" id="emptySync">⟳ Sync from Amazon</button></p>
+        <p class="footnote" style="max-width:560px;margin:14px auto 0">If sync keeps failing, the backend API is unreachable from this page. Check the Amazon connection, or toggle <b>Demo data</b> in the filter bar to preview the interface with simulated figures.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN DASHBOARD BODY (hidden until data) -->
+  <div id="dashBody" class="hidden">
+
+    <!-- KPI SECTION -->
+    <div class="section">
+      <div class="sec-head">
+        <h2>Executive KPIs — keyword performance</h2>
+        <span class="datehint" id="kpiHint"></span>
+      </div>
+      <div class="kpigrid" id="kpiGrid"></div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="section">
+      <div class="grid2">
+        <div class="card pad">
+          <div class="sec-head">
+            <h2>YoY keyword sales trend</h2>
+            <div class="charttools"><span class="datehint" id="trendHint"></span></div>
+          </div>
+          <div id="trendChart"></div>
+          <div class="legend">
+            <span><span class="swatch" style="background:#0e2340"></span><span id="legCur">Current</span></span>
+            <span><span class="swatch" style="background:#c8352b;opacity:.85"></span><span id="legPrev">Previous year</span></span>
+          </div>
+        </div>
+        <div class="card pad">
+          <div class="sec-head">
+            <h2>Top 10 keywords</h2>
+            <div class="charttools">
+              <select id="barSort" style="font-size:11.5px;padding:5px 7px;min-height:30px">
+                <option value="decline">Highest decline</option>
+                <option value="growth">Highest growth</option>
+                <option value="sales">Highest sales</option>
+                <option value="spend">Highest spend</option>
+              </select>
+            </div>
+          </div>
+          <div id="barChart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIAGNOSIS STRIP -->
+    <div class="section">
+      <div class="sec-head"><h2>Keyword diagnosis breakdown</h2><span class="datehint">Click a tile to filter the table</span></div>
+      <div class="diagstrip" id="diagStrip"></div>
+    </div>
+
+    <!-- TOP MOVERS -->
+    <div class="section">
+      <div class="grid2b">
+        <div class="card pad">
+          <div class="sec-head"><h2 style="color:var(--green)">▲ Top keyword growth</h2></div>
+          <div class="moverlist" id="growList"></div>
+        </div>
+        <div class="card pad">
+          <div class="sec-head"><h2 style="color:var(--red)">▼ Top keyword declines</h2></div>
+          <div class="moverlist" id="decList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN KEYWORD TABLE -->
+    <div class="section">
+      <div class="sec-head">
+        <h2>Keyword YoY detail</h2>
+        <span class="datehint" id="tableCount"></span>
+      </div>
+      <div class="tablewrap">
+        <table class="kw" id="kwTable">
+          <thead id="kwHead"></thead>
+          <tbody id="kwBody"></tbody>
+          <tfoot id="kwFoot"></tfoot>
+        </table>
+      </div>
+      <div class="footnote" id="tableNote"></div>
+    </div>
+
+    <!-- DATA QUALITY -->
+    <div class="section">
+      <div class="sec-head"><h2>Data quality</h2></div>
+      <div class="card pad"><div class="dq" id="dqGrid"></div>
+        <div class="footnote" id="dqNote"></div>
+      </div>
+    </div>
+
+  </div><!-- /dashBody -->
+
+</div><!-- /wrap -->
+
+<div class="tip" id="tooltip"></div>
+
+<script>
+"use strict";
+/* =====================================================================
+   AMAZON PPC KEYWORD YoY DASHBOARD — application logic
+   Sections: CONFIG · API SERVICE · DATA VALIDATION · DATE RANGE ENGINE ·
+             YOY CALCULATION · KEYWORD BUSINESS LOGIC · FILTER ENGINE ·
+             UI RENDERING · EXPORT
+   Keyword-only. No ASIN logic anywhere.
+   ===================================================================== */
+
+/* ============================ CONFIG ============================ */
+const CONFIG = {
+  // Reference "today". In production leave as null to use the real clock.
+  // Fixed here so the MTD example (01–10 Aug 2026) is reproducible.
+  REFERENCE_DATE: "2026-08-10",
+
+  // Backend base URL. The frontend never holds Amazon credentials — the
+  // backend authenticates to Amazon Ads API and returns normalised JSON.
+  API_BASE: "/api/amazon",
+  ENDPOINTS: {
+    keywordPerformance: "/keyword-performance", // primary: both periods + daily series
+    keywordSales:       "/keyword-sales",
+    keywordMetrics:     "/keyword-metrics"
+  },
+  REQUEST_TIMEOUT_MS: 20000,
+  AUTO_SYNC_MS: 5 * 60 * 1000,
+
+  // Account name -> backend account id / sub_source id (edit to match backend)
+  ACCOUNTS: {
+    "LEDSone":          { subSource: 8,   ssName: "amazon Ledsone" },
+    "DC Voltage":       { subSource: 6,   ssName: "amazon Dcvoltage" },
+    "Neighbour Market": { subSource: 239, ssName: "Neighbour Market" }
+  },
+  // Marketplace -> currency
+  MARKETS: {
+    UK: { currency: "GBP", symbol: "£", locale: "en-GB" },
+    US: { currency: "USD", symbol: "$", locale: "en-US" },
+    CA: { currency: "CAD", symbol: "$", locale: "en-CA" },
+    DE: { currency: "EUR", symbol: "€", locale: "de-DE" },
+    FR: { currency: "EUR", symbol: "€", locale: "fr-FR" },
+    IT: { currency: "EUR", symbol: "€", locale: "it-IT" }
+  },
+
+  // CSV header aliases (normalised: lowercased, non-alphanumerics stripped).
+  // First matching alias in each list wins, so order = priority.
+  CSV_HEADERS: {
+    keyword:  ["keyword","keywordtext","targeting","targetingtext","customersearchterm","searchterm","term"],
+    campaign: ["campaignname","campaign"],
+    adGroup:  ["adgroupname","adgroup"],
+    matchType:["matchtype","match"],
+    impressions:["impressions","impr","imprs"],
+    clicks:   ["clicks"],
+    spend:    ["spend","cost","totalspend"],
+    sales:    ["7daytotalsales","14daytotalsales","totaladvertisingsales","attributedsales7d","attributedsales14d","totalsales","sales"],
+    orders:   ["7daytotalorders","7daytotalordersu","14daytotalorders","attributedconversions7d","totalorders","orders","conversions"],
+    date:     ["date","day"],
+    status:   ["status","campaignstatus","adgroupstatus","state","keywordstatus"],
+    bid:      ["keywordbid","currentbid","bid","maxbid","defaultbid"],
+    suggestedBid:["suggestedbid","suggestedbidmedian","suggbid"],
+    // ---- optional explicit previous-year columns (one-file compare) ----
+    prevSales:      ["previoussales","prevsales","salesprev","salesprevyear","salespreviousyear","prevyearsales","previousyearsales","prioryearsales","lastyearsales","saleslastyear","salespy","pysales","salesly"],
+    prevOrders:     ["previousorders","prevorders","ordersprev","prevyearorders","previousyearorders","prioryearorders","lastyearorders","orderslastyear","orderspy","pyorders"],
+    prevImpressions:["previousimpressions","previmpressions","impressionsprev","prevyearimpressions","previousyearimpressions","previmpr","pyimpressions"],
+    prevClicks:     ["previousclicks","prevclicks","clicksprev","prevyearclicks","previousyearclicks","clickspy","pyclicks"],
+    prevSpend:      ["previousspend","prevspend","spendprev","prevyearspend","previousyearspend","previouscost","prevcost","spendpy","pyspend"]
+  },
+
+  // Business-logic thresholds (priority thresholds are user-configurable in UI)
+  THRESHOLDS: {
+    severe: 50, high: 30, moderate: 20, growth: 0,      // sales-decline % bands
+    changeSensitivity: 15,   // % move that counts as "up"/"down" for a metric
+    stableBand: 10,          // |sales change| under this = Stable Performance
+    lowImpr: 100,            // impressions below this in current period = low volume
+    highAcos: 35             // ACOS above this = High ACOS flag
+  }
+};
+
+/* Live application state */
+const STATE = {
+  raw: null,          // last normalised API payload
+  keywords: [],       // enriched keyword rows (post YoY + diagnosis)
+  filtered: [],       // after filter engine
+  periodMeta: null,   // {curStart,curEnd,prevStart,prevEnd,typeLabel}
+  demo: false,
+  source: "api",            // 'api' — Amazon API is the only data source
+  csv: { single:null, name:null },
+  autoSync: false,
+  autoTimer: null,
+  thresholds: Object.assign({}, CONFIG.THRESHOLDS),
+  sort: { key: "salesChange", dir: 1 } // table sort
+};
+
+/* ============================ HELPERS ============================ */
+const $ = (id) => document.getElementById(id);
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function pad2(n){ return String(n).padStart(2,"0"); }
+function toISO(d){ return d.getUTCFullYear()+"-"+pad2(d.getUTCMonth()+1)+"-"+pad2(d.getUTCDate()); }
+function parseISO(s){ const [y,m,d]=s.split("-").map(Number); return new Date(Date.UTC(y,m-1,d)); }
+function fmtDate(s){ const d=parseISO(s); return pad2(d.getUTCDate())+" "+MONTHS[d.getUTCMonth()]+" "+d.getUTCFullYear(); }
+function fmtShort(s){ const d=parseISO(s); return pad2(d.getUTCDate())+" "+MONTHS[d.getUTCMonth()]; }
+function fmtRange(a,b){ return fmtDate(a)+" – "+fmtDate(b); }
+function daysBetween(a,b){ return Math.round((parseISO(b)-parseISO(a))/86400000); }
+function addDaysISO(s,n){ const d=parseISO(s); d.setUTCDate(d.getUTCDate()+n); return toISO(d); }
+
+/* subtract exactly one calendar year, clamping Feb-29 -> Feb-28 */
+function minusOneYear(s){
+  const d=parseISO(s); const y=d.getUTCFullYear()-1; const m=d.getUTCMonth(); let day=d.getUTCDate();
+  const last=new Date(Date.UTC(y,m+1,0)).getUTCDate();
+  if(day>last) day=last;
+  return y+"-"+pad2(m+1)+"-"+pad2(day);
+}
+function refDate(){ return CONFIG.REFERENCE_DATE || toISO(new Date()); }
+
+function curSym(){ const mk=CONFIG.MARKETS[$("selMkt").value]||CONFIG.MARKETS.UK; return mk.symbol; }
+function money(v){ const s=curSym(); const n=Math.round((v||0)); return s+n.toLocaleString("en-GB"); }
+function money2(v){ const s=curSym(); return s+(v||0).toLocaleString("en-GB",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function intf(v){ return Math.round(v||0).toLocaleString("en-GB"); }
+function pct(v,dp){ dp=dp==null?1:dp; if(v==null||!isFinite(v)) return "—"; return (v>0?"+":"")+v.toFixed(dp)+"%"; }
+function pctRaw(v,dp){ dp=dp==null?2:dp; if(v==null||!isFinite(v)) return "—"; return v.toFixed(dp)+"%"; }
+
+/* safe YoY % change */
+function change(cur,prev){
+  if(prev===0||prev==null) return (cur>0? Infinity : (cur===0?0:null));
+  return (cur-prev)/prev*100;
+}
+function changeClass(v,invert){
+  if(v==null||!isFinite(v)) return "flat";
+  const up = invert ? v<0 : v>0;
+  const down = invert ? v>0 : v<0;
+  if(Math.abs(v)<0.05) return "flat";
+  return up?"up":(down?"down":"flat");
+}
+
+/* =========================== DATE RANGE ENGINE ===========================
+   Produces LIKE-FOR-LIKE current vs previous-year windows.
+   MTD never compares against a full previous-year month. */
+function computePeriod(){
+  const type = $("selPeriod").value;
+  const ref = refDate();
+  const d = parseISO(ref);
+  let curStart, curEnd, typeLabel;
+
+  if(type==="mtd"){
+    curStart = toISO(new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1)));
+    curEnd   = ref;
+    typeLabel = "Month-to-Date";
+  } else if(type==="prevmonth"){
+    const first = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth()-1, 1));
+    const last  = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 0));
+    curStart = toISO(first); curEnd = toISO(last);
+    typeLabel = "Previous Month";
+  } else if(type==="last7"||type==="last14"||type==="last30"){
+    const n = type==="last7"?7:(type==="last14"?14:30);
+    curEnd = ref; curStart = addDaysISO(ref, -(n-1));
+    typeLabel = "Last "+n+" Days";
+  } else { // custom
+    curStart = $("selFrom").value || ref;
+    curEnd   = $("selTo").value   || ref;
+    if(parseISO(curStart) > parseISO(curEnd)){ const t=curStart; curStart=curEnd; curEnd=t; }
+    typeLabel = "Custom Range";
+  }
+
+  // Like-for-like previous-year window (same day-of-month span, one year back)
+  const prevStart = minusOneYear(curStart);
+  const prevEnd   = minusOneYear(curEnd);
+
+  return { curStart, curEnd, prevStart, prevEnd, typeLabel,
+           days: daysBetween(curStart,curEnd)+1 };
+}
+
+/* =========================== API SERVICE ===========================
+   Single point of integration. Backend authenticates to Amazon Ads API
+   and returns normalised JSON. Swap the fetch target without touching UI.
+
+   Expected response contract (see README comment at bottom of file):
+   {
+     syncedAt, account, marketplace, currency,
+     current:{start,end,daily:[{date,sales,spend,orders,clicks,impressions}]},
+     previous:{start,end,daily:[...]},   // may be [] when no prior-year data
+     keywords:[{ keyword,campaign,adGroup,matchType,status,bid,suggestedBid,
+                 cur:{sales,orders,impressions,clicks,spend},
+                 prev:{sales,orders,impressions,clicks,spend} }]
+   }
+*/
+const API = {
+  async _fetch(url, params){
+    const q = new URLSearchParams(params).toString();
+    const ctrl = new AbortController();
+    const t = setTimeout(()=>ctrl.abort(), CONFIG.REQUEST_TIMEOUT_MS);
+    try{
+      const res = await fetch(url+"?"+q, {
+        signal: ctrl.signal,
+        headers: { "Accept":"application/json" },
+        credentials: "include"    // auth handled by backend session/cookie — no keys in JS
+      });
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      return await res.json();
+    } finally { clearTimeout(t); }
+  },
+
+  async getKeywordPerformance(period){
+    const acct = $("selAccount").value, mkt = $("selMkt").value;
+    if(STATE.demo){
+      return DEMO.build(period, acct, mkt);
+    }
+    const params = {
+      account: (CONFIG.ACCOUNTS[acct]||{}).subSource ?? acct,
+      marketplace: mkt,
+      current_start: period.curStart, current_end: period.curEnd,
+      previous_start: period.prevStart, previous_end: period.prevEnd,
+      type: "keyword"
+    };
+    return this._fetch(CONFIG.API_BASE + CONFIG.ENDPOINTS.keywordPerformance, params);
+  }
+};
+
+/* =========================== DATA VALIDATION =========================== */
+function validatePayload(p, period){
+  const flags = {
+    currentAvailable:false, previousAvailable:false, currencyOk:false,
+    datesOk:false, dupChecked:true, synced:false, notes:[]
+  };
+  if(!p || typeof p!=="object"){ flags.notes.push("Empty response from backend."); return {ok:false,flags}; }
+
+  const kw = Array.isArray(p.keywords)? p.keywords : [];
+  const cur = (p.current&&Array.isArray(p.current.daily))? p.current.daily : [];
+  const prev = (p.previous&&Array.isArray(p.previous.daily))? p.previous.daily : [];
+
+  flags.synced = !!p.syncedAt || true;
+  flags.currencyOk = !!(CONFIG.MARKETS[$("selMkt").value]);
+  flags.currentAvailable = kw.some(k=>k.cur && (k.cur.impressions||k.cur.clicks||k.cur.sales||k.cur.spend)) || cur.length>0;
+  flags.previousAvailable = kw.some(k=>k.prev && (k.prev.impressions||k.prev.clicks||k.prev.sales)) || prev.length>0;
+
+  // date sanity: backend windows should match requested windows
+  const cS=p.current&&p.current.start, cE=p.current&&p.current.end;
+  flags.datesOk = (!cS || cS===period.curStart) && (!cE || cE===period.curEnd);
+  if(!flags.datesOk) flags.notes.push("Returned window ("+cS+"–"+cE+") differs from requested ("+period.curStart+"–"+period.curEnd+").");
+
+  // duplicate keyword check
+  const seen=new Set(); let dups=0;
+  kw.forEach(k=>{ const key=(k.keyword||"")+"|"+(k.campaign||"")+"|"+(k.adGroup||""); if(seen.has(key)) dups++; seen.add(key); });
+  flags.dupChecked = dups===0;
+  if(dups>0) flags.notes.push(dups+" duplicate keyword rows collapsed.");
+
+  if(!flags.previousAvailable) flags.notes.push("No previous-year keyword rows for "+fmtRange(period.prevStart,period.prevEnd)+". Amazon keyword/targeting history begins in 2026, so pre-2026 comparisons return no data.");
+
+  const ok = flags.currentAvailable; // need at least current period to render
+  return { ok, flags, kw, cur, prev };
+}
+
+/* =========================== YOY CALCULATION + BUSINESS LOGIC =========================== */
+function ctr(clicks,impr){ return impr>0? clicks/impr*100 : 0; }
+function cvr(orders,clicks){ return clicks>0? orders/clicks*100 : 0; }
+function acos(spend,sales){ return sales>0? spend/sales*100 : (spend>0?Infinity:0); }
+function cpc(spend,clicks){ return clicks>0? spend/clicks : 0; }
+
+function enrichKeywords(kw){
+  return kw.map(k=>{
+    const c = k.cur||{}, p = k.prev||{};
+    const cSales=+c.sales||0, pSales=+p.sales||0;
+    const cOrd=+c.orders||0, pOrd=+p.orders||0;
+    const cImp=+c.impressions||0, pImp=+p.impressions||0;
+    const cClk=+c.clicks||0, pClk=+p.clicks||0;
+    const cSpend=+c.spend||0, pSpend=+p.spend||0;
+    const cCTR=ctr(cClk,cImp), pCTR=ctr(pClk,pImp);
+    const cCVR=cvr(cOrd,cClk), pCVR=cvr(pOrd,pClk);
+    const cCPC=cpc(cSpend,cClk), pCPC=cpc(pSpend,pClk);
+    const cACOS=acos(cSpend,cSales);
+
+    const salesChange=change(cSales,pSales);
+    const row={
+      keyword:k.keyword||"(unknown)", campaign:k.campaign||"—", adGroup:k.adGroup||"—",
+      matchType:k.matchType||"", status:(k.status||"active").toLowerCase(),
+      bid: k.bid!=null? +k.bid : null, suggestedBid: k.suggestedBid!=null? +k.suggestedBid : null,
+      cSales,pSales,cOrd,pOrd,cImp,pImp,cClk,pClk,cSpend,pSpend,
+      cCTR,pCTR,cCVR,pCVR,cCPC,pCPC,cACOS,
+      salesChange, ordersChange:change(cOrd,pOrd), imprChange:change(cImp,pImp),
+      clicksChange:change(cClk,pClk), ctrChange:change(cCTR,pCTR), cvrChange:change(cCVR,pCVR),
+      cpcChange:change(cCPC,pCPC)
+    };
+    const dg = diagnose(row);
+    row.diagnosis=dg.diagnosis; row.priority=dg.priority;
+    row.cause=dg.cause; row.support=dg.support; row.action=dg.action; row.badge=dg.badge;
+    return row;
+  });
+}
+
+/* diagnosis + priority + root cause + recommended action (section 10/11/12) */
+function diagnose(r){
+  const T=STATE.thresholds, sens=CONFIG.THRESHOLDS.changeSensitivity;
+  const dec = r.salesChange==null? null : -r.salesChange; // positive = decline magnitude
+
+  // priority band by sales decline %
+  let priority;
+  if(r.salesChange!=null && r.salesChange> T.growth) priority="GROWTH";
+  else if(dec!=null && dec>=T.severe) priority="SEVERE";
+  else if(dec!=null && dec>=T.high) priority="HIGH";
+  else if(dec!=null && dec>=T.moderate) priority="MODERATE";
+  else priority="STABLE";
+
+  // diagnosis label
+  let diagnosis, badge="bg-stable", cause="", support="", action="";
+  const up=(v)=>v!=null&&isFinite(v)&&v>=sens, down=(v)=>v!=null&&isFinite(v)&&v<=-sens;
+
+  if(r.status==="paused"){
+    diagnosis="Paused Keyword"; badge="bg-paused";
+    cause="Keyword is paused"; action="Review why it was paused; re-enable if it previously converted.";
+  } else if(r.cImp>0 && r.cImp<CONFIG.THRESHOLDS.lowImpr && r.cSales<=0){
+    diagnosis="Low Impression Volume"; badge="bg-warn";
+    cause="Very low impressions ("+intf(r.cImp)+") — thin coverage";
+    action="Raise bid or broaden match type to gain impression share.";
+  } else if(r.cClk>0 && r.cSales<=0){
+    diagnosis="No Sales"; badge="bg-decline";
+    cause="Clicks but zero conversions ("+intf(r.cClk)+" clicks, 0 orders)";
+    action="Check listing/price/relevance; consider negative-matching if irrelevant.";
+  } else if(r.salesChange!=null && r.salesChange>=CONFIG.THRESHOLDS.stableBand){
+    diagnosis="Sales Growth"; badge="bg-growth";
+    cause="Sales up "+pct(r.salesChange)+" YoY"; action="Protect winner: sustain/raise budget, guard bid on this term.";
+    if(r.suggestedBid!=null && r.bid!=null && r.suggestedBid>r.bid*1.15){ diagnosis="Bid Opportunity"; badge="bg-info"; action="Growing + suggested bid above current — raise bid to capture more volume."; }
+  } else if(r.salesChange==null || Math.abs(r.salesChange)<CONFIG.THRESHOLDS.stableBand){
+    diagnosis="Stable Performance"; badge="bg-stable";
+    cause="Sales flat YoY ("+pct(r.salesChange)+")"; action="Hold. Monitor ACOS and impression share.";
+  } else {
+    // declining — determine driver
+    if(down(r.imprChange)){ diagnosis="Visibility Loss"; badge="bg-decline"; }
+    else if(down(r.ctrChange)){ diagnosis="CTR Decline"; badge="bg-decline"; }
+    else if(down(r.cvrChange)){ diagnosis="CVR Decline"; badge="bg-decline"; }
+    else if(isFinite(r.cACOS)&&r.cACOS>CONFIG.THRESHOLDS.highAcos){ diagnosis="High ACOS"; badge="bg-warn"; }
+    else { diagnosis="Sales Decline"; badge="bg-decline"; }
+  }
+
+  // ROOT CAUSE (section 11 IF/THEN) — computed for any declining keyword
+  if(r.salesChange!=null && r.salesChange<0){
+    if(down(r.imprChange)){
+      cause="Visibility / Coverage Issue";
+      support="Impressions "+pct(r.imprChange)+", sales "+pct(r.salesChange)+" — fewer eyes on the ad.";
+      action="Raise bid / budget or broaden match to recover impression share.";
+      if(r.suggestedBid!=null && r.bid!=null && r.suggestedBid>r.bid){ diagnosis="Bid Opportunity"; badge="bg-info"; action="Impressions down and suggested bid ("+money2(r.suggestedBid)+") > current ("+money2(r.bid)+") — raise bid."; }
+    } else if(down(r.ctrChange)){
+      cause="CTR Issue";
+      support="Impressions stable, CTR "+pct(r.ctrChange)+" — ad shown but not clicked.";
+      action="Improve main image/title/price; test tighter match type.";
+    } else if(down(r.cvrChange)){
+      cause="Conversion Issue";
+      support="Clicks stable, CVR "+pct(r.cvrChange)+" — clicks not converting.";
+      action="Review listing content, price competitiveness, reviews, stock.";
+    } else if(up(r.cpcChange)){
+      cause="Cost Efficiency Issue";
+      support="CPC "+pct(r.cpcChange)+" — paying more per click for the same term.";
+      action="Lower bid toward suggested; check competitor bidding pressure.";
+    } else if(isFinite(r.cACOS)&&r.cACOS>CONFIG.THRESHOLDS.highAcos){
+      cause="PPC Efficiency Issue";
+      support="ACOS "+pctRaw(r.cACOS)+" with sales "+pct(r.salesChange)+" — spend outrunning return.";
+      action="Cut bid, add negatives on wasteful queries, or pause if persistently unprofitable.";
+    } else {
+      cause="General Sales Decline";
+      support="Sales "+pct(r.salesChange)+" with no single dominant driver.";
+      action="Investigate seasonality, stock, and search-term mix for this keyword.";
+    }
+  }
+  return { diagnosis, priority, cause, support, action, badge };
+}
+
+/* =========================== FILTER ENGINE =========================== */
+function applyFilters(){
+  const camp=$("selCampaign").value, ag=$("selAdGroup").value, dg=$("selDiag").value,
+        pr=$("selPrio").value, st=$("selStatus").value, q=($("selSearch").value||"").toLowerCase().trim();
+  STATE.filtered = STATE.keywords.filter(k=>{
+    if(camp && k.campaign!==camp) return false;
+    if(ag && k.adGroup!==ag) return false;
+    if(dg && k.diagnosis!==dg) return false;
+    if(pr && k.priority!==pr) return false;
+    if(st && k.status!==st) return false;
+    if(q){ const hay=(k.keyword+" "+k.campaign+" "+k.adGroup).toLowerCase(); if(hay.indexOf(q)<0) return false; }
+    return true;
+  });
+  sortFiltered();
+  renderKPIs();
+  renderDiagStrip();
+  renderMovers();
+  renderTable();
+  renderBar();
+  // trend uses full period series, not per-keyword filters, so it stays put
+}
+function sortFiltered(){
+  const k=STATE.sort.key, d=STATE.sort.dir;
+  STATE.filtered.sort((a,b)=>{
+    let va=a[k], vb=b[k];
+    if(typeof va==="string"){ return d*va.localeCompare(vb); }
+    va=(va==null||!isFinite(va))?-Infinity:va; vb=(vb==null||!isFinite(vb))?-Infinity:vb;
+    return d*(va-vb);
+  });
+}
+
+/* =========================== UI RENDERING =========================== */
+function statusChip(){
+  if(STATE.source==="csv") return '<span class="dot csv"></span>CSV file';
+  if(STATE.demo) return '<span class="dot demo"></span>Demo';
+  return '<span class="dot on"></span>Connected';
+}
+function renderHeader(period, payload){
+  const acct=$("selAccount").value, mkt=$("selMkt").value, mk=CONFIG.MARKETS[mkt]||CONFIG.MARKETS.UK;
+  $("hdAccount").textContent=acct;
+  $("hdMkt").textContent=mkt;
+  $("hdCur").textContent=mk.currency+" ("+mk.symbol+")";
+  $("hdPtype").textContent=period.typeLabel;
+  const synced = payload && payload.syncedAt ? new Date(payload.syncedAt) : new Date();
+  $("hdSync").textContent = pad2(synced.getDate())+" "+MONTHS[synced.getMonth()]+" "+synced.getFullYear()+" "+pad2(synced.getHours())+":"+pad2(synced.getMinutes());
+  $("hdStatus").innerHTML = statusChip();
+  $("kpiHint").textContent = "Current "+fmtRange(period.curStart,period.curEnd)+"  vs  Previous "+fmtRange(period.prevStart,period.prevEnd);
+  $("trendHint").textContent = period.days+" days · daily keyword sales";
+  $("legCur").textContent = fmtShort(period.curStart)+"–"+fmtShort(period.curEnd)+" "+parseISO(period.curStart).getUTCFullYear();
+  $("legPrev").textContent = fmtShort(period.prevStart)+"–"+fmtShort(period.prevEnd)+" "+parseISO(period.prevStart).getUTCFullYear();
+}
+
+function totals(list){
+  const t={sales:0,pSales:0,ord:0,pOrd:0,imp:0,pImp:0,clk:0,pClk:0,spend:0,pSpend:0};
+  list.forEach(k=>{ t.sales+=k.cSales;t.pSales+=k.pSales;t.ord+=k.cOrd;t.pOrd+=k.pOrd;
+    t.imp+=k.cImp;t.pImp+=k.pImp;t.clk+=k.cClk;t.pClk+=k.pClk;t.spend+=k.cSpend;t.pSpend+=k.pSpend; });
+  return t;
+}
+
+function renderKPIs(){
+  const t=totals(STATE.filtered), p=STATE.periodMeta;
+  const cCTR=ctr(t.clk,t.imp), pCTR=ctr(t.pClk,t.pImp);
+  const cCVR=cvr(t.ord,t.clk), pCVR=cvr(t.pOrd,t.pClk);
+  const cAC=acos(t.spend,t.sales), pAC=acos(t.pSpend,t.pSales);
+  const cards=[
+    {name:"Keyword Sales", cur:money(t.sales), prev:money(t.pSales), ch:change(t.sales,t.pSales)},
+    {name:"PPC Spend", cur:money(t.spend), prev:money(t.pSpend), ch:change(t.spend,t.pSpend), invert:true},
+    {name:"Orders", cur:intf(t.ord), prev:intf(t.pOrd), ch:change(t.ord,t.pOrd)},
+    {name:"Clicks", cur:intf(t.clk), prev:intf(t.pClk), ch:change(t.clk,t.pClk)},
+    {name:"Impressions", cur:intf(t.imp), prev:intf(t.pImp), ch:change(t.imp,t.pImp)},
+    {name:"CTR", cur:pctRaw(cCTR), prev:pctRaw(pCTR), ch:change(cCTR,pCTR)},
+    {name:"CVR", cur:pctRaw(cCVR), prev:pctRaw(pCVR), ch:change(cCVR,pCVR)},
+    {name:"ACOS", cur:(isFinite(cAC)?pctRaw(cAC):"—"), prev:(isFinite(pAC)?pctRaw(pAC):"—"), ch:change(cAC,pAC), invert:true}
+  ];
+  $("kpiGrid").innerHTML = cards.map(c=>{
+    const cls=changeClass(c.ch,c.invert);
+    const dtxt = c.ch==null?"—":(c.ch===Infinity?"NEW":pct(c.ch));
+    return '<div class="kpi"><div class="name">'+c.name+'</div>'+
+      '<div class="delta '+cls+'">'+dtxt+'</div>'+
+      '<div class="big">'+c.cur+'</div>'+
+      '<div class="prev">Prev yr: <b>'+c.prev+'</b> &middot; '+fmtShort(p.prevStart)+'–'+fmtShort(p.prevEnd)+'</div></div>';
+  }).join("");
+}
+
+const DIAG_ORDER=["Sales Growth","Bid Opportunity","Stable Performance","Sales Decline","Visibility Loss","CTR Decline","CVR Decline","High ACOS","Low Impression Volume","No Sales","Paused Keyword"];
+function renderDiagStrip(){
+  const counts={};
+  STATE.keywords.forEach(k=>{ counts[k.diagnosis]=(counts[k.diagnosis]||0)+1; });
+  const active=$("selDiag").value;
+  const items=DIAG_ORDER.filter(d=>counts[d]).map(d=>{
+    const cls = d==="Sales Growth"?"var(--green)":(d==="Stable Performance"?"#4a5765":(d==="Bid Opportunity"?"var(--blue)":(/ACOS|Low Impr/.test(d)?"var(--amber)":(d==="Paused Keyword"?"#5b5470":"var(--red)"))));
+    return '<div class="diagpill'+(active===d?" active":"")+'" data-diag="'+d+'">'+
+      '<span class="c" style="color:'+cls+'">'+counts[d]+'</span><span class="l">'+d+'</span></div>';
+  });
+  $("diagStrip").innerHTML=items.join("")||'<div class="footnote">No keywords.</div>';
+  document.querySelectorAll("#diagStrip .diagpill").forEach(el=>{
+    el.onclick=()=>{ const d=el.getAttribute("data-diag"); $("selDiag").value = ($("selDiag").value===d?"":d); applyFilters(); };
+  });
+}
+
+function renderMovers(){
+  const withPrev = STATE.filtered.filter(k=>k.salesChange!=null&&isFinite(k.salesChange));
+  const grow=[...withPrev].filter(k=>k.salesChange>0).sort((a,b)=>b.salesChange-a.salesChange).slice(0,8);
+  const dec =[...withPrev].filter(k=>k.salesChange<0).sort((a,b)=>(a.cSales-a.pSales)-(b.cSales-b.pSales)).slice(0,8);
+  $("growList").innerHTML = grow.length? grow.map(k=>moverRow(k,true)).join("") : emptyMover("No growing keywords in view.");
+  $("decList").innerHTML  = dec.length?  dec.map(k=>moverRow(k,false)).join("") : emptyMover("No declining keywords in view.");
+}
+function emptyMover(t){ return '<div class="footnote">'+t+'</div>'; }
+function moverRow(k,isGrow){
+  const diff=k.cSales-k.pSales;
+  const amt=(diff>=0?"+":"−")+money(Math.abs(diff)).replace(curSym(),curSym());
+  const pctTxt=pct(k.salesChange);
+  const col=isGrow?"var(--green)":"var(--red)";
+  let extra;
+  if(isGrow){
+    extra='<div class="meta">Orders '+pct(k.ordersChange)+' · CTR '+pct(k.ctrChange)+' · CVR '+pct(k.cvrChange)+'</div>';
+  } else {
+    extra='<div class="cause">Cause: '+(k.cause||"—")+'</div><div class="act">Action: '+(k.action||"—")+'</div>';
+  }
+  return '<div class="mover"><div><div class="kw">'+esc(k.keyword)+'</div>'+
+    '<div class="meta">'+esc(k.campaign)+(k.matchType?' · '+k.matchType:'')+'</div>'+extra+'</div>'+
+    '<div class="right"><div class="amt" style="color:'+col+'">'+amt+'</div>'+
+    '<div class="pct" style="color:'+col+'">'+pctTxt+'</div>'+
+    '<div class="meta">'+money(k.cSales)+' vs '+money(k.pSales)+'</div></div></div>';
+}
+
+/* ---- main table ---- */
+const COLS=[
+  {k:"keyword",l:"Keyword",per:"",cls:"kwname l"},
+  {k:"campaign",l:"Campaign",per:"",cls:"l"},
+  {k:"adGroup",l:"Ad Group",per:"",cls:"l"},
+  {k:"cSales",l:"Sales",per:"CUR",cls:"grpsep",fmt:"money"},
+  {k:"pSales",l:"Sales",per:"PREV",fmt:"money"},
+  {k:"salesChange",l:"Δ Sales",per:"YoY",fmt:"pctcell"},
+  {k:"cOrd",l:"Orders",per:"CUR",cls:"grpsep",fmt:"int"},
+  {k:"pOrd",l:"Orders",per:"PREV",fmt:"int"},
+  {k:"ordersChange",l:"Δ Ord",per:"YoY",fmt:"pctcell"},
+  {k:"cImp",l:"Impr",per:"CUR",cls:"grpsep",fmt:"int"},
+  {k:"pImp",l:"Impr",per:"PREV",fmt:"int"},
+  {k:"imprChange",l:"Δ Impr",per:"YoY",fmt:"pctcell"},
+  {k:"cClk",l:"Clicks",per:"CUR",cls:"grpsep",fmt:"int"},
+  {k:"pClk",l:"Clicks",per:"PREV",fmt:"int"},
+  {k:"cCTR",l:"CTR",per:"CUR",cls:"grpsep",fmt:"pctraw"},
+  {k:"pCTR",l:"CTR",per:"PREV",fmt:"pctraw"},
+  {k:"ctrChange",l:"Δ CTR",per:"YoY",fmt:"pctcell"},
+  {k:"cCVR",l:"CVR",per:"CUR",cls:"grpsep",fmt:"pctraw"},
+  {k:"pCVR",l:"CVR",per:"PREV",fmt:"pctraw"},
+  {k:"cvrChange",l:"Δ CVR",per:"YoY",fmt:"pctcell"},
+  {k:"cSpend",l:"PPC Spend",per:"CUR",cls:"grpsep",fmt:"money2"},
+  {k:"cACOS",l:"ACOS",per:"CUR",fmt:"acos"},
+  {k:"bid",l:"Bid",per:"CUR",cls:"grpsep",fmt:"money2n"},
+  {k:"suggestedBid",l:"Sugg. Bid",per:"—",fmt:"money2n"},
+  {k:"diagnosis",l:"Diagnosis",per:"",cls:"grpsep l",fmt:"badge"},
+  {k:"priority",l:"Priority",per:"",cls:"l",fmt:"prio"},
+  {k:"cause",l:"Likely Cause",per:"",cls:"l"},
+  {k:"action",l:"Recommended Action",per:"",cls:"l"}
+];
+function renderTableHead(){
+  const p=STATE.periodMeta;
+  const curTag=fmtShort(p.curStart)+"–"+fmtShort(p.curEnd)+" "+parseISO(p.curStart).getUTCFullYear();
+  const prevTag=fmtShort(p.prevStart)+"–"+fmtShort(p.prevEnd)+" "+parseISO(p.prevStart).getUTCFullYear();
+  $("kwHead").innerHTML="<tr>"+COLS.map(c=>{
+    let per="";
+    if(c.per==="CUR") per=curTag; else if(c.per==="PREV") per=prevTag; else if(c.per==="YoY") per="YoY %";
+    const sortMark = STATE.sort.key===c.k? (STATE.sort.dir>0?" ▲":" ▼") : "";
+    return '<th class="'+(c.cls||"")+'" data-k="'+c.k+'">'+c.l+sortMark+(per?'<span class="per">'+per+'</span>':'')+'</th>';
+  }).join("")+"</tr>";
+  document.querySelectorAll("#kwHead th").forEach(th=>{
+    th.onclick=()=>{ const k=th.getAttribute("data-k");
+      if(STATE.sort.key===k) STATE.sort.dir*=-1; else { STATE.sort.key=k; STATE.sort.dir=(k==="keyword"||k==="campaign"||k==="adGroup")?1:-1; }
+      applyFilters();
+    };
+  });
+}
+function fmtCell(k,c){
+  const v=k[c.k];
+  switch(c.fmt){
+    case "money": return {t:money(v),cl:""};
+    case "money2": return {t:money2(v),cl:""};
+    case "money2n": return {t:(v==null?"—":money2(v)),cl:""};
+    case "int": return {t:intf(v),cl:""};
+    case "pctraw": return {t:pctRaw(v),cl:""};
+    case "acos": return {t:(isFinite(v)?pctRaw(v):"—"),cl:(isFinite(v)&&v>CONFIG.THRESHOLDS.highAcos?"cell-down":"")};
+    case "pctcell": {
+      const invert=false; const cls=changeClass(v,invert);
+      const t = v==null?"—":(v===Infinity?"NEW":pct(v));
+      return {t:t,cl:cls==="up"?"cell-up":(cls==="down"?"cell-down":"cell-flat")};
+    }
+    case "badge": return {t:'<span class="badge '+k.badge+'">'+esc(v)+'</span>',cl:"",raw:true};
+    case "prio": return {t:'<span class="prio p-'+v+'">'+v+'</span>',cl:"",raw:true};
+    default: return {t:esc(String(v==null?"—":v)),cl:""};
+  }
+}
+function renderTable(){
+  const rows=STATE.filtered;
+  $("tableCount").textContent=rows.length+" keyword"+(rows.length===1?"":"s")+" shown of "+STATE.keywords.length;
+  const body=rows.map(k=>{
+    return "<tr>"+COLS.map(c=>{
+      const f=fmtCell(k,c);
+      const cls=(c.cls||"")+(f.cl?(" "+f.cl):"");
+      return '<td class="'+cls+'">'+(f.raw?f.t:esc(f.t))+'</td>';
+    }).join("")+"</tr>";
+  }).join("");
+  $("kwBody").innerHTML= rows.length? body : '<tr><td colspan="'+COLS.length+'" style="text-align:center;padding:26px;color:var(--muted)">No keywords match the current filters.</td></tr>';
+  // totals row
+  if(rows.length){
+    const t=totals(rows);
+    const cCTR=ctr(t.clk,t.imp),pCTR=ctr(t.pClk,t.pImp),cCVR=cvr(t.ord,t.clk),pCVR=cvr(t.pOrd,t.pClk),cAC=acos(t.spend,t.sales);
+    const map={keyword:"TOTAL / WEIGHTED",campaign:"",adGroup:"",cSales:money(t.sales),pSales:money(t.pSales),salesChange:pct(change(t.sales,t.pSales)),
+      cOrd:intf(t.ord),pOrd:intf(t.pOrd),ordersChange:pct(change(t.ord,t.pOrd)),cImp:intf(t.imp),pImp:intf(t.pImp),imprChange:pct(change(t.imp,t.pImp)),
+      cClk:intf(t.clk),pClk:intf(t.pClk),cCTR:pctRaw(cCTR),pCTR:pctRaw(pCTR),ctrChange:pct(change(cCTR,pCTR)),
+      cCVR:pctRaw(cCVR),pCVR:pctRaw(pCVR),cvrChange:pct(change(cCVR,pCVR)),cSpend:money2(t.spend),cACOS:(isFinite(cAC)?pctRaw(cAC):"—"),bid:"",suggestedBid:"",diagnosis:"",priority:"",cause:"",action:""};
+    $("kwFoot").innerHTML="<tr class='totrow'>"+COLS.map(c=>'<td class="'+(c.cls||"")+'">'+esc(map[c.k]!=null?map[c.k]:"")+'</td>').join("")+"</tr>";
+  } else $("kwFoot").innerHTML="";
+}
+
+/* ---- trend line chart (pure SVG) ---- */
+function renderTrend(){
+  const cur=STATE.raw.current&&STATE.raw.current.daily||[];
+  const prev=STATE.raw.previous&&STATE.raw.previous.daily||[];
+  const p=STATE.periodMeta;
+  const n=p.days;
+  // align by day index
+  const curSeries=[], prevSeries=[], labels=[];
+  for(let i=0;i<n;i++){
+    const cd=addDaysISO(p.curStart,i), pd=addDaysISO(p.prevStart,i);
+    labels.push(cd);
+    curSeries.push(sumForDate(cur,cd));
+    prevSeries.push(sumForDate(prev,pd));
+  }
+  const total=curSeries.reduce((s,v)=>s+v,0)+prevSeries.reduce((s,v)=>s+v,0);
+  if(total<=0){
+    $("trendChart").innerHTML='<div class="footnote" style="padding:26px 8px;text-align:center">'+
+      (STATE.source==="csv"
+        ? "Daily trend needs a <b>Date</b> column in the uploaded CSV. Totals and the keyword table are still accurate."
+        : "No dated daily sales in the selected window.")+'</div>';
+    return;
+  }
+  drawLineChart("trendChart",labels,curSeries,prevSeries,p);
+}
+function sumForDate(arr,iso){ let s=0; for(const r of arr){ if(r.date===iso) s+= (+r.sales||0); } return s; }
+
+function drawLineChart(elId,labels,a,b,p){
+  const W=680,H=250,padL=46,padR=14,padT=14,padB=30;
+  const iw=W-padL-padR, ih=H-padT-padB;
+  const maxV=Math.max(1,...a,...b);
+  const n=labels.length;
+  const x=(i)=> padL + (n<=1?iw/2:(i/(n-1))*iw);
+  const y=(v)=> padT + ih - (v/maxV)*ih;
+  const line=(arr)=> arr.map((v,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)).join(" ");
+  const area=(arr)=> "M"+padL+" "+(padT+ih)+" "+arr.map((v,i)=>"L"+x(i).toFixed(1)+" "+y(v).toFixed(1)).join(" ")+" L"+x(n-1)+" "+(padT+ih)+" Z";
+  // gridlines
+  let grid="";
+  for(let g=0; g<=4; g++){ const gy=padT+ (ih/4)*g; const val=maxV*(1-g/4);
+    grid+='<line x1="'+padL+'" y1="'+gy+'" x2="'+(W-padR)+'" y2="'+gy+'" stroke="#eef2f6"/>'+
+          '<text x="'+(padL-6)+'" y="'+(gy+3)+'" text-anchor="end" font-size="9" fill="#8a97a6">'+curSym()+shortNum(val)+'</text>';
+  }
+  // x labels (max ~8)
+  let xl=""; const step=Math.max(1,Math.ceil(n/8));
+  for(let i=0;i<n;i+=step){ xl+='<text x="'+x(i)+'" y="'+(H-10)+'" text-anchor="middle" font-size="9" fill="#8a97a6">'+fmtShort(labels[i])+'</text>'; }
+  // hover targets
+  let hov="";
+  for(let i=0;i<n;i++){
+    const bw=n<=1?iw:iw/(n-1);
+    hov+='<rect x="'+(x(i)-bw/2)+'" y="'+padT+'" width="'+bw+'" height="'+ih+'" fill="transparent" '+
+      'data-i="'+i+'" class="hovcell"/>';
+  }
+  const svg='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="YoY keyword sales trend">'+
+    grid+
+    '<path d="'+area(a)+'" fill="rgba(14,35,64,.06)"/>'+
+    '<path d="'+line(b)+'" fill="none" stroke="#c8352b" stroke-width="2" stroke-dasharray="5 4" opacity=".9"/>'+
+    '<path d="'+line(a)+'" fill="none" stroke="#0e2340" stroke-width="2.4"/>'+
+    a.map((v,i)=>'<circle cx="'+x(i)+'" cy="'+y(v)+'" r="2.4" fill="#0e2340"/>').join("")+
+    xl+'<g id="hovmark"></g>'+hov+'</svg>';
+  const host=$(elId); host.innerHTML=svg;
+  // interactivity
+  const tip=$("tooltip");
+  host.querySelectorAll(".hovcell").forEach(cell=>{
+    cell.addEventListener("mousemove",(e)=>{
+      const i=+cell.getAttribute("data-i");
+      const cv=a[i],pv=b[i],diff=cv-pv,dpct=change(cv,pv);
+      tip.innerHTML='<b>'+fmtDate(labels[i])+'</b>'+
+        '<div class="r"><span>Current</span><span>'+money(cv)+'</span></div>'+
+        '<div class="r"><span>Prev yr</span><span>'+money(pv)+'</span></div>'+
+        '<div class="r"><span>Diff</span><span>'+(diff>=0?"+":"−")+money(Math.abs(diff))+'</span></div>'+
+        '<div class="r"><span>Diff %</span><span>'+(dpct==null?"—":(dpct===Infinity?"NEW":pct(dpct)))+'</span></div>';
+      tip.style.opacity="1"; positionTip(e);
+      const mk=host.querySelector("#hovmark");
+      mk.innerHTML='<line x1="'+x(i)+'" y1="'+padT+'" x2="'+x(i)+'" y2="'+(padT+ih)+'" stroke="#9fb0c2" stroke-dasharray="3 3"/>'+
+        '<circle cx="'+x(i)+'" cy="'+y(cv)+'" r="4" fill="#0e2340" stroke="#fff" stroke-width="1.5"/>';
+    });
+    cell.addEventListener("mouseleave",()=>{ tip.style.opacity="0"; const mk=host.querySelector("#hovmark"); if(mk) mk.innerHTML=""; });
+  });
+}
+function positionTip(e){ const tip=$("tooltip"); let xx=e.clientX+14, yy=e.clientY+14;
+  if(xx+170>window.innerWidth) xx=e.clientX-170; tip.style.left=xx+"px"; tip.style.top=yy+"px"; }
+function shortNum(v){ if(v>=1000000) return (v/1000000).toFixed(1)+"M"; if(v>=1000) return (v/1000).toFixed(1)+"k"; return Math.round(v); }
+
+/* ---- horizontal bar chart ---- */
+function renderBar(){
+  const sort=$("barSort").value;
+  let list=[...STATE.filtered];
+  if(sort==="decline") list=list.filter(k=>k.cSales-k.pSales<0).sort((a,b)=>(a.cSales-a.pSales)-(b.cSales-b.pSales));
+  else if(sort==="growth") list=list.filter(k=>k.cSales-k.pSales>0).sort((a,b)=>(b.cSales-b.pSales)-(a.cSales-a.pSales));
+  else if(sort==="sales") list.sort((a,b)=>b.cSales-a.cSales);
+  else list.sort((a,b)=>b.cSpend-a.cSpend);
+  list=list.slice(0,10);
+  const host=$("barChart");
+  if(!list.length){ host.innerHTML='<div class="footnote">No keywords for this view.</div>'; return; }
+  const valOf=(k)=> sort==="sales"? k.cSales : (sort==="spend"? k.cSpend : (k.cSales-k.pSales));
+  const vals=list.map(valOf);
+  const maxAbs=Math.max(1,...vals.map(v=>Math.abs(v)));
+  const rowH=26, W=560, labW=150, padR=64, H=list.length*rowH+8;
+  const zero= (sort==="sales"||sort==="spend")? labW : labW + (W-labW-padR)* (0/1); // for signed we center at labW
+  const axStart=labW, axEnd=W-padR, axW=axEnd-axStart;
+  let bars="";
+  list.forEach((k,i)=>{
+    const v=valOf(k); const y=i*rowH+4;
+    let bx,bw,col;
+    if(sort==="sales"||sort==="spend"){
+      bw=(v/maxAbs)*axW; bx=axStart; col=sort==="spend"?"#20558a":"#1a8f4c";
+    } else {
+      const half=axW/2; const cx=axStart+half;
+      bw=(Math.abs(v)/maxAbs)*half; col=v<0?"#c8352b":"#1a8f4c";
+      bx= v<0? cx-bw : cx;
+    }
+    const valTxt=(sort==="sales"||sort==="spend")? money(v) : ((v>=0?"+":"−")+money(Math.abs(v)));
+    bars+='<g><text x="'+(labW-8)+'" y="'+(y+rowH/2+3)+'" text-anchor="end" font-size="10.5" fill="#1b2733">'+esc(truncate(k.keyword,20))+'</text>'+
+      '<rect x="'+bx+'" y="'+(y+3)+'" width="'+Math.max(1,bw)+'" height="'+(rowH-10)+'" rx="3" fill="'+col+'"/>'+
+      '<text x="'+((sort==="sales"||sort==="spend")? (bx+bw+5) : (v<0? bx-5 : bx+bw+5))+'" y="'+(y+rowH/2+3)+'" text-anchor="'+((v<0&&sort!=="sales"&&sort!=="spend")?"end":"start")+'" font-size="10" font-weight="700" fill="'+col+'">'+valTxt+'</text></g>';
+  });
+  let axis="";
+  if(!(sort==="sales"||sort==="spend")){ const cx=axStart+axW/2; axis='<line x1="'+cx+'" y1="0" x2="'+cx+'" y2="'+H+'" stroke="#d7dee6"/>'; }
+  host.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Top keywords bar chart">'+axis+bars+'</svg>';
+}
+function truncate(s,n){ return s.length>n? s.slice(0,n-1)+"…" : s; }
+
+/* ---- data quality ---- */
+function renderDQ(vres){
+  const f=vres.flags;
+  const items=[
+    {ok:f.currentAvailable, l:"Current period data available"},
+    {ok:f.previousAvailable, l:"Previous-year data available", warn:!f.previousAvailable},
+    {ok:f.currencyOk, l:"Currency validated ("+(CONFIG.MARKETS[$("selMkt").value]||{}).currency+")"},
+    {ok:f.datesOk, l:"Keyword dates validated"},
+    {ok:f.dupChecked, l:"Duplicate records checked"},
+    {ok:f.synced, l:"Data successfully synced"}
+  ];
+  $("dqGrid").innerHTML=items.map(it=>{
+    const cls = it.ok? "ok" : (it.warn? "warnq":"bad");
+    const ic = it.ok? "✓" : (it.warn? "!":"✕");
+    return '<div class="dqitem '+cls+'"><span class="ic">'+ic+'</span>'+esc(it.l)+'</div>';
+  }).join("");
+  $("dqNote").innerHTML = f.notes.length? f.notes.map(esc).join("<br>") : "All checks passed for the selected comparison period.";
+}
+
+/* =========================== EXPORT =========================== */
+function exportCSV(){
+  if(!STATE.filtered.length){ alert("No keyword data to export."); return; }
+  const p=STATE.periodMeta;
+  const head=["Keyword","Campaign","Ad Group","Match Type","Status",
+    "Sales "+p.curStart+".."+p.curEnd,"Sales "+p.prevStart+".."+p.prevEnd,"Sales Change %",
+    "Orders Cur","Orders Prev","Orders Change %","Impr Cur","Impr Prev","Impr Change %",
+    "Clicks Cur","Clicks Prev","CTR Cur %","CTR Prev %","CTR Change %","CVR Cur %","CVR Prev %","CVR Change %",
+    "PPC Spend Cur","ACOS Cur %","Bid","Suggested Bid","Diagnosis","Priority","Likely Cause","Recommended Action"];
+  const rows=STATE.filtered.map(k=>[
+    k.keyword,k.campaign,k.adGroup,k.matchType,k.status,
+    k.cSales.toFixed(2),k.pSales.toFixed(2),num(k.salesChange),
+    k.cOrd,k.pOrd,num(k.ordersChange),k.cImp,k.pImp,num(k.imprChange),
+    k.cClk,k.pClk,k.cCTR.toFixed(2),k.pCTR.toFixed(2),num(k.ctrChange),
+    k.cCVR.toFixed(2),k.pCVR.toFixed(2),num(k.cvrChange),
+    k.cSpend.toFixed(2),(isFinite(k.cACOS)?k.cACOS.toFixed(2):""),
+    (k.bid==null?"":k.bid.toFixed(2)),(k.suggestedBid==null?"":k.suggestedBid.toFixed(2)),
+    k.diagnosis,k.priority,k.cause,k.action
+  ]);
+  const csv=[head,...rows].map(r=>r.map(csvCell).join(",")).join("\r\n");
+  const mkt=$("selMkt").value;
+  const fname="Amazon_Keyword_YoY_"+mkt+"_"+fmtFile(p.curStart)+"_"+fmtFile(p.curEnd)+".csv";
+  const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=fname; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+}
+function num(v){ return (v==null||!isFinite(v))?"":v.toFixed(1); }
+function csvCell(v){ v=String(v==null?"":v); return /[",\n\r]/.test(v)? '"'+v.replace(/"/g,'""')+'"' : v; }
+function fmtFile(s){ const d=parseISO(s); return pad2(d.getUTCDate())+"-"+MONTHS[d.getUTCMonth()]+"-"+d.getUTCFullYear(); }
+
+/* =========================== ORCHESTRATION =========================== */
+function populateEntityFilters(){
+  const camps=[...new Set(STATE.keywords.map(k=>k.campaign))].sort();
+  const ags=[...new Set(STATE.keywords.map(k=>k.adGroup))].sort();
+  const diags=[...new Set(STATE.keywords.map(k=>k.diagnosis))].sort();
+  fillSelect("selCampaign","All campaigns",camps);
+  fillSelect("selAdGroup","All ad groups",ags);
+  fillSelect("selDiag","All diagnoses",diags);
+}
+function fillSelect(id,allLabel,arr){
+  const el=$(id); const cur=el.value;
+  el.innerHTML='<option value="">'+allLabel+'</option>'+arr.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join("");
+  if(arr.indexOf(cur)>=0) el.value=cur;
+}
+
+async function sync(){
+  const period=computePeriod();
+  STATE.periodMeta=period;
+  setStatusSyncing();
+  renderHeaderRangesOnly(period);
+  try{
+    let payload;
+    if(STATE.source==="csv"){
+      if(!CSVSVC.hasData()){
+        showEmpty(period,"No CSV loaded",
+          "Drop your prepared Amazon keyword file in the Keyword CSV box above. It should include current metrics plus previous-year columns (or a Date column spanning both years) so the dashboard can compare current vs previous-year sales.");
+        return;
+      }
+      payload = CSVSVC.build(period);
+    } else {
+      payload = await API.getKeywordPerformance(period);
+    }
+    const v=validatePayload(payload,period);
+    if(!v.ok){
+      showEmpty(period,"Amazon data connection unavailable",
+        "No keyword data was returned for the current period. "+(v.flags.notes[0]||""));
+      return;
+    }
+    STATE.raw=payload;
+    STATE.keywords=enrichKeywords(v.kw);
+    hideEmpty();
+    renderHeader(period,payload);
+    populateEntityFilters();
+    renderTableHead();
+    renderTrend();
+    applyFilters();
+    renderDQ(v);
+    $("hdStatus").innerHTML = statusChip();
+  }catch(err){
+    console.error("Sync failed:",err);
+    if(STATE.source==="csv"){
+      showEmpty(period,"Couldn't read the CSV",
+        (err&&err.message||"Parse error")+" Check that the file is an Amazon keyword report and try again.");
+    } else {
+      showEmpty(period,"Amazon data connection unavailable",
+        "Couldn't reach the backend ("+(err&&err.message||"network error")+"). Check the Amazon connection and sync again — or turn on Demo data instead.");
+    }
+  }
+}
+function setStatusSyncing(){ $("hdStatus").innerHTML='<span class="dot demo"></span>Syncing…'; }
+function renderHeaderRangesOnly(period){
+  $("hdPtype").textContent=period.typeLabel;
+}
+function showEmpty(period,title,msg){
+  $("dashBody").classList.add("hidden");
+  const e=$("emptyState"); e.classList.add("show");
+  $("emptyTitle").textContent=title;
+  $("emptyMsg").textContent=msg;
+  $("emptyRanges").innerHTML="Current period: "+fmtRange(period.curStart,period.curEnd)+
+    "<br>Comparison period: "+fmtRange(period.prevStart,period.prevEnd);
+  $("hdStatus").innerHTML = STATE.demo? '<span class="dot demo"></span>Demo' : '<span class="dot off"></span>Unavailable';
+}
+function hideEmpty(){ $("emptyState").classList.remove("show"); $("dashBody").classList.remove("hidden"); }
+
+/* =========================== EVENTS =========================== */
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+
+function wireEvents(){
+  $("selPeriod").addEventListener("change",()=>{
+    $("customWrap").classList.toggle("show",$("selPeriod").value==="custom");
+    if($("selPeriod").value!=="custom") sync();
+  });
+  ["selFrom","selTo"].forEach(id=>$(id).addEventListener("change",()=>{ if($("selPeriod").value==="custom" && $("selFrom").value && $("selTo").value) sync(); }));
+  ["selAccount","selMkt"].forEach(id=>$(id).addEventListener("change",sync));
+  ["selCampaign","selAdGroup","selDiag","selPrio","selStatus"].forEach(id=>$(id).addEventListener("change",applyFilters));
+  $("selSearch").addEventListener("input",debounce(applyFilters,180));
+  $("barSort").addEventListener("change",renderBar);
+  $("btnSync").addEventListener("click",sync);
+  $("emptySync").addEventListener("click",sync);
+  $("btnExport").addEventListener("click",exportCSV);
+
+  $("btnThresholds").addEventListener("click",()=>$("thrPanel").classList.toggle("hidden"));
+  ["thSevere","thHigh","thMod","thGrowth"].forEach(id=>$(id).addEventListener("input",()=>{
+    STATE.thresholds.severe=+$("thSevere").value; STATE.thresholds.high=+$("thHigh").value;
+    STATE.thresholds.moderate=+$("thMod").value; STATE.thresholds.growth=+$("thGrowth").value;
+    if(STATE.keywords.length){ STATE.keywords=enrichKeywords(rawKw()); populateEntityFilters(); applyFilters(); }
+  }));
+
+  // ---- data source switch ----
+  $("selSource").addEventListener("change",()=>{
+    STATE.source=$("selSource").value;
+    relabelSync();
+    sync();
+  });
+
+  $("demoSw").parentElement.addEventListener("click",()=>{
+    if(STATE.source==="csv") return; // demo not applicable to CSV source
+    STATE.demo=!STATE.demo; $("demoSw").classList.toggle("on",STATE.demo);
+    $("demoBar").classList.toggle("show",STATE.demo); sync();
+  });
+  $("autoSyncSw").parentElement.addEventListener("click",()=>{
+    STATE.autoSync=!STATE.autoSync; $("autoSyncSw").classList.toggle("on",STATE.autoSync);
+    if(STATE.autoSync){ STATE.autoTimer=setInterval(sync,CONFIG.AUTO_SYNC_MS); }
+    else { clearInterval(STATE.autoTimer); STATE.autoTimer=null; }
+  });
+  window.addEventListener("resize",()=>{ if(STATE.raw){ renderTrend(); renderBar(); } });
+}
+function relabelSync(){ $("btnSync").textContent = STATE.source==="csv" ? "⟳ Re-sync CSV" : "⟳ Sync from Amazon"; }
+
+function setupDrop(dropId,inputId,clearId){
+  const drop=$(dropId), input=$(inputId);
+  const openPick=()=>input.click();
+  drop.addEventListener("click",(e)=>{ if(e.target.id===clearId) return; openPick(); });
+  drop.addEventListener("keydown",(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openPick(); } });
+  input.addEventListener("change",()=>{ if(input.files&&input.files[0]) readCSVFile(input.files[0]); });
+  ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,(e)=>{ e.preventDefault(); drop.classList.add("drag"); }));
+  ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,(e)=>{ e.preventDefault(); drop.classList.remove("drag"); }));
+  drop.addEventListener("drop",(e)=>{ const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) readCSVFile(f); });
+  $(clearId).addEventListener("click",(e)=>{ e.stopPropagation(); clearCSV(); });
+}
+function readCSVFile(file){
+  const rdr=new FileReader();
+  rdr.onload=()=>{
+    const text=String(rdr.result||"");
+    STATE.csv.single=text; STATE.csv.name=file.name;
+    // describe how this file will be compared
+    let desc="Loaded";
+    try{
+      const {map}=CSVSVC.parse(text);
+      const hasPrev=["prevSales","prevOrders","prevImpressions","prevClicks","prevSpend"].some(f=>map[f]!=null);
+      const hasDate=map.date!=null;
+      desc = hasPrev? "Previous-year columns found — comparing directly"
+           : hasDate? "Date column found — splitting current vs previous year"
+           : "No previous-year data in file — current period only";
+    }catch(_){}
+    markDrop("dropCur","curTt","curDs",file.name,desc);
+    if(STATE.source!=="csv"){ $("selSource").value="csv"; STATE.source="csv"; $("demoWrap").style.display="none"; relabelSync(); }
+    sync();
+  };
+  rdr.onerror=()=>alert("Could not read the file.");
+  rdr.readAsText(file);
+}
+function markDrop(dropId,ttId,dsId,name,desc){
+  $(dropId).classList.add("loaded");
+  $(ttId).textContent=name; $(dsId).textContent=desc;
+}
+function clearCSV(){
+  STATE.csv.single=null; STATE.csv.name=null;
+  $("fileCur").value=""; $("dropCur").classList.remove("loaded");
+  $("curTt").textContent="Keyword CSV";
+  $("curDs").textContent="Drag & drop or click — one file with current & previous-year data";
+  sync();
+}
+
+function rawKw(){ // reconstruct minimal kw input for re-enrichment on threshold change
+  return STATE.keywords.map(k=>({keyword:k.keyword,campaign:k.campaign,adGroup:k.adGroup,matchType:k.matchType,status:k.status,
+    bid:k.bid,suggestedBid:k.suggestedBid,
+    cur:{sales:k.cSales,orders:k.cOrd,impressions:k.cImp,clicks:k.cClk,spend:k.cSpend},
+    prev:{sales:k.pSales,orders:k.pOrd,impressions:k.pImp,clicks:k.pClk,spend:k.pSpend}}));
+}
+function debounce(fn,ms){ let t; return function(){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,arguments),ms); }; }
+
+/* =========================== CSV SERVICE ===========================
+   Parses ONE uploaded Amazon keyword CSV (comma / tab / semicolon) into the
+   same normalised payload the API returns, so it flows through the identical
+   validation → YoY → diagnosis → render pipeline.
+   A single file can carry the comparison in any of these ways:
+     (a) explicit previous-year columns per keyword
+         (e.g. "Sales" + "Previous Sales")            -> direct current vs prev
+     (b) a Date column spanning both years            -> auto-split into windows
+     (c) current only (no prev columns, no 2nd year)  -> previous stays empty
+   Runs on the cached file text, so Auto Sync can re-apply a new period. */
+const CSVSVC = {
+  hasData(){ return !!STATE.csv.single; },
+
+  detectDelim(sample){
+    const line = sample.split(/\r?\n/).find(l=>l.trim().length) || "";
+    const t=(line.match(/\t/g)||[]).length, c=(line.match(/,/g)||[]).length, s=(line.match(/;/g)||[]).length;
+    if(t>=c && t>=s && t>0) return "\t";
+    if(s>c && s>0) return ";";
+    return ",";
+  },
+  splitLine(line,delim){
+    const out=[]; let cur="",q=false;
+    for(let i=0;i<line.length;i++){ const ch=line[i];
+      if(q){ if(ch=='"'){ if(line[i+1]=='"'){cur+='"';i++;} else q=false; } else cur+=ch; }
+      else { if(ch=='"') q=true; else if(ch===delim){ out.push(cur); cur=""; } else cur+=ch; }
+    }
+    out.push(cur); return out;
+  },
+  norm(h){ return String(h||"").toLowerCase().replace(/[^a-z0-9]/g,""); },
+  mapHeaders(headers){
+    const normd=headers.map(this.norm);
+    const map={};
+    for(const field in CONFIG.CSV_HEADERS){
+      for(const alias of CONFIG.CSV_HEADERS[field]){
+        const idx=normd.indexOf(alias);
+        if(idx>=0){ map[field]=idx; break; }
+      }
+    }
+    return map;
+  },
+  parse(text){
+    text=text.replace(/^\uFEFF/,"");
+    const delim=this.detectDelim(text);
+    const lines=text.split(/\r?\n/).filter(l=>l.length>0);
+    if(!lines.length) return {map:{},rows:[]};
+    const headers=this.splitLine(lines[0],delim);
+    const map=this.mapHeaders(headers);
+    const rows=[];
+    for(let i=1;i<lines.length;i++){
+      const cells=this.splitLine(lines[i],delim);
+      if(cells.every(c=>c.trim()==="")) continue;
+      rows.push(cells);
+    }
+    return {map,rows,delim};
+  },
+  numAt(cells,idx){ if(idx==null) return 0; let v=cells[idx]; if(v==null) return 0;
+    v=String(v).replace(/[£$€,%\s]/g,""); const n=parseFloat(v); return isFinite(n)?n:0; },
+  strAt(cells,idx){ if(idx==null) return ""; return (cells[idx]==null?"":String(cells[idx]).trim()); },
+  normDate(s){ if(!s) return null; s=String(s).trim();
+    const iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/); if(iso) return iso[1]+"-"+iso[2]+"-"+iso[3];
+    const d=new Date(s); if(!isNaN(d)) return toISO(new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())));
+    return null; },
+
+  emptyAgg(){ return {sales:0,orders:0,impressions:0,clicks:0,spend:0}; },
+  addCur(a,cells,map){
+    a.sales+=this.numAt(cells,map.sales); a.orders+=this.numAt(cells,map.orders);
+    a.impressions+=this.numAt(cells,map.impressions); a.clicks+=this.numAt(cells,map.clicks);
+    a.spend+=this.numAt(cells,map.spend);
+  },
+  addPrevCols(a,cells,map){
+    a.sales+=this.numAt(cells,map.prevSales); a.orders+=this.numAt(cells,map.prevOrders);
+    a.impressions+=this.numAt(cells,map.prevImpressions); a.clicks+=this.numAt(cells,map.prevClicks);
+    a.spend+=this.numAt(cells,map.prevSpend);
+  },
+  keyFor(cells,map){
+    return this.strAt(cells,map.keyword)+"||"+this.strAt(cells,map.campaign)+"||"+this.strAt(cells,map.adGroup);
+  },
+  meta(cells,map){
+    return { keyword:this.strAt(cells,map.keyword)||"(unknown)",
+      campaign:this.strAt(cells,map.campaign)||"—", adGroup:this.strAt(cells,map.adGroup)||"—",
+      matchType:this.strAt(cells,map.matchType), status:(this.strAt(cells,map.status)||"active").toLowerCase(),
+      bid: map.bid!=null? this.numAt(cells,map.bid): null,
+      suggestedBid: map.suggestedBid!=null? this.numAt(cells,map.suggestedBid): null };
+  },
+
+  build(period){
+    const {map,rows}=this.parse(STATE.csv.single);
+    if(map.keyword==null) throw new Error("No keyword/targeting column found in the CSV.");
+
+    const hasPrevCols = ["prevSales","prevOrders","prevImpressions","prevClicks","prevSpend"].some(f=>map[f]!=null);
+    const hasDate = map.date!=null;
+
+    const dict={}, curDaily={}, prevDaily={};
+    const ensure=(cells)=>{ const k=this.keyFor(cells,map);
+      if(!dict[k]){ dict[k]={...this.meta(cells,map),cur:this.emptyAgg(),prev:this.emptyAgg()}; }
+      else { const m=this.meta(cells,map); const e=dict[k]; // refresh latest non-empty attributes
+        if(m.matchType)e.matchType=m.matchType; if(m.status)e.status=m.status;
+        if(m.bid!=null)e.bid=m.bid; if(m.suggestedBid!=null)e.suggestedBid=m.suggestedBid; }
+      return dict[k]; };
+
+    rows.forEach(cells=>{
+      if(!this.strAt(cells,map.keyword)) return;
+      const e=ensure(cells);
+
+      if(hasPrevCols){
+        // (a) explicit previous-year columns → current from standard cols, prev from prev cols
+        this.addCur(e.cur,cells,map);
+        this.addPrevCols(e.prev,cells,map);
+        if(hasDate){ const d=this.normDate(this.strAt(cells,map.date));
+          if(d){ curDaily[d]=(curDaily[d]||0)+this.numAt(cells,map.sales);
+                 prevDaily[d]=(prevDaily[d]||0)+this.numAt(cells,map.prevSales); } }
+      } else if(hasDate){
+        // (b) dated two-year file → slice current & previous windows
+        const d=this.normDate(this.strAt(cells,map.date));
+        const sales=this.numAt(cells,map.sales);
+        if(d && d>=period.curStart && d<=period.curEnd){ this.addCur(e.cur,cells,map); curDaily[d]=(curDaily[d]||0)+sales; }
+        else if(d && d>=period.prevStart && d<=period.prevEnd){ this.addCur(e.prev,cells,map); prevDaily[d]=(prevDaily[d]||0)+sales; }
+      } else {
+        // (c) current only
+        this.addCur(e.cur,cells,map);
+      }
+    });
+
+    const keywords=Object.values(dict).map(e=>({
+      keyword:e.keyword,campaign:e.campaign,adGroup:e.adGroup,matchType:e.matchType,status:e.status,
+      bid:e.bid,suggestedBid:e.suggestedBid, cur:e.cur, prev:e.prev
+    }));
+    const toDaily=(obj)=>Object.keys(obj).sort().map(k=>({date:k,sales:Math.round(obj[k]*100)/100}));
+    return { syncedAt:new Date().toISOString(), account:$("selAccount").value, marketplace:$("selMkt").value,
+      currency:(CONFIG.MARKETS[$("selMkt").value]||{}).currency, source:"csv", mode:(hasPrevCols?"prev-columns":(hasDate?"date-split":"current-only")),
+      current:{start:period.curStart,end:period.curEnd,daily:toDaily(curDaily)},
+      previous:{start:period.prevStart,end:period.prevEnd,daily:toDaily(prevDaily)},
+      keywords };
+  }
+};
+
+/* =========================== DEMO DATA PROVIDER ===========================
+   Only used when the "Demo data" toggle is ON. Clearly labelled in the UI.
+   Deterministic pseudo-random so previews are stable. Never invoked silently. */
+const DEMO=(function(){
+  const TERMS=["pendant lamp shade","ceiling rose","e27 lamp holder","fabric lampshade","brass ceiling light",
+    "vintage edison bulb","metal pendant shade","cable gland","conduit lighting","wall lamp bracket",
+    "table lamp base","led filament bulb","shade ring reducer","chandelier chain","bakelite lamp holder",
+    "flex cord fabric","junction box waterproof","dimmer switch led","ceiling pendant kit","gu10 spotlight",
+    "black pendant light","copper lamp holder","drum lampshade","industrial cage bulb","porcelain lamp holder",
+    "e14 bulb holder","braided lighting cable","batten holder","glass lamp shade","screw terminal block",
+    "smart led bulb","reading lamp","picture light","plug in pendant","cluster ceiling light",
+    "wire cage shade","transformer led driver","tile spacer clips","ceiling hook","strain relief cord grip"];
+  const CAMPS=["SP-Lighting-Core","SP-Shades-Exact","SP-Holders-Broad","SP-Bulbs-Auto","SP-Cables-Phrase","SB-Brand-Defense"];
+  const AGS=["Pendant","Rose & Holders","Bulbs","Cables","Spares","Brand"];
+  const MATCH=["EXACT","PHRASE","BROAD"];
+  function rng(seed){ let s=seed>>>0; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+  function build(period,acct,mkt){
+    const seed=hash(acct+"|"+mkt+"|"+period.curStart);
+    const r=rng(seed);
+    const scale = acct==="LEDSone"?1: (acct==="DC Voltage"?0.55:0.25);
+    const mScale = ({UK:1,US:0.8,DE:0.7,CA:0.4,FR:0.5,IT:0.45})[mkt]||0.6;
+    const nKw=34;
+    const keywords=[];
+    const curDaily={}, prevDaily={};
+    for(let i=0;i<nKw;i++){
+      const term=TERMS[i%TERMS.length];
+      const ci=Math.floor(r()*CAMPS.length);
+      const baseSales=(20+r()*260)*scale*mScale;
+      // introduce a spread of YoY behaviours
+      const roll=r();
+      let factor; // current = prev*factor
+      if(roll<0.28) factor=1.1+r()*0.9;       // growth
+      else if(roll<0.45) factor=0.92+r()*0.14; // stable
+      else if(roll<0.62) factor=0.72+r()*0.16; // moderate
+      else if(roll<0.78) factor=0.52+r()*0.18; // high
+      else if(roll<0.9) factor=0.15+r()*0.32;  // severe
+      else factor=0;                            // dropped to zero
+      const pSales=baseSales, cSales=pSales*factor;
+      const status = (roll>=0.9 && r()<0.5)?"paused":"active";
+      const pClicks=Math.max(3,Math.round(pSales/ (6+r()*8)));
+      const cClicks=Math.max(0,Math.round(pClicks*(factor*(0.8+r()*0.5))));
+      const pCTRb=0.3+r()*0.7, cCTRb=pCTRb*(0.7+r()*0.6);
+      const pImp=Math.round(pClicks/ (pCTRb/100));
+      const cImp=Math.round(cClicks/ Math.max(0.001,(cCTRb/100))) || Math.round(pImp*(0.6+r()*0.6));
+      const pOrd=Math.max(0,Math.round(pClicks*(0.06+r()*0.12)));
+      const cOrd=Math.max(0,Math.round(cClicks*(0.05+r()*0.12)));
+      const pSpend=pSales*(0.18+r()*0.22), cSpend=cSales*(0.2+r()*0.28)+ (status==="paused"?0:cClicks*0.02);
+      const bid=+(0.3+r()*1.2).toFixed(2);
+      const sugg=+(bid*(0.9+r()*0.6)).toFixed(2);
+      keywords.push({keyword:term,campaign:CAMPS[ci],adGroup:AGS[ci],matchType:MATCH[i%3],status,bid,suggestedBid:sugg,
+        cur:{sales:round2(cSales),orders:cOrd,impressions:cImp,clicks:cClicks,spend:round2(cSpend)},
+        prev:{sales:round2(pSales),orders:pOrd,impressions:pImp,clicks:pClicks,spend:round2(pSpend)}});
+    }
+    // daily series (aggregate) with mild weekday variation
+    const n=period.days;
+    const curArr=[],prevArr=[];
+    const totCur=keywords.reduce((s,k)=>s+k.cur.sales,0), totPrev=keywords.reduce((s,k)=>s+k.prev.sales,0);
+    let wc=[],wp=[],sc=0,sp=0;
+    for(let i=0;i<n;i++){ const c=0.6+Math.abs(Math.sin(i*1.1))*0.9+r()*0.3; const p=0.6+Math.abs(Math.sin(i*1.0+1))*0.9+r()*0.3; wc.push(c);wp.push(p);sc+=c;sp+=p; }
+    for(let i=0;i<n;i++){
+      curArr.push({date:addDaysISO(period.curStart,i), sales:round2(totCur*wc[i]/sc)});
+      prevArr.push({date:addDaysISO(period.prevStart,i), sales:round2(totPrev*wp[i]/sp)});
+    }
+    return { syncedAt:new Date().toISOString(), account:acct, marketplace:mkt,
+      currency:(CONFIG.MARKETS[mkt]||{}).currency,
+      current:{start:period.curStart,end:period.curEnd,daily:curArr},
+      previous:{start:period.prevStart,end:period.prevEnd,daily:prevArr},
+      keywords };
+  }
+  function round2(v){ return Math.round(v*100)/100; }
+  function hash(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+  return { build };
+})();
+
+/* =========================== INIT =========================== */
+function init(){
+  // default custom dates to a sensible like-for-like example
+  $("selFrom").value="2026-06-15"; $("selTo").value="2026-06-30";
+  $("selSource").value=STATE.source;
+  $("demoWrap").style.display = STATE.source==="csv" ? "none" : "";
+  wireEvents();
+  relabelSync();
+  // initial paint of period ranges even before first sync
+  const period=computePeriod();
+  STATE.periodMeta=period;
+  renderHeaderRangesOnly(period);
+  $("hdCur").textContent=(CONFIG.MARKETS.UK.currency)+" (£)";
+  $("hdStatus").innerHTML=statusChip();
+  $("emptyState").classList.add("show");
+  $("emptyRanges").innerHTML="Current period: "+fmtRange(period.curStart,period.curEnd)+
+    "<br>Comparison period: "+fmtRange(period.prevStart,period.prevEnd);
+  $("emptyTitle").textContent="Sync from Amazon to load keyword performance data";
+  $("emptyMsg").innerHTML="Press <b>Sync from Amazon</b> above to pull current vs previous-year keyword sales. "+
+    "Want to preview the interface first? Turn on <b>Demo data</b>.";
+}
+document.addEventListener("DOMContentLoaded",init);
+
+</script>
+</body>
+</html>
