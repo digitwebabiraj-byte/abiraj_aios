@@ -12,19 +12,19 @@ OUT = os.path.join(HERE, "smaw_merge.json")
 
 # (source-key, display-name, role, type)
 SPEC = [
-    ("listing_sku",   "SKU",            "id",     "text"),
-    ("asin",          "ASIN",           "id",     "text"),
-    ("master_sku",    "Master SKU",     "id",     "text"),
-    ("account",       "Account",        "id",     "text"),
-    ("amazon_fbm",    "Amazon FBM",     "metric", "num"),
-    ("uk_warehouse",  "UK Warehouse",   "metric", "num"),
-    ("order_count_90","Order Count 90d","metric", "num"),
-    ("velocity",      "Velocity",       "metric", "num"),
-    ("days_remaining","Days Remaining", "metric", "num"),
-    ("stock_status",  "Stock Status",   "metric", "text"),
-    ("suppliers",     "Suppliers",      "metric", "text"),
-    ("po_qty",        "PO Qty",         "metric", "num"),
-    ("containers",    "Containers",     "metric", "text"),
+    ("asin",          "ASIN",                "id",     "text"),
+    ("account",       "Account",             "id",     "text"),
+    ("listing_sku",   "Listing SKU",         "id",     "text"),
+    ("master_sku",    "Correct SKU (Master)","id",     "text"),
+    ("amazon_fbm",    "Amazon Qty (FBM)",    "metric", "num"),
+    ("uk_warehouse",  "UK Warehouse (Real)", "metric", "num"),
+    ("order_count_90","90d Order Count",     "metric", "num"),
+    ("velocity",      "Velocity /day",       "metric", "num"),
+    ("days_remaining","Days Remaining",      "metric", "num"),
+    ("suppliers",     "Upcoming Supplier",   "metric", "text"),
+    ("po_qty",        "PO Qty (Incoming)",   "metric", "num"),
+    ("containers",    "Container #",         "metric", "text"),
+    ("stock_status",  "Stock Status",        "metric", "text"),
 ]
 COLUMNS = [{"key": k, "name": n, "role": r, "type": t} for (k, n, r, t) in SPEC]
 

@@ -25,11 +25,11 @@ def dref(tbl, i):
 
 # (raw slot, lookup-dict or None, key, name, role, type) — full 20, original order
 SPEC = [
-    (0,  None,      "image",    "Product Image",   "id",     "img"),
+    (0,  None,      "image",    "Image",           "id",     "img"),
     (1,  "account", "account",  "Account",         "id",     "text"),
     (2,  "brand",   "brand",    "Brand",           "id",     "text"),
     (3,  None,      "sku",      "SKU",             "id",     "text"),
-    (4,  None,      "item_id",  "eBay Item ID",    "id",     "text"),
+    (4,  None,      "item_id",  "Item ID",         "id",     "text"),
     (5,  None,      "title",    "Product Title",   "id",     "text"),
     (6,  "category","category", "Category",        "id",     "text"),
     (7,  None,      "price",    "Current Price",   "metric", "money"),
@@ -43,7 +43,7 @@ SPEC = [
     (15, None,      "s_days",   "Days Since Sale", "metric", "num"),
     (16, None,      "s_views",  "Views 30d",       "metric", "num"),
     (18, None,      "s_conv",   "Conv Rate",       "metric", "pct"),
-    (19, "status",  "s_status", "Listing Status",  "metric", "text"),
+    (19, "status",  "s_status", "Status",          "metric", "text"),
     (20, "action",  "s_action", "Action Required", "metric", "text"),
 ]
 COLUMNS = [{"key": k, "name": n, "role": r, "type": t} for (_s, _d, k, n, r, t) in SPEC]
