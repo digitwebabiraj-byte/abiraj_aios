@@ -89,7 +89,15 @@ def fetch_t7(workdir):
     rows = [{"s": r.get("sku"), "r": r.get("ref_id"), "p": r.get("platform"), "a": r.get("account"),
              "b": r.get("base_sku"), "m": int(r.get("mapped_flag") or 0), "o": int(r.get("orders") or 0)}
             for r in raw]
-    names = {r["sku"]: r.get("product_name") for r in raw if r.get("sku")}
+    # build the names map EXACTLY like T7's own runner: iterate in query order, keep the FIRST
+    # non-empty title per SKU (setdefault), and map BOTH sku and base_sku — so multi-listing SKUs
+    # (Amazon/eBay/B&Q titles differ) resolve to the same product name T7 shows.
+    names = {}
+    for r in raw:
+        pn = r.get("product_name")
+        if pn:
+            names.setdefault(r.get("sku"), pn)
+            names.setdefault(r.get("base_sku"), pn)
     data = {"meta": {"run_date": str(we), "week_start": str(ws), "week_end": str(we)},
             "names": names, "rows": rows}
     path = os.path.join(workdir, "t7_data.json")
