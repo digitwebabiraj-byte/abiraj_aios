@@ -88,12 +88,13 @@ for base, listings in grp.items():
     total = sum(plat.values())
     distinct = {r["s"] for r in listings}
     merged = len(distinct) > 1
+    # perf verdict string — EXACTLY as T7's build_html.build_groups produces it
     if y > 0 and x == y:
         perf = "All performing ✅"
     elif x == 0:
-        perf = f"0 / {y} ASINs performing \U0001f534"
+        perf = f"0/{y} performing \U0001f534"
     else:
-        perf = f"{x} / {y} ASINs performing ⚠️"
+        perf = f"{x}/{y} performing ⚠️"
     action = "See ASIN rows below ↓" if x < y else "—"
     blue = []
     for r in sorted(listings, key=lambda z: (-z["o"], z["p"])):
