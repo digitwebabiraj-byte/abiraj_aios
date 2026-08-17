@@ -7,6 +7,6 @@
     { "task": "EBPD", "file": "emitters/ebpd_merge.json", "headline": ["revenue", "orders"],
       "filters": [] },
     { "task": "DST", "file": "emitters/dst_merge.json", "headline": ["o_today"],
-      "filters": ["market", "trend", "holder"] }
+      "filters": ["trend"] }
   ]
 }
