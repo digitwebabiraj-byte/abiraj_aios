@@ -34,9 +34,11 @@ for t in REG["tasks"]:
     has_ccy = any(c["key"] == "__ccy" for c in d["columns"])
     disp_columns = [c for c in d["columns"] if c["key"] != "__ccy"]
 
-    id_cols  = [c for c in disp_columns if c["role"] == "id"]
+    # preserve the emitter's DECLARED column order exactly (some tasks interleave id/metric
+    # roles — e.g. DST trends, T7 Performing?/Action, ESNM Status/Action, FMP Overall Rank —
+    # and reordering id-before-metric would break exact column-order parity with the source table)
     met_cols = [c for c in disp_columns if c["role"] == "metric"]
-    ordered  = id_cols + met_cols
+    ordered  = disp_columns
     cols = [{"key": c["key"], "name": c["name"], "group": ("ID" if c["role"] == "id" else d["task"]),
              "type": c["type"], "pin": c["key"] in ("image", "sku", "acct"),
              "agg": c.get("agg"), "big": c["key"] in headline} for c in ordered]
