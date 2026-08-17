@@ -36,6 +36,7 @@ COLUMNS = [
     {"key": "total",     "name": "TOTAL Orders",    "role": "metric", "type": "num"},
     {"key": "perf",      "name": "Performing?",     "role": "id",     "type": "text"},
     {"key": "action",    "name": "Action Required", "role": "id",     "type": "text"},
+    {"key": "__name_tip","name": "__name_tip",      "role": "id",     "type": "text"},  # hidden: real name (T7 shows "Bulb", real name on hover)
 ]
 
 PLATFORM_KEY = {"AMAZON": "amazon", "EBAY": "ebay", "B&Q": "bq"}
@@ -118,7 +119,7 @@ rows = []
 for g in groups:
     base_lbl = g["base"] + (f"  [+{g['skus']-1} SKUs]" if g["merged"] else "")
     rows.append({
-        "sku": base_lbl, "row_type": "SKU SUMMARY", "title": g["name"],
+        "sku": base_lbl, "row_type": "SKU SUMMARY", "title": "Bulb", "__name_tip": g["name"],
         "platform": "All Platforms", "account": "-", "week_start": ws2, "week_end": we2,
         "amazon": g["amazon"], "ebay": g["ebay"], "bq": g["bq"], "total": g["total"],
         "perf": g["perf"], "action": g["action"],
@@ -126,7 +127,7 @@ for g in groups:
     for r in g["rows"]:
         sku_lbl = r["sku"] + ("  [variant]" if r["variant"] else "")
         rows.append({
-            "sku": sku_lbl, "row_type": clean(r["ref"]), "title": clean(r["name"]),
+            "sku": sku_lbl, "row_type": clean(r["ref"]), "title": "Bulb", "__name_tip": clean(r["name"]),
             "platform": clean(r["platform"]), "account": clean(r["account"]),
             "week_start": ws2, "week_end": we2,
             "amazon": r["amazon"], "ebay": r["ebay"], "bq": r["bq"], "total": r["total"],
@@ -137,4 +138,5 @@ out = {"task": "T7", "label": "SKU Performance", "owner": "Thuwaraga",
        "join_key": "sku", "as_of": asof, "columns": COLUMNS, "rows": rows}
 json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False)
 print("wrote", OUT)
-print("task T7 |", len(rows), "rows (", len(groups), "families ) |", len(COLUMNS), "columns | as_of", asof)
+print("task T7 |", len(rows), "rows (", len(groups), "families ) |",
+      len([c for c in COLUMNS if not c["key"].startswith("__")]), "columns | as_of", asof)

@@ -31,8 +31,10 @@ for t in REG["tasks"]:
     # multi-currency tabs like DST £/€/$/CA$, and to FORCE £ on £-only tabs like EBPD).
     CCY_SYM = {"GBP": "£", "EUR": "€", "USD": "$", "CAD": "CA$",
                "£": "£", "€": "€", "$": "$", "CA$": "CA$"}
-    has_ccy = any(c["key"] == "__ccy" for c in d["columns"])
-    disp_columns = [c for c in d["columns"] if c["key"] != "__ccy"]
+    hidden_cols = [c for c in d["columns"] if c["key"].startswith("__")]
+    hkeys = [c["key"] for c in hidden_cols]
+    has_ccy = "__ccy" in hkeys
+    disp_columns = [c for c in d["columns"] if not c["key"].startswith("__")]
 
     # preserve the emitter's DECLARED column order exactly (some tasks interleave id/metric
     # roles — e.g. DST trends, T7 Performing?/Action, ESNM Status/Action, FMP Overall Rank —
@@ -43,12 +45,16 @@ for t in REG["tasks"]:
              "type": c["type"], "pin": c["key"] in ("image", "sku", "acct"),
              "agg": c.get("agg"), "big": c["key"] in headline} for c in ordered]
 
-    # rows aligned to this task's own column order (+ hidden trailing currency symbol if present)
+    # rows aligned to this task's own column order (+ any hidden "__" values as trailing elements,
+    # in hkeys order — currency symbol, name tooltip, etc. — so they survive the JS sort/filter)
     ckeys = [c["key"] for c in ordered]
-    def _ccy(r):
-        raw = str(r.get("__ccy") or "").strip()
-        return CCY_SYM.get(raw.upper(), CCY_SYM.get(raw, "£"))
-    rows = [[r.get(k) for k in ckeys] + ([_ccy(r)] if has_ccy else []) for r in d["rows"]]
+    def _hid(k, r):
+        v = r.get(k)
+        if k == "__ccy":
+            raw = str(v or "").strip()
+            return CCY_SYM.get(raw.upper(), CCY_SYM.get(raw, "£"))
+        return v
+    rows = [[r.get(k) for k in ckeys] + [_hid(k, r) for k in hkeys] for r in d["rows"]]
 
     # default sort: first money metric desc (nice ordering), else leave as-is
     sort_key = next((c["key"] for c in met_cols if c["type"] == "money"), None)
@@ -75,7 +81,7 @@ for t in REG["tasks"]:
     tasks.append({"code": d["task"], "label": d.get("label", d["task"]),
                   "owner": d.get("owner", ""), "as_of": d.get("as_of", ""),
                   "count": len(rows), "cols": cols, "summary": summary,
-                  "filters": tfilters, "rows": rows, "hasccy": has_ccy})
+                  "filters": tfilters, "rows": rows, "hasccy": has_ccy, "hidden": hkeys})
     print(f"loaded {d['task']}: {len(rows):,} rows, {len(cols)} cols, as_of {d.get('as_of')}")
 
 meta = {"title": REG.get("title", "Unified Dashboard"),
@@ -169,10 +175,10 @@ function T(){return TASKS[active];}
 function colIdx(pred){return T().cols.findIndex(pred);}
 function computeView(){
  const cols=T().cols, rows=T().rows;
- const skuI=colIdx(c=>c.key==='sku'), titI=colIdx(c=>c.key==='title'||c.name==='Product Title');
+ const skuI=colIdx(c=>c.key==='sku'), titI=colIdx(c=>c.key==='title'||c.name==='Product Title'), tipI=hcol('__name_tip');
  let v=rows;
  if(ui.q){const q=ui.q.toLowerCase();
-  v=v.filter(r=>(skuI>=0&&(''+(r[skuI]??'')).toLowerCase().includes(q))||(titI>=0&&(''+(r[titI]??'')).toLowerCase().includes(q)));}
+  v=v.filter(r=>(skuI>=0&&(''+(r[skuI]??'')).toLowerCase().includes(q))||(titI>=0&&(''+(r[titI]??'')).toLowerCase().includes(q))||(tipI>=0&&(''+(r[tipI]??'')).toLowerCase().includes(q)));}
  T().filters.forEach(f=>{const val=ui.f[f.key];if(!val)return;const ci=colIdx(c=>c.key===f.key);
   if(ci>=0)v=v.filter(r=>(''+(r[ci]??''))===val);});
  if(ui.sortCol!=null){const ci=ui.sortCol,dir=ui.sortDir,typ=cols[ci].type;
@@ -218,14 +224,15 @@ function buildHeader(){const cols=T().cols;const hrow=document.getElementById('h
   const s=document.querySelector('#body tr:not(.spacer)');
   if(s){const h=s.getBoundingClientRect().height;if(h>1&&Math.abs(h-ROWH)>0.5){ROWH=h;paint();applyOffsets();}}});}
 let ccyMI=-1,ccyAI=-1;
+function hcol(key){const hs=T().hidden||[];const i=hs.indexOf(key);return i<0?-1:T().cols.length+i;}  // index of a hidden "__" value in the row
 function rowCurrency(r){
- if(T().hasccy)return r[r.length-1]||(DATA.currency||'£');   // explicit per-row symbol (rides as hidden trailing element)
+ if(T().hasccy){const i=hcol('__ccy');return (i>=0?r[i]:'')||(DATA.currency||'£');}   // explicit per-row symbol (hidden trailing element)
  if(ccyMI>=0){const m=(''+(r[ccyMI]??'')).toLowerCase();if(m.includes('german'))return '€';if(m.includes('uk')||m.includes('gb'))return '£';}
  if(ccyAI>=0){const a=(''+(r[ccyAI]??'')).toLowerCase();if(a.includes('german')||/\bde\b/.test(a))return '€';if(a.includes('uk'))return '£';}
  return DATA.currency||'£';}
-function makeCell(c,val,cur){const td=document.createElement('td');td.className=(c.pin?'fix ':'')+cls(c);
+function makeCell(c,val,cur,tip){const td=document.createElement('td');td.className=(c.pin?'fix ':'')+cls(c);
  if(c.type==='img'){td.className+=' imgc';td.innerHTML=val?`<img class="thumb" src="${val}" loading="lazy">`:'';}
- else if(c.key==='title'||c.name==='Product Title'){td.className+=' title';const t=val||'—';td.textContent=t;td.title=t;}
+ else if(c.key==='title'||c.name==='Product Title'||c.name==='Product Name'){td.className+=' title';const t=val||'—';td.textContent=t;td.title=(tip!=null&&tip!=='')?tip:t;}
  else{let s;
   if(c.type==='money'&&val!=null&&val!==''&&!isNaN(Number(val))){const n=Number(val);
    s=(n<0?'-':'')+(cur||'')+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
@@ -241,8 +248,9 @@ function paint(){const cols=T().cols,ROWS=view;const body=document.getElementByI
  body.innerHTML='';
  const top=document.createElement('tr');top.className='spacer';top.innerHTML=`<td colspan="${nCol}" style="height:${start*ROWH}px"></td>`;body.appendChild(top);
  const frag=document.createDocumentFragment();
- for(let ri=start;ri<end;ri++){const r=ROWS[ri];const cur=rowCurrency(r);const tr=document.createElement('tr');
-  cols.forEach((c,i)=>{const td=makeCell(c,r[i],cur);if(c.pin&&stickyOffs[i]!=null)td.style.left=stickyOffs[i]+'px';tr.appendChild(td);});frag.appendChild(tr);}
+ const tI=hcol('__name_tip');
+ for(let ri=start;ri<end;ri++){const r=ROWS[ri];const cur=rowCurrency(r);const ntip=tI>=0?r[tI]:null;const tr=document.createElement('tr');
+  cols.forEach((c,i)=>{const isName=(c.key==='title'||c.name==='Product Title'||c.name==='Product Name');const td=makeCell(c,r[i],cur,isName?ntip:null);if(c.pin&&stickyOffs[i]!=null)td.style.left=stickyOffs[i]+'px';tr.appendChild(td);});frag.appendChild(tr);}
  body.appendChild(frag);const bot=document.createElement('tr');bot.className='spacer';
  bot.innerHTML=`<td colspan="${nCol}" style="height:${(ROWS.length-end)*ROWH}px"></td>`;body.appendChild(bot);}
 function buildFilters(){const host=document.getElementById('filters');host.innerHTML='';
