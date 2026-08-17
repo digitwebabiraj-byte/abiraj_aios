@@ -8,3 +8,4 @@ automation/*_status.txt
 automation/*.log
 thuwaraga_t7_smaw/*.html
 ebay_account_ebpd_dst/*.html
+thuwaraga_t7_smaw/sources/*.html

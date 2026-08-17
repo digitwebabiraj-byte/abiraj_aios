@@ -1,0 +1,12 @@
+{
+  "title": "Merged — Thuwaraga Products",
+  "brand": "Thuwaraga",
+  "brand_sub": "SKU Performance + Amazon Stock · combined in one page",
+  "output": "thuwaraga_t7_smaw/merged_thuwaraga_dashboard.html",
+  "tabs": [
+    { "code": "T7", "label": "Weekly SKU Performance", "sub": "Amazon / eBay / B&Q UK",
+      "accent": "#2563eb", "src": "thuwaraga_t7_smaw/sources/t7_dashboard.html" },
+    { "code": "SMAW", "label": "Table 5 — Amazon Stock Check", "sub": "Amazon UK",
+      "accent": "#b45309", "src": "thuwaraga_t7_smaw/sources/smaw_dashboard.html" }
+  ]
+}
