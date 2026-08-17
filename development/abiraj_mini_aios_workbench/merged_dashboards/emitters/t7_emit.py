@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-T7 -> standard merge file (read-only). Reproduces T7's OWN displayed table exactly:
-the product-family tree (purple SKU summary rows + blue listing/ASIN rows) with the
-Amz/eBay/B&Q order pivot and the Performing?/Action verdict — same columns, same names,
-same grouping/verdict logic as its build_html.build_groups(). Flattened to one table
-with a "Type" column (Family / Listing) so it fits the merged dashboard's uniform grid.
-Env override: T7_SRC. Does not touch the T7 task.
+T7 -> standard merge file (read-only). Reproduces T7's OWN signed-off REPORT (build_report.py,
+the Table-7 xlsx Thuwaraga receives) EXACTLY: the 13-column layout with the product-family tree
+(purple SKU SUMMARY rows + blue listing rows), the [+N SKUs] / [variant] tags, Row Type = SKU
+SUMMARY / ref-id, Week Start/End, per-platform Amazon/eBay/B&Q order columns, TOTAL Orders, and
+the Performing?/Action-Required verdict — via the same build_groups() logic. Flattened into one
+table for the merged grid. Env override: T7_SRC. Does not touch the T7 task.
 """
-import os, glob, json
+import os, glob, json, collections
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BASE = os.path.abspath(os.path.join(HERE, "..", "..", "projects"))
@@ -17,26 +17,28 @@ OUT = os.path.join(HERE, "t7_merge.json")
 d = json.load(open(SRC, encoding="utf-8"))
 names = d.get("names", {})
 meta = d.get("meta", {})
-asof = meta.get("run_date") or meta.get("week_end") or ""
+ws2 = meta.get("week_start", "")
+we2 = meta.get("week_end", "")
+asof = meta.get("run_date") or we2 or ""
 
-# ---- exact columns of T7's native table -------------------------------------
+# EXACT columns of T7's signed-off xlsx report (build_report.py COLS)
 COLUMNS = [
-    {"key": "sku",      "name": "SKU / ASIN",   "role": "id",     "type": "text"},
-    {"key": "type",     "name": "Type",         "role": "id",     "type": "text"},
-    {"key": "title",    "name": "Product Name", "role": "id",     "type": "text"},
-    {"key": "platform", "name": "Platform",     "role": "id",     "type": "text"},
-    {"key": "account",  "name": "Account",      "role": "id",     "type": "text"},
-    {"key": "amazon",   "name": "Amz",          "role": "metric", "type": "num"},
-    {"key": "ebay",     "name": "eBay",         "role": "metric", "type": "num"},
-    {"key": "bq",       "name": "B&Q",          "role": "metric", "type": "num"},
-    {"key": "total",    "name": "Total",        "role": "metric", "type": "num"},
-    {"key": "perf",     "name": "Performing?",  "role": "id",     "type": "text"},
-    {"key": "action",   "name": "Action",       "role": "id",     "type": "text"},
+    {"key": "sku",       "name": "SKU / ASIN",      "role": "id",     "type": "text"},
+    {"key": "row_type",  "name": "Row Type",        "role": "id",     "type": "text"},
+    {"key": "title",     "name": "Product Name",    "role": "id",     "type": "text"},
+    {"key": "platform",  "name": "Platform",        "role": "id",     "type": "text"},
+    {"key": "account",   "name": "Account Name",    "role": "id",     "type": "text"},
+    {"key": "week_start","name": "Week Start",      "role": "id",     "type": "text"},
+    {"key": "week_end",  "name": "Week End",        "role": "id",     "type": "text"},
+    {"key": "amazon",    "name": "Amazon Orders",   "role": "metric", "type": "num"},
+    {"key": "ebay",      "name": "eBay Orders",     "role": "metric", "type": "num"},
+    {"key": "bq",        "name": "B&Q Orders",      "role": "metric", "type": "num"},
+    {"key": "total",     "name": "TOTAL Orders",    "role": "metric", "type": "num"},
+    {"key": "perf",      "name": "Performing?",     "role": "id",     "type": "text"},
+    {"key": "action",    "name": "Action Required", "role": "id",     "type": "text"},
 ]
 
 PLATFORM_KEY = {"AMAZON": "amazon", "EBAY": "ebay", "B&Q": "bq"}
-
-# pack-size / multipack suffixes — identical to T7's build_html
 _PACK_SUFFIXES = (
     ["APK"]
     + [f"{n}PK" for n in range(1, 25)]
@@ -61,17 +63,16 @@ def clean(s):
     return "" if s is None else str(s).strip()
 
 
-# ---- reproduce build_groups, then flatten to Family + Listing rows ----------
-import collections
+# ---- reproduce build_groups() exactly (base SKU family + its variants) ------
 uni_upper = {r["s"].upper() for r in d.get("rows", []) if r.get("s")}
-groups = collections.OrderedDict()
+grp = collections.OrderedDict()
 for r in d.get("rows", []):
     if not r.get("s"):
         continue
-    groups.setdefault(product_family(r["s"], uni_upper), []).append(r)
+    grp.setdefault(product_family(r["s"], uni_upper), []).append(r)
 
-fams = []
-for base, listings in groups.items():
+groups = []
+for base, listings in grp.items():
     pname = names.get(base, "")
     if not pname:
         for r in listings:
@@ -84,50 +85,56 @@ for base, listings in groups.items():
     for r in listings:
         plat[PLATFORM_KEY[r["p"]]] += r["o"]
     total = sum(plat.values())
+    distinct = {r["s"] for r in listings}
+    merged = len(distinct) > 1
     if y > 0 and x == y:
         perf = "All performing ✅"
     elif x == 0:
-        perf = f"0/{y} performing \U0001f534"
+        perf = f"0 / {y} ASINs performing \U0001f534"
     else:
-        perf = f"{x}/{y} performing ⚠️"
+        perf = f"{x} / {y} ASINs performing ⚠️"
     action = "See ASIN rows below ↓" if x < y else "—"
-    fams.append({
-        "base": base, "name": pname or "—", "x": x, "y": y,
-        "amazon": plat["amazon"], "ebay": plat["ebay"], "bq": plat["bq"],
-        "total": total, "perf": perf, "action": action, "active": total > 0,
-        "listings": listings, "pname": pname,
-    })
-fams.sort(key=lambda g: (not g["active"], -g["total"], g["base"]))
+    blue = []
+    for r in sorted(listings, key=lambda z: (-z["o"], z["p"])):
+        pk = PLATFORM_KEY[r["p"]]
+        ro = {"amazon": 0, "ebay": 0, "bq": 0}
+        ro[pk] = r["o"]
+        blue.append({
+            "sku": r["s"], "ref": r["r"] or ("B&Q SKU" if r["p"] == "B&Q" else "—"),
+            "name": names.get(r["s"], "") or pname or "—", "platform": r["p"],
+            "account": r["a"] or "—", "amazon": ro["amazon"], "ebay": ro["ebay"],
+            "bq": ro["bq"], "total": r["o"], "performing": r["o"] > 0,
+            "action": "—" if r["o"] > 0 else "Investigate & fix listing",
+            "variant": r["s"] != base,
+        })
+    groups.append({"base": base, "name": pname or "—", "skus": len(distinct),
+                   "amazon": plat["amazon"], "ebay": plat["ebay"], "bq": plat["bq"],
+                   "total": total, "perf": perf, "action": action, "merged": merged,
+                   "active": total > 0, "rows": blue})
+groups.sort(key=lambda g: (not g["active"], -g["total"], g["base"]))
 
+# ---- flatten to the xlsx's 13-column rows (purple SUMMARY then blue listings)
 rows = []
-for g in fams:
-    # purple family (summary) row
+for g in groups:
+    base_lbl = g["base"] + (f"  [+{g['skus']-1} SKUs]" if g["merged"] else "")
     rows.append({
-        "sku": g["base"], "type": "Family", "title": g["name"],
-        "platform": "—", "account": "—",
+        "sku": base_lbl, "row_type": "SKU SUMMARY", "title": g["name"],
+        "platform": "All Platforms", "account": "-", "week_start": ws2, "week_end": we2,
         "amazon": g["amazon"], "ebay": g["ebay"], "bq": g["bq"], "total": g["total"],
         "perf": g["perf"], "action": g["action"],
     })
-    # blue listing (detail) rows — same sort as T7 (orders desc, then platform)
-    for r in sorted(g["listings"], key=lambda z: (-z["o"], z["p"])):
-        pk = PLATFORM_KEY[r["p"]]
-        row_orders = {"amazon": 0, "ebay": 0, "bq": 0}
-        row_orders[pk] = r["o"]
-        performing = r["o"] > 0
+    for r in g["rows"]:
+        sku_lbl = r["sku"] + ("  [variant]" if r["variant"] else "")
         rows.append({
-            "sku": clean(r["s"]),
-            "type": "Listing",
-            "title": clean(names.get(r["s"], "") or g["pname"] or "—"),
-            "platform": clean(r["p"]),
-            "account": clean(r["a"]) or "—",
-            "amazon": row_orders["amazon"], "ebay": row_orders["ebay"],
-            "bq": row_orders["bq"], "total": r["o"],
-            "perf": "Yes" if performing else "No",
-            "action": "—" if performing else "Investigate & fix listing",
+            "sku": sku_lbl, "row_type": clean(r["ref"]), "title": clean(r["name"]),
+            "platform": clean(r["platform"]), "account": clean(r["account"]),
+            "week_start": ws2, "week_end": we2,
+            "amazon": r["amazon"], "ebay": r["ebay"], "bq": r["bq"], "total": r["total"],
+            "perf": "YES" if r["performing"] else "NO", "action": r["action"],
         })
 
 out = {"task": "T7", "label": "SKU Performance", "owner": "Thuwaraga",
        "join_key": "sku", "as_of": asof, "columns": COLUMNS, "rows": rows}
 json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False)
 print("wrote", OUT)
-print("task T7 |", len(rows), "rows (", len(fams), "families ) |", len(COLUMNS), "columns | as_of", asof)
+print("task T7 |", len(rows), "rows (", len(groups), "families ) |", len(COLUMNS), "columns | as_of", asof)
