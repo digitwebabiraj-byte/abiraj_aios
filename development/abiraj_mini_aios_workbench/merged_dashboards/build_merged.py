@@ -26,16 +26,27 @@ for t in REG["tasks"]:
         raise SystemExit(f"ABORT: task {d['task']} has 0 rows")
     headline = set(t.get("headline", []))
 
-    id_cols  = [c for c in d["columns"] if c["role"] == "id"]
-    met_cols = [c for c in d["columns"] if c["role"] == "metric"]
+    # optional explicit per-row currency: a column keyed "__ccy" is NOT displayed — its symbol
+    # rides as a hidden trailing element in each row so it survives the JS sort/filter (used by
+    # multi-currency tabs like DST £/€/$/CA$, and to FORCE £ on £-only tabs like EBPD).
+    CCY_SYM = {"GBP": "£", "EUR": "€", "USD": "$", "CAD": "CA$",
+               "£": "£", "€": "€", "$": "$", "CA$": "CA$"}
+    has_ccy = any(c["key"] == "__ccy" for c in d["columns"])
+    disp_columns = [c for c in d["columns"] if c["key"] != "__ccy"]
+
+    id_cols  = [c for c in disp_columns if c["role"] == "id"]
+    met_cols = [c for c in disp_columns if c["role"] == "metric"]
     ordered  = id_cols + met_cols
     cols = [{"key": c["key"], "name": c["name"], "group": ("ID" if c["role"] == "id" else d["task"]),
-             "type": c["type"], "pin": c["key"] in ("image", "sku"),
+             "type": c["type"], "pin": c["key"] in ("image", "sku", "acct"),
              "agg": c.get("agg"), "big": c["key"] in headline} for c in ordered]
 
-    # rows aligned to this task's own column order
+    # rows aligned to this task's own column order (+ hidden trailing currency symbol if present)
     ckeys = [c["key"] for c in ordered]
-    rows = [[r.get(k) for k in ckeys] for r in d["rows"]]
+    def _ccy(r):
+        raw = str(r.get("__ccy") or "").strip()
+        return CCY_SYM.get(raw.upper(), CCY_SYM.get(raw, "£"))
+    rows = [[r.get(k) for k in ckeys] + ([_ccy(r)] if has_ccy else []) for r in d["rows"]]
 
     # default sort: first money metric desc (nice ordering), else leave as-is
     sort_key = next((c["key"] for c in met_cols if c["type"] == "money"), None)
@@ -62,7 +73,7 @@ for t in REG["tasks"]:
     tasks.append({"code": d["task"], "label": d.get("label", d["task"]),
                   "owner": d.get("owner", ""), "as_of": d.get("as_of", ""),
                   "count": len(rows), "cols": cols, "summary": summary,
-                  "filters": tfilters, "rows": rows})
+                  "filters": tfilters, "rows": rows, "hasccy": has_ccy})
     print(f"loaded {d['task']}: {len(rows):,} rows, {len(cols)} cols, as_of {d.get('as_of')}")
 
 meta = {"title": REG.get("title", "Unified Dashboard"),
@@ -206,6 +217,7 @@ function buildHeader(){const cols=T().cols;const hrow=document.getElementById('h
   if(s){const h=s.getBoundingClientRect().height;if(h>1&&Math.abs(h-ROWH)>0.5){ROWH=h;paint();applyOffsets();}}});}
 let ccyMI=-1,ccyAI=-1;
 function rowCurrency(r){
+ if(T().hasccy)return r[r.length-1]||(DATA.currency||'£');   // explicit per-row symbol (rides as hidden trailing element)
  if(ccyMI>=0){const m=(''+(r[ccyMI]??'')).toLowerCase();if(m.includes('german'))return '€';if(m.includes('uk')||m.includes('gb'))return '£';}
  if(ccyAI>=0){const a=(''+(r[ccyAI]??'')).toLowerCase();if(a.includes('german')||/\bde\b/.test(a))return '€';if(a.includes('uk'))return '£';}
  return DATA.currency||'£';}

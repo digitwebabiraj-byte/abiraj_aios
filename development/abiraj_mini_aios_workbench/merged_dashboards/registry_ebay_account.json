@@ -1,0 +1,12 @@
+{
+  "title": "Merged — eBay Account Performance",
+  "output": "ebay_account_ebpd_dst/merged_ebay_account_dashboard.html",
+  "currency": "£",
+  "colors": { "EBPD": "#0f766e", "DST": "#2563eb" },
+  "tasks": [
+    { "task": "EBPD", "file": "emitters/ebpd_merge.json", "headline": ["revenue", "orders"],
+      "filters": [] },
+    { "task": "DST", "file": "emitters/dst_merge.json", "headline": ["o_today"],
+      "filters": ["market", "trend", "holder"] }
+  ]
+}
