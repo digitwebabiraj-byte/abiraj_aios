@@ -1,12 +1,14 @@
 {
-  "title": "Germany Products — Fast & Slow",
+  "title": "Germany Products — Unified",
   "output": "germany_products_fmp_smp/merged_germany_products_dashboard.html",
   "currency": "€",
-  "colors": { "FMP": "#0f5c57", "SMP": "#b45309" },
+  "colors": { "FMP": "#0f5c57", "SMP": "#b45309", "CHOP": "#3a2f6b" },
   "tasks": [
     { "task": "FMP", "file": "emitters/fmp_merge.json", "headline": ["f_units", "f_rev"],
       "filters": ["category", "f_dec"] },
     { "task": "SMP", "file": "emitters/smp_merge.json", "headline": ["s_stock", "s_90"],
-      "filters": ["s_reason", "s_action"] }
+      "filters": ["s_reason", "s_action"] },
+    { "task": "CHOP", "file": "emitters/chop_merge.json", "headline": ["c_total"],
+      "filters": ["c_opp", "c_action"] }
   ]
 }

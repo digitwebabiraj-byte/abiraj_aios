@@ -28,7 +28,11 @@ SMP_PROJ = os.path.join(PROJECTS, "PRJ-2026-022_slow-moving-products")
 SMP_DIR = os.path.join(SMP_PROJ, "sql", "REQ-25_slow-moving-products")  # build_smp_d01.py = live fetch()+build
 SMP_XLSX = os.path.join(SMP_PROJ, "evidence", "final_outputs", "REQ-25_slow-moving-products",
                         "REQ-25-D01_slow_moving_products.xlsx")
-MIN_FMP, MIN_SMP = 40, 3000
+CHOP_PROJ = os.path.join(PROJECTS, "PRJ-2026-021_channel-opportunity")
+CHOP_RUN_DIR = os.path.join(CHOP_PROJ, "automation")                    # chop_monthly_run.py --dry-run = live, NO publish
+CHOP_XLSX = os.path.join(CHOP_PROJ, "evidence", "final_outputs", "REQ-24_channel-opportunity",
+                         "REQ-24-D01_channel_opportunity.xlsx")
+MIN_FMP, MIN_SMP, MIN_CHOP = 40, 3000, 50
 
 def die(msg):
     logging.getLogger("merge-de").error("ABORT: %s", msg)
@@ -36,17 +40,17 @@ def die(msg):
         f.write("FAIL %s\n%s\n" % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), msg))
     sys.exit(1)
 
-def run_build(name, script_dir, script):
+def run_build(name, script_dir, script, args=None):
     import time
-    # FMP/SMP connect to LEDSONE without an explicit port -> libpq would use PGPORT (the WAREHOUSE
+    # FMP/SMP/CHOP connect to LEDSONE without an explicit port -> libpq would use PGPORT (the WAREHOUSE
     # 5435) and fail. Strip PGPORT so they default to 5432 (ledsone). LED_* are what they read.
     benv = dict(os.environ); benv.pop("PGPORT", None)
     if benv.get("LED_PGPORT"):
         benv["PGPORT"] = benv["LED_PGPORT"]        # 5432
+    cmd = [sys.executable, os.path.join(script_dir, script)] + (args or [])
     for attempt in (1, 2, 3):
         log("%s: running its live build (%s), attempt %d…" % (name, script, attempt))
-        r = subprocess.run([sys.executable, os.path.join(script_dir, script)],
-                           cwd=script_dir, env=benv, capture_output=True, text=True)
+        r = subprocess.run(cmd, cwd=script_dir, env=benv, capture_output=True, text=True)
         if r.returncode == 0:
             return
         log("  %s attempt %d failed: %s" % (name, attempt, (r.stderr or r.stdout).strip()[-200:]))
@@ -74,18 +78,22 @@ def restore(proj_dirs):
 def main():
     log("=== germany merge run start (dry_run=%s) ===" % DRY)
     try:
-        run_build("FMP", FMP_RUN_DIR, "fmp_weekly_run.py")     # live fetch->build->refresh, no publish
-        run_build("SMP", SMP_DIR, "build_smp_d01.py")          # live fetch()+build, no publish
+        run_build("FMP", FMP_RUN_DIR, "fmp_weekly_run.py")            # live fetch->build->refresh, no publish
+        run_build("SMP", SMP_DIR, "build_smp_d01.py")                 # live fetch()+build, no publish
+        run_build("CHOP", CHOP_RUN_DIR, "chop_monthly_run.py", ["--dry-run"])  # live pull+build, NO publish
 
         fmp = run_emitter("fmp_emit.py", "FMP_SRC", FMP_XLSX)
         smp = run_emitter("smp_emit.py", "SMP_SRC", SMP_XLSX)
+        chop = run_emitter("chop_emit.py", "CHOP_SRC", CHOP_XLSX)
         if len(fmp["rows"]) < MIN_FMP:
             die("FMP only %d rows (< %d)" % (len(fmp["rows"]), MIN_FMP))
         if len(smp["rows"]) < MIN_SMP:
             die("SMP only %d rows (< %d)" % (len(smp["rows"]), MIN_SMP))
-        log("fresh data: FMP %d · SMP %d" % (len(fmp["rows"]), len(smp["rows"])))
+        if len(chop["rows"]) < MIN_CHOP:
+            die("CHOP only %d rows (< %d)" % (len(chop["rows"]), MIN_CHOP))
+        log("fresh data: FMP %d · SMP %d · CHOP %d" % (len(fmp["rows"]), len(smp["rows"]), len(chop["rows"])))
     finally:
-        restore([FMP_PROJ, SMP_PROJ])
+        restore([FMP_PROJ, SMP_PROJ, CHOP_PROJ])
 
     r = subprocess.run([sys.executable, os.path.join(MERGE_DIR, "build_merged.py"),
                         os.path.join(MERGE_DIR, "registry_germany.json")],
