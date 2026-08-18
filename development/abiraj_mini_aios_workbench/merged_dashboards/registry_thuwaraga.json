@@ -5,7 +5,7 @@
   "colors": { "T7": "#2563eb", "SMAW": "#b45309" },
   "tasks": [
     { "task": "T7", "file": "emitters/t7_merge.json", "headline": ["orders"],
-      "filters": ["platform", "account"] },
+      "filters": [] },
     { "task": "SMAW", "file": "emitters/smaw_merge.json", "headline": ["uk_warehouse", "order_count_90"],
       "filters": ["stock_status", "account"] }
   ]

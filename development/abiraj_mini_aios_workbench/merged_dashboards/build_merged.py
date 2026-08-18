@@ -140,6 +140,24 @@ th,td{padding:9px 12px;font-size:12.5px;white-space:nowrap;border-bottom:1px sol
  max-width:170px;overflow:hidden;text-overflow:ellipsis}
 tbody td{height:42px}tr.spacer td{padding:0;border:0;height:0;max-width:none}
 th.title,td.title{max-width:260px}
+/* ---- family-tree tabs (T7): purple family summary + expandable listing rows ---- */
+tr.sku>td{background:#f4f1fe;font-weight:700;cursor:pointer;border-top:1px solid #e5ddfb}
+tr.sku>td.fix{background:#f4f1fe}
+tr.sku.st-green>td:first-child{box-shadow:inset 3px 0 0 #16a34a}
+tr.sku.st-red>td:first-child{box-shadow:inset 3px 0 0 #dc2626}
+tr.sku.st-orange>td:first-child{box-shadow:inset 3px 0 0 #ea580c}
+tr.sku:hover>td{filter:brightness(.985)}
+tr.asin>td{background:#fbfcff}
+tr.asin>td.fix{background:#fbfcff}
+tr.asin>td:first-child{padding-left:30px;position:relative}
+tr.asin.zero>td:first-child{box-shadow:inset 2px 0 0 #f0a3a3}
+.caret{display:inline-block;width:12px;color:#7c3aed;font-size:9px;transition:transform .12s;cursor:pointer}
+.caret.op{transform:rotate(90deg)}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
+.pill.g{background:#dcfce7;color:#166534}.pill.r{background:#fee2e2;color:#991b1b}.pill.o{background:#ffedd5;color:#9a3412}
+.pf{display:inline-flex;align-items:center;gap:6px}.pf i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.pf.amazon i{background:#f59e0b}.pf.ebay i{background:#2563eb}.pf.bq i{background:#16a34a}
+.tag{display:inline-block;margin-left:6px;background:#ede9fe;color:#6d28d9;border:1px solid #ddd6fe;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:5px;vertical-align:middle}
 th.imgc,td.imgc{max-width:52px;width:52px;text-align:center;overflow:visible}
 th.num,td.num,th.money,td.money,th.pct,td.pct{max-width:120px}
 thead th{position:sticky;top:0;background:linear-gradient(var(--head),#16244a);color:#e2e8f6;z-index:3;font-weight:600;letter-spacing:.02em;text-transform:uppercase;font-size:11px}
@@ -173,9 +191,30 @@ const ui={q:'',f:{},sortCol:null,sortDir:-1};
 let view=[];
 function T(){return TASKS[active];}
 function colIdx(pred){return T().cols.findIndex(pred);}
+// ---- tree detection: a tab is a family tree if it has a "row_type" column (T7) ----
+function treeInfo(){const t=T();if(t._tree!==undefined)return t._tree;
+ const ti=t.cols.findIndex(c=>c.key==='row_type');
+ if(ti<0){t._tree=null;return null;}
+ const parents=[],childOf={};let cur=-1;
+ t.rows.forEach((r,i)=>{if((''+(r[ti]??'')).trim()==='SKU SUMMARY'){cur=i;parents.push(i);childOf[i]=[];}
+  else if(cur>=0)childOf[cur].push(i);});
+ t._tree={typeI:ti,parents,childOf,exp:new Set()};return t._tree;}
+let viewMeta=[];
 function computeView(){
  const cols=T().cols, rows=T().rows;
  const skuI=colIdx(c=>c.key==='sku'), titI=colIdx(c=>c.key==='title'||c.name==='Product Title'), tipI=hcol('__name_tip');
+ const tr=treeInfo();
+ if(tr){                                              // ---- TREE MODE (family summary + expandable listings) ----
+  const q=ui.q.toLowerCase();
+  const match=r=>!q||(skuI>=0&&(''+(r[skuI]??'')).toLowerCase().includes(q))||(tipI>=0&&(''+(r[tipI]??'')).toLowerCase().includes(q));
+  const disp=[],meta=[];
+  tr.parents.forEach(pi=>{const p=rows[pi],kids=tr.childOf[pi]||[];
+   const km=kids.filter(match),show=match(p)||km.length>0;if(!show)return;
+   disp.push(p);meta.push({kind:'p',idx:pi,n:kids.length});
+   if(tr.exp.has(pi)){(q?km:kids.map(ci=>rows[ci])).forEach(cr=>{disp.push(cr);meta.push({kind:'c',idx:pi});});}});
+  view=disp;viewMeta=meta;return;
+ }
+ viewMeta=[];
  let v=rows;
  if(ui.q){const q=ui.q.toLowerCase();
   v=v.filter(r=>(skuI>=0&&(''+(r[skuI]??'')).toLowerCase().includes(q))||(titI>=0&&(''+(r[titI]??'')).toLowerCase().includes(q))||(tipI>=0&&(''+(r[tipI]??'')).toLowerCase().includes(q)));}
@@ -188,8 +227,10 @@ function computeView(){
    x=(x==null?'':''+x).toLowerCase();y=(y==null?'':''+y).toLowerCase();return x<y?-dir:x>y?dir:0;});}
  view=v;
 }
-function updateCount(){const t=T().count,n=view.length;
- const base=(n===t?`${t.toLocaleString()} listings`:`showing <b>${n.toLocaleString()}</b> of ${t.toLocaleString()}`);
+function updateCount(){const t=T().count,tr=treeInfo();
+ if(tr){const fam=tr.parents.length,lis=t-fam;
+  document.getElementById('count').innerHTML=`<b>${fam.toLocaleString()}</b> families · <b>${lis.toLocaleString()}</b> listings · as of <b>${T().as_of||'?'}</b>`;return;}
+ const n=view.length;const base=(n===t?`${t.toLocaleString()} listings`:`showing <b>${n.toLocaleString()}</b> of ${t.toLocaleString()}`);
  document.getElementById('count').innerHTML=base+` · as of <b>${T().as_of||'?'}</b>`;}
 function updateArrows(){document.querySelectorAll('#hrow th').forEach((th,i)=>{const a=th.querySelector('.ar');
  if(a)a.textContent=(ui.sortCol===i?(ui.sortDir<0?'▼':'▲'):'');});}
@@ -217,7 +258,7 @@ function buildHeader(){const cols=T().cols;const hrow=document.getElementById('h
  cols.forEach((c,i)=>{const th=document.createElement('th');
   th.innerHTML=(c.type==='img'?'':c.name)+'<span class="ar"></span>';
   th.className=(c.pin?'fix ':'')+(c.type==='img'?'imgc ':'')+cls(c);if(c.group!=='ID')th.style.background=col(T().code);
-  th.onclick=()=>{if(ui.sortCol===i){ui.sortDir=-ui.sortDir;}else{ui.sortCol=i;ui.sortDir=(c.type==='text'||c.type==='img'?1:-1);}applyView();};
+  th.onclick=()=>{if(treeInfo())return;if(ui.sortCol===i){ui.sortDir=-ui.sortDir;}else{ui.sortCol=i;ui.sortDir=(c.type==='text'||c.type==='img'?1:-1);}applyView();};
   hrow.appendChild(th);});
  computeView();paint();                            // render rows FIRST so columns reach final width
  requestAnimationFrame(()=>{measureOffsets();applyOffsets();updateArrows();
@@ -241,6 +282,19 @@ function makeCell(c,val,cur,tip){const td=document.createElement('td');td.classN
   td.textContent=s;td.title=s;
   if(c.group!=='ID'&&c.type==='money'){const n=Number(val);if(!isNaN(n)&&val!==null&&val!=='')td.classList.add(n<0?'neg':'pos');}}
  return td;}
+// ---- family-tree cell renderers ----
+function esc(s){return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function famStatus(v){const s=''+(v||'');if(s.indexOf('All performing')>=0)return'st-green';if(/^0\s*\//.test(s))return'st-red';return'st-orange';}
+function famPill(v){const c=famStatus(v);return c==='st-green'?'g':c==='st-red'?'r':'o';}
+function skuCellHTML(val,meta){let v=''+(val||''),tag='';const mm=v.match(/\s+\[(\+\d+ SKUs|variant)\]$/);
+ if(mm){tag=' <span class="tag">'+esc(mm[1])+'</span>';v=v.slice(0,mm.index);}
+ if(meta.kind==='p'){const op=treeInfo().exp.has(meta.idx)?' op':'';return '<span class="caret'+op+'">▶</span> '+esc(v)+tag;}
+ return esc(v)+tag;}
+function perfCellHTML(val,meta){if(meta.kind==='p')return '<span class="pill '+famPill(val)+'">'+esc(val)+'</span>';
+ const yes=(''+(val||'')).toUpperCase().indexOf('Y')===0;return '<span class="pill '+(yes?'g':'r')+'">'+(yes?'YES ✓':'NO ✕')+'</span>';}
+function platCellHTML(val){const v=''+(val||''),k=v.toUpperCase();if(k==='ALL PLATFORMS')return esc(v);
+ const c=k==='AMAZON'?'amazon':k==='EBAY'?'ebay':k==='B&Q'?'bq':'';return '<span class="pf '+c+'"><i></i>'+esc(v)+'</span>';}
+function toggleFam(pi){const t=treeInfo();if(t.exp.has(pi))t.exp.delete(pi);else t.exp.add(pi);computeView();paint();updateCount();}
 function paint(){const cols=T().cols,ROWS=view;const body=document.getElementById('body');const nCol=cols.length;
  if(ROWS.length===0){body.innerHTML=`<tr><td class="empty" colspan="${nCol}">No listings match your search or filter.</td></tr>`;return;}
  const st=SCROLLER.scrollTop,vh=SCROLLER.clientHeight;
@@ -249,8 +303,17 @@ function paint(){const cols=T().cols,ROWS=view;const body=document.getElementByI
  const top=document.createElement('tr');top.className='spacer';top.innerHTML=`<td colspan="${nCol}" style="height:${start*ROWH}px"></td>`;body.appendChild(top);
  const frag=document.createDocumentFragment();
  const tI=hcol('__name_tip');
- for(let ri=start;ri<end;ri++){const r=ROWS[ri];const cur=rowCurrency(r);const ntip=tI>=0?r[tI]:null;const tr=document.createElement('tr');
-  cols.forEach((c,i)=>{const isName=(c.key==='title'||c.name==='Product Title'||c.name==='Product Name');const td=makeCell(c,r[i],cur,isName?ntip:null);if(c.pin&&stickyOffs[i]!=null)td.style.left=stickyOffs[i]+'px';tr.appendChild(td);});frag.appendChild(tr);}
+ const perfI=cols.findIndex(c=>c.key==='perf'),platI=cols.findIndex(c=>c.key==='platform'),skuCI=cols.findIndex(c=>c.key==='sku');
+ for(let ri=start;ri<end;ri++){const r=ROWS[ri];const cur=rowCurrency(r);const ntip=tI>=0?r[tI]:null;const meta=viewMeta[ri];const tr=document.createElement('tr');
+  cols.forEach((c,i)=>{const isName=(c.key==='title'||c.name==='Product Title'||c.name==='Product Name');let td;
+   if(meta&&i===perfI){td=document.createElement('td');td.className=cls(c);td.innerHTML=perfCellHTML(r[i],meta);}
+   else if(meta&&meta.kind==='c'&&i===platI){td=document.createElement('td');td.innerHTML=platCellHTML(r[i]);}
+   else{td=makeCell(c,r[i],cur,isName?ntip:null);}
+   if(meta&&i===skuCI){td.className=(c.pin?'fix ':'')+cls(c);td.innerHTML=skuCellHTML(r[i],meta);}
+   if(c.pin&&stickyOffs[i]!=null)td.style.left=stickyOffs[i]+'px';tr.appendChild(td);});
+  if(meta){if(meta.kind==='p'){tr.className='sku '+famStatus(r[perfI]);tr.onclick=()=>toggleFam(meta.idx);}
+   else{const yes=(''+(r[perfI]||'')).toUpperCase().indexOf('Y')===0;tr.className='asin'+(yes?'':' zero');}}
+  frag.appendChild(tr);}
  body.appendChild(frag);const bot=document.createElement('tr');bot.className='spacer';
  bot.innerHTML=`<td colspan="${nCol}" style="height:${(ROWS.length-end)*ROWH}px"></td>`;body.appendChild(bot);}
 function buildFilters(){const host=document.getElementById('filters');host.innerHTML='';
@@ -266,9 +329,9 @@ function renderTable(){
  buildFilters();buildHeader();updateCount();}
 let ticking=false;SCROLLER.addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(()=>{paint();ticking=false;});}});
 document.getElementById('q').addEventListener('input',e=>{ui.q=e.target.value;applyView();});
-document.getElementById('csv').onclick=()=>{const cols=T().cols;
+document.getElementById('csv').onclick=()=>{const cols=T().cols;const src=treeInfo()?T().rows:view;
  const head=cols.map(c=>c.name).join(',');
- const lines=view.map(r=>cols.map((c,i)=>{let v=r[i]??'';v=(''+v).replace(/"/g,'""');return /[",\n]/.test(v)?`"${v}"`:v;}).join(','));
+ const lines=src.map(r=>cols.map((c,i)=>{let v=r[i]??'';v=(''+v).replace(/"/g,'""');return /[",\n]/.test(v)?`"${v}"`:v;}).join(','));
  const blob=new Blob([head+'\n'+lines.join('\n')],{type:'text/csv'});const a=document.createElement('a');
  a.href=URL.createObjectURL(blob);a.download=T().code.toLowerCase()+'_listings.csv';a.click();};
 document.getElementById('h1').innerHTML=DATA.title+' <span class="chip">'+TASKS.map(t=>t.code).join(' · ')+'</span>';
