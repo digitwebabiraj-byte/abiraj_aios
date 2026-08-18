@@ -130,7 +130,7 @@ h1{font-size:19px;margin:0;font-weight:750;letter-spacing:-.01em}.sub{color:var(
 .inp{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:7px 11px;font-size:12.5px;box-shadow:var(--sh);transition:.15s}
 .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
 #q{min-width:230px}
-thead th{cursor:pointer;user-select:none}
+thead th{cursor:pointer;user-select:none;max-width:none;overflow:visible;text-overflow:clip}
 thead th.fix{cursor:pointer}
 thead th .ar{font-size:9px;margin-left:4px;opacity:.9}
 .ptop{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);gap:10px;flex-wrap:wrap}
