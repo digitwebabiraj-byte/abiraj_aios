@@ -33,7 +33,7 @@ ROW = {
     "task_id": "fmp-2026-08-04-DE-Mahi",
     "team": "Development",
     "developer": "Abiraj",
-    "assigned_user": "Mahi",
+    "assigned_user": "Mahima",   # live row 673 reads Mahima; "Mahi" here would insert a ghost duplicate
     "assigned_user_team": "german_priors",
     "description": "",   # portal shows this as a header block — kept blank per request
     "phase_level": 1,
@@ -41,8 +41,46 @@ ROW = {
     "version_status": "released",
 }
 
+PROJECT_CODE = ROW["project_code"]          # 'fmp'
+
+
+def refresh_all(dry):
+    """Update html_content of EVERY existing fmp row — used by the weekly automation.
+    Mirrors publish_esdt_ph_task.refresh_all: content-only update, md5-verified across all rows.
+    Never touches ROW, so the automation can never insert a duplicate row.
+    """
+    html = open(HTML_PATH, encoding="utf-8").read()
+    m = hashlib.md5(html.encode()).hexdigest()
+    print(f"HTML: {HTML_PATH}  size={len(html):,}  md5={m}")
+    print(f"REFRESH: update html_content of all rows WHERE project_code='{PROJECT_CODE}'")
+    if dry:
+        print("[dry-run] no write performed."); return
+    if not DB["password"]:
+        raise SystemExit("PGPASSWORD not set - cannot refresh the portal rows.")
+    conn = psycopg2.connect(**DB)
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("UPDATE tech_team_outputs.ph_task SET html_content=%s, "
+                            "version_level=version_level+1, updated_at=now() "
+                            "WHERE project_code=%s", (html, PROJECT_CODE))
+                print("rows updated:", cur.rowcount)
+                if cur.rowcount == 0:                 # never report success on a no-op
+                    raise SystemExit(f"no rows with project_code='{PROJECT_CODE}' - nothing refreshed")
+                cur.execute("SELECT bool_and(md5(html_content)=%s) FROM tech_team_outputs.ph_task "
+                            "WHERE project_code=%s", (m, PROJECT_CODE))
+                ok = cur.fetchone()[0]
+                print("all rows md5", "OK" if ok else "MISMATCH!")
+                if not ok:
+                    raise SystemExit("md5 mismatch after refresh")
+    finally:
+        conn.close()
+
+
 def main():
     dry = "--dry-run" in sys.argv
+    if "--refresh" in sys.argv:                # automation path: refresh every published fmp row
+        refresh_all(dry); return
     html = open(HTML_PATH, encoding="utf-8").read()
     md5 = hashlib.md5(html.encode()).hexdigest()
     print(f"HTML: {HTML_PATH}\n      {len(html):,} chars, md5 {md5}")

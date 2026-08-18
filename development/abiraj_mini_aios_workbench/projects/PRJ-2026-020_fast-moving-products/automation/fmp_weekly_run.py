@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """FMP weekly auto-refresh (REQ-23-D01) — fail-closed.
-Refreshes the Fast Moving Products Excel + HTML dashboard from the RAW mcp.ledsone DB.
-Does NOT publish to ph_task (held pending Mahima's audience/sign-off).
+Refreshes the Fast Moving Products Excel + HTML dashboard from the RAW mcp.ledsone DB, then —
+if publish creds are present — refreshes the already-published portal row(s) (project_code='fmp',
+audience Mahima / german_priors) so the portal never lags the files on disk. Content-only update
+of rows that already exist; it never inserts.
 
 Pipeline: fmp_fetch_raw.py (raw psycopg2 fetch -> fmp_payload.json) -> build_fmp_d01.py (xlsx)
 -> gen_dashboard.py (html). Gates the fresh payload before overwriting the delivered outputs;
@@ -13,6 +15,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 PROJ = os.path.dirname(HERE)
 SQL  = os.path.join(PROJ, "sql", "REQ-23_fast-moving-products")
 OUT  = os.path.join(PROJ, "evidence", "final_outputs", "REQ-23_fast-moving-products")
+PUBLISH = os.path.join(HERE, "publish_fmp_ph_task.py")
 STATUS = os.path.join(HERE, "fmp_status.txt")
 LASTGOOD = os.path.join(HERE, "fmp_last_good.json")
 ALERT = os.path.join(os.path.expanduser("~"), "Desktop", "FMP_ALERT.txt")
@@ -84,11 +87,26 @@ def main():
         shutil.copyfile(src, os.path.join(OUT, fn))
     json.dump({"counts": counts, "md5": md5s, "at": f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}"},
               open(LASTGOOD, "w", encoding="utf-8"))
+
+    # 5. refresh the published portal row(s) — only reached once every gate above has passed,
+    #    so a bad build can never overwrite Mahima's page (it fails closed and leaves the last good).
+    if os.environ.get("PGPASSWORD"):
+        try:
+            r = subprocess.run([sys.executable, PUBLISH, "--refresh"], cwd=HERE,
+                               capture_output=True, text=True, timeout=300)
+            if r.returncode != 0:
+                alert(f"portal refresh failed (build OK): {r.stderr.strip()[:400]}"); return 1
+            log("portal rows refreshed: " + (r.stdout.strip().splitlines() or [""])[-1])
+        except Exception as e:
+            alert(f"portal refresh crashed (build OK): {e}"); return 1
+    else:
+        log("PGPASSWORD not set — skipped portal refresh (outputs refreshed only).")
+
     if os.path.exists(ALERT):
         os.remove(ALERT)
     log(f"OK — refreshed Excel (md5 {md5s['REQ-23-D01_fast_moving_products.xlsx'][:8]}) + dashboard "
         f"(md5 {md5s['REQ-23-D01_fast_moving_products.html'][:8]}) for window "
-        f"{payload['meta']['win30_start']} -> {payload['meta']['win_end']}. ph_task publish NOT run (held for Mahima).")
+        f"{payload['meta']['win30_start']} -> {payload['meta']['win_end']}.")
     log("=== FMP weekly refresh done ===")
     return 0
 
