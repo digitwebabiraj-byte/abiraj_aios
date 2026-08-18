@@ -78,7 +78,7 @@ def restore(proj_dirs):
 def main():
     log("=== germany merge run start (dry_run=%s) ===" % DRY)
     try:
-        run_build("FMP", FMP_RUN_DIR, "fmp_weekly_run.py")            # live fetch->build->refresh, no publish
+        run_build("FMP", FMP_RUN_DIR, "fmp_weekly_run.py", ["--no-publish"])  # live fetch->build->refresh, NO publish
         run_build("SMP", SMP_DIR, "build_smp_d01.py")                 # live fetch()+build, no publish
         run_build("CHOP", CHOP_RUN_DIR, "chop_monthly_run.py", ["--dry-run"])  # live pull+build, NO publish
 

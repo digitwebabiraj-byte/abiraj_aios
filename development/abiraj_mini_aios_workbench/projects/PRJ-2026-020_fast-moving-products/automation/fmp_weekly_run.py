@@ -24,6 +24,12 @@ ROW_FLOOR = 10          # each channel/combined must have >= this many ranked ro
 COLLAPSE_FRAC = 0.60    # fail if fresh row count < 60% of last good (data collapse guard)
 CHANNELS = ("amazon", "ebay", "shopify", "combined")
 
+# Build-only mode for callers that reuse this pipeline purely as a data source (merge_germany_run.py).
+# Those callers rewrite PGPORT to 5432 for the ledsone builds, so a publish attempt would hit the
+# warehouse host on the wrong port and fail the whole caller. Mirrors CHOP's --dry-run and eppa's
+# --no-publish.
+NO_PUBLISH = "--no-publish" in sys.argv
+
 def log(msg):
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     line = f"[{ts}] {msg}"
@@ -90,7 +96,9 @@ def main():
 
     # 5. refresh the published portal row(s) — only reached once every gate above has passed,
     #    so a bad build can never overwrite Mahima's page (it fails closed and leaves the last good).
-    if os.environ.get("PGPASSWORD"):
+    if NO_PUBLISH:
+        log("--no-publish — skipped portal refresh (build-only run for a calling job).")
+    elif os.environ.get("PGPASSWORD"):
         try:
             r = subprocess.run([sys.executable, PUBLISH, "--refresh"], cwd=HERE,
                                capture_output=True, text=True, timeout=300)
