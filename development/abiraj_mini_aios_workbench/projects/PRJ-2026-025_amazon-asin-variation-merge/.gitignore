@@ -1,0 +1,7 @@
+# Build artefacts and machine-local files — not source of truth
+__pycache__/
+*.pyc
+# The zip is regenerated from automation/vm_scraper/ ; do not track a binary copy
+avm_vm_scraper.zip
+# Intermediate encoding used once for a paste-transfer experiment
+asins_b64.txt
