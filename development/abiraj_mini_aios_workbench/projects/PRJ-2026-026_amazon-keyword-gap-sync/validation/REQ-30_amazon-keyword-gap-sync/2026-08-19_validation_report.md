@@ -187,21 +187,30 @@ start with the biggest numbers, and mark done in the "By listing" view. It close
 that matter most: nothing touches Amazon, and **a word that does not suit the bulb must not be added** —
 that judgement is hers, not the report's.
 
-## 🔴 A real bug this exposed
-Remembering the Hide/Show preference used `localStorage`, which **throws** in sandboxed viewers and
-`data:` URLs. Because `help()` runs during start-up, that exception would have aborted the script
-**before the tables drew** — the whole dashboard would have opened blank, with working filters and no
-data, in any viewer that blocks storage. Now wrapped in try/catch: the preference is a nicety, and
-failing to save it can never stop the page.
+## 🔴 The Hide/Show button was broken, and is now gone
+Two problems, both mine:
+1. The button was positioned `float:right; margin-top:-26px`, which lifted it **over the tab strip** —
+   so in a real browser it was awkward or impossible to click. The owner reported exactly that.
+2. Remembering the preference used `localStorage`, which **throws** in sandboxed viewers and `data:`
+   URLs. Because that ran during start-up, the exception would have aborted the script **before the
+   tables drew** — the dashboard would have opened blank, with working filters and no data.
 
-## Verified in a storage-blocked context
+**Both fixed by deleting the mechanism.** The panel is now a native HTML `<details>`/`<summary>`: the
+heading itself is the control, showing "▾ click to hide" / "▸ click to show". **Zero JavaScript, zero
+storage** — there is nothing left in it that can fail, and it works in every browser without help.
+
+Lesson: a convenience feature that runs during start-up can take the whole page down with it. Either
+isolate it, or — better here — use the browser's own behaviour instead of writing any.
+
+## Verified after the rewrite
 | Check | Result |
 |---|---|
-| Page still draws with storage blocked | ✅ 443 Phase 1 rows |
-| Instructions shown by default | ✅ |
-| Hide / Show toggle + button label | ✅ both directions |
-| Phase 2 after toggling | ✅ A 22 · B 204 · C 3 |
-| Filter still works | ✅ "Add to backend" → 51 rows |
+| No script, no storage in the panel | ✅ 0 matches for the old button / storage code |
+| Collapse by clicking the heading | ✅ closes, label flips to "click to show" |
+| Re-open | ✅ |
+| Tables intact either way | ✅ 443 Phase 1 rows · Phase 2 A 22 · B 204 · C 3 |
+| Filter with the panel collapsed | ✅ "Add to bullets" → 6 rows |
+| "By listing" view | ✅ 6 panels, 6 §2.7 buttons |
 | Reset | ✅ 229 rows |
 
 One self-contained file, 157 KB.
