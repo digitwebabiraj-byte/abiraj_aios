@@ -1,0 +1,74 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BGCT Keyword Gap Report — REQ-30-D02</title><style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#16202c;--mut:#5d6b7a;--line:#e2e6ec;--nv:#1f3864;
+--gap:#c0392b;--ok:#1e8449;--warn:#b7791f;}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);
+font:14px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+header{background:var(--nv);color:#fff;padding:22px 26px}
+header h1{margin:0 0 4px;font-size:20px} header .meta{opacity:.85;font-size:12.5px}
+.wrap{max-width:1500px;margin:0 auto;padding:20px 26px 60px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:18px 0}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.tile .v{font-size:30px;font-weight:700;line-height:1.1} .tile .k{color:var(--mut);font-size:12.5px;margin-top:4px}
+.tile .h{color:var(--mut);font-size:11.5px;margin-top:6px;font-style:italic}
+.bar{background:#fff4e5;border:1px solid #f0d3a3;border-left:4px solid var(--warn);
+padding:12px 16px;border-radius:8px;margin:16px 0;font-size:13px}
+.bar b{color:#8a5a00}
+section.acct{margin:30px 0} section.acct h2{margin:0 0 2px;font-size:17px}
+.sub{color:var(--mut);margin:0 0 14px;font-size:12.5px}
+h3.pa,h3.pb{font-size:14px;margin:22px 0 4px;padding-left:9px;border-left:4px solid var(--warn)}
+h3.pb{border-color:var(--gap)}
+.note{color:var(--mut);font-size:12.5px;margin:0 0 10px}
+table.t{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);
+border-radius:8px;overflow:hidden;margin-bottom:16px}
+.t th{background:#eef1f5;text-align:left;padding:8px 10px;font-size:12px;color:#3a4a5c;
+border-bottom:1px solid var(--line);white-space:nowrap}
+.t td{padding:7px 10px;border-bottom:1px solid #f0f2f5;vertical-align:top}
+.t tr:last-child td{border-bottom:none} .t tr.gap td{background:#fdf6f5}
+.c{text-align:center} .n{font-variant-numeric:tabular-nums;text-align:right}
+.m{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12.5px}
+.s{color:var(--mut);font-size:11.5px} .warn{color:var(--warn)} .tgt{font-weight:600}
+.b{display:inline-block;width:20px;height:20px;line-height:20px;border-radius:50%;font-size:12px;color:#fff}
+.b.y{background:var(--ok)} .b.n{background:var(--gap)}
+.pair{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.ph{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+padding:12px 14px;background:#f9fafc;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tag{background:#e7edf6;color:var(--nv);border-radius:4px;padding:2px 7px;font-size:11px;font-weight:600}
+.tag.dead{background:#fbe6e4;color:var(--gap)} .arrow{color:var(--mut);margin:0 4px}
+.sk{color:var(--mut);font-size:11.5px;margin-top:4px}
+.pair table.t{border:none;border-radius:0;margin:0}
+.btn{border:0;border-radius:7px;padding:8px 14px;font-size:12.5px;font-weight:600;cursor:pointer;color:#fff}
+.btn.ok{background:var(--ok)} .btn.add{background:var(--gap)} .btn.done{background:#7b8794}
+#q{width:100%;max-width:420px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px}
+footer{color:var(--mut);font-size:11.5px;margin-top:34px;border-top:1px solid var(--line);padding-top:14px}
+b.y{color:var(--ok)} b.n{color:var(--gap)}
+</style></head><body>
+<header><h1>BGCT — Keyword Collection &amp; Cross-ASIN Gap Sync</h1>
+<div class="meta">REQ-30-D02 · Amazon UK · DCVOLTAGE UK + LEDSone UK (never merged) ·
+period 2026-05-01 → 2026-07-31 · zero-sales window from 2026-02-01 ·
+generated 2026-08-19T11:11:39</div></header>
+<div class="wrap">
+<div class="bar"><b>This report does not change anything on Amazon.</b> It shows where each proven
+keyword should go. The buttons below record your review in this page only — a person applies the
+keywords. (Source section 2.7's automatic SP-API push is deliberately out of scope.)</div>
+<div class="tiles"><div class="tile"><div class="v">11</div><div class="k">Top-Moving ASINs</div><div class="h">units &gt; 5 in all 3 months</div></div><div class="tile"><div class="v">5</div><div class="k">Underperforming listings</div><div class="h">no sales 6mo, or falling 3mo</div></div><div class="tile"><div class="v">3</div><div class="k">Listings needing rewrite</div><div class="h">Part A — no content to check</div></div><div class="tile"><div class="v">4</div><div class="k">Real keyword gaps</div><div class="h">Part B — across 2 listings</div></div></div>
+<input id="q" placeholder="Filter by ASIN or base SKU…" oninput="flt(this.value)">
+<section class="acct"><h2>LEDSone UK</h2><p class="sub">3 listing(s) needing a rewrite · 2 listing(s) with keyword gaps · accounts are reported independently and never merged</p><h3 class="pa">Part A — listing has no content (3)</h3><p class="note">Every keyword would read as “missing” because there is nothing on the listing to search. These need a rewrite, not keyword edits.</p><table class="t"><thead><tr><th>Dead ASIN</th><th>SKU</th><th>Base SKU</th><th>Why flagged</th><th>What is missing</th><th>Proven terms ready</th><th>Top-Moving twin</th></tr></thead><tbody><tr><td class="m">B0D4YG1QFJ</td><td class="m s">LDMG95E2783PK_DCVV</td><td class="m">LDMG95E</td><td>zero_sales_6mo</td><td class="warn">backend keyword field empty; no bullet points; no description</td><td class="c">12</td><td class="m">B09479HV6W</td></tr><tr><td class="m">B0D4Y9DKJD</td><td class="m s">LDMG95E2786PK_DCVV</td><td class="m">LDMG95E</td><td>zero_sales_6mo</td><td class="warn">backend keyword field empty; no bullet points; no description</td><td class="c">12</td><td class="m">B09479HV6W</td></tr><tr><td class="m">B093ST24PN</td><td class="m s">LDMT185E274 H_DCVV</td><td class="m">LDMT185E274</td><td>zero_sales_6mo</td><td class="warn">backend keyword field empty; no bullet points; no description</td><td class="c">0</td><td class="m">B0BL82M8SB</td></tr></tbody></table><h3 class="pb">Part B — keyword gaps (2 listings)</h3><div class="pair" data-search="b0gdcn4lcw b0bl84kxsv ldmt185e"><div class="ph"><div><span class="tag">Top-Moving</span> <b class="m">B0GDCN4LCW</b> <span class="arrow">→</span> <span class="tag dead">zero_sales_6mo</span> <b class="m">B0BL84KXSV</b><div class="sk">base SKU LDMT185E</div></div><div class="acts"><button class="btn add" onclick="mark(this)">Add missing keywords (2)</button></div></div><table class="t"><thead><tr><th>Keyword</th><th class="c">Volume</th><th class="c">Title / bullets / desc</th><th class="c">Backend</th><th>Status</th><th>Where to add it</th></tr></thead><tbody><tr class="gap"><td>t30 light bulb</td><td class="c n">3</td><td class="c"><span class="b n">✗</span></td><td class="c"><span class="b n">✗</span></td><td>gap</td><td class="tgt">Add to backend + bullets</td></tr><tr class="gap"><td>diall 2700 k scl t30c 4w e27l 220-240v 50hz 4w</td><td class="c n">1</td><td class="c"><span class="b n">✗</span></td><td class="c"><span class="b n">✗</span></td><td>gap</td><td class="tgt">Add to backend + bullets</td></tr></tbody></table></div><div class="pair" data-search="b0gdcn4lcw b0bl968cdm ldmt185e"><div class="ph"><div><span class="tag">Top-Moving</span> <b class="m">B0GDCN4LCW</b> <span class="arrow">→</span> <span class="tag dead">zero_sales_6mo</span> <b class="m">B0BL968CDM</b><div class="sk">base SKU LDMT185E</div></div><div class="acts"><button class="btn add" onclick="mark(this)">Add missing keywords (2)</button></div></div><table class="t"><thead><tr><th>Keyword</th><th class="c">Volume</th><th class="c">Title / bullets / desc</th><th class="c">Backend</th><th>Status</th><th>Where to add it</th></tr></thead><tbody><tr class="gap"><td>t30 light bulb</td><td class="c n">3</td><td class="c"><span class="b n">✗</span></td><td class="c"><span class="b n">✗</span></td><td>gap</td><td class="tgt">Add to backend + bullets</td></tr><tr class="gap"><td>diall 2700 k scl t30c 4w e27l 220-240v 50hz 4w</td><td class="c n">1</td><td class="c"><span class="b n">✗</span></td><td class="c"><span class="b n">✗</span></td><td>gap</td><td class="tgt">Add to backend + bullets</td></tr></tbody></table></div></section>
+<footer>
+Rules — Top-Moving: units &gt; 5 in all 3 months ·
+base SKU: pack size, trailing letters and account suffixes stripped, bundles kept whole ·
+underperformer: 0 units in 6 months (catalogue-anchored) or strictly falling across the period ·
+keyword match: all words present anywhere, any order, case and punctuation ignored ·
+top 50 terms per ASIN, zero-conversion terms dropped (source Step 6).<br>
+QA (source 2.10) — account separation <b class="y">PASS</b> · one place is enough <b class="y">PASS</b> · dual method independent <b class="y">PASS</b> · directional add logic <b class="y">PASS</b> · zero manual lookup <b class="y">PASS</b> · monthly cadence <b class="y">PASS</b>.<br>
+Source: BGCT_Keyword_Workflow_Phase1_Phase2_v2.1.pdf · PRJ-2026-026 / REQ-30 (bgct, provisional) ·
+rules confirmed by Abiraj 2026-08-19, business confirmation from Thuwaraga outstanding ·
+DRAFT — not validated, not published, not automated.
+</footer></div>
+<script>
+function mark(b){b.classList.add('done');b.classList.remove('ok','add');b.textContent='Reviewed ✓';b.disabled=true;}
+function flt(v){v=v.trim().toLowerCase();
+ document.querySelectorAll('.pair').forEach(function(el){
+  el.style.display = !v || el.dataset.search.indexOf(v)>-1 ? '' : 'none';});}
+</script></body></html>

@@ -1,0 +1,3 @@
+# Build artefacts and machine-local files — not source of truth
+__pycache__/
+*.pyc

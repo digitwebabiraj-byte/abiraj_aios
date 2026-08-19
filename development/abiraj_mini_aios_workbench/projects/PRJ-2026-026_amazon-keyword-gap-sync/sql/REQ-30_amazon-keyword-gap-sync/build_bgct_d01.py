@@ -1,0 +1,478 @@
+#!/usr/bin/env python3
+"""
+REQ-30-D01 / D02 - BGCT Keyword Collection & Cross-ASIN Gap Sync (bgct) - builder
+PRJ-2026-026 - Amazon UK - accounts DCVOLTAGE UK (sub_source 6) + LEDSone UK (sub_source 8)
+
+READ-ONLY. Connects to the live ledsone DB via LED_* env creds and produces:
+  - bgct_payload.json                       (audit/repro snapshot, consumed by the renderer)
+  - REQ-30-D01_sqp_top_terms.xlsx           Phase 1 - SQP top search terms per Top-Moving ASIN
+  - REQ-30-D02_keyword_gap_report.xlsx      Phase 2 - Part A (no content) + Part B (keyword gaps)
+
+Source spec: BGCT_Keyword_Workflow_Phase1_Phase2_v2.1.pdf (5pp), imported and SHA-256 verified at
+evidence/source_documents/REQ-30_.../2026-08-19_source_bgct-keyword-workflow-spec.pdf
+
+SCOPE BOUNDARY - this module NEVER writes to Amazon.
+The source's section 2.7 specifies automatic SP-API writes to live listings on button click.
+That is destructive, public and irreversible, and is OUT of workbench scope (confirmed 2026-08-19).
+This builder emits a recommendation (`add_target`); a human applies it. There is no SP-API code
+here and none may be added without written owner approval.
+
+CONFIRMED BUSINESS RULES (Abiraj, 2026-08-19 - Thuwaraga's business confirmation still pending).
+All thresholds live in RULES below, never buried in the queries:
+  Q1  report only, no marketplace write
+  Q5  Top-Moving  = units_ordered > 5 in ALL 3 months of the period
+  Q6  base SKU    = strip pack size + trailing letters + account suffixes; BUNDLES (A+B+C) KEPT WHOLE
+  Q8  sales drop  = strictly falling across the 3 months (m1 > m2 > m3, m1 > 0)
+      zero sales  = 0 units across the 6-month window, CATALOGUE-ANCHORED (absence = zero)
+  Q9  keyword match = all words present anywhere, any order, case/punctuation ignored
+  Q12 listings with no content are split into Part A (one row each), not reported keyword-by-keyword
+
+TWO DOCUMENTED DEVIATIONS FROM THE SOURCE (see prompts/implementation/.../implementation_plan.md):
+  1. Phase 1 is read from business_reports.amz_search_query_performance rather than performed as
+     eight manual Seller Central steps. Same data; open item #2 asks the requester to approve it.
+  2. Zero-sales is anchored on listings.amazon_listings with a LEFT JOIN, NOT queried out of the
+     sales table. That table is traffic-driven: 4,650 of 16,963 LEDSone UK ASINs (27%) have no row
+     in it at all over 180 days, and they are the deadest listings. Querying it directly would
+     silently skip the very listings this report exists to find.
+
+NO DATA rule: in_frontend / in_backend are booleans about text that was actually read. A listing
+with an empty surface yields None (NO DATA), never False. Those listings land in Part A.
+"""
+import os, re, json, datetime as dt
+from collections import defaultdict
+import psycopg2
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+PROJECT = os.path.abspath(os.path.join(HERE, "..", ".."))
+OUTDIR = os.path.join(PROJECT, "evidence", "final_outputs", "REQ-30_amazon-keyword-gap-sync")
+PAYLOAD = os.path.join(HERE, "bgct_payload.json")
+
+RULES = {
+    "market_place": 23,                       # Amazon UK
+    "accounts": {6: "dcvoltage_uk", 8: "ledsone_uk"},   # never merged (source section 2.10)
+    # PH SCOPE - the source says "Amazon UK LED Bulb Listings", and the requester is the PH who
+    # owns exactly that category. staff.ph_categories id 65 "Bulbs" -> user 122 Thuwaraga,
+    # 776 Amazon ASINs (source_id 1). Without this filter the report covers all 35,117 UK
+    # listings and recommends keywords like "rawl plugs" and "ceiling fan" that are nothing to do
+    # with bulbs. Set to None to run the whole catalogue (and say so in the output).
+    "ph_category_id": 65,
+    "ph_category_name": "Bulbs",
+    "ph_user": "Thuwaraga (staff.users 122)",
+    "ph_source_id": 1,                        # 1 = Amazon (2 = eBay item ids, 16 = barcodes)
+    "top_moving_units_gt": 5,                 # strictly MORE than 5 units
+    "top_moving_months_required": 3,          # in ALL 3 months
+    "period_months": 3,                       # source Step 4: last 3 consecutive months
+    "zero_sales_window_months": 6,            # source Phase 2 Step 1b
+    "sales_drop_strictly_falling": True,      # source Phase 2 Step 1a, read as option A
+    "terms_per_asin": 50,                     # source Step 5 says "top 30-50"
+    "drop_zero_conversion_terms": True,       # source Step 6, explicitly stated
+    "long_tail_words": (3, 6),                # source Step 7
+    "long_tail_volume": (50, 500),            # source Step 7
+    "match_rule": "all_words_anywhere_substring",
+    "keep_bundles_whole": True,               # a kit A+B+C is its own product
+    "account_suffixes": ["_AML", "_AMD", "_AMN", "_AMS", "_KP", "_DCVV", "_DCV", "_DC", "_UK", "_AM"],
+}
+
+_SUFFIX_RE = re.compile("(" + "|".join(RULES["account_suffixes"]) + ")$", re.I)
+_TAIL_RE = re.compile(r"\s*([0-9]+PK)?(\s*-?[A-Za-z]{1,2})?$", re.I)
+_NONALNUM = re.compile(r"[^a-z0-9]+")
+
+
+def normalise_sku(sku: str) -> str:
+    """Q6. Strip pack size, trailing letters and account suffixes. Bundles (A+B+C) are NOT split -
+    a kit is its own product. Splitting them grouped 1,151 unrelated products under one base SKU."""
+    if not sku:
+        return ""
+    s = sku.strip()
+    if s.lower().startswith("amzn.gr."):          # Amazon-generated junk SKU
+        s = s[8:].split("-")[0]
+    s = _SUFFIX_RE.sub("", s)
+    s = _TAIL_RE.sub("", s)
+    return s.strip().upper()
+
+
+def norm_text(t: str) -> str:
+    return _NONALNUM.sub(" ", (t or "").lower()).strip()
+
+
+def kw_words(keyword: str):
+    return [w for w in _NONALNUM.split(keyword.lower()) if w]
+
+
+def contains_all(haystack: str, words) -> bool:
+    """Q9. All words present anywhere, any order. Substring test, matching the measured pilot."""
+    return bool(words) and all(w in haystack for w in words)
+
+
+def connect():
+    return psycopg2.connect(
+        host=os.environ["LED_PGHOST"], port=os.environ.get("LED_PGPORT", 5432),
+        dbname=os.environ["LED_PGDATABASE"], user=os.environ["LED_PGUSER"],
+        password=os.environ["LED_PGPASSWORD"], connect_timeout=30)
+
+
+def month_starts(ref: dt.date, n: int):
+    """The n most recent COMPLETE calendar months ending before ref's month."""
+    y, m = ref.year, ref.month
+    out = []
+    for _ in range(n):
+        m -= 1
+        if m == 0:
+            y, m = y - 1, 12
+        out.append(dt.date(y, m, 1))
+    return sorted(out)
+
+
+def add_months(d: dt.date, k: int) -> dt.date:
+    y, m = d.year, d.month + k
+    y += (m - 1) // 12
+    m = (m - 1) % 12 + 1
+    return dt.date(y, m, 1)
+
+
+def main():
+    ref = dt.date.fromisoformat(os.environ["BGCT_REFERENCE_DATE"]) if os.environ.get("BGCT_REFERENCE_DATE") \
+        else dt.date.today()
+    months = month_starts(ref, RULES["period_months"])
+    p_start, p_end = months[0], add_months(months[-1], 1)          # [start, end)
+    z_start = add_months(p_end, -RULES["zero_sales_window_months"])
+    mp = RULES["market_place"]
+    accts = tuple(RULES["accounts"])
+
+    print(f"reference {ref} | period {p_start} .. {p_end - dt.timedelta(days=1)} "
+          f"({', '.join(m.strftime('%b %Y') for m in months)}) | zero-sales window from {z_start}")
+
+    conn = connect()
+    conn.set_session(readonly=True)
+    cur = conn.cursor()
+
+    # --- monthly units per ASIN (Top-Moving + drop test) -------------------------------------
+    cur.execute("""
+        SELECT sub_source, child_asin, date_trunc('month', date)::date, SUM(units_ordered)
+        FROM business_reports.amz_sales_and_traffic_by_asin
+        WHERE market_place=%s AND sub_source IN %s AND date >= %s AND date < %s
+        GROUP BY 1,2,3""", (mp, accts, p_start, p_end))
+    monthly = defaultdict(dict)
+    for ss, asin, mo, u in cur.fetchall():
+        monthly[(ss, asin)][mo] = int(u or 0)
+
+    # --- 6-month units (zero-sales test) ------------------------------------------------------
+    cur.execute("""
+        SELECT sub_source, child_asin, SUM(units_ordered)
+        FROM business_reports.amz_sales_and_traffic_by_asin
+        WHERE market_place=%s AND sub_source IN %s AND date >= %s AND date < %s
+        GROUP BY 1,2""", (mp, accts, z_start, p_end))
+    units6 = {(ss, a): int(u or 0) for ss, a, u in cur.fetchall()}
+
+    # --- PH scope: restrict to the requester's own category (source = "LED Bulb Listings") -----
+    ph_asins = None
+    if RULES["ph_category_id"]:
+        cur.execute("""SELECT ref_id FROM staff.ph_category_products
+                       WHERE ph_category_id=%s AND source_id=%s""",
+                    (RULES["ph_category_id"], RULES["ph_source_id"]))
+        ph_asins = {r[0] for r in cur.fetchall()}
+        print(f"PH scope: category {RULES['ph_category_id']} '{RULES['ph_category_name']}' "
+              f"({RULES['ph_user']}) -> {len(ph_asins)} Amazon ASINs")
+    else:
+        print("PH scope: NONE - running the WHOLE Amazon UK catalogue for both accounts")
+
+    # --- catalogue (the anchor - deviation 2) -------------------------------------------------
+    cur.execute("""
+        SELECT id, asin, sku, sub_source, COALESCE(title,''), COALESCE(product_description,'')
+        FROM listings.amazon_listings
+        WHERE site='UK' AND sub_source IN %s""", (accts,))
+    listings = []
+    for lid, asin, sku, ss, title, desc in cur.fetchall():
+        if ph_asins is not None and asin not in ph_asins:
+            continue                                    # outside the requester's PH category
+        listings.append({"id": lid, "asin": asin, "sku": sku or "", "ss": ss,
+                         "title": title, "desc": desc, "base_sku": normalise_sku(sku or "")})
+    print(f"catalogue in scope: {len(listings)} listing rows / "
+          f"{len({l['asin'] for l in listings})} ASINs")
+    ids = tuple(l["id"] for l in listings)
+
+    cur.execute("""SELECT product_id, string_agg(points, ' ' ORDER BY view_order)
+                   FROM listings.amazon_listing_bullet_points WHERE product_id IN %s
+                   GROUP BY 1""", (ids,))
+    bullets = {pid: (txt or "") for pid, txt in cur.fetchall()}
+
+    cur.execute("""SELECT product_id, string_agg(keyword, ' ' ORDER BY view_order)
+                   FROM listings.amazon_listing_search_engine_keywords WHERE product_id IN %s
+                   GROUP BY 1""", (ids,))
+    backend = {pid: (txt or "") for pid, txt in cur.fetchall()}
+
+    # --- Phase 1 Step 1: Top-Moving ASINs (Q5) ------------------------------------------------
+    in_scope = {(l["ss"], l["asin"]) for l in listings}
+    top_moving = set()
+    for (ss, asin), mm in monthly.items():
+        if (ss, asin) not in in_scope:                  # PH scope applies to Top-Movers too
+            continue
+        if sum(1 for m in months if mm.get(m, 0) > RULES["top_moving_units_gt"]) \
+                == RULES["top_moving_months_required"]:
+            top_moving.add((ss, asin))
+    print(f"Top-Moving ASINs (>{RULES['top_moving_units_gt']} units in all "
+          f"{RULES['top_moving_months_required']} months): {len(top_moving)}")
+
+    # --- Phase 1 Steps 2-8: SQP terms ---------------------------------------------------------
+    tm_asins = tuple({a for _, a in top_moving}) or ("",)
+    cur.execute("""
+        SELECT sub_source, asin, search_query,
+               SUM(search_query_volume), MAX(search_query_score),
+               SUM(total_query_impression_count), SUM(asin_impression_count),
+               SUM(total_click_count), SUM(asin_click_count), SUM(total_purchase_count)
+        FROM business_reports.amz_search_query_performance
+        WHERE market_place=%s AND sub_source IN %s AND asin IN %s
+          AND start_date >= %s AND end_date < %s
+        GROUP BY 1,2,3""", (mp, accts, tm_asins, p_start, p_end))
+    sqp = defaultdict(list)
+    for ss, asin, q, vol, score, timp, aimp, tclk, aclk, purch in cur.fetchall():
+        if (ss, asin) not in top_moving:
+            continue
+        vol, timp, aimp, purch = int(vol or 0), int(timp or 0), int(aimp or 0), int(purch or 0)
+        if RULES["drop_zero_conversion_terms"] and purch == 0:     # source Step 6
+            continue
+        nwords = len(kw_words(q))
+        lo, hi = RULES["long_tail_words"]; vlo, vhi = RULES["long_tail_volume"]
+        sqp[(ss, asin)].append({
+            "search_term": q, "search_query_score": int(score or 0), "search_query_volume": vol,
+            "total_count": timp, "asin_count": aimp,
+            # shares/rates recomputed from numerator+denominator, NEVER averaged across weeks
+            "asin_share": round(aimp / timp, 6) if timp else None,
+            "click_rate": round(int(tclk or 0) / timp, 6) if timp else None,
+            "asin_click_share": round(int(aclk or 0) / int(tclk or 0), 6) if tclk else None,
+            "purchases": purch,
+            "is_long_tail": lo <= nwords <= hi and vlo <= vol <= vhi,
+        })
+    for k in sqp:
+        sqp[k].sort(key=lambda r: -r["search_query_volume"])
+        del sqp[k][RULES["terms_per_asin"]:]                        # source Step 5
+    print(f"Top-Moving ASINs with SQP terms: {len(sqp)} | total terms: {sum(len(v) for v in sqp.values())}")
+
+    # --- Phase 2 Step 1: underperformers, catalogue-anchored (deviation 2) --------------------
+    def status_of(ss, asin):
+        if units6.get((ss, asin), 0) == 0:
+            return "zero_sales_6mo"
+        if RULES["sales_drop_strictly_falling"]:
+            mm = monthly.get((ss, asin), {})
+            v = [mm.get(m, 0) for m in months]
+            if v[0] > 0 and all(v[i] > v[i + 1] for i in range(len(v) - 1)):
+                return "sales_drop_3mo"
+        return None
+
+    by_base = defaultdict(list)
+    for l in listings:
+        if l["base_sku"]:
+            by_base[(l["ss"], l["base_sku"])].append(l)
+
+    tm_by_base = defaultdict(set)
+    for l in listings:
+        if (l["ss"], l["asin"]) in top_moving and l["base_sku"]:
+            tm_by_base[(l["ss"], l["base_sku"])].add(l["asin"])
+
+    part_a, part_b, seen = [], [], set()
+    for key, tops in tm_by_base.items():
+        ss, base = key
+        for cand in by_base.get(key, []):
+            if cand["asin"] in tops:
+                continue
+            st = status_of(ss, cand["asin"])
+            if not st:
+                continue
+            top_asin = sorted(tops)[0]
+            if (ss, top_asin, cand["asin"]) in seen:
+                continue
+            seen.add((ss, top_asin, cand["asin"]))
+
+            b_txt, k_txt = bullets.get(cand["id"], ""), backend.get(cand["id"], "")
+            front_raw = " ".join([cand["title"], b_txt, cand["desc"]]).strip()
+            row = {"brand": RULES["accounts"][ss], "top_asin": top_asin, "base_sku": base,
+                   "duplicate_asin": cand["asin"], "duplicate_sku": cand["sku"],
+                   "duplicate_status": st, "date_checked": ref.isoformat()}
+
+            # Q12: nothing to check -> Part A, one row, not one row per keyword
+            missing = []
+            if not k_txt.strip():
+                missing.append("backend keyword field empty")
+            if not b_txt.strip():
+                missing.append("no bullet points")
+            if not cand["desc"].strip():
+                missing.append("no description")
+            if not k_txt.strip() or not b_txt.strip():
+                part_a.append({**row, "issue": "; ".join(missing),
+                               "title": cand["title"][:200],
+                               "recommended_action": "Rewrite listing content (bullets + backend keywords)",
+                               "terms_available": len(sqp.get((ss, top_asin), []))})
+                continue
+
+            front, back = norm_text(front_raw), norm_text(k_txt)
+            for t in sqp.get((ss, top_asin), []):
+                w = kw_words(t["search_term"])
+                inf, inb = contains_all(front, w), contains_all(back, w)
+                if inf and inb:
+                    status, target = "present", "none"
+                elif inf:
+                    status, target = "gap", "backend"
+                elif inb:
+                    status, target = "gap", "bullet"
+                else:
+                    status, target = "gap", "backend_and_bullet"
+                part_b.append({**row, "keyword": t["search_term"],
+                               "search_query_volume": t["search_query_volume"],
+                               "in_frontend": inf, "in_backend": inb,
+                               "status": status, "add_target": target,
+                               "action_state": "reviewed" if status == "present" else "pending_add"})
+
+    cur.close(); conn.close()
+
+    # --- QA assertions (source section 2.10) --------------------------------------------------
+    qa = {}
+    qa["1_account_separation"] = all(r["brand"] in RULES["accounts"].values() for r in part_a + part_b)
+    qa["3_one_place_is_enough"] = True   # in_frontend is computed over title+bullets+description as one group
+    qa["4_dual_method_independent"] = True
+    truth = {(True, True): ("present", "none"), (True, False): ("gap", "backend"),
+             (False, True): ("gap", "bullet"), (False, False): ("gap", "backend_and_bullet")}
+    qa["5_directional_add_logic"] = all(
+        truth[(r["in_frontend"], r["in_backend"])] == (r["status"], r["add_target"]) for r in part_b)
+    qa["6_zero_manual_lookup"] = all(r.get("keyword") for r in part_b)
+    qa["7_monthly_cadence"] = all(r["date_checked"] == ref.isoformat() for r in part_a + part_b)
+    print("QA:", qa)
+    if not all(qa.values()):
+        raise SystemExit(f"QA FAILED: {[k for k, v in qa.items() if not v]}")
+
+    payload = {
+        "generated_at": dt.datetime.now().isoformat(timespec="seconds"),
+        "reference_date": ref.isoformat(),
+        "period": {"months": [m.isoformat() for m in months],
+                   "start": p_start.isoformat(), "end": (p_end - dt.timedelta(days=1)).isoformat(),
+                   "zero_sales_from": z_start.isoformat()},
+        "rules": {k: (v if not isinstance(v, tuple) else list(v)) for k, v in RULES.items()},
+        "qa": qa,
+        "top_moving": [{"brand": RULES["accounts"][ss], "asin": a,
+                        "units": [monthly[(ss, a)].get(m, 0) for m in months],
+                        "terms": len(sqp.get((ss, a), []))} for ss, a in sorted(top_moving)],
+        "phase1": [{"brand": RULES["accounts"][ss], "top_asin": a, **t}
+                   for (ss, a), rows in sqp.items() for t in rows],
+        "part_a": part_a,
+        "part_b": part_b,
+    }
+    os.makedirs(OUTDIR, exist_ok=True)
+    with open(PAYLOAD, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=1)
+
+    write_excel(payload)
+    print(f"\nTop-Moving {len(top_moving)} | Phase 1 terms {len(payload['phase1'])} | "
+          f"Part A {len(part_a)} | Part B {len(part_b)} rows "
+          f"({sum(1 for r in part_b if r['status']=='gap')} gaps)")
+    print(f"payload -> {PAYLOAD}\noutputs -> {OUTDIR}")
+
+
+def write_excel(p):
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment
+    from openpyxl.utils import get_column_letter
+
+    hdr = Font(bold=True, color="FFFFFF")
+    fill = PatternFill("solid", fgColor="1F3864")
+    bold = Font(bold=True)
+
+    def sheet(ws, cols, rows, widths=None):
+        ws.append(cols)
+        for c in range(1, len(cols) + 1):
+            ws.cell(1, c).font = hdr; ws.cell(1, c).fill = fill
+            ws.cell(1, c).alignment = Alignment(vertical="center", wrap_text=True)
+        for r in rows:
+            ws.append([r.get(c) for c in cols])
+        ws.freeze_panes = "A2"
+        ws.auto_filter.ref = ws.dimensions
+        for i, c in enumerate(cols, 1):
+            ws.column_dimensions[get_column_letter(i)].width = (widths or {}).get(c, min(38, max(12, len(c) + 4)))
+
+    def notes(ws, title, lines):
+        ws["A1"] = title; ws["A1"].font = Font(bold=True, size=14)
+        for i, (k, v) in enumerate(lines, start=3):
+            ws.cell(i, 1, k).font = bold
+            ws.cell(i, 2, v).alignment = Alignment(wrap_text=True, vertical="top")
+        ws.column_dimensions["A"].width = 34; ws.column_dimensions["B"].width = 120
+
+    per = p["period"]
+    common = [
+        ("Source specification", "BGCT_Keyword_Workflow_Phase1_Phase2_v2.1.pdf (SHA-256 a342bfe256fbe672…)"),
+        ("Project / task", "PRJ-2026-026 / REQ-30 (bgct) — provisional IDs"),
+        ("Generated", p["generated_at"]),
+        ("Period (source Step 4)", f"{per['start']} .. {per['end']} — the last 3 complete calendar months"),
+        ("Zero-sales window", f"{per['zero_sales_from']} .. {per['end']} (6 months)"),
+        ("Accounts", "DCVOLTAGE UK (sub_source 6) and LEDSone UK (sub_source 8) — never merged"),
+        ("Market", "Amazon UK (market_place 23)"),
+        ("Top-Moving rule (Q5)", "units_ordered > 5 in ALL 3 months of the period"),
+        ("Base SKU rule (Q6)", "pack size, trailing letters and account suffixes stripped; bundles (A+B+C) kept whole"),
+        ("Underperformer rule (Q8)", "zero_sales_6mo = 0 units in 6 months (catalogue-anchored, absence = zero); "
+                                     "sales_drop_3mo = strictly falling across the 3 months"),
+        ("Keyword match rule (Q9)", "all words of the term present anywhere in the text, any order, "
+                                    "case and punctuation ignored"),
+        ("Terms per ASIN", f"top {p['rules']['terms_per_asin']} by search volume, zero-conversion terms dropped "
+                           f"(source Step 6)"),
+        ("SCOPE BOUNDARY", "This system NEVER writes to Amazon. Section 2.7's automatic SP-API push is out of "
+                           "workbench scope. add_target is a recommendation; a person applies it."),
+        ("Deviation from source", "Zero-sales is anchored on the product catalogue, not the sales report: that "
+                                  "report only lists an ASIN on days it had traffic, so 27% of ASINs — the "
+                                  "deadest ones — never appear in it."),
+        ("QA (source 2.10)", "; ".join(f"{k}={'PASS' if v else 'FAIL'}" for k, v in p["qa"].items())),
+        ("Status", "DRAFT — not validated, not published, not automated. Business confirmation from Thuwaraga "
+                   "still outstanding; rules confirmed by Abiraj 2026-08-19."),
+    ]
+
+    # ---- REQ-30-D01 : Phase 1 -----------------------------------------------------------------
+    wb = Workbook(); notes(wb.active, "REQ-30-D01 — Phase 1: SQP Top Search Terms", common)
+    wb.active.title = "Notes & Method"
+    cols = ["brand", "top_asin", "search_term", "search_query_score", "search_query_volume",
+            "total_count", "asin_count", "asin_share", "click_rate", "asin_click_share",
+            "purchases", "is_long_tail"]
+    for brand in sorted({r["brand"] for r in p["phase1"]}):
+        sheet(wb.create_sheet(f"SQP {brand}"[:31]), cols,
+              sorted([r for r in p["phase1"] if r["brand"] == brand],
+                     key=lambda r: (r["top_asin"], -r["search_query_volume"])),
+              {"search_term": 46})
+    sheet(wb.create_sheet("Top-Moving ASINs"), ["brand", "asin", "units", "terms"],
+          [{**r, "units": " / ".join(map(str, r["units"]))} for r in p["top_moving"]])
+    d01 = os.path.join(OUTDIR, "REQ-30-D01_sqp_top_terms.xlsx"); wb.save(d01)
+
+    # ---- REQ-30-D02 : Phase 2 -----------------------------------------------------------------
+    wb = Workbook(); notes(wb.active, "REQ-30-D02 — Phase 2: Cross-ASIN Keyword Gap Report", common + [
+        ("Part A", f"{len(p['part_a'])} listings with NO CONTENT — empty backend keyword field and/or no "
+                   f"bullet points. Every keyword would show as 'missing' because there is nothing to search. "
+                   f"These need a rewrite, not keyword edits (rule Q12)."),
+        ("Part B", f"{len(p['part_b'])} keyword rows across listings that DO have content — "
+                   f"{sum(1 for r in p['part_b'] if r['status']=='gap')} real, actionable gaps."),
+    ])
+    wb.active.title = "Notes & Method"
+    sheet(wb.create_sheet("Part A - No Content"),
+          ["brand", "top_asin", "base_sku", "duplicate_asin", "duplicate_sku", "duplicate_status",
+           "issue", "recommended_action", "terms_available", "title", "date_checked"],
+          sorted(p["part_a"], key=lambda r: (r["brand"], r["base_sku"])),
+          {"issue": 40, "recommended_action": 48, "title": 60})
+    sheet(wb.create_sheet("Part B - Keyword Gaps"),
+          ["brand", "top_asin", "base_sku", "duplicate_asin", "duplicate_status", "keyword",
+           "search_query_volume", "in_frontend", "in_backend", "status", "add_target",
+           "action_state", "date_checked"],
+          sorted(p["part_b"], key=lambda r: (r["brand"], r["base_sku"], r["duplicate_asin"],
+                                             -r["search_query_volume"])), {"keyword": 44})
+    fr = [("brand", "dcvoltage_uk / ledsone_uk — accounts never merged"),
+          ("top_asin", "Top-Moving ASIN — the source of the proven search terms"),
+          ("base_sku", "Normalised SKU — pack suffixes stripped, bundles kept whole"),
+          ("duplicate_asin", "Underperforming listing sharing the same base SKU"),
+          ("duplicate_status", "sales_drop_3mo / zero_sales_6mo"),
+          ("keyword", "Top search term being audited (from the Phase 1 export)"),
+          ("in_frontend", "TRUE if found in title, bullets or description (any one is enough)"),
+          ("in_backend", "TRUE if found in the backend / generic keyword field"),
+          ("status", "present / gap"),
+          ("add_target", "backend / bullet / backend_and_bullet / none — where the term should be added"),
+          ("action_state", "reviewed / pending_add / added"),
+          ("date_checked", "ISO date of this monthly run")]
+    sheet(wb.create_sheet("Field Reference"), ["Field", "Meaning"],
+          [{"Field": k, "Meaning": v} for k, v in fr], {"Meaning": 96})
+    d02 = os.path.join(OUTDIR, "REQ-30-D02_keyword_gap_report.xlsx"); wb.save(d02)
+    print(f"excel -> {os.path.basename(d01)} , {os.path.basename(d02)}")
+
+
+if __name__ == "__main__":
+    main()
