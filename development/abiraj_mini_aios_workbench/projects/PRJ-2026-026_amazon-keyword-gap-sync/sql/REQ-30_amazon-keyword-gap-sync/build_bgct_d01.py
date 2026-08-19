@@ -473,7 +473,10 @@ def main():
                 part_a.append({**row, "issue": "; ".join(missing),
                                "title": cand["title"][:200],
                                "recommended_action": "Rewrite listing content (bullets + backend keywords)",
-                               "terms_available": len(sqp.get((ss, top_asin), []))})
+                               # how many proven terms the good-selling twin already has, so whoever
+                               # rewrites this listing does not start from a blank page. 0 = the twin
+                               # has none either, so the report cannot help; look at the product.
+                               "keywords_ready_to_use": len(sqp.get((ss, top_asin), []))})
                 continue
 
             front, back = norm_text(front_raw), norm_text(k_txt)
@@ -642,7 +645,7 @@ def write_excel(p):
     wb.active.title = "Notes & Method"
     sheet(wb.create_sheet("Part A - No Content"),
           ["brand", "top_asin", "base_sku", "duplicate_asin", "duplicate_sku", "duplicate_status",
-           "issue", "recommended_action", "terms_available", "title", "date_checked"],
+           "issue", "recommended_action", "keywords_ready_to_use", "title", "date_checked"],
           sorted(p["part_a"], key=lambda r: (r["brand"], r["base_sku"])),
           {"issue": 40, "recommended_action": 48, "title": 60})
     sheet(wb.create_sheet("Part B - Keyword Gaps"),
@@ -656,7 +659,10 @@ def write_excel(p):
            "top_watts", "duplicate_watts", "issue", "recommended_action", "title", "date_checked"],
           sorted(p.get("part_c", []), key=lambda r: (r["brand"], r["base_sku"])),
           {"issue": 60, "recommended_action": 44, "title": 60})
-    fr = [("brand", "dcvoltage_uk / ledsone_uk — accounts never merged"),
+    fr = [("keywords_ready_to_use", "Part A only — how many proven search terms already exist on the "
+                                    "good-selling twin, ready for whoever rewrites this empty listing. "
+                                    "0 means the twin has none either."),
+          ("brand", "dcvoltage_uk / ledsone_uk — accounts never merged"),
           ("top_asin", "Top-Moving ASIN — the source of the proven search terms"),
           ("base_sku", "Normalised SKU — pack suffixes stripped, bundles kept whole"),
           ("duplicate_asin", "Underperforming listing sharing the same base SKU"),
