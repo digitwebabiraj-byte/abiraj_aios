@@ -22,11 +22,13 @@ Runs **monthly, per brand account**, with no manual keyword lookup.
 instruction"; the assignment came from HR.)*
 
 ## Status
-🟢 **BUILT 2026-08-19 — REQ-30-D01 + D02, 6/6 QA checks pass, committed to `main`.**
+🟢 **BUILT + VALIDATED 2026-08-19 — 10/10 independent checks PASS, 7/7 in-run QA, on `main`.**
 Scoped to the requester's own PH category (`staff.ph_categories` 65 **"Bulbs"**, 776 Amazon UK ASINs) —
 **not** the whole estate. Top-Moving = >5 units in **at least 2 of 3** months → **30 ASINs → 359 SQP
-terms → 31 underperforming listings → Part A 18 rewrites + Part B 144 rows (115 real gaps)**.
-Verified in-browser. **Not validated, not published, not automated.** Earlier status: Folder structure, source import (checksum-verified), governance
+terms → 48 underperforming listings → Part A 22 rewrites + Part B 204 real gaps + Part C 3 rejected
+(wrong SKU)**. Uses `mapped_sku`, the source's own SKU mapping table. Verified in-browser and
+independently reconciled — see `validation/REQ-30_.../2026-08-19_validation_report.md`.
+**Not published, not automated; awaiting Thuwaraga's sign-off.** Earlier status: Folder structure, source import (checksum-verified), governance
 docs and a live data-foundation probe are done. **No build, no deliverable, nothing committed, nothing
 published.** Next step is sending the discovery decision sheet to Thuwaraga + a GPT-approved implementation
 prompt (this workbench: Claude executes approved prompts, it does not invent business logic).

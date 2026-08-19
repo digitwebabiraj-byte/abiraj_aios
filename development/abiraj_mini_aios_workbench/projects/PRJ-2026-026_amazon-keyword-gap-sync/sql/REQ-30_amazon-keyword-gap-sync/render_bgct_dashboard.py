@@ -45,7 +45,7 @@ def main():
              ("Underperforming listings", len(pa) + len(pairs), "no sales 6mo, or falling 3mo"),
              ("Listings needing rewrite", len(pa), "Part A — no content to check"),
              ("Real keyword gaps", gaps, f"Part B — across {len(pairs)} listings"),
-             ("Wrong SKU — rejected", len(pc), "Part C — different wattage, not the same bulb")]
+             ("Wrong SKU — rejected", len(pc), "Part C — wattage or fitting differs")]
 
     def badge(v, yes="✓", no="✗"):
         return f'<span class="b {"y" if v else "n"}">{yes if v else no}</span>'
@@ -81,10 +81,11 @@ def main():
         if bc:
             body.append(f'<h3 class="pc">Part C — wrong SKU, pair rejected ({len(bc)})</h3>'
                         '<p class="note">These two listings share a base SKU but state <b>different '
-                        'wattage</b>, so they are not the same bulb — the stored SKU is wrong. '
+                        'wattage or a different cap fitting</b>, so they are not the same bulb — the stored '
+                        'SKU is wrong. '
                         'No keywords were checked. Fix the SKU first.</p>'
                         '<table class="t"><thead><tr><th>Good seller</th><th>Its wattage</th>'
-                        '<th>Listing with the wrong SKU</th><th>Its wattage</th><th>Wrong SKU</th>'
+                        '<th>Listing with the wrong SKU</th><th>Its spec</th><th>Wrong SKU</th>'
                         '<th>Base SKU</th><th>Title</th></tr></thead><tbody>')
             for r in sorted(bc, key=lambda x: x["base_sku"]):
                 body.append(f'<tr><td class="m">{E(r["top_asin"])}</td><td class="c n">{r["top_watts"]}W</td>'
