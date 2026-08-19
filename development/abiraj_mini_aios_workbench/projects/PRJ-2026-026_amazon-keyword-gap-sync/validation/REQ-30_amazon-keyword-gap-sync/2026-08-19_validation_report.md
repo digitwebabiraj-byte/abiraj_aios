@@ -126,3 +126,39 @@ on screen — no business threshold has been invented.
 | D01 | Excel (7 month/account sheets) **+ dashboard** — rate columns now match Amazon exactly |
 | D02 | Excel (Parts A/B/C + field reference) **+ dashboard** with the §2.7 review buttons |
 | Independent checks | 10/10 · in-run QA 7/7 · 372 rate rows reconciled |
+
+---
+
+# ADDENDUM 2 — consolidated to ONE dashboard file (2026-08-19)
+
+Owner: *"keep only correct html not keep many html"*. The folder had grown two HTML dashboards, one per
+phase. A person receiving this should open **one** thing.
+
+## Now
+| File | |
+|---|---|
+| **`REQ-30_bgct_keyword_dashboard.html`** | **the only dashboard** — both phases as two tabs |
+| `REQ-30-D01_sqp_top_terms.xlsx` | Phase 1 workbook (7 month/account sheets) |
+| `REQ-30-D02_keyword_gap_report.xlsx` | Phase 2 workbook (Parts A/B/C + field reference) |
+
+`REQ-30-D01_sqp_top_terms_dashboard.html` and `REQ-30-D02_keyword_gap_dashboard.html` are **deleted**,
+and `render_bgct_d01_dashboard.py` with them — one renderer now emits one file. The renderer deletes the
+two superseded names on every run, so they cannot reappear.
+
+The two **Excel workbooks stay separate** because they are the two named deliverables (D01 and D02).
+Only the review surface is consolidated.
+
+## Verified interactively
+| Action | Result |
+|---|---|
+| Opens on Phase 1 | 443 keyword rows · 24 ASINs · 30 Top-Movers listed |
+| Phase 1 + month 2026-06 | 210 rows · 21 ASINs |
+| Phase 1 + Opportunity only | 44 rows · 14 ASINs |
+| Switch to Phase 2 | Part A 22 · Part B 204 · Part C 3 |
+| Phase 2 + LEDSone | 177 rows |
+| Phase 2 "By listing" view | 15 pair panels, 15 §2.7 buttons |
+| Phase 2 KPI "Need a rewrite" | 22 rows, Part B hidden |
+| Back to Phase 1 | state intact |
+
+Each tab keeps its own filter bar, KPI tiles and Reset, so the two phases never interfere. Still one
+self-contained file — no network, no external assets, 153 KB.
