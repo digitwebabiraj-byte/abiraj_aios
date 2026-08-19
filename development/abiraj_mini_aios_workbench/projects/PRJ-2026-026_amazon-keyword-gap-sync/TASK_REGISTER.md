@@ -136,7 +136,27 @@ cadence · **Q12** how to report listings with no content.
 None. Not automated, not scheduled, not on the fleet.
 
 ## Publish record — ph_task
-None. Nothing published.
+✅ **PUBLISHED 2026-08-19 — `tech_team_outputs.ph_task` id 980**, md5-verified byte-identical
+(141,402 chars, `22a8f2bb10ca9c73c913ff2d22d7571e`).
+
+| field | value |
+|---|---|
+| id | **980** |
+| project_code | **`bgct-kwgap`** |
+| task_id | `bgct-kwgap-2026-08-19-thuwaraga` |
+| assigned_user | **thuwaraga** · assigned_user_team **ph_priors** |
+| team / developer | Development / Abiraj |
+| version_status | released · version_level 1 |
+
+🔴 **Why the code is `bgct-kwgap`, not `bgct`.** `ph_task` already holds project_code **`BGCT` at id 9
+= "BGCT Listing Generator"** — developer tharsika, assigned to **utharsika**, last updated 2026-08-17.
+A different team's live project that merely shares the prefix. Publishing under `bgct` would have
+collided with it in the portal, and updating id 9 would have destroyed their work. Verified after the
+insert: **id 9 is unchanged** (9,176 chars, still updated 2026-08-17).
+
+Publisher: `automation/publish_bgct_ph_task.py` — guarded INSERT, refuses to touch any row whose
+`project_code`/`task_id` are not ours, md5-verifies the read-back, and takes the password from
+`PGPASSWORD` only. Refresh with `--update 980`.
 
 ## Sign-off
 None. Project scaffolded 2026-08-19 and assigned by HR to **Thuwaraga** (`staff.users` id 122); sign-off is
