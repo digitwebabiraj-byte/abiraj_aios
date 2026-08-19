@@ -108,9 +108,17 @@ header .meta b{{color:#ffe9b0;font-weight:600}}
 .help>summary{{cursor:pointer;font-size:14px;font-weight:700;color:var(--nv);list-style:none;
  display:flex;align-items:center;gap:7px}}
 .help>summary::-webkit-details-marker{{display:none}}
-.help>summary::after{{content:"▾ click to hide";font-size:11.5px;font-weight:500;color:var(--mut);
- margin-left:auto}}
-.help:not([open])>summary::after{{content:"▸ click to show"}}
+/* the show/hide affordance is a pseudo-element, so it is styled to LOOK like the button it is -
+   the whole summary row is the click target, and it highlights on hover of any part of it */
+.help>summary::after{{content:"Hide ▴";margin-left:auto;flex:none;
+ font-size:12px;font-weight:600;color:var(--nv2);background:#f2f6fb;
+ border:1px solid #c9d9ea;border-bottom-width:2px;border-radius:7px;padding:4px 11px;
+ transition:.12s}}
+.help:not([open])>summary::after{{content:"Show ▾"}}
+.help>summary:hover::after{{background:var(--nv2);color:#fff;border-color:var(--nv)}}
+.help>summary:active::after{{transform:translateY(1px);border-bottom-width:1px}}
+.help>summary:focus-visible{{outline:none}}
+.help>summary:focus-visible::after{{box-shadow:0 0 0 3px rgba(37,80,125,.25)}}
 .help:not([open]){{padding:11px 18px}}
 .help[open]>summary{{margin-bottom:9px;padding-bottom:8px;border-bottom:1px solid var(--line2)}}
 .help ol{{margin:0;padding-left:20px}} .help li{{margin:6px 0;font-size:13px}}
