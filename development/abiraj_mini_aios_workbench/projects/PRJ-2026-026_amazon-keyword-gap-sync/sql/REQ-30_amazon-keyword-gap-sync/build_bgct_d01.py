@@ -514,6 +514,14 @@ def main():
                     continue                       # too few searches to be worth her time
                 w = kw_words(t["search_term"])
                 inf, inb = contains_all(front, w), contains_all(back, w)
+                # WHICH WORDS ARE ACTUALLY MISSING - not the whole phrase.
+                # Amazon's backend keyword field is a bag of words with a byte limit, and Amazon
+                # itself says not to repeat words already present. Verified on B0GTYNG2RB: its
+                # backend already holds "E27" and "bulb", so for "e27 screw bulb" the only thing
+                # to add is "screw". Telling her to paste all three wastes the field and repeats
+                # what is already indexed.
+                miss_front = [x for x in w if x not in front]
+                miss_back = [x for x in w if x not in back]
                 if inf and inb:
                     status, target = "present", "none"
                 elif inf:
@@ -525,6 +533,8 @@ def main():
                 part_b.append({**row, "keyword": t["search_term"],
                                "search_query_volume": t["search_query_volume"],
                                "in_frontend": inf, "in_backend": inb,
+                               "missing_words_frontend": " ".join(miss_front),
+                               "missing_words_backend": " ".join(miss_back),
                                "status": status, "add_target": target,
                                "action_state": "reviewed" if status == "present" else "pending_add"})
 
@@ -778,9 +788,10 @@ def write_excel(p):
     sheet(wb.create_sheet("Part B - Keyword Gaps"),
           ["brand", "top_asin", "base_sku", "duplicate_asin", "duplicate_status", "keyword",
            "search_query_volume", "in_frontend", "in_backend", "status", "add_target",
-           "action_state", "date_checked"],
+           "missing_words_backend", "missing_words_frontend", "action_state", "date_checked"],
           sorted(p["part_b"], key=lambda r: (r["brand"], r["base_sku"], r["duplicate_asin"],
-                                             -r["search_query_volume"])), {"keyword": 44})
+                                             -r["search_query_volume"])),
+          {"keyword": 44, "missing_words_backend": 30, "missing_words_frontend": 30})
     sheet(wb.create_sheet("Part C - SKU mismatch"),
           ["brand", "top_asin", "base_sku", "duplicate_asin", "duplicate_sku", "duplicate_status",
            "top_watts", "duplicate_watts", "issue", "recommended_action", "title", "date_checked"],
@@ -799,6 +810,12 @@ def write_excel(p):
           ("in_backend", "TRUE if found in the backend / generic keyword field"),
           ("status", "present / gap"),
           ("add_target", "backend / bullet / backend_and_bullet / none — where the term should be added"),
+          ("missing_words_backend", "THE WORDS TO ACTUALLY TYPE into the backend keyword field — only "
+                                    "the words not already there. If the keyword is 'e27 screw bulb' "
+                                    "and the field already holds 'e27' and 'bulb', this reads just "
+                                    "'screw'. The backend field has a size limit and Amazon does not "
+                                    "reward repeating a word it has already indexed."),
+          ("missing_words_frontend", "Same idea for the title / bullets / description text."),
           ("action_state", "reviewed / pending_add / added"),
           ("date_checked", "ISO date of this monthly run")]
     sheet(wb.create_sheet("Field Reference"), ["Field", "Meaning"],

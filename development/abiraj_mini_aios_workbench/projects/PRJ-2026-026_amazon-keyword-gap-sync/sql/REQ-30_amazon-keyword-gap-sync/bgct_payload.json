@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-19T16:06:04",
+ "generated_at": "2026-08-19T16:20:33",
  "reference_date": "2026-08-19",
  "period": {
   "months": [
@@ -27184,6 +27184,8 @@
    "search_query_volume": 6135,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27200,6 +27202,8 @@
    "search_query_volume": 722,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27216,6 +27220,8 @@
    "search_query_volume": 380,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "edison",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -27232,6 +27238,8 @@
    "search_query_volume": 70,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "60w",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -27248,6 +27256,8 @@
    "search_query_volume": 41,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "4000k",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -27264,6 +27274,8 @@
    "search_query_volume": 39,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "bulbs",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -27280,6 +27292,8 @@
    "search_query_volume": 6135,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27296,6 +27310,8 @@
    "search_query_volume": 722,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27312,6 +27328,8 @@
    "search_query_volume": 380,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27328,6 +27346,8 @@
    "search_query_volume": 70,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "60w",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -27344,6 +27364,8 @@
    "search_query_volume": 41,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "4000k",
+   "missing_words_backend": "4000k",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -27360,6 +27382,8 @@
    "search_query_volume": 39,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27376,6 +27400,8 @@
    "search_query_volume": 6135,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "screw",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -27392,6 +27418,8 @@
    "search_query_volume": 722,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "dimmable",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -27408,6 +27436,8 @@
    "search_query_volume": 380,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "screw",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -27424,6 +27454,8 @@
    "search_query_volume": 70,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "60w",
+   "missing_words_backend": "60w",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -27440,6 +27472,8 @@
    "search_query_volume": 41,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "4000k",
+   "missing_words_backend": "4000k",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -27456,6 +27490,8 @@
    "search_query_volume": 39,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27472,6 +27508,8 @@
    "search_query_volume": 6135,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27488,6 +27526,8 @@
    "search_query_volume": 722,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27504,6 +27544,8 @@
    "search_query_volume": 380,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27520,6 +27562,8 @@
    "search_query_volume": 70,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "60w",
+   "missing_words_backend": "60w",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -27536,6 +27580,8 @@
    "search_query_volume": 41,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "4000k",
+   "missing_words_backend": "4000k",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -27552,6 +27598,8 @@
    "search_query_volume": 39,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27568,6 +27616,8 @@
    "search_query_volume": 6135,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27584,6 +27634,8 @@
    "search_query_volume": 722,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27600,6 +27652,8 @@
    "search_query_volume": 380,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27616,6 +27670,8 @@
    "search_query_volume": 70,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "60w",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -27632,6 +27688,8 @@
    "search_query_volume": 41,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "4000k",
+   "missing_words_backend": "4000k",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -27648,6 +27706,8 @@
    "search_query_volume": 39,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27664,6 +27724,8 @@
    "search_query_volume": 6135,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27680,6 +27742,8 @@
    "search_query_volume": 722,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27696,6 +27760,8 @@
    "search_query_volume": 380,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27712,6 +27778,8 @@
    "search_query_volume": 70,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "60w",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -27728,6 +27796,8 @@
    "search_query_volume": 41,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "4000k",
+   "missing_words_backend": "4000k",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -27744,6 +27814,8 @@
    "search_query_volume": 39,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "bulbs",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -27760,6 +27832,8 @@
    "search_query_volume": 6135,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27776,6 +27850,8 @@
    "search_query_volume": 722,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27792,6 +27868,8 @@
    "search_query_volume": 380,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27808,6 +27886,8 @@
    "search_query_volume": 70,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "60w",
+   "missing_words_backend": "60w",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -27824,6 +27904,8 @@
    "search_query_volume": 41,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "4000k",
+   "missing_words_backend": "4000k",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -27840,6 +27922,8 @@
    "search_query_volume": 39,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27856,6 +27940,8 @@
    "search_query_volume": 871,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27872,6 +27958,8 @@
    "search_query_volume": 192,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -27888,6 +27976,8 @@
    "search_query_volume": 74,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27904,6 +27994,8 @@
    "search_query_volume": 63,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27920,6 +28012,8 @@
    "search_query_volume": 14,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "10w gls",
+   "missing_words_backend": "10w gls",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -27936,6 +28030,8 @@
    "search_query_volume": 871,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27952,6 +28048,8 @@
    "search_query_volume": 192,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27968,6 +28066,8 @@
    "search_query_volume": 74,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -27984,6 +28084,8 @@
    "search_query_volume": 63,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28000,6 +28102,8 @@
    "search_query_volume": 14,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "10w gls",
+   "missing_words_backend": "10w",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28016,6 +28120,8 @@
    "search_query_volume": 11,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28032,6 +28138,8 @@
    "search_query_volume": 11,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "60w",
+   "missing_words_backend": "60w",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28048,6 +28156,8 @@
    "search_query_volume": 11,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "60w",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -28064,6 +28174,8 @@
    "search_query_volume": 11,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "60w",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -28080,6 +28192,8 @@
    "search_query_volume": 11,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "60w",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -28096,6 +28210,8 @@
    "search_query_volume": 11,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "60w",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -28112,6 +28228,8 @@
    "search_query_volume": 11,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "60w",
+   "missing_words_backend": "60w",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28128,6 +28246,8 @@
    "search_query_volume": 133,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28144,6 +28264,8 @@
    "search_query_volume": 91,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28160,6 +28282,8 @@
    "search_query_volume": 50,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28176,6 +28300,8 @@
    "search_query_volume": 45,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28192,6 +28318,8 @@
    "search_query_volume": 40,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "extra large",
+   "missing_words_backend": "extra large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28208,6 +28336,8 @@
    "search_query_volume": 35,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "screw",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -28224,6 +28354,8 @@
    "search_query_volume": 20,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "big",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -28240,6 +28372,8 @@
    "search_query_volume": 17,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "spiral",
+   "missing_words_backend": "screw spiral",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28256,6 +28390,8 @@
    "search_query_volume": 16,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "white large screw",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28272,6 +28408,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28288,6 +28426,8 @@
    "search_query_volume": 28,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28304,6 +28444,8 @@
    "search_query_volume": 28,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28320,6 +28462,8 @@
    "search_query_volume": 6610,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28336,6 +28480,8 @@
    "search_query_volume": 192,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28352,6 +28498,8 @@
    "search_query_volume": 105,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "10w",
+   "missing_words_backend": "10w",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28368,6 +28516,8 @@
    "search_query_volume": 59,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "low",
+   "missing_words_backend": "low watt",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28384,6 +28534,8 @@
    "search_query_volume": 37,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28400,6 +28552,8 @@
    "search_query_volume": 36,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "g80",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -28416,6 +28570,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "vintage",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -28432,6 +28588,8 @@
    "search_query_volume": 13,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "lucide",
+   "missing_words_backend": "lucide",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28448,6 +28606,8 @@
    "search_query_volume": 10,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "amber",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -28464,6 +28624,8 @@
    "search_query_volume": 6610,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28480,6 +28642,8 @@
    "search_query_volume": 192,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28496,6 +28660,8 @@
    "search_query_volume": 105,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "10w",
+   "missing_words_backend": "10w warm white",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28512,6 +28678,8 @@
    "search_query_volume": 59,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "low watt",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -28528,6 +28696,8 @@
    "search_query_volume": 37,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28544,6 +28714,8 @@
    "search_query_volume": 36,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "g80",
+   "missing_words_backend": "g80",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28560,6 +28732,8 @@
    "search_query_volume": 14,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "globe",
+   "missing_words_backend": "globe warm white",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28576,6 +28750,8 @@
    "search_query_volume": 13,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "lucide dimmable",
+   "missing_words_backend": "lucide dimmable",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28592,6 +28768,8 @@
    "search_query_volume": 10,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "globe dimmable",
+   "missing_words_backend": "globe dimmable",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28608,6 +28786,8 @@
    "search_query_volume": 394,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28624,6 +28804,8 @@
    "search_query_volume": 213,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "bulbs",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -28640,6 +28822,8 @@
    "search_query_volume": 177,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "bulbs",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -28656,6 +28840,8 @@
    "search_query_volume": 132,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "e14",
+   "missing_words_backend": "e14",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28672,6 +28858,8 @@
    "search_query_volume": 64,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "fancy",
+   "missing_words_backend": "fancy bulbs",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28688,6 +28876,8 @@
    "search_query_volume": 16,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28704,6 +28894,8 @@
    "search_query_volume": 11,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "e14 2w shaped",
+   "missing_words_backend": "e14 2w shaped",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28720,6 +28912,8 @@
    "search_query_volume": 10,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "fancy lightbulbs",
+   "missing_words_backend": "fancy lightbulbs",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28736,6 +28930,8 @@
    "search_query_volume": 394,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28752,6 +28948,8 @@
    "search_query_volume": 213,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28768,6 +28966,8 @@
    "search_query_volume": 177,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28784,6 +28984,8 @@
    "search_query_volume": 132,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "e14",
+   "missing_words_backend": "e14",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28800,6 +29002,8 @@
    "search_query_volume": 64,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28816,6 +29020,8 @@
    "search_query_volume": 16,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28832,6 +29038,8 @@
    "search_query_volume": 11,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "e14 2w shaped",
+   "missing_words_backend": "e14 2w",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28848,6 +29056,8 @@
    "search_query_volume": 10,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "lightbulbs",
+   "missing_words_backend": "lightbulbs",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28864,6 +29074,8 @@
    "search_query_volume": 394,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28880,6 +29092,8 @@
    "search_query_volume": 213,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28896,6 +29110,8 @@
    "search_query_volume": 177,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28912,6 +29128,8 @@
    "search_query_volume": 132,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "e14",
+   "missing_words_backend": "e14",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28928,6 +29146,8 @@
    "search_query_volume": 64,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "fancy",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -28944,6 +29164,8 @@
    "search_query_volume": 16,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -28960,6 +29182,8 @@
    "search_query_volume": 11,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "e14 2w",
+   "missing_words_backend": "e14 2w shaped",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28976,6 +29200,8 @@
    "search_query_volume": 10,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "fancy lightbulbs",
+   "missing_words_backend": "lightbulbs",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -28992,6 +29218,8 @@
    "search_query_volume": 543,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29008,6 +29236,8 @@
    "search_query_volume": 204,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "screw cool",
+   "missing_words_backend": "e27 screw",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29024,6 +29254,8 @@
    "search_query_volume": 15,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "100w",
+   "missing_words_backend": "e27 100w equivalent",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29040,6 +29272,8 @@
    "search_query_volume": 14,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "screw cool 100w",
+   "missing_words_backend": "e27 screw 100w",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29056,6 +29290,8 @@
    "search_query_volume": 204,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29072,6 +29308,8 @@
    "search_query_volume": 15,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "100w",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -29088,6 +29326,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "100w",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -29104,6 +29344,8 @@
    "search_query_volume": 6610,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29120,6 +29362,8 @@
    "search_query_volume": 147,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29136,6 +29380,8 @@
    "search_query_volume": 31,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "24v",
+   "missing_words_backend": "24v",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29152,6 +29398,8 @@
    "search_query_volume": 19,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29168,6 +29416,8 @@
    "search_query_volume": 11,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "8w",
+   "missing_words_backend": "8w",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29184,6 +29434,8 @@
    "search_query_volume": 6610,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29200,6 +29452,8 @@
    "search_query_volume": 147,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29216,6 +29470,8 @@
    "search_query_volume": 31,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "24v",
+   "missing_words_backend": "24v",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29232,6 +29488,8 @@
    "search_query_volume": 19,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "bulbs",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -29248,6 +29506,8 @@
    "search_query_volume": 11,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "8w",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -29264,6 +29524,8 @@
    "search_query_volume": 6610,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29280,6 +29542,8 @@
    "search_query_volume": 147,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29296,6 +29560,8 @@
    "search_query_volume": 31,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "24v",
+   "missing_words_backend": "24v",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29312,6 +29578,8 @@
    "search_query_volume": 19,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29328,6 +29596,8 @@
    "search_query_volume": 11,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "8w",
+   "missing_words_backend": "8w",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29344,6 +29614,8 @@
    "search_query_volume": 6610,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "screw",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -29360,6 +29632,8 @@
    "search_query_volume": 147,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29376,6 +29650,8 @@
    "search_query_volume": 31,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "24v",
+   "missing_words_backend": "24v",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29392,6 +29668,8 @@
    "search_query_volume": 19,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "bulbs",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -29408,6 +29686,8 @@
    "search_query_volume": 11,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "8w",
+   "missing_words_backend": "8w screw",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29424,6 +29704,8 @@
    "search_query_volume": 6610,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "screw",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -29440,6 +29722,8 @@
    "search_query_volume": 147,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29456,6 +29740,8 @@
    "search_query_volume": 31,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "24v",
+   "missing_words_backend": "24v",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29472,6 +29758,8 @@
    "search_query_volume": 19,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29488,6 +29776,8 @@
    "search_query_volume": 11,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "8w",
+   "missing_words_backend": "screw",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29504,6 +29794,8 @@
    "search_query_volume": 306,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -29520,6 +29812,8 @@
    "search_query_volume": 192,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -29536,6 +29830,8 @@
    "search_query_volume": 128,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -29552,6 +29848,8 @@
    "search_query_volume": 91,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29568,6 +29866,8 @@
    "search_query_volume": 55,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -29584,6 +29884,8 @@
    "search_query_volume": 40,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -29600,6 +29902,8 @@
    "search_query_volume": 23,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -29616,6 +29920,8 @@
    "search_query_volume": 20,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "decorative bayonet",
+   "missing_words_backend": "bayonet",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29632,6 +29938,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29648,6 +29956,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "es",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -29664,6 +29974,8 @@
    "search_query_volume": 10,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29680,6 +29992,8 @@
    "search_query_volume": 306,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29696,6 +30010,8 @@
    "search_query_volume": 192,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29712,6 +30028,8 @@
    "search_query_volume": 128,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29728,6 +30046,8 @@
    "search_query_volume": 91,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29744,6 +30064,8 @@
    "search_query_volume": 55,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29760,6 +30082,8 @@
    "search_query_volume": 40,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29776,6 +30100,8 @@
    "search_query_volume": 23,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -29792,6 +30118,8 @@
    "search_query_volume": 20,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "bayonet",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -29808,6 +30136,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29824,6 +30154,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29840,6 +30172,8 @@
    "search_query_volume": 10,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -29856,6 +30190,8 @@
    "search_query_volume": 306,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -29872,6 +30208,8 @@
    "search_query_volume": 192,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -29888,6 +30226,8 @@
    "search_query_volume": 128,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "large globe",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -29904,6 +30244,8 @@
    "search_query_volume": 91,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "globe",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -29920,6 +30262,8 @@
    "search_query_volume": 55,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "large globe",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -29936,6 +30280,8 @@
    "search_query_volume": 40,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -29952,6 +30298,8 @@
    "search_query_volume": 23,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -29968,6 +30316,8 @@
    "search_query_volume": 20,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "decorative bayonet",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -29984,6 +30334,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30000,6 +30352,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30016,6 +30370,8 @@
    "search_query_volume": 10,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "globe",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -30032,6 +30388,8 @@
    "search_query_volume": 306,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30048,6 +30406,8 @@
    "search_query_volume": 192,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30064,6 +30424,8 @@
    "search_query_volume": 128,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30080,6 +30442,8 @@
    "search_query_volume": 91,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30096,6 +30460,8 @@
    "search_query_volume": 55,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30112,6 +30478,8 @@
    "search_query_volume": 40,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30128,6 +30496,8 @@
    "search_query_volume": 23,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30144,6 +30514,8 @@
    "search_query_volume": 20,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30160,6 +30532,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30176,6 +30550,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30192,6 +30568,8 @@
    "search_query_volume": 10,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30208,6 +30586,8 @@
    "search_query_volume": 306,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -30224,6 +30604,8 @@
    "search_query_volume": 192,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -30240,6 +30622,8 @@
    "search_query_volume": 128,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -30256,6 +30640,8 @@
    "search_query_volume": 91,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30272,6 +30658,8 @@
    "search_query_volume": 55,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -30288,6 +30676,8 @@
    "search_query_volume": 40,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -30304,6 +30694,8 @@
    "search_query_volume": 23,
    "in_frontend": false,
    "in_backend": true,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "",
    "status": "gap",
    "add_target": "bullet",
    "action_state": "pending_add"
@@ -30320,6 +30712,8 @@
    "search_query_volume": 20,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "bayonet",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -30336,6 +30730,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30352,6 +30748,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30368,6 +30766,8 @@
    "search_query_volume": 10,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30384,6 +30784,8 @@
    "search_query_volume": 306,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "large bulbs",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -30400,6 +30802,8 @@
    "search_query_volume": 192,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -30416,6 +30820,8 @@
    "search_query_volume": 128,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -30432,6 +30838,8 @@
    "search_query_volume": 91,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30448,6 +30856,8 @@
    "search_query_volume": 55,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -30464,6 +30874,8 @@
    "search_query_volume": 40,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -30480,6 +30892,8 @@
    "search_query_volume": 23,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -30496,6 +30910,8 @@
    "search_query_volume": 20,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "bayonet",
+   "missing_words_backend": "bulbs bayonet",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -30512,6 +30928,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30528,6 +30946,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "8w",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -30544,6 +30964,8 @@
    "search_query_volume": 10,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30560,6 +30982,8 @@
    "search_query_volume": 306,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -30576,6 +31000,8 @@
    "search_query_volume": 192,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -30592,6 +31018,8 @@
    "search_query_volume": 128,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large globe",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -30608,6 +31036,8 @@
    "search_query_volume": 91,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "globe",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -30624,6 +31054,8 @@
    "search_query_volume": 55,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large globe edison",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -30640,6 +31072,8 @@
    "search_query_volume": 40,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -30656,6 +31090,8 @@
    "search_query_volume": 23,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "large",
+   "missing_words_backend": "large",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -30672,6 +31108,8 @@
    "search_query_volume": 20,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "decorative",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -30688,6 +31126,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": true,
+   "missing_words_frontend": "",
+   "missing_words_backend": "",
    "status": "present",
    "add_target": "none",
    "action_state": "reviewed"
@@ -30704,6 +31144,8 @@
    "search_query_volume": 14,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "es",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -30720,6 +31162,8 @@
    "search_query_volume": 10,
    "in_frontend": true,
    "in_backend": false,
+   "missing_words_frontend": "",
+   "missing_words_backend": "amber filament globe",
    "status": "gap",
    "add_target": "backend",
    "action_state": "pending_add"
@@ -30736,6 +31180,8 @@
    "search_query_volume": 25,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "outdoor",
+   "missing_words_backend": "outdoor",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -30752,6 +31198,8 @@
    "search_query_volume": 25,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "outdoor",
+   "missing_words_backend": "outdoor",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -30768,6 +31216,8 @@
    "search_query_volume": 25,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "outdoor",
+   "missing_words_backend": "outdoor bulbs",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -30784,6 +31234,8 @@
    "search_query_volume": 25,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "outdoor",
+   "missing_words_backend": "outdoor bulbs",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -30800,6 +31252,8 @@
    "search_query_volume": 25,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "outdoor",
+   "missing_words_backend": "outdoor",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"
@@ -30816,6 +31270,8 @@
    "search_query_volume": 25,
    "in_frontend": false,
    "in_backend": false,
+   "missing_words_frontend": "outdoor",
+   "missing_words_backend": "outdoor",
    "status": "gap",
    "add_target": "backend_and_bullet",
    "action_state": "pending_add"

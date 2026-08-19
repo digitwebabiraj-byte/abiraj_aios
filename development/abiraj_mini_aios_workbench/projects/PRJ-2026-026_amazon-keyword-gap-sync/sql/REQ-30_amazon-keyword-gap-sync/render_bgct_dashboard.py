@@ -75,6 +75,8 @@ def main():
     rows_b = [{"br": r["brand"], "ta": r["top_asin"], "da": r["duplicate_asin"], "sk": r["base_sku"],
                "ds": r["duplicate_status"], "kw": r["keyword"], "v": r["search_query_volume"],
                "f": 1 if r["in_frontend"] else 0, "b": 1 if r["in_backend"] else 0,
+               "mf": r.get("missing_words_frontend", ""),
+               "mb": r.get("missing_words_backend", ""),
                "t": r["add_target"]} for r in pb]
     rows_a = [{"br": r["brand"], "ta": r["top_asin"], "da": r["duplicate_asin"],
                "sku": r["duplicate_sku"], "sk": r["base_sku"], "ds": r["duplicate_status"],
@@ -208,6 +210,10 @@ th b{{color:var(--nv2)}}
 .pill.bk{{background:#fbe9e7;color:var(--gap)}} .pill.wn{{background:#f0e9f8;color:var(--purple)}}
 .pill.am{{background:#fff3e0;color:var(--warn)}} .pill.ok{{background:#e7f4ea;color:var(--ok)}}
 .pill.tm{{background:#e2f2f8;color:var(--opp)}}
+.wd{{display:inline-block;font-weight:700;font-size:12px;border-radius:5px;padding:1px 7px;
+ margin:1px 2px 1px 0;white-space:nowrap}}
+.wd.be{{background:#fff3e0;color:var(--warn);border:1px solid #f0d9b0}}
+.wd.bu{{background:#e8f0fe;color:var(--nv2);border:1px solid #c9d9ea}}
 /* each month shown with a tick or cross, so the Top-Moving rule reads off the row itself */
 .mth{{display:inline-block;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11.5px;
  border-radius:5px;padding:2px 7px;margin-right:5px;white-space:nowrap}}
@@ -339,6 +345,10 @@ Amazon's own first-party data, not an estimate. They are the input to Phase 2.</
       you the word and exactly <b>where to put it</b>.
       <br><b>Part C</b> — the <b>SKU code is wrong</b>, so these two are not really the same bulb.
       Fix the code first; do not add keywords.</li>
+    <li><b>Only add the words shown in “Words to actually add”</b> — not the whole phrase. If the
+      keyword is <i>e27 screw bulb</i> and the listing already has “e27” and “bulb”, the only thing
+      missing is <b>screw</b>. The backend keyword box has a size limit, and Amazon says not to repeat
+      words that are already there.</li>
     <li>In Part B, read the <b>What to do</b> column and follow it exactly:
       <br><span class="pill be">Add to backend</span> put it only in the backend keyword box
       <br><span class="pill bu">Add to bullets</span> put it only in the bullet points
@@ -459,6 +469,7 @@ should go — a person adds it. (The source document's automatic push is deliber
     <th data-k="f" class="c">In text<span class="ar">▾</span></th>
     <th data-k="b" class="c">In backend<span class="ar">▾</span></th>
     <th data-k="t">What to do<span class="ar">▾</span></th>
+    <th class="na">Words to actually add</th>
     <th data-k="da">Listing to fix — <b>ASIN</b><span class="ar">▾</span></th>
     <th data-k="ds">Why flagged<span class="ar">▾</span></th>
     <th data-k="sk">Base SKU<span class="ar">▾</span></th>
@@ -548,6 +559,18 @@ independently validated 10/10 · <b>not yet signed off</b>. Shortcuts: <kbd>/</k
 const D = {data};
 const BR = {json.dumps(BRANDS)}, ST = {json.dumps(STATUS)}, TG = {json.dumps(TARGET)};
 const PILL = {{backend_and_bullet:'both',backend:'be',bullet:'bu',none:'no'}};
+// Only the words that are genuinely absent - never the whole phrase. The backend keyword field is a
+// bag of words with a byte limit, so repeating words already there wastes it.
+function words(r){{
+  const chip=(w,cls)=>`<span class="wd ${{cls}}">${{esc(w)}}</span>`;
+  const out=[];
+  if(r.t==='none') return '<span class="s">—</span>';
+  if(r.mb && (r.t==='backend'||r.t==='backend_and_bullet'))
+    out.push('<span class="s">backend:</span> '+r.mb.split(' ').map(w=>chip(w,'be')).join(' '));
+  if(r.mf && (r.t==='bullet'||r.t==='backend_and_bullet'))
+    out.push('<span class="s">bullets:</span> '+r.mf.split(' ').map(w=>chip(w,'bu')).join(' '));
+  return out.join('<br>') || '<span class="s">—</span>';
+}}
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}}[c]));
 const num = x => x==null ? '<span class="s">—</span>' : x.toLocaleString();
@@ -661,6 +684,7 @@ function draw2(){{
     <td class="c"><span class="tick ${{r.f?'y':'n'}}">${{r.f?'✓':'✗'}}</span></td>
     <td class="c"><span class="tick ${{r.b?'y':'n'}}">${{r.b?'✓':'✗'}}</span></td>
     <td><span class="pill ${{PILL[r.t]}}">${{esc(TG[r.t])}}</span></td>
+    <td>${{words(r)}}</td>
     <td><span class="asin">${{esc(r.da)}}</span></td><td>${{esc(ST[r.ds]||r.ds)}}</td>
     <td class="m">${{esc(r.sk)}}</td><td><span class="asin">${{esc(r.ta)}}</span></td></tr>`).join('');
 
@@ -686,11 +710,12 @@ function draw2(){{
         <div>${{btn}}<span class="state"></span></div></div>
         <div class="wrap"><table><thead><tr><th class="na">Keyword</th><th class="na r">Searches / mo</th>
         <th class="na c">In text</th><th class="na c">In backend</th><th class="na">What to do</th>
-        </tr></thead><tbody>${{rs.map(r=>`<tr class="${{r.t==='none'?'':'gap'}}">
+        <th class="na">Words to actually add</th></tr></thead><tbody>${{rs.map(r=>`<tr class="${{r.t==='none'?'':'gap'}}">
           <td class="kw">${{esc(r.kw)}}</td><td class="r">${{r.v.toLocaleString()}}</td>
           <td class="c"><span class="tick ${{r.f?'y':'n'}}">${{r.f?'✓':'✗'}}</span></td>
           <td class="c"><span class="tick ${{r.b?'y':'n'}}">${{r.b?'✓':'✗'}}</span></td>
-          <td><span class="pill ${{PILL[r.t]}}">${{esc(TG[r.t])}}</span></td></tr>`).join('')}}
+          <td><span class="pill ${{PILL[r.t]}}">${{esc(TG[r.t])}}</span></td>
+          <td>${{words(r)}}</td></tr>`).join('')}}
         </tbody></table></div></div>`;
     }}).join('') || '<div class="empty">Nothing matches these filters.</div>';
     $$('#pairs .act').forEach(b=>b.addEventListener('click',()=>{{
