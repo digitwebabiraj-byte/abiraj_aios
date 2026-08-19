@@ -60,7 +60,12 @@ RULES = {
     "ph_user": "Thuwaraga (staff.users 122)",
     "ph_source_id": 1,                        # 1 = Amazon (2 = eBay item ids, 16 = barcodes)
     "top_moving_units_gt": 5,                 # strictly MORE than 5 units
-    "top_moving_months_required": 3,          # in ALL 3 months
+    # MINIMUM number of qualifying months (>=, not ==). Set to 2 on 2026-08-19: "all 3 months" was
+    # chosen while looking at whole-catalogue numbers (103 ASINs) and, once the PH scope was
+    # corrected to the requester's own 776 bulbs, it selected only 11 - a 5-listing report.
+    # Within her scope: all-3 = 11 · >=2-of-3 = 30 · >=1-of-3 = 56 · any sales = 258.
+    # 2-of-3 still means a repeat seller rather than a one-month spike.
+    "top_moving_months_required": 2,
     "period_months": 3,                       # source Step 4: last 3 consecutive months
     "zero_sales_window_months": 6,            # source Phase 2 Step 1b
     "sales_drop_strictly_falling": True,      # source Phase 2 Step 1a, read as option A
@@ -208,10 +213,10 @@ def main():
         if (ss, asin) not in in_scope:                  # PH scope applies to Top-Movers too
             continue
         if sum(1 for m in months if mm.get(m, 0) > RULES["top_moving_units_gt"]) \
-                == RULES["top_moving_months_required"]:
+                >= RULES["top_moving_months_required"]:      # >= , not == : 3-month sellers qualify too
             top_moving.add((ss, asin))
-    print(f"Top-Moving ASINs (>{RULES['top_moving_units_gt']} units in all "
-          f"{RULES['top_moving_months_required']} months): {len(top_moving)}")
+    print(f"Top-Moving ASINs (>{RULES['top_moving_units_gt']} units in at least "
+          f"{RULES['top_moving_months_required']} of {len(months)} months): {len(top_moving)}")
 
     # --- Phase 1 Steps 2-8: SQP terms ---------------------------------------------------------
     tm_asins = tuple({a for _, a in top_moving}) or ("",)

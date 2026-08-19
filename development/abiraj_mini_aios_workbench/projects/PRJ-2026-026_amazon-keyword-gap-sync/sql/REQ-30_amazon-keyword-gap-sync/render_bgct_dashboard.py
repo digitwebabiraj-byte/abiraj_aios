@@ -37,7 +37,11 @@ def main():
         v.sort(key=lambda r: -r["search_query_volume"])
 
     gaps = sum(1 for r in pb if r["status"] == "gap")
-    tiles = [("Top-Moving ASINs", len(p["top_moving"]), "units &gt; 5 in all 3 months"),
+    nmonths = len(per["months"])
+    req = rules["top_moving_months_required"]
+    tm_rule = (f"units &gt; {rules['top_moving_units_gt']} in "
+               + ("all " if req >= nmonths else f"at least {req} of ") + f"{nmonths} months")
+    tiles = [("Top-Moving ASINs", len(p["top_moving"]), tm_rule),
              ("Underperforming listings", len(pa) + len(pairs), "no sales 6mo, or falling 3mo"),
              ("Listings needing rewrite", len(pa), "Part A — no content to check"),
              ("Real keyword gaps", gaps, f"Part B — across {len(pairs)} listings")]
@@ -163,7 +167,7 @@ keywords. (Source section 2.7's automatic SP-API push is deliberately out of sco
 <input id="q" placeholder="Filter by ASIN or base SKU…" oninput="flt(this.value)">
 {''.join(body)}
 <footer>
-Rules — Top-Moving: units &gt; {rules['top_moving_units_gt']} in all {rules['top_moving_months_required']} months ·
+Rules — Top-Moving: {tm_rule} ·
 base SKU: pack size, trailing letters and account suffixes stripped, bundles kept whole ·
 underperformer: 0 units in {rules['zero_sales_window_months']} months (catalogue-anchored) or strictly falling across the period ·
 keyword match: all words present anywhere, any order, case and punctuation ignored ·
