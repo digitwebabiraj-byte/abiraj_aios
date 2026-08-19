@@ -91,6 +91,14 @@ tbody tr.gap td{background:var(--gapbg)} tbody tr.gap:hover td{background:#fbece
  background:#eaf2fb;color:#123a63;border:1px solid #cfe0f2;border-radius:4px;padding:1px 5px}
 th b{color:var(--nv2)}
 .s{color:var(--mut);font-size:11.5px} .kw{font-weight:600} .warnt{color:var(--warn)}
+/* free-text columns are capped and ellipsised, with the full value on hover, so one long title
+   cannot turn a table row into a seven-line block on a narrow window */
+.clip{max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clip.wide{max-width:420px}
+/* Amazon itself reports a click rate above 100% when one search yields several clicks - up to
+   5900% in this data. The figure is faithful, so it is shown, but marked so it does not read as a
+   fault. Hovering explains it. */
+.odd{color:var(--warn);border-bottom:1px dotted var(--warn);cursor:help}
 .tick{display:inline-block;width:19px;height:19px;line-height:19px;border-radius:50%;font-size:11px;
  color:#fff;text-align:center} .tick.y{background:var(--ok)} .tick.n{background:var(--gap)}
 .pill{display:inline-block;padding:2px 8px;border-radius:11px;font-size:11px;font-weight:600;white-space:nowrap}
@@ -334,6 +342,9 @@ list, so listings absent from the sales report still count) or falling every mon
 a keyword counts as present if <b>all its words appear anywhere</b> in the text, any order, ignoring
 capitals and punctuation · a pair is rejected when the two listings state a different wattage or cap
 fitting.<br>
+A click rate shown in <span class="odd">amber</span> is above 100% — Amazon's own figure, which happens
+when one search produces several clicks on a term whose recorded volume is very low. Hover any long
+title or note to read it in full.<br>
 <b>Self-checks:</b> account separation <b class="y">PASS</b> · sku mismatch never paired <b class="y">PASS</b> · one place is enough <b class="y">PASS</b> · dual method independent <b class="y">PASS</b> · directional add logic <b class="y">PASS</b> · zero manual lookup <b class="y">PASS</b> · monthly cadence <b class="y">PASS</b>.<br>
 Source: BGCT_Keyword_Workflow_Phase1_Phase2_v2.1.pdf · PRJ-2026-026 / REQ-30 (bgct) ·
 independently validated 10/10 · <b>not yet signed off</b>. Shortcuts: <kbd>/</kbd> search,
@@ -348,6 +359,10 @@ const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAl
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const num = x => x==null ? '<span class="s">—</span>' : x.toLocaleString();
 const pct = x => x==null ? '<span class="s">—</span>' : x.toFixed(2)+'%';
+// Amazon reports >100% when a single search produces several clicks; show it, but flag it
+const rate = x => x==null ? '<span class="s">—</span>'
+  : (x>100 ? `<span class="odd" title="Amazon reports more than one click per search for this term - its recorded search volume is very low, so treat this figure with care">${x.toFixed(0)}%</span>`
+           : x.toFixed(2)+'%');
 const sort = {T:{k:'v',d:-1},M:{k:'n',d:-1},A:{k:'sk',d:1},B:{k:'v',d:-1},C:{k:'sk',d:1}};
 const REVIEWED = {};        // 2.9 action_state - in-page only, never sent to Amazon
 let tab='1', sec='';
@@ -386,7 +401,7 @@ function draw1(){
 
   $('#tT tbody').innerHTML=T.map(r=>`<tr><td class="m">${esc(r.mo)}</td>
     <td><span class="pill acc">${esc(BR[r.br])}</span></td><td class="kw">${esc(r.kw)}</td>
-    <td class="r">${num(r.v)}</td><td class="r">${pct(r.sh)}</td><td class="r">${pct(r.cr)}</td>
+    <td class="r">${num(r.v)}</td><td class="r">${pct(r.sh)}</td><td class="r">${rate(r.cr)}</td>
     <td class="r">${num(r.pu)}</td>
     <td class="c">${r.op?'<span class="pill op">Opportunity</span> ':''}${r.lt?'<span class="pill lt">Long-tail</span>':''}${(!r.op&&!r.lt)?'<span class="s">—</span>':''}</td>
     <td><span class="asin">${esc(r.a)}</span></td></tr>`).join('');
@@ -426,15 +441,17 @@ function draw2(){
   $('#tA tbody').innerHTML=A.map(r=>`<tr><td><span class="pill acc">${esc(BR[r.br])}</span></td>
     <td><span class="asin">${esc(r.da)}</span></td><td class="m s">${esc(r.sku)}</td>
     <td class="m">${esc(r.sk)}</td>
-    <td>${esc(ST[r.ds]||r.ds)}</td><td class="warnt">${esc(r.is)}</td>
+    <td>${esc(ST[r.ds]||r.ds)}</td>
+    <td class="warnt clip" title="${esc(r.is)}">${esc(r.is)}</td>
     <td class="r">${r.n?r.n:'<span class="warnt">0 — none</span>'}</td>
     <td><span class="asin">${esc(r.ta)}</span></td>
-    <td class="s">${esc((r.ti||'').slice(0,80))}</td></tr>`).join('');
+    <td class="s clip wide" title="${esc(r.ti)}">${esc(r.ti)}</td></tr>`).join('');
   $('#tC tbody').innerHTML=C.map(r=>`<tr><td><span class="pill acc">${esc(BR[r.br])}</span></td>
     <td><span class="asin">${esc(r.ta)}</span></td><td class="c m">${esc(r.tw)}</td>
     <td><span class="asin">${esc(r.da)}</span></td>
     <td class="c m warnt"><b>${esc(r.dw)}</b></td><td class="m warnt">${esc(r.sku)}</td>
-    <td class="m">${esc(r.sk)}</td><td class="s">${esc((r.ti||'').slice(0,80))}</td></tr>`).join('');
+    <td class="m">${esc(r.sk)}</td>
+    <td class="s clip wide" title="${esc(r.ti)}">${esc(r.ti)}</td></tr>`).join('');
   $('#tB tbody').innerHTML=B.map(r=>`<tr class="${r.t==='none'?'':'gap'}">
     <td><span class="pill acc">${esc(BR[r.br])}</span></td><td class="kw">${esc(r.kw)}</td>
     <td class="r">${r.v.toLocaleString()}</td>
