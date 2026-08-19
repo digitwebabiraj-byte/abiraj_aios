@@ -21,6 +21,20 @@ The report finds those missing words and tells you exactly where to put them.
 
 I looked at **your 776 bulbs** on Amazon UK (DCVOLTAGE and LEDSone).
 
+**Where all 776 went** — the dashboard shows this at the top of the Phase 2 tab:
+
+| Bulbs | What happened to them |
+|---|---|
+| **30** | Your best sellers — they supplied the proven keywords |
+| **45** | **In this report** — these need work. Your list. |
+| **302** | Selling normally — nothing to fix |
+| **59** | Struggling, but they already have the right words. Their problem is something else — price, stock, photos, reviews |
+| **340** | **Struggling, but this report cannot help them** — there is no best-selling version of the same product to copy words from |
+
+That last row is the honest limit of this report. **340 of your bulbs are not selling and have no
+successful twin to learn from.** They need keyword research of their own. Worth talking about as a
+separate piece of work.
+
 **I found:**
 - **1 listing that is completely empty** — no keywords at all. It needs writing.
 - **136 missing keywords** across your listings. These just need the words added.

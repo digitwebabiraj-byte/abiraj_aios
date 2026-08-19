@@ -530,6 +530,45 @@ def main():
 
     cur.close(); conn.close()
 
+    # --- Where did every ASIN in her category go? ----------------------------------------------
+    # The requester asked: "I have 776 bulbs - how many are in this, and what happened to the rest?"
+    # A report that silently covers 6% of someone's products is misleading even when every row in it
+    # is correct, so the full population is accounted for and shown on the dashboard.
+    reported_asins = {r["duplicate_asin"] for r in part_a + part_b + part_c}
+    tm_bases = {l["base_sku"] for l in listings if (l["ss"], l["asin"]) in top_moving and l["base_sku"]}
+    asin_bases = defaultdict(set)
+    for l in listings:
+        if l["base_sku"]:
+            asin_bases[l["asin"]].add(l["base_sku"])
+    in_catalogue = {l["asin"] for l in listings}
+
+    def is_under(a):
+        for ss_ in RULES["accounts"]:
+            if units6.get((ss_, a), 0) == 0 and (ss_, a) in {(x["ss"], x["asin"]) for x in listings}:
+                return True
+            mm = monthly.get((ss_, a), {})
+            v = [mm.get(m, 0) for m in months]
+            if v and v[0] > 0 and all(v[i] > v[i + 1] for i in range(len(v) - 1)):
+                return True
+        return False
+
+    cov = defaultdict(int)
+    for a in (ph_asins or in_catalogue):
+        if a not in in_catalogue:
+            cov["not_listed"] += 1
+        elif any((ss_, a) in top_moving for ss_ in RULES["accounts"]):
+            cov["top_moving"] += 1
+        elif a in reported_asins:
+            cov["in_report"] += 1
+        elif is_under(a) and not (asin_bases.get(a, set()) & tm_bases):
+            cov["under_no_twin"] += 1
+        elif is_under(a):
+            cov["under_no_gap"] += 1
+        else:
+            cov["selling_ok"] += 1
+    coverage = {"total": len(ph_asins or in_catalogue), **cov}
+    print("coverage of her category:", dict(coverage))
+
     # --- QA assertions (source section 2.10) --------------------------------------------------
     qa = {}
     qa["1_account_separation"] = all(r["brand"] in RULES["accounts"].values() for r in part_a + part_b + part_c)
@@ -542,6 +581,8 @@ def main():
     qa["5_directional_add_logic"] = all(
         truth[(r["in_frontend"], r["in_backend"])] == (r["status"], r["add_target"]) for r in part_b)
     qa["6_zero_manual_lookup"] = all(r.get("keyword") for r in part_b)
+    qa["8_every_asin_accounted_for"] = (
+        sum(v for k, v in coverage.items() if k != "total") == coverage["total"])
     qa["7_monthly_cadence"] = all(r["date_checked"] == ref.isoformat() for r in part_a + part_b + part_c)
     print("QA:", qa)
     if not all(qa.values()):
@@ -555,6 +596,7 @@ def main():
                    "zero_sales_from": z_start.isoformat()},
         "rules": {k: (v if not isinstance(v, tuple) else list(v)) for k, v in RULES.items()},
         "qa": qa,
+        "coverage": coverage,
         "top_moving": [{"brand": RULES["accounts"][ss], "asin": a,
                         "units": [monthly[(ss, a)].get(m, 0) for m in months],
                         "terms": len(sqp.get((ss, a), []))} for ss, a in sorted(top_moving)],

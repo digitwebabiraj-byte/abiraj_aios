@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-19T15:18:23",
+ "generated_at": "2026-08-19T15:55:01",
  "reference_date": "2026-08-19",
  "period": {
   "months": [
@@ -59,7 +59,16 @@
   "4_dual_method_independent": true,
   "5_directional_add_logic": true,
   "6_zero_manual_lookup": true,
+  "8_every_asin_accounted_for": true,
   "7_monthly_cadence": true
+ },
+ "coverage": {
+  "total": 776,
+  "under_no_twin": 340,
+  "selling_ok": 302,
+  "in_report": 45,
+  "under_no_gap": 59,
+  "top_moving": 30
  },
  "top_moving": [
   {
