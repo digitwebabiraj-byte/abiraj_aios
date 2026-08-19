@@ -89,7 +89,7 @@ def main():
             for r in sorted(bc, key=lambda x: x["base_sku"]):
                 body.append(f'<tr><td class="m">{E(r["top_asin"])}</td><td class="c n">{r["top_watts"]}W</td>'
                             f'<td class="m">{E(r["duplicate_asin"])}</td>'
-                            f'<td class="c n warn"><b>{r["duplicate_watts"]}W</b></td>'
+                            f'<td class="c n warn"><b>{E(r["duplicate_watts"])}</b></td>'
                             f'<td class="m warn">{E(r["duplicate_sku"])}</td>'
                             f'<td class="m">{E(r["base_sku"])}</td>'
                             f'<td class="s">{E(r["title"][:90])}</td></tr>')

@@ -129,22 +129,27 @@ assert normalise_sku("LDSG125MUE274APK") == normalise_sku("LDSG125MUE2746PK") ==
 _WATT_RE = re.compile(r"(?<![0-9])([0-9]{1,2})\s*W(?![A-Za-z])", re.I)
 
 
+MAX_LED_WATTS = 30   # real LED wattages here run 3-25W; 40/50/60/70/100 are incandescent equivalents
+
+
 def title_watts(title: str):
-    """Wattage as stated on the listing itself. Used ONLY as a safety check on pairing - a wrong SKU
-    must not silently pair two different bulbs.
+    """The SET of wattages the listing itself states. Used ONLY as a safety check on pairing - a
+    wrong SKU must not silently pair two different bulbs.
 
     The source's Phase 2 Step 2 warns: "Where a listing's stored SKU doesn't match its real product,
-    correct it against the SKU mapping table." Measured 2026-08-19 inside the requester's category:
-    of 518 listings where both the SKU wattage (E27<digit>) and the title wattage could be read,
-    **124 disagree** - and `amazon_listings.wrong_sku` flags only 4 of them, so the existing flag
-    cannot be relied on. Real case found by the owner: B0B8P75R4Y carries SKU LDMG125E2782PK (an 8W
-    code) but is a 4W non-dimmable bulb, and was being paired with the 8W family.
+    correct it against the SKU mapping table." Real case found by the owner 2026-08-19: B0B8P75R4Y
+    carries SKU LDMG125E2782PK (an 8W code) but is a 4W bulb, and was being paired with the 8W family.
 
-    Amazon titles state wattage twice ("8W (Equivalent 60W)"), so take the MINIMUM - the equivalent
-    figure is always the larger, incandescent-comparison number.
+    A SET, not a single value, because two title conventions break a single-number reading:
+      - "8W (Equivalent 60W)" states the LED wattage AND the incandescent comparison. Values above
+        MAX_LED_WATTS are dropped, so this yields {8}.
+      - "4W/6W/8W" is one listing covering several wattages. Taking the minimum called it 4W and
+        wrongly rejected a valid pair (B0D7HPWK2P). It yields {4, 6, 8} and now matches an 8W twin.
+
+    Pairs are rejected only when both sets are non-empty and DISJOINT - no shared wattage at all.
     """
-    vals = [int(m) for m in _WATT_RE.findall(title or "")]
-    return min(vals) if vals else None
+    vals = {int(m) for m in _WATT_RE.findall(title or "")}
+    return {v for v in vals if 0 < v <= MAX_LED_WATTS} or None
 
 
 def norm_text(t: str) -> str:
@@ -348,13 +353,15 @@ def main():
             # SAFETY: a wrong SKU must not silently pair two different bulbs. If both listings state
             # a wattage and they disagree, this is NOT the same product - surface it, never guess.
             wt, wd = watts.get((ss, top_asin)), watts.get((ss, cand["asin"]))
-            if wt is not None and wd is not None and wt != wd:
+            if wt and wd and not (wt & wd):        # both stated, and NO shared wattage
                 part_c.append({"brand": RULES["accounts"][ss], "top_asin": top_asin, "base_sku": base,
                                "duplicate_asin": cand["asin"], "duplicate_sku": cand["sku"],
                                "duplicate_status": st, "date_checked": ref.isoformat(),
-                               "top_watts": wt, "duplicate_watts": wd,
-                               "issue": f"same base SKU but the listings state different wattage "
-                                        f"({wt}W vs {wd}W) - the stored SKU looks wrong",
+                               "top_watts": "/".join(f"{w}W" for w in sorted(wt)),
+                               "duplicate_watts": "/".join(f"{w}W" for w in sorted(wd)),
+                               "issue": f"same base SKU but the listings share no wattage "
+                                        f"({'/'.join(f'{w}W' for w in sorted(wt))} vs "
+                                        f"{'/'.join(f'{w}W' for w in sorted(wd))}) - the stored SKU looks wrong",
                                "recommended_action": "Check and correct the SKU before using this pair",
                                "title": cand["title"][:200]})
                 continue
@@ -404,8 +411,7 @@ def main():
     qa = {}
     qa["1_account_separation"] = all(r["brand"] in RULES["accounts"].values() for r in part_a + part_b + part_c)
     qa["2_sku_mismatch_never_paired"] = all(
-        not (r.get("top_watts") and r.get("duplicate_watts") and r["top_watts"] == r["duplicate_watts"])
-        for r in part_c)
+        r.get("top_watts") != r.get("duplicate_watts") for r in part_c)
     qa["3_one_place_is_enough"] = True   # in_frontend is computed over title+bullets+description as one group
     qa["4_dual_method_independent"] = True
     truth = {(True, True): ("present", "none"), (True, False): ("gap", "backend"),
