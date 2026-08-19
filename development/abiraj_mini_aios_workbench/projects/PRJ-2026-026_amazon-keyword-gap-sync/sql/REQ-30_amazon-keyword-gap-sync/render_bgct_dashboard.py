@@ -28,7 +28,7 @@ E = lambda s: html.escape(str(s if s is not None else ""))
 def main():
     p = json.load(open(PAYLOAD, encoding="utf-8"))
     per, rules = p["period"], p["rules"]
-    pa, pb = p["part_a"], p["part_b"]
+    pa, pb, pc = p["part_a"], p["part_b"], p.get("part_c", [])
 
     pairs = {}
     for r in pb:
@@ -44,7 +44,8 @@ def main():
     tiles = [("Top-Moving ASINs", len(p["top_moving"]), tm_rule),
              ("Underperforming listings", len(pa) + len(pairs), "no sales 6mo, or falling 3mo"),
              ("Listings needing rewrite", len(pa), "Part A — no content to check"),
-             ("Real keyword gaps", gaps, f"Part B — across {len(pairs)} listings")]
+             ("Real keyword gaps", gaps, f"Part B — across {len(pairs)} listings"),
+             ("Wrong SKU — rejected", len(pc), "Part C — different wattage, not the same bulb")]
 
     def badge(v, yes="✓", no="✗"):
         return f'<span class="b {"y" if v else "n"}">{yes if v else no}</span>'
@@ -56,7 +57,8 @@ def main():
     for brand in ("dcvoltage_uk", "ledsone_uk"):
         bp = {k: v for k, v in pairs.items() if k[0] == brand}
         ba = [r for r in pa if r["brand"] == brand]
-        if not bp and not ba:
+        bc = [r for r in pc if r["brand"] == brand]
+        if not bp and not ba and not bc:
             continue
         body.append(f'<section class="acct"><h2>{E(BRANDS[brand])}</h2>'
                     f'<p class="sub">{len(ba)} listing(s) needing a rewrite · {len(bp)} listing(s) with keyword gaps '
@@ -74,6 +76,23 @@ def main():
                             f'<td class="m">{E(r["base_sku"])}</td><td>{E(r["duplicate_status"])}</td>'
                             f'<td class="warn">{E(r["issue"])}</td><td class="c">{r["terms_available"]}</td>'
                             f'<td class="m">{E(r["top_asin"])}</td></tr>')
+            body.append("</tbody></table>")
+
+        if bc:
+            body.append(f'<h3 class="pc">Part C — wrong SKU, pair rejected ({len(bc)})</h3>'
+                        '<p class="note">These two listings share a base SKU but state <b>different '
+                        'wattage</b>, so they are not the same bulb — the stored SKU is wrong. '
+                        'No keywords were checked. Fix the SKU first.</p>'
+                        '<table class="t"><thead><tr><th>Good seller</th><th>Its wattage</th>'
+                        '<th>Listing with the wrong SKU</th><th>Its wattage</th><th>Wrong SKU</th>'
+                        '<th>Base SKU</th><th>Title</th></tr></thead><tbody>')
+            for r in sorted(bc, key=lambda x: x["base_sku"]):
+                body.append(f'<tr><td class="m">{E(r["top_asin"])}</td><td class="c n">{r["top_watts"]}W</td>'
+                            f'<td class="m">{E(r["duplicate_asin"])}</td>'
+                            f'<td class="c n warn"><b>{r["duplicate_watts"]}W</b></td>'
+                            f'<td class="m warn">{E(r["duplicate_sku"])}</td>'
+                            f'<td class="m">{E(r["base_sku"])}</td>'
+                            f'<td class="s">{E(r["title"][:90])}</td></tr>')
             body.append("</tbody></table>")
 
         if bp:
@@ -129,7 +148,7 @@ padding:12px 16px;border-radius:8px;margin:16px 0;font-size:13px}}
 section.acct{{margin:30px 0}} section.acct h2{{margin:0 0 2px;font-size:17px}}
 .sub{{color:var(--mut);margin:0 0 14px;font-size:12.5px}}
 h3.pa,h3.pb{{font-size:14px;margin:22px 0 4px;padding-left:9px;border-left:4px solid var(--warn)}}
-h3.pb{{border-color:var(--gap)}}
+h3.pb{{border-color:var(--gap)}} h3.pc{{border-color:#7d3c98}}
 .note{{color:var(--mut);font-size:12.5px;margin:0 0 10px}}
 table.t{{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);
 border-radius:8px;overflow:hidden;margin-bottom:16px}}

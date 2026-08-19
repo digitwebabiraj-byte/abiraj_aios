@@ -666,3 +666,67 @@ Fixed to `([0-9A])PK$`, with an assertion: `LDSG125MUE274APK` and `LDSG125MUE274
 instead of reading it off the catalogue. The owner's spot-check in the operational tool found in minutes
 what the QA checklist structurally cannot see — the checklist verifies that rules were applied, never
 that the rule matches reality.
+
+---
+
+## 17. 🔴 WRONG SKUs IN THE CATALOGUE — Part C added (owner spot-check, 2026-08-19)
+
+The owner searched SKU family `LDMG125E278` in the Listing Management tool. Nine listings came back —
+eight are **8W dimmable G125**, one is not:
+
+| ASIN | SKU | title says |
+|---|---|---|
+| B09M42FP91 · B09M42QJCS · B0CNQ1Q3BJ · B0B8SRVWSP · B0DQ8TM75J · B0B8SP4JD1 | `LDMG125E278…` | **8W** dimmable |
+| **`B0B8P75R4Y`** | **`LDMG125E2782PK`** | **4W, non-dimmable** |
+
+The SKU grammar encodes wattage — `LDMG125` + `E27` + **`8`** = G125, E27 fitting, 8W. So
+`B0B8P75R4Y` carries an **8W SKU on a 4W bulb**. The normaliser grouped it correctly *by SKU*; the SKU
+itself is wrong.
+
+**The existing flag does not catch it:** `wrong_sku = 0`, `mapped_sku = null`. This is precisely the
+case the source's Phase 2 Step 2 anticipates — *"Where a listing's stored SKU doesn't match its real
+product, correct it against the SKU mapping table"* — and it resolves **open item #7**: `wrong_sku`
+cannot serve as that mapping table.
+
+### Scale, measured inside the requester's category
+| | |
+|---|---|
+| Listings where both SKU wattage and title wattage are readable | **518** |
+| They agree | 394 |
+| **They DISAGREE** | **124 (24%)** |
+| …of those, flagged `wrong_sku = 1` | **4 (3%)** |
+
+### The fix — Part C, reject rather than guess
+A pair is now **rejected** when both listings state a wattage and the two disagree. The report never
+decides which listing is wrong; it surfaces the conflict:
+
+> *"same base SKU but the listings state different wattage (8W vs 4W) — the stored SKU looks wrong"*
+
+Wattage is read from the title, taking the **minimum** of the numbers found, because Amazon titles
+state it twice (`8W (Equivalent 60W)`) and the equivalent figure is always the larger incandescent
+comparison. A new QA assertion `2_sku_mismatch_never_paired` guards it.
+
+### What Part C caught
+| base SKU | Top-Moving | dead listing | verdict |
+|---|---|---|---|
+| `LDMG125E278` | B0B8P9BKXB **8W** | **B0B8P75R4Y 4W** | rejected — the owner's find |
+| `LDCWB223` | B09Z6P8H29 **7W** | B0D5CMBXK6 **3W** | rejected |
+| `LDMST64E278` | B0BLP1JSRK **8W** | **B0D7HPWK2P 4W** | rejected |
+
+The third is notable: `B0D7HPWK2P` was one of the three pairs put to the owner for checking in §16.
+The automated check found it independently — **the two verification routes agree**.
+
+### Effect
+| | §16 | **§17 (Part C)** |
+|---|---|---|
+| Part A — rewrites | 21 | **20** |
+| Part B — listings / rows / gaps | 16 / 191 / 149 | **14 / 150 / 115** |
+| **Part C — rejected, SKU wrong** | — | **3** |
+| QA | 6/6 | **7/7** (new mismatch check) |
+
+### Lesson
+**Matching on an identifier assumes the identifier is right.** 24% of comparable listings here contradict
+their own SKU, and the system's `wrong_sku` flag catches 3% of those. Any report that joins products by
+SKU needs an independent cross-check on an attribute the SKU claims — here, wattage from the title.
+Three rounds of SKU bugs (§15 greedy pack, §16 APK marker, §17 wrong SKUs) were all found by the owner
+opening the operational tool, never by the QA checklist.

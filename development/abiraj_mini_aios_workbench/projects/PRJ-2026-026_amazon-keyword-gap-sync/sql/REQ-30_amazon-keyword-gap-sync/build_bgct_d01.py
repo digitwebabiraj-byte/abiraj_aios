@@ -126,6 +126,27 @@ assert normalise_sku("LDSG125MUE274APK") == normalise_sku("LDSG125MUE2746PK") ==
        "LDSG125MUE274", "APK (10-pack) must normalise like a numeric pack"
 
 
+_WATT_RE = re.compile(r"(?<![0-9])([0-9]{1,2})\s*W(?![A-Za-z])", re.I)
+
+
+def title_watts(title: str):
+    """Wattage as stated on the listing itself. Used ONLY as a safety check on pairing - a wrong SKU
+    must not silently pair two different bulbs.
+
+    The source's Phase 2 Step 2 warns: "Where a listing's stored SKU doesn't match its real product,
+    correct it against the SKU mapping table." Measured 2026-08-19 inside the requester's category:
+    of 518 listings where both the SKU wattage (E27<digit>) and the title wattage could be read,
+    **124 disagree** - and `amazon_listings.wrong_sku` flags only 4 of them, so the existing flag
+    cannot be relied on. Real case found by the owner: B0B8P75R4Y carries SKU LDMG125E2782PK (an 8W
+    code) but is a 4W non-dimmable bulb, and was being paired with the 8W family.
+
+    Amazon titles state wattage twice ("8W (Equivalent 60W)"), so take the MINIMUM - the equivalent
+    figure is always the larger, incandescent-comparison number.
+    """
+    vals = [int(m) for m in _WATT_RE.findall(title or "")]
+    return min(vals) if vals else None
+
+
 def norm_text(t: str) -> str:
     return _NONALNUM.sub(" ", (t or "").lower()).strip()
 
@@ -304,7 +325,13 @@ def main():
         if (l["ss"], l["asin"]) in top_moving and l["base_sku"]:
             tm_by_base[(l["ss"], l["base_sku"])].add(l["asin"])
 
-    part_a, part_b, seen = [], [], set()
+    watts = {}
+    for l in listings:
+        w = title_watts(l["title"])
+        if w is not None:
+            watts.setdefault((l["ss"], l["asin"]), w)
+
+    part_a, part_b, part_c, seen = [], [], [], set()
     for key, tops in tm_by_base.items():
         ss, base = key
         for cand in by_base.get(key, []):
@@ -317,6 +344,20 @@ def main():
             if (ss, top_asin, cand["asin"]) in seen:
                 continue
             seen.add((ss, top_asin, cand["asin"]))
+
+            # SAFETY: a wrong SKU must not silently pair two different bulbs. If both listings state
+            # a wattage and they disagree, this is NOT the same product - surface it, never guess.
+            wt, wd = watts.get((ss, top_asin)), watts.get((ss, cand["asin"]))
+            if wt is not None and wd is not None and wt != wd:
+                part_c.append({"brand": RULES["accounts"][ss], "top_asin": top_asin, "base_sku": base,
+                               "duplicate_asin": cand["asin"], "duplicate_sku": cand["sku"],
+                               "duplicate_status": st, "date_checked": ref.isoformat(),
+                               "top_watts": wt, "duplicate_watts": wd,
+                               "issue": f"same base SKU but the listings state different wattage "
+                                        f"({wt}W vs {wd}W) - the stored SKU looks wrong",
+                               "recommended_action": "Check and correct the SKU before using this pair",
+                               "title": cand["title"][:200]})
+                continue
 
             b_txt, k_txt = bullets.get(cand["id"], ""), backend.get(cand["id"], "")
             front_raw = " ".join([cand["title"], b_txt, cand["desc"]]).strip()
@@ -361,7 +402,10 @@ def main():
 
     # --- QA assertions (source section 2.10) --------------------------------------------------
     qa = {}
-    qa["1_account_separation"] = all(r["brand"] in RULES["accounts"].values() for r in part_a + part_b)
+    qa["1_account_separation"] = all(r["brand"] in RULES["accounts"].values() for r in part_a + part_b + part_c)
+    qa["2_sku_mismatch_never_paired"] = all(
+        not (r.get("top_watts") and r.get("duplicate_watts") and r["top_watts"] == r["duplicate_watts"])
+        for r in part_c)
     qa["3_one_place_is_enough"] = True   # in_frontend is computed over title+bullets+description as one group
     qa["4_dual_method_independent"] = True
     truth = {(True, True): ("present", "none"), (True, False): ("gap", "backend"),
@@ -369,7 +413,7 @@ def main():
     qa["5_directional_add_logic"] = all(
         truth[(r["in_frontend"], r["in_backend"])] == (r["status"], r["add_target"]) for r in part_b)
     qa["6_zero_manual_lookup"] = all(r.get("keyword") for r in part_b)
-    qa["7_monthly_cadence"] = all(r["date_checked"] == ref.isoformat() for r in part_a + part_b)
+    qa["7_monthly_cadence"] = all(r["date_checked"] == ref.isoformat() for r in part_a + part_b + part_c)
     print("QA:", qa)
     if not all(qa.values()):
         raise SystemExit(f"QA FAILED: {[k for k, v in qa.items() if not v]}")
@@ -389,6 +433,7 @@ def main():
                    for (ss, a), rows in sqp.items() for t in rows],
         "part_a": part_a,
         "part_b": part_b,
+        "part_c": part_c,
     }
     os.makedirs(OUTDIR, exist_ok=True)
     with open(PAYLOAD, "w", encoding="utf-8") as f:
@@ -396,7 +441,7 @@ def main():
 
     write_excel(payload)
     print(f"\nTop-Moving {len(top_moving)} | Phase 1 terms {len(payload['phase1'])} | "
-          f"Part A {len(part_a)} | Part B {len(part_b)} rows "
+          f"Part A {len(part_a)} | Part B {len(part_b)} rows | Part C {len(part_c)} SKU-mismatch "
           f"({sum(1 for r in part_b if r['status']=='gap')} gaps)")
     print(f"payload -> {PAYLOAD}\noutputs -> {OUTDIR}")
 
@@ -476,6 +521,9 @@ def write_excel(p):
         ("Part A", f"{len(p['part_a'])} listings with NO CONTENT — empty backend keyword field and/or no "
                    f"bullet points. Every keyword would show as 'missing' because there is nothing to search. "
                    f"These need a rewrite, not keyword edits (rule Q12)."),
+        ("Part C", f"{len(p.get('part_c', []))} pairs REJECTED — same base SKU but the two listings state "
+                   f"different wattage, so the stored SKU is wrong. Not keyword-checked; the SKU needs "
+                   f"correcting first."),
         ("Part B", f"{len(p['part_b'])} keyword rows across listings that DO have content — "
                    f"{sum(1 for r in p['part_b'] if r['status']=='gap')} real, actionable gaps."),
     ])
@@ -491,6 +539,11 @@ def write_excel(p):
            "action_state", "date_checked"],
           sorted(p["part_b"], key=lambda r: (r["brand"], r["base_sku"], r["duplicate_asin"],
                                              -r["search_query_volume"])), {"keyword": 44})
+    sheet(wb.create_sheet("Part C - SKU mismatch"),
+          ["brand", "top_asin", "base_sku", "duplicate_asin", "duplicate_sku", "duplicate_status",
+           "top_watts", "duplicate_watts", "issue", "recommended_action", "title", "date_checked"],
+          sorted(p.get("part_c", []), key=lambda r: (r["brand"], r["base_sku"])),
+          {"issue": 60, "recommended_action": 44, "title": 60})
     fr = [("brand", "dcvoltage_uk / ledsone_uk — accounts never merged"),
           ("top_asin", "Top-Moving ASIN — the source of the proven search terms"),
           ("base_sku", "Normalised SKU — pack suffixes stripped, bundles kept whole"),
