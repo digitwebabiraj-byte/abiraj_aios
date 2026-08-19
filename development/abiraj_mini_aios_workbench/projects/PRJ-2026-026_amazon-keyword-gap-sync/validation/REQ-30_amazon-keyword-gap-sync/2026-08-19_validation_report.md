@@ -278,3 +278,49 @@ validation script is as misleading as a false figure in a report.
 external, check whether the external thing is really per-row — here one ASIN is one Amazon page, and
 the account split is ours, not Amazon's. The tell was available all along: the operator's own tool
 showed content the report called empty.
+
+---
+
+# ADDENDUM 5 — published to ph_task id 980, and a project_code collision avoided (2026-08-19)
+
+Published on the owner's instruction, using the sample script's connection
+(`order_management_copy` as `temp_user`) and the guarded pattern proven on SMP #022.
+
+## 🔴 The collision, found before writing anything
+`tech_team_outputs.ph_task` **already held project_code `BGCT`** — **id 9, "BGCT Listing Generator"**,
+developer **tharsika**, assigned to **utharsika**, last updated **2026-08-17**. A different team's live
+project that happens to share the prefix.
+
+Had the sample script been used as-is with its `TASK_ID = 5`, or had `bgct` been used as the code, this
+publish would have **overwritten someone else's live dashboard**. Checked first, so it did not.
+
+Ours went in under **`bgct-kwgap`** as a **new row**. Verified after the insert: **id 9 unchanged**,
+still 9,176 chars, still stamped 2026-08-17.
+
+## The publisher
+`automation/publish_bgct_ph_task.py`:
+- `--dry-run` prints the row and writes nothing
+- default is **INSERT**, and it refuses if the `task_id` already exists
+- `--update <id>` calls `guard()`, which **reads the row first and exits** unless its `project_code`
+  *and* `task_id` are ours — so it can never write to id 9 or anything else in the table
+- reads the row back and **md5-compares** it with the file; a mismatch exits non-zero rather than
+  reporting success
+- password from **`PGPASSWORD` only** — never hard-coded, never committed *(the sample script carries a
+  literal password; that value was not copied into the repo)*
+
+## Result
+| | |
+|---|---|
+| id | **980** |
+| assigned_user | **thuwaraga** · team `ph_priors` |
+| version_status | released · level 1 |
+| html | 141,402 chars · md5 `22a8f2bb10ca9c73c913ff2d22d7571e` · **match confirmed** |
+
+## Full-screen rendering
+The published page carries **no container width cap** — the only `max-width` rules are the 320/420px
+text-clipping on two table cells and the sub-820px mobile padding. It fills whatever width the portal
+gives it, and matches the document shell other published dashboards use (`<!doctype html>` … `<body>`).
+
+## Standing
+Built · validated 10/10 · spec-compliant · **published**. Still **not automated**, and Thuwaraga's
+business sign-off is still outstanding.
