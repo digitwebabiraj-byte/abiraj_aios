@@ -26,10 +26,11 @@ I looked at **your 776 bulbs** on Amazon UK (DCVOLTAGE and LEDSone).
 | Bulbs | What happened to them |
 |---|---|
 | **30** | Your best sellers — they supplied the proven keywords |
-| **45** | **In this report** — these need work. Your list. |
+| **42** | **In this report** — these need work. Your list. |
 | **302** | Selling normally — nothing to fix |
 | **59** | Struggling, but they already have the right words. Their problem is something else — price, stock, photos, reviews |
 | **340** | **Struggling, but this report cannot help them** — there is no best-selling version of the same product to copy words from |
+| **3** | SKU code needs checking — see question 4. Not a keyword job, so they are not on your list |
 
 That last row is the honest limit of this report. **340 of your bulbs are not selling and have no
 successful twin to learn from.** They need keyword research of their own. Worth talking about as a
@@ -39,7 +40,9 @@ separate piece of work.
 - **1 listing that is completely empty** — no keywords at all. It needs writing.
 - **136 missing keywords** across your listings. These just need the words added.
   *(Only words at least 10 people search a month are listed. The full set is on the Phase 1 tab.)*
-- **3 listings where the SKU does not match the bulb** (see question 4).
+- **3 listings where the SKU does not match the bulb** (see question 4). These are **not** on your
+  keyword list — a wrong SKU is a data fix, not a keyword. You can find them on the **All my bulbs**
+  tab by choosing *"SKU code needs checking"*.
 
 ---
 
