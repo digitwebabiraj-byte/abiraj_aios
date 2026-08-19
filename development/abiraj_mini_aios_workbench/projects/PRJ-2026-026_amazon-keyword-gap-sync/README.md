@@ -25,8 +25,8 @@ instruction"; the assignment came from HR.)*
 🟢 **BUILT + VALIDATED 2026-08-19 — 10/10 independent checks PASS, 7/7 in-run QA, on `main`.**
 Scoped to the requester's own PH category (`staff.ph_categories` 65 **"Bulbs"**, 776 Amazon UK ASINs) —
 **not** the whole estate. Top-Moving = >5 units in **at least 2 of 3** months → **30 ASINs → 359 SQP
-terms → 48 underperforming listings → Part A 22 rewrites + Part B 204 real gaps + Part C 3 rejected
-(wrong SKU)**. Uses `mapped_sku`, the source's own SKU mapping table. Verified in-browser and
+terms → 49 underperforming listings → **Part A 1 rewrite + Part B 387 real gaps across 45
+listings + Part C 3 rejected (wrong SKU)**. Uses `mapped_sku`, the source's own SKU mapping table. Verified in-browser and
 independently reconciled — see `validation/REQ-30_.../2026-08-19_validation_report.md`.
 **Not published, not automated; awaiting Thuwaraga's sign-off.** Earlier status: Folder structure, source import (checksum-verified), governance
 docs and a live data-foundation probe are done. **No build, no deliverable, nothing committed, nothing

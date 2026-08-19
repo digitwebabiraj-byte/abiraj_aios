@@ -22,8 +22,8 @@ The report finds those missing words and tells you exactly where to put them.
 I looked at **your 776 bulbs** on Amazon UK (DCVOLTAGE and LEDSone).
 
 **I found:**
-- **22 listings that are completely empty** — no bullet points, no keywords. These need writing.
-- **204 missing keywords** on 26 other listings. These just need the words added.
+- **1 listing that is completely empty** — no keywords at all. It needs writing.
+- **387 missing keywords** across 45 listings. These just need the words added.
 - **3 listings where the SKU does not match the bulb** (see question 4).
 
 ---
