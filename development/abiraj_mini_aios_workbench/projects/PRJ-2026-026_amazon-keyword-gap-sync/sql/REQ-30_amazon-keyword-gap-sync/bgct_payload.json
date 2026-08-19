@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-19T17:22:10",
+ "generated_at": "2026-08-19T17:36:04",
  "reference_date": "2026-08-19",
  "period": {
   "months": [
@@ -64,10 +64,10 @@
  },
  "coverage": {
   "total": 776,
-  "under_no_twin": 340,
   "selling_ok": 302,
-  "in_report": 42,
+  "under_no_twin": 340,
   "under_no_gap": 59,
+  "in_report": 42,
   "top_moving": 30,
   "sku_check": 3
  },

@@ -59,6 +59,33 @@ def write_status(state, detail):
                                     state, detail))
 
 
+def published_html_len():
+    """Length of the HTML currently sitting in ph_task, as a collapse baseline.
+
+    The local bgct_last_good.json only survives on the PC. In GitHub Actions every run starts from a
+    fresh checkout, so that file is always absent and the relative collapse guard would be inert -
+    exactly where an unattended run most needs it. The published row is the one baseline that does
+    persist everywhere, so compare against it before overwriting it. Returns 0 if unreachable, which
+    simply skips this gate rather than failing the run for an unrelated reason.
+    """
+    try:
+        import psycopg2
+        conn = psycopg2.connect(host=os.getenv("PGHOST", "149.28.134.54"),
+                                port=os.getenv("PGPORT", "5435"),
+                                dbname=os.getenv("PGDATABASE", "order_management_copy"),
+                                user=os.getenv("PGUSER", "temp_user"),
+                                password=os.getenv("PGPASSWORD", ""), connect_timeout=25)
+        with conn, conn.cursor() as cur:
+            cur.execute("SELECT length(html_content) FROM tech_team_outputs.ph_task WHERE id=%s",
+                        (PH_TASK_ID,))
+            r = cur.fetchone()
+        conn.close()
+        return int(r[0]) if r and r[0] else 0
+    except Exception as e:
+        log("could not read the published baseline (%s) - skipping that gate" % e)
+        return 0
+
+
 def load_last_good():
     try:
         with open(LASTGOOD, encoding="utf-8") as f:
@@ -151,6 +178,15 @@ def main():
         if size < MIN_HTML:
             raise RuntimeError("GATE FAIL: dashboard is %d bytes (< %d) - truncated render, "
                                "not publishing" % (size, MIN_HTML))
+        # Compare against what is actually published. Works on the PC AND in the cloud, where the
+        # local last-good file never survives the fresh checkout.
+        live = published_html_len()
+        chars = len(io.open(HTML, encoding="utf-8").read())
+        if live and chars < COLLAPSE * live:
+            raise RuntimeError("GATE FAIL: new dashboard is %d chars vs %d already published "
+                               "(< %.0f%%) - refusing to overwrite a fuller report with a thinner one"
+                               % (chars, live, COLLAPSE * 100))
+        log("render OK: %d chars (published baseline %s)" % (chars, live or "-"))
 
         run(PUBLISH, "--update", str(PH_TASK_ID))     # guarded; it md5-verifies the read-back itself
 
