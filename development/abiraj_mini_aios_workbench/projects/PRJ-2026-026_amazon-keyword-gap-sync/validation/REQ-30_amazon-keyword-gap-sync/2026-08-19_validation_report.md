@@ -162,3 +162,46 @@ Only the review surface is consolidated.
 
 Each tab keeps its own filter bar, KPI tiles and Reset, so the two phases never interfere. Still one
 self-contained file — no network, no external assets, 153 KB.
+
+---
+
+# ADDENDUM 3 — instructions built into the dashboard (2026-08-19)
+
+Owner: *"the UI must look easy to the user … I need to explain how to use it"*. Rather than ship a
+separate guide that gets separated from the file, the instructions are now **inside the dashboard** —
+still one file, nothing to lose.
+
+## What was added
+A **"How to use this tab"** panel at the top of each tab, open by default, with a
+**Hide / Show instructions** button in the header. Written in plain language for a reader whose first
+language is not English: short sentences, no jargon, and the **coloured labels shown inline** so the
+reader can match the instruction to what they see in the table.
+
+**Phase 1** — what the words are, what *Opportunity* and *Long-tail* mean in business terms
+("many people search this but your bulb hardly shows up"), how to use Month / ASIN, and when to use this
+tab at all.
+
+**Phase 2** — framed as a monthly to-do list: the three Parts are **three different jobs** (write /
+add words / fix the SKU), what each *What to do* label means, **work in batches** using the filter,
+start with the biggest numbers, and mark done in the "By listing" view. It closes with the two things
+that matter most: nothing touches Amazon, and **a word that does not suit the bulb must not be added** —
+that judgement is hers, not the report's.
+
+## 🔴 A real bug this exposed
+Remembering the Hide/Show preference used `localStorage`, which **throws** in sandboxed viewers and
+`data:` URLs. Because `help()` runs during start-up, that exception would have aborted the script
+**before the tables drew** — the whole dashboard would have opened blank, with working filters and no
+data, in any viewer that blocks storage. Now wrapped in try/catch: the preference is a nicety, and
+failing to save it can never stop the page.
+
+## Verified in a storage-blocked context
+| Check | Result |
+|---|---|
+| Page still draws with storage blocked | ✅ 443 Phase 1 rows |
+| Instructions shown by default | ✅ |
+| Hide / Show toggle + button label | ✅ both directions |
+| Phase 2 after toggling | ✅ A 22 · B 204 · C 3 |
+| Filter still works | ✅ "Add to backend" → 51 rows |
+| Reset | ✅ 229 rows |
+
+One self-contained file, 157 KB.

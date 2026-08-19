@@ -103,6 +103,17 @@ header .meta b{{color:#ffe9b0;font-weight:600}}
 .tab:hover{{background:rgba(255,255,255,.2);color:#fff}}
 .tab.on{{background:var(--bg);color:var(--nv)}}
 .tab .c{{opacity:.75;font-weight:500;margin-left:5px}}
+.help{{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--nv2);
+ border-radius:9px;margin:14px 22px 0;padding:14px 18px}}
+.help h3{{margin:0 0 8px;font-size:14px;color:var(--nv)}}
+.help ol{{margin:0;padding-left:20px}} .help li{{margin:6px 0;font-size:13px}}
+.help .tip{{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);font-size:12.5px;
+ color:var(--mut)}}
+.help b{{color:var(--ink)}}
+.help .lg{{display:inline-block;width:15px;height:15px;border-radius:4px;vertical-align:-2px;margin-right:4px}}
+.helpbtn{{background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:7px;padding:6px 12px;
+ font:600 12px inherit;cursor:pointer;float:right;margin-top:-26px}}
+.helpbtn:hover{{background:rgba(255,255,255,.26)}}
 .note{{padding:9px 22px;font-size:12.5px;border-bottom:1px solid var(--line)}}
 .note.p1{{background:#eef6fb;border-top:1px solid #cde2ef;color:#0d4a63}} .note.p1 b{{color:#08384c}}
 .note.p2{{background:#fff8e8;border-top:1px solid #f0dcae;color:#6b4a05}} .note.p2 b{{color:#8a5a00}}
@@ -182,6 +193,7 @@ kbd{{background:#fff;border:1px solid #c9d3de;border-bottom-width:2px;border-rad
   <div class="meta">REQ-30 · Amazon UK · DCVOLTAGE UK + LEDSone UK (reported separately, never merged)
   · keywords from <b>{E(per['start'])} → {E(per['end'])}</b> · no-sales window from
   <b>{E(per['zero_sales_from'])}</b> · generated {E(p['generated_at'])}</div>
+  <button class="helpbtn" id="hb">Hide instructions</button>
   <div class="tabs">
     <button class="tab on" data-t="1">Phase 1 — Proven keywords<span class="c">{len(terms)}</span></button>
     <button class="tab" data-t="2">Phase 2 — Gaps to fix<span class="c">{len(gaps)}</span></button>
@@ -189,6 +201,22 @@ kbd{{background:#fff;border:1px solid #c9d3de;border-bottom-width:2px;border-rad
 </header>
 
 <div id="p1">
+<div class="help" id="h1">
+  <h3>How to use this tab</h3>
+  <ol>
+    <li>This is the list of words <b>customers really typed into Amazon</b> before buying your
+      best-selling bulbs. It is Amazon's own data, not a guess.</li>
+    <li>Look for <span class="pill op">Opportunity</span> — it means <b>many people search this word,
+      but your bulb hardly ever shows up for it</b>. Those are your best chances.</li>
+    <li><span class="pill lt">Long-tail</span> means a longer, more exact phrase (3–6 words). Fewer
+      searches, but the customer knows what they want, so they buy more often.</li>
+    <li>Use <b>Month</b> to see one month at a time, and <b>ASIN</b> to see the words for one product.</li>
+    <li>Click <b>Searches / mo</b> at the top of the column to sort biggest first.</li>
+  </ol>
+  <div class="tip">Use this tab when you are <b>writing or improving a listing</b> and need to know
+    which words to include. To see which listings are <b>missing</b> these words, go to
+    <b>Phase 2</b>.</div>
+</div>
 <div class="note p1"><b>These are the words real customers typed</b> to find your best-selling bulbs —
 Amazon's own first-party data, not an estimate. They are the input to Phase 2.</div>
 <div class="kpis">
@@ -244,6 +272,35 @@ Amazon's own first-party data, not an estimate. They are the input to Phase 2.</
 </div>
 
 <div id="p2" hidden>
+<div class="help" id="h2">
+  <h3>How to use this tab — your monthly to-do list</h3>
+  <ol>
+    <li>You sell the <b>same bulb</b> twice. One listing sells; the other sells nothing. Often the dead
+      one is simply <b>missing the words</b> customers search for. This tab lists those words.</li>
+    <li>There are <b>three jobs</b>, and they are different:
+      <br><b>Part A</b> — the listing is <b>empty</b> (no bullet points, no keywords). It needs
+      <b>writing</b>. The column <b>Keywords ready to use</b> tells you how many proven words are
+      already waiting from the good twin.
+      <br><b>Part B</b> — the listing has text, but <b>specific words are missing</b>. Each row tells
+      you the word and exactly <b>where to put it</b>.
+      <br><b>Part C</b> — the <b>SKU code is wrong</b>, so these two are not really the same bulb.
+      Fix the code first; do not add keywords.</li>
+    <li>In Part B, read the <b>What to do</b> column and follow it exactly:
+      <br><span class="pill be">Add to backend</span> put it only in the backend keyword box
+      <br><span class="pill bu">Add to bullets</span> put it only in the bullet points
+      <br><span class="pill both">Add to backend + bullets</span> put it in both</li>
+    <li><b>Work in batches.</b> Set <b>What to do</b> to “Add to backend”, do all of those in Seller
+      Central in one go, then switch to the next one. Much faster than going listing by listing.</li>
+    <li>Start with the <b>biggest numbers</b>. The list is already sorted by monthly searches, so the
+      top rows are worth the most.</li>
+    <li>When you have finished a listing, set <b>View</b> to <b>“By listing”</b> and click its button
+      to mark it done.</li>
+  </ol>
+  <div class="tip"><b>Two things to know.</b> Nothing here touches Amazon — you make the changes
+    yourself, so nothing can go wrong by accident. And <b>if a word does not suit the bulb, do not add
+    it</b> — the report finds words that work, but only you can judge whether a word really describes
+    that product. Amazon does not like keywords that do not match.</div>
+</div>
 <div class="note p2"><b>This report changes nothing on Amazon.</b> It shows where each proven keyword
 should go — a person adds it. (The source document's automatic push is deliberately out of scope.)</div>
 <div class="kpis">
@@ -503,6 +560,18 @@ function tabTo(t){{ tab=t; $('#p1').hidden=t!=='1'; $('#p2').hidden=t!=='2';
   $$('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
   (t==='1'?draw1:draw2)(); }}
 $$('.tab').forEach(b=>b.addEventListener('click',()=>tabTo(b.dataset.t)));
+// localStorage is blocked in some viewers (sandboxed frames, data: URLs). Remembering the
+// preference is a nicety; an exception here must never stop the tables from drawing.
+const remember = {{
+  get(){{ try{{ return localStorage.getItem('bgctHelp'); }}catch(e){{ return null; }} }},
+  set(v){{ try{{ localStorage.setItem('bgctHelp', v); }}catch(e){{}} }}
+}};
+let helpOn = remember.get() !== 'off';
+function help(){{ $('#h1').hidden=!helpOn; $('#h2').hidden=!helpOn;
+  $('#hb').textContent = helpOn ? 'Hide instructions' : 'Show instructions';
+  remember.set(helpOn?'on':'off'); }}
+$('#hb').addEventListener('click',()=>{{ helpOn=!helpOn; help(); }});
+help();
 ['q1','br1','mo1','a1','v1','op1','lt1'].forEach(id=>{{
   $('#'+id).addEventListener('input',draw1); $('#'+id).addEventListener('change',draw1); }});
 ['q2','br2','tg2','ds2','v2','gap2','vw2'].forEach(id=>{{
