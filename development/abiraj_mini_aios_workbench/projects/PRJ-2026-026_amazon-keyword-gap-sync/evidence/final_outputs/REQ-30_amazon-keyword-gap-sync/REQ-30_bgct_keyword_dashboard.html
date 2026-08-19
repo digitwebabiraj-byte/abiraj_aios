@@ -116,6 +116,16 @@ th b{color:var(--nv2)}
 .pill.bk{background:#fbe9e7;color:var(--gap)} .pill.wn{background:#f0e9f8;color:var(--purple)}
 .pill.am{background:#fff3e0;color:var(--warn)} .pill.ok{background:#e7f4ea;color:var(--ok)}
 .pill.tm{background:#e2f2f8;color:var(--opp)}
+/* The ASIN column is what she actually hunts for - keep it visible however far she scrolls right.
+   Each state below repeats a colour the plain cells already have; a transparent sticky cell would
+   let the scrolling columns slide visibly underneath it. */
+tbody td.pin{position:sticky;left:0;z-index:3;background:var(--panel);
+  box-shadow:1px 0 0 var(--line),4px 0 7px -4px rgba(0,0,0,.16)}
+thead th.pin{position:sticky;left:0;top:0;z-index:6;background:#f2f5f9;
+  box-shadow:1px 0 0 var(--line),4px 0 7px -4px rgba(0,0,0,.16)}
+tbody tr:hover td.pin{background:#f7fafd}
+tbody tr.gap td.pin{background:var(--gapbg)}
+tbody tr.gap:hover td.pin{background:#fbeceb}
 .wd{display:inline-block;font-weight:700;font-size:12px;border-radius:5px;padding:1px 7px;
  margin:1px 2px 1px 0;white-space:nowrap}
 .wd.be{background:#fff3e0;color:var(--warn);border:1px solid #f0d9b0}
@@ -337,8 +347,8 @@ should go — a person adds it. (The source document's automatic push is deliber
   search terms already exist on the good-selling twin, so whoever rewrites it does not start from a
   blank page. <b>0 — none</b> means the twin has no proven terms either.</p>
   <div class="wrap"><table id="tA"><thead><tr>
+    <th data-k="da" class="pin">Dead listing — <b>ASIN</b><span class="ar">▾</span></th>
     <th data-k="br">Account<span class="ar">▾</span></th>
-    <th data-k="da">Dead listing — <b>ASIN</b><span class="ar">▾</span></th>
     <th data-k="sku">Its <b>SKU</b><span class="ar">▾</span></th>
     <th data-k="sk">Base SKU<span class="ar">▾</span></th>
     <th data-k="ds">Why flagged<span class="ar">▾</span></th>
@@ -352,14 +362,14 @@ should go — a person adds it. (The source document's automatic push is deliber
   <p class="sub">Sorted by monthly searches — work down from the top. Switch <b>View</b> to
   “By listing” for the per-pair review buttons.</p>
   <div class="wrap"><table id="tB"><thead><tr>
-    <th data-k="br">Account<span class="ar">▾</span></th>
+    <th data-k="da" class="pin">Listing to fix — <b>ASIN</b><span class="ar">▾</span></th>
     <th data-k="kw">Keyword<span class="ar">▾</span></th>
     <th data-k="v" class="r">Searches / mo<span class="ar">▾</span></th>
     <th data-k="f" class="c">In text<span class="ar">▾</span></th>
     <th data-k="b" class="c">In backend<span class="ar">▾</span></th>
     <th data-k="t">What to do<span class="ar">▾</span></th>
     <th class="na">Words to actually add</th>
-    <th data-k="da">Listing to fix — <b>ASIN</b><span class="ar">▾</span></th>
+    <th data-k="br">Account<span class="ar">▾</span></th>
     <th data-k="ds">Why flagged<span class="ar">▾</span></th>
     <th data-k="sk">Base SKU<span class="ar">▾</span></th>
     <th data-k="ta">Keyword came from — <b>ASIN</b><span class="ar">▾</span></th></tr></thead><tbody></tbody></table>
@@ -553,8 +563,9 @@ function draw2(){
   const A=(sec&&sec!=='A')?[]:order(D.a.filter(r=>keep2(r,f,'A')),sort.A.k,sort.A.d);
   const B=(sec&&sec!=='B')?[]:order(D.b.filter(r=>keep2(r,f,'B')),sort.B.k,sort.B.d);
 
-  $('#tA tbody').innerHTML=A.map(r=>`<tr><td><span class="pill acc">${esc(BR[r.br])}</span></td>
-    <td><span class="asin">${esc(r.da)}</span></td><td class="m s">${esc(r.sku)}</td>
+  $('#tA tbody').innerHTML=A.map(r=>`<tr>
+    <td class="pin"><span class="asin">${esc(r.da)}</span></td>
+    <td><span class="pill acc">${esc(BR[r.br])}</span></td><td class="m s">${esc(r.sku)}</td>
     <td class="m">${esc(r.sk)}</td>
     <td>${esc(ST[r.ds]||r.ds)}</td>
     <td class="warnt clip" title="${esc(r.is)}">${esc(r.is)}</td>
@@ -562,13 +573,15 @@ function draw2(){
     <td><span class="asin">${esc(r.ta)}</span></td>
     <td class="s clip wide" title="${esc(r.ti)}">${esc(r.ti)}</td></tr>`).join('');
   $('#tB tbody').innerHTML=B.map(r=>`<tr class="${r.t==='none'?'':'gap'}">
-    <td><span class="pill acc">${esc(BR[r.br])}</span></td><td class="kw">${esc(r.kw)}</td>
+    <td class="pin"><span class="asin">${esc(r.da)}</span></td>
+    <td class="kw">${esc(r.kw)}</td>
     <td class="r">${r.v.toLocaleString()}</td>
     <td class="c"><span class="tick ${r.f?'y':'n'}">${r.f?'✓':'✗'}</span></td>
     <td class="c"><span class="tick ${r.b?'y':'n'}">${r.b?'✓':'✗'}</span></td>
     <td><span class="pill ${PILL[r.t]}">${esc(TG[r.t])}</span></td>
     <td>${words(r)}</td>
-    <td><span class="asin">${esc(r.da)}</span></td><td>${esc(ST[r.ds]||r.ds)}</td>
+    <td><span class="pill acc">${esc(BR[r.br])}</span></td>
+    <td>${esc(ST[r.ds]||r.ds)}</td>
     <td class="m">${esc(r.sk)}</td><td><span class="asin">${esc(r.ta)}</span></td></tr>`).join('');
 
   /* grouped view - source 2.6 (per-pair status) + 2.7 (the two buttons) */
