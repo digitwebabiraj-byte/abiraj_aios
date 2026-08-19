@@ -158,6 +158,22 @@ Publisher: `automation/publish_bgct_ph_task.py` — guarded INSERT, refuses to t
 `project_code`/`task_id` are not ours, md5-verifies the read-back, and takes the password from
 `PGPASSWORD` only. Refresh with `--update 980`.
 
+## Automation — REQ-30-D03 (added 2026-08-19)
+**Windows task `BGCT_Monthly_Keyword_Gap` — 20th of each month, 12:00**, registered on the main-tree
+path (never a worktree: the `0xC000013A` trap). Proven end-to-end the same day: `LastTaskResult 0`,
+776 bulbs, 136 gaps, `bgct_last_good.json` md5 identical to `ph_task` 980's.
+
+Fail-closed gates: catalogue ≥ 500 · **buckets must sum to the catalogue** · ≥ 60% of last good ·
+Top-Movers ≥ 1 · SQP not absent for every account · **no account that had data may arrive with none** ·
+render ≥ 150 KB. Any trip → refuse, leave id 980 untouched, `FAILED` status, exit 1, Desktop alert.
+
+🔴 **There is deliberately no minimum on the gap count.** It is a backlog, not a universe — every
+keyword Thuwaraga adds removes a row, so it should trend to zero. A floor would fail the job exactly
+when the project succeeds. Operations detail: `automation/AUTOMATION_README.md`.
+
+⚠ The automation re-publishes the **same unconfirmed default rules** every month. Her answers on the
+decision sheet replace them in the single `RULES` dict in `build_bgct_d01.py`.
+
 ## Sign-off
 None. Project scaffolded 2026-08-19 and assigned by HR to **Thuwaraga** (`staff.users` id 122); sign-off is
 pending the decision sheet (open items #1–#11) and a first delivered report.

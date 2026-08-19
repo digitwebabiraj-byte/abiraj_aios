@@ -45,6 +45,22 @@ def main():
     per, rules, qa = p["period"], p["rules"], p["qa"]
     pa, pb, pc = p["part_a"], p["part_b"], p.get("part_c", [])
     cov = p.get("coverage", {})
+    # Amazon delivers each account's search data on its own schedule. When one account's month is
+    # assembled from fewer weeks than another's, its keyword volumes are NOT comparable - and nothing
+    # in a row admits that. Say it on the face of the report rather than let her infer equal footing.
+    sqpc = p.get("sqp_coverage", {})
+    BRN = {"dcvoltage_uk": "DCVOLTAGE UK", "ledsone_uk": "LEDSone UK"}
+    thin = []
+    for b, c in sorted(sqpc.items()):
+        wk = c.get("weeks_by_month", {})
+        if wk and min(wk.values()) < 4:
+            det = ", ".join(f"{m[:7]}&nbsp;{n}wk" for m, n in sorted(wk.items()))
+            thin.append(f"<b>{BRN.get(b, b)}</b> {det}")
+    freshness = ("" if not thin else
+        '<div class="fresh"><b>Search-data coverage.</b> Amazon sends each account its own search '
+        'data, and one of yours arrived thinner than the other. A month built from fewer weeks has '
+        'lower keyword volumes than a full one, so <b>do not compare volumes across the two accounts</b> '
+        '&mdash; compare within an account. ' + " &middot; ".join(thin) + ' (4wk = complete).</div>')
     cat = p.get("catalogue", [])
     rows_g = [{"a": r["asin"], "sk": r["sku"], "bs": r["base_sku"], "ac": r["accounts"],
                "u": r["units_by_month"], "u3": r["units_3mo"], "u6": r["units_6mo"],
@@ -225,6 +241,10 @@ thead th.pin{{position:sticky;left:0;top:0;z-index:6;background:#f2f5f9;
 tbody tr:hover td.pin{{background:#f7fafd}}
 tbody tr.gap td.pin{{background:var(--gapbg)}}
 tbody tr.gap:hover td.pin{{background:#fbeceb}}
+.fresh{{background:#fff8e6;border:1px solid #f0dcae;border-left:4px solid var(--warn);
+ color:#5a4413;border-radius:0 7px 7px 0;padding:9px 13px;margin:10px 22px 0;font-size:12.5px;
+ line-height:1.5}}
+.fresh b{{color:#7a5a12}}
 .wd{{display:inline-block;font-weight:700;font-size:12px;border-radius:5px;padding:1px 7px;
  margin:1px 2px 1px 0;white-space:nowrap}}
 .wd.be{{background:#fff3e0;color:var(--warn);border:1px solid #f0d9b0}}
@@ -258,6 +278,7 @@ kbd{{background:#fff;border:1px solid #c9d3de;border-bottom-width:2px;border-rad
   <div class="meta">REQ-30 · Amazon UK · DCVOLTAGE UK + LEDSone UK (reported separately, never merged)
   · keywords from <b>{E(per['start'])} → {E(per['end'])}</b> · no-sales window from
   <b>{E(per['zero_sales_from'])}</b> · generated {E(p['generated_at'])}</div>
+  {freshness}
   <div class="tabs">
     <button class="tab on" data-t="1">Phase 1 — Proven keywords<span class="c">{len(terms)}</span></button>
     <button class="tab" data-t="2">Phase 2 — Gaps to fix<span class="c">{len(gaps)}</span></button>

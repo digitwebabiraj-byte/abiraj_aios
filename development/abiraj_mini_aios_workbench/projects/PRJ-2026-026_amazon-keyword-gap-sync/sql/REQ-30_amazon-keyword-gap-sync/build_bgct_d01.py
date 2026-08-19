@@ -350,8 +350,37 @@ def main():
         WHERE market_place=%s AND sub_source IN %s AND asin IN %s
           AND start_date >= %s AND end_date < %s
         GROUP BY 1,2,3,4""", (mp, accts, tm_asins, p_start, p_end))
+    term_rows = cur.fetchall()      # drain FIRST - the next execute() on this cursor discards it
+    # --- how much of each month each account's SQP actually covers ------------------------------
+    # Measured 2026-08-19: DCVOLTAGE trails LEDSone badly and is SPARSE, not merely late - it had
+    # 4 weeks of July but only 2 of June and 1 of May, while LEDSone had 4/4/4. A month assembled
+    # from 1 week is not comparable to one assembled from 4, and nothing in the row says so. This
+    # is recorded per account per month so the monthly runner can gate on it and the dashboard can
+    # admit it, rather than quietly shipping a half-covered account beside a full one.
+    cur.execute("""
+        SELECT sub_source, date_trunc('month', start_date)::date AS mo,
+               COUNT(DISTINCT end_date), MAX(end_date)
+        FROM business_reports.amz_search_query_performance
+        WHERE market_place=%s AND sub_source IN %s AND report_period='WEEK'
+          AND start_date >= %s AND end_date < %s
+        GROUP BY 1,2""", (mp, accts, p_start, p_end))
+    sqp_cov = {RULES["accounts"][ss_]: {"weeks_by_month": {}, "latest_week_end": None}
+               for ss_ in RULES["accounts"]}
+    for ss_, mo, nweeks, latest in cur.fetchall():
+        b = RULES["accounts"][ss_]
+        sqp_cov[b]["weeks_by_month"][mo.isoformat()] = int(nweeks)
+        cur_latest = sqp_cov[b]["latest_week_end"]
+        iso = latest.isoformat()
+        if cur_latest is None or iso > cur_latest:
+            sqp_cov[b]["latest_week_end"] = iso
+    for b, c in sqp_cov.items():
+        c["weeks_by_month"] = {m.isoformat(): c["weeks_by_month"].get(m.isoformat(), 0) for m in months}
+        c["min_weeks"] = min(c["weeks_by_month"].values()) if c["weeks_by_month"] else 0
+        c["full"] = c["min_weeks"] >= 4
+        print(f"SQP coverage {b}: {c['weeks_by_month']} latest={c['latest_week_end']} full={c['full']}")
+
     per_month = defaultdict(list)          # (ss, asin, month) -> term rows, months kept SEPARATE
-    for ss, asin, mo, q, vol, score, timp, aimp, tclk, aclk, purch in cur.fetchall():
+    for ss, asin, mo, q, vol, score, timp, aimp, tclk, aclk, purch in term_rows:
         if (ss, asin) not in top_moving:
             continue
         vol, timp, aimp = int(vol or 0), int(timp or 0), int(aimp or 0)
@@ -665,6 +694,7 @@ def main():
         "rules": {k: (v if not isinstance(v, tuple) else list(v)) for k, v in RULES.items()},
         "qa": qa,
         "coverage": coverage,
+        "sqp_coverage": sqp_cov,
         "catalogue": catalogue,
         "top_moving": [{"brand": RULES["accounts"][ss], "asin": a,
                         "units": [monthly[(ss, a)].get(m, 0) for m in months],

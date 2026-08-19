@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-19T16:40:50",
+ "generated_at": "2026-08-19T17:22:10",
  "reference_date": "2026-08-19",
  "period": {
   "months": [
@@ -64,12 +64,34 @@
  },
  "coverage": {
   "total": 776,
-  "selling_ok": 302,
   "under_no_twin": 340,
-  "top_moving": 30,
+  "selling_ok": 302,
   "in_report": 42,
   "under_no_gap": 59,
+  "top_moving": 30,
   "sku_check": 3
+ },
+ "sqp_coverage": {
+  "dcvoltage_uk": {
+   "weeks_by_month": {
+    "2026-05-01": 0,
+    "2026-06-01": 3,
+    "2026-07-01": 3
+   },
+   "latest_week_end": "2026-07-25",
+   "min_weeks": 0,
+   "full": false
+  },
+  "ledsone_uk": {
+   "weeks_by_month": {
+    "2026-05-01": 4,
+    "2026-06-01": 4,
+    "2026-07-01": 3
+   },
+   "latest_week_end": "2026-07-25",
+   "min_weeks": 3,
+   "full": false
+  }
  },
  "catalogue": [
   {
