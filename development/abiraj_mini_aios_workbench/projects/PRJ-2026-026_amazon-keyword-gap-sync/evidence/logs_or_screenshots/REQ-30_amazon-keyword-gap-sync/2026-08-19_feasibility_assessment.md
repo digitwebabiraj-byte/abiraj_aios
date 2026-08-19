@@ -730,3 +730,73 @@ their own SKU, and the system's `wrong_sku` flag catches 3% of those. Any report
 SKU needs an independent cross-check on an attribute the SKU claims — here, wattage from the title.
 Three rounds of SKU bugs (§15 greedy pack, §16 APK marker, §17 wrong SKUs) were all found by the owner
 opening the operational tool, never by the QA checklist.
+
+---
+
+## 18. 🔴 RETRACTION — the "124 wrong SKUs" figure was my own parsing error (2026-08-19)
+
+§17 claimed **124 of 518** listings in the requester's category carry a wrong wattage in their SKU.
+The owner asked what that meant before sending it to Thuwaraga. **On checking, the figure is wrong and
+is retracted.** It was nearly sent to a requester as a finding about her data.
+
+### What was wrong with it
+The claim compared a wattage parsed from the SKU (`E27([0-9])`) against one parsed from the title.
+Both parsers were unsound:
+
+| SKU | I read | Actually |
+|---|---|---|
+| `LDCWE27**18**3PK K` | 1W | **18W** — two-digit wattage, only the first digit taken |
+| `LDCWE27**25**` | 2W | **25W** |
+| `LDDTCE27**16**2PK` | 1W | **16W** |
+| `LDSG1001E27**2PK**` | 2W | **no wattage in the SKU at all** — the pack digit was read as wattage |
+| `LDMA60E274WW6PK` (title "Dimmable 40W Equivalent") | title 40W | the *equivalent*, not the LED wattage |
+
+So most of the 124 "disagreements" are parser artefacts, not wrong SKUs. **The SKU wattage position is
+not a reliable, uniform grammar across this catalogue**, and no claim should be built on it.
+
+### What survives
+The **specific** finding stands, because it was verified by eye against eight sibling listings, not by
+the parser: `B0B8P75R4Y` carries `LDMG125E2782PK` (an 8W family code) on a 4W bulb.
+
+### A second defect found in the same check — Part C had a false rejection
+Part C compares the two listings' **title** wattages, so it never depended on the SKU parser. But it
+took the **minimum** of the numbers found, and that broke on a real title:
+
+> `B0D7HPWK2P` — *"Vintage Light Bulb,**4W/6W/8W** E27 2700K Warm white ST64"*
+
+One listing covering three wattages. Minimum said 4W; it was rejected against its 8W twin. **The pair
+was valid.**
+
+### Both fixed
+`title_watts()` now returns a **set** of wattages, filtered to `<= 30W` (real LED range here is 3-25W;
+40/50/60/70/100 are incandescent equivalents). A pair is rejected only when both sets are non-empty and
+**disjoint** — no shared wattage at all.
+
+| Title | set |
+|---|---|
+| "8W (Equivalent 60W)" | {8} — 60 dropped as an equivalent |
+| "4W(40 Watts Equivalent)" | {4} |
+| "4W/6W/8W" | {4, 6, 8} — now matches an 8W twin |
+| "Dimmable 40W Equivalent" (no LED figure) | empty → check skipped, never guessed |
+
+### Effect
+| | §17 | **§18 (corrected)** |
+|---|---|---|
+| Part A | 20 | 20 |
+| Part B — listings / rows / gaps | 14 / 150 / 115 | **15 / 165 / 130** |
+| Part C — rejected | 3 (1 of them false) | **2, both genuine** |
+| QA | 7/7 | **7/7** |
+
+Part C now holds only: `B0B8P75R4Y` (4W vs an 8W family) and `B0D5CMBXK6` (3W vs 7W).
+`B0D7HPWK2P` is back in Part B where it belongs.
+
+### The message to Thuwaraga was corrected before sending
+Question 4 no longer claims "124 wrong SKUs". It now names the two specific listings and asks her to say
+which is right — the SKU or the title — because the report cannot know.
+
+### Lesson
+**Do not publish a population statistic derived from a parser that has not itself been validated.** The
+single hand-verified case was solid; generalising it to a percentage required a grammar assumption that
+turned out to be false in at least four distinct ways. A finding about someone's data is a claim about
+their work — it needs the same evidence standard as a number in the report, and this one was one
+question away from being sent.
