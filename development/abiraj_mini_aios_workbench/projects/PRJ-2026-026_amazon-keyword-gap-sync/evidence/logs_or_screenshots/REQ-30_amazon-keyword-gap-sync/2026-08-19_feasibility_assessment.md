@@ -616,3 +616,53 @@ anything on the rule.** The example was quoted verbatim in `SOURCE_MANIFEST.md`,
 and the implementation plan — and never executed. It would have failed on the first run.
 Second lesson: a greedy quantifier next to a product code is a silent data-merge, and the QA checklist
 did not catch it because every §2.10 check passed on wrongly-paired rows.
+
+---
+
+## 16. Owner spot-check in the Listing Management tool — §15 fix CONFIRMED, one more marker found
+
+The owner checked the corrected pairs in `listings.vintageinterior.co.uk` and sent four screenshots.
+
+### ✅ The §15 fix is right — both pairs verified as the same product
+| ASIN | SKU | pack | base SKU |
+|---|---|---|---|
+| `B0BLP1JSRK` (Top-Moving) | `LDMST64E2786PK` | 6-pack | `LDMST64E278` |
+| `B0BLNZS78D` (dead) | `LDMST64E2782PK` | 2-pack | `LDMST64E278` |
+| `B0BLP1LN2C` (dead) | `LDMST64E278` | single | `LDMST64E278` |
+
+Exactly the shape the source document describes (single / 2-pack / 5-pack of one product), on a real
+family. Both pairings are correct. Titles disagree with each other on ST64 vs ST84 across markets — a
+listing-content inconsistency, not a matching error; the SKU family is unambiguous. **Both assertions
+added to the builder so this family stays verified.**
+
+### 🔴 New finding from the same screenshots — 'A' is the 10-pack marker
+The listings page showed one product's German family:
+
+| SKU | title says |
+|---|---|
+| `LDSG125MUE274APK _DE` | **(10er-Packung)** |
+| `LDSG125MUE2746PK_DE` | (6er-Packung) |
+| `LDSG125MUE2745PK _DE` | (5er-Packung) |
+| `LDSG125MUE2743PK_DE` | (3er-Packung) |
+
+**`APK` = 10-pack, not a numeric suffix.** Measured: **4,208 rows carry an `APK` suffix across 1,635
+ASINs**; **487** of their titles say "pack of 10" and **414** say "10er-Packung". The §15 rule
+`([0-9])PK$` did not strip it, so `LDMG95E274APK` survived as its own base SKU and 10-packs were
+separated from the rest of their family.
+
+Fixed to `([0-9A])PK$`, with an assertion: `LDSG125MUE274APK` and `LDSG125MUE2746PK` must both give
+`LDSG125MUE274`.
+
+### Effect
+| | §15 | **§16 (APK fixed)** |
+|---|---|---|
+| Part A — rewrites | 18 | **21** |
+| Part B — listings / rows / gaps | 13 / 144 / 115 | **16 / 191 / 149** |
+| Base SKUs still containing "PK" | 1 (`LDMG95E274APK`) | **0** |
+| QA (§2.10) | 6/6 | **6/6** |
+
+### Lesson
+**A pack marker is not necessarily a digit.** Two rounds of this bug came from assuming the SKU grammar
+instead of reading it off the catalogue. The owner's spot-check in the operational tool found in minutes
+what the QA checklist structurally cannot see — the checklist verifies that rules were applied, never
+that the rule matches reality.

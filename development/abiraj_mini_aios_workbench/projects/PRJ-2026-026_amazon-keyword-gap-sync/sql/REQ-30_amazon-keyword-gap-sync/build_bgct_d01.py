@@ -85,7 +85,9 @@ _MARKER_RE = re.compile(r"[\s\-_][A-Za-z]{1,4}[0-9]{0,2}$")
 # The earlier `[0-9]+PK` was greedy and ate the product code: LDMST64E2786PK (8W ST64) and
 # LDMST64E2746PK (6W ST84) both collapsed to LDMST64E and were wrongly paired as one product.
 # The source document's own example is the test: LDMG95E2782PK / LDMG95E2785PK -> LDMG95E278.
-_PACK_RE = re.compile(r"([0-9])PK$", re.I)
+# 'A' is the 10-pack marker, not a digit: LDSG125MUE274APK is titled "(10er-Packung)" / "Pack of 10".
+# 4,208 rows carry an APK suffix and 487 of their titles say "pack of 10" (414 say "10er-Packung").
+_PACK_RE = re.compile(r"([0-9A])PK$", re.I)
 _NONALNUM = re.compile(r"[^a-z0-9]+")
 
 
@@ -115,6 +117,13 @@ assert normalise_sku("LDMG95E2782PK") == normalise_sku("LDMG95E2785PK") == \
 # …and two products that differ only in the digits before the pack must NOT collapse together.
 assert normalise_sku("LDMST64E2786PK") != normalise_sku("LDMST64E2746PK"), \
        "SKU rule wrongly merges distinct products"
+# Owner-verified in the Listing Management tool, 2026-08-19: the LDMST64E278 family really is one
+# product in three pack sizes - 6-pack (B0BLP1JSRK), 2-pack (B0BLNZS78D) and single (B0BLP1LN2C).
+assert normalise_sku("LDMST64E2786PK") == normalise_sku("LDMST64E2782PK") == \
+       normalise_sku("LDMST64E278") == "LDMST64E278", "owner-verified pack family must match"
+# 'A' = 10-pack, so it must strip like any other pack marker.
+assert normalise_sku("LDSG125MUE274APK") == normalise_sku("LDSG125MUE2746PK") == \
+       "LDSG125MUE274", "APK (10-pack) must normalise like a numeric pack"
 
 
 def norm_text(t: str) -> str:
