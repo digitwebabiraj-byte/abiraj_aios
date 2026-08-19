@@ -284,15 +284,35 @@ def main():
           f"{len({l['asin'] for l in listings})} ASINs")
     ids = tuple(l["id"] for l in listings)
 
+    # CONTENT IS A PROPERTY OF THE ASIN, NOT OF OUR ACCOUNT ROW.
+    # On Amazon one ASIN has one set of title/bullets/description/backend keywords. Our DB keeps a
+    # row per account offer, and the content often sits on only one of them - measured 2026-08-19:
+    # for 21 of 22 Part A listings the content existed on a row belonging to a DIFFERENT account
+    # (e.g. B08G4YZDH5 is empty on the LEDSone row but populated on the SRM row, and the Listing
+    # Management tool shows those keywords when the listing is opened). Reading one account's row
+    # therefore reports "empty" for listings that visibly have content, and produces false
+    # "keyword missing" results in Part B.
+    # Accounts are still never merged in the REPORT (source 2.10) - only the content read is widened.
+    cur.execute("""SELECT id, asin FROM listings.amazon_listings
+                   WHERE site='UK' AND asin = ANY(%s)""", (sorted(ph_asins) if ph_asins else [],))
+    content_ids = {}
+    for lid, a in cur.fetchall():
+        content_ids.setdefault(a, []).append(lid)
+    all_ids = tuple({i for v in content_ids.values() for i in v}) or (0,)
+
     cur.execute("""SELECT product_id, string_agg(points, ' ' ORDER BY view_order)
                    FROM listings.amazon_listing_bullet_points WHERE product_id IN %s
-                   GROUP BY 1""", (ids,))
+                   GROUP BY 1""", (all_ids,))
     bullets = {pid: (txt or "") for pid, txt in cur.fetchall()}
 
     cur.execute("""SELECT product_id, string_agg(keyword, ' ' ORDER BY view_order)
                    FROM listings.amazon_listing_search_engine_keywords WHERE product_id IN %s
-                   GROUP BY 1""", (ids,))
+                   GROUP BY 1""", (all_ids,))
     backend = {pid: (txt or "") for pid, txt in cur.fetchall()}
+
+    cur.execute("""SELECT id, COALESCE(title,''), COALESCE(product_description,'')
+                   FROM listings.amazon_listings WHERE id IN %s""", (all_ids,))
+    text_of = {lid: (t, d) for lid, t, d in cur.fetchall()}
 
     # --- Phase 1 Step 1: Top-Moving ASINs (Q5) ------------------------------------------------
     in_scope = {(l["ss"], l["asin"]) for l in listings}
@@ -451,11 +471,11 @@ def main():
             # commonly has several rows (per market/SKU variant) and the bullets or backend keywords
             # may sit on a different row from the one picked here. Reading a single row put 3
             # listings into Part A ("no content") that actually had content on a sibling row.
-            rows_for_asin = by_asin[(ss, cand["asin"])]
-            b_txt = " ".join(filter(None, (bullets.get(x["id"], "") for x in rows_for_asin))).strip()
-            k_txt = " ".join(filter(None, (backend.get(x["id"], "") for x in rows_for_asin))).strip()
-            t_txt = " ".join(filter(None, (x["title"] for x in rows_for_asin))).strip()
-            d_txt = " ".join(filter(None, (x["desc"] for x in rows_for_asin))).strip()
+            cids = content_ids.get(cand["asin"], [x["id"] for x in by_asin[(ss, cand["asin"])]])
+            b_txt = " ".join(filter(None, (bullets.get(i, "") for i in cids))).strip()
+            k_txt = " ".join(filter(None, (backend.get(i, "") for i in cids))).strip()
+            t_txt = " ".join(filter(None, (text_of.get(i, ("", ""))[0] for i in cids))).strip()
+            d_txt = " ".join(filter(None, (text_of.get(i, ("", ""))[1] for i in cids))).strip()
             front_raw = " ".join([t_txt, b_txt, d_txt]).strip()
             row = {"brand": RULES["accounts"][ss], "top_asin": top_asin, "base_sku": base,
                    "duplicate_asin": cand["asin"], "duplicate_sku": cand["sku"],
