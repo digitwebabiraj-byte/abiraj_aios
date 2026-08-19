@@ -54,7 +54,7 @@ def main():
                "b": 1 if r["in_backend"] else 0, "t": r["add_target"]} for r in pb]
     rows_a = [{"br": r["brand"], "ta": r["top_asin"], "da": r["duplicate_asin"],
                "sku": r["duplicate_sku"], "sk": r["base_sku"], "ds": r["duplicate_status"],
-               "is": r["issue"], "n": r["terms_available"], "ti": r["title"]} for r in pa]
+               "is": r["issue"], "n": r["keywords_ready_to_use"], "ti": r["title"]} for r in pa]
     rows_c = [{"br": r["brand"], "ta": r["top_asin"], "da": r["duplicate_asin"],
                "sku": r["duplicate_sku"], "sk": r["base_sku"], "tw": r["top_watts"],
                "dw": r["duplicate_watts"], "is": r["issue"], "ti": r["title"]} for r in pc]
@@ -240,7 +240,10 @@ should go — a person adds it. (The source document's automatic push is deliber
   <section class="A" id="secA">
     <h2>Part A — listing has no content <span class="n" id="nA"></span></h2>
     <p class="sub">Every keyword would read as “missing” because there is nothing on the listing to
-    search. These need writing, not keyword edits.</p>
+    search. These need <b>writing</b>, not keyword edits. <b>Keywords ready to use</b> = how many proven
+    search terms already exist on the good-selling twin, so whoever rewrites the listing does not start
+    from a blank page. <b>0 — none</b> means the twin has no proven terms either; that listing needs a
+    look at the product itself.</p>
     <div class="wrap"><table id="tA"><thead><tr>
       <th data-k="br">Account<span class="ar">▾</span></th>
       <th data-k="da">Dead listing<span class="ar">▾</span></th>
@@ -248,7 +251,7 @@ should go — a person adds it. (The source document's automatic push is deliber
       <th data-k="sk">Base SKU<span class="ar">▾</span></th>
       <th data-k="ds">Why flagged<span class="ar">▾</span></th>
       <th data-k="is">What is missing<span class="ar">▾</span></th>
-      <th data-k="n" class="r">Terms ready<span class="ar">▾</span></th>
+      <th data-k="n" class="r">Keywords ready to use<span class="ar">▾</span></th>
       <th data-k="ta">Good twin<span class="ar">▾</span></th>
       <th class="na">Title</th></tr></thead><tbody></tbody></table>
       <div class="empty" hidden>Nothing matches these filters.</div></div>
@@ -358,7 +361,8 @@ function draw(){{
     <td><span class="pill acc">${{esc(BR[r.br])}}</span></td>
     <td class="m">${{esc(r.da)}}</td><td class="m s">${{esc(r.sku)}}</td><td class="m">${{esc(r.sk)}}</td>
     <td>${{esc(ST[r.ds]||r.ds)}}</td><td class="warnt">${{esc(r.is)}}</td>
-    <td class="r">${{r.n}}</td><td class="m">${{esc(r.ta)}}</td>
+    <td class="r">${{r.n ? r.n : '<span class="warnt">0 — none</span>'}}</td>
+    <td class="m">${{esc(r.ta)}}</td>
     <td class="s">${{esc((r.ti||'').slice(0,80))}}</td></tr>`).join('');
 
   $('#tC tbody').innerHTML = C.map(r=>`<tr>

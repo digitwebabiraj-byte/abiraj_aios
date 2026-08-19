@@ -125,7 +125,7 @@ kbd{background:#fff;border:1px solid #c9d3de;border-bottom-width:2px;border-radi
   <h1>BGCT — Keyword Collection &amp; Cross-ASIN Gap Sync</h1>
   <div class="meta">REQ-30-D02 · Amazon UK · DCVOLTAGE UK + LEDSone UK (reported separately, never
   merged) · keywords from <b>2026-05-01 → 2026-07-31</b> · no-sales window from
-  <b>2026-02-01</b> · generated 2026-08-19T13:42:26</div>
+  <b>2026-02-01</b> · generated 2026-08-19T14:02:40</div>
 </header>
 
 <div class="note"><b>This report changes nothing on Amazon.</b> It shows where each proven keyword
@@ -173,7 +173,10 @@ should go — a person adds it. (The source document's automatic push is deliber
   <section class="A" id="secA">
     <h2>Part A — listing has no content <span class="n" id="nA"></span></h2>
     <p class="sub">Every keyword would read as “missing” because there is nothing on the listing to
-    search. These need writing, not keyword edits.</p>
+    search. These need <b>writing</b>, not keyword edits. <b>Keywords ready to use</b> = how many proven
+    search terms already exist on the good-selling twin, so whoever rewrites the listing does not start
+    from a blank page. <b>0 — none</b> means the twin has no proven terms either; that listing needs a
+    look at the product itself.</p>
     <div class="wrap"><table id="tA"><thead><tr>
       <th data-k="br">Account<span class="ar">▾</span></th>
       <th data-k="da">Dead listing<span class="ar">▾</span></th>
@@ -181,7 +184,7 @@ should go — a person adds it. (The source document's automatic push is deliber
       <th data-k="sk">Base SKU<span class="ar">▾</span></th>
       <th data-k="ds">Why flagged<span class="ar">▾</span></th>
       <th data-k="is">What is missing<span class="ar">▾</span></th>
-      <th data-k="n" class="r">Terms ready<span class="ar">▾</span></th>
+      <th data-k="n" class="r">Keywords ready to use<span class="ar">▾</span></th>
       <th data-k="ta">Good twin<span class="ar">▾</span></th>
       <th class="na">Title</th></tr></thead><tbody></tbody></table>
       <div class="empty" hidden>Nothing matches these filters.</div></div>
@@ -291,7 +294,8 @@ function draw(){
     <td><span class="pill acc">${esc(BR[r.br])}</span></td>
     <td class="m">${esc(r.da)}</td><td class="m s">${esc(r.sku)}</td><td class="m">${esc(r.sk)}</td>
     <td>${esc(ST[r.ds]||r.ds)}</td><td class="warnt">${esc(r.is)}</td>
-    <td class="r">${r.n}</td><td class="m">${esc(r.ta)}</td>
+    <td class="r">${r.n ? r.n : '<span class="warnt">0 — none</span>'}</td>
+    <td class="m">${esc(r.ta)}</td>
     <td class="s">${esc((r.ti||'').slice(0,80))}</td></tr>`).join('');
 
   $('#tC tbody').innerHTML = C.map(r=>`<tr>
