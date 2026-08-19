@@ -898,3 +898,51 @@ flagged** — it has no `mapped_sku`, and the owner confirmed `LDMG125E278` is 8
 table in plain English; I treated that as an open question for the requester instead of a column to go
 and find. A caution inherited from another project is a reason to test something carefully, never a
 reason to skip it — especially when the source explicitly asks for it. Open item #7 is now **closed**.
+
+---
+
+## 21. Dashboard rebuilt as a full-screen working tool (2026-08-19)
+
+Owner: *"the dashboard must look full screen and be easy for the user to find things — add correct
+filters."* The first version was a fixed-width report page with per-pair panels and one text box, which
+is fine to read and poor to work from.
+
+### What changed
+| Before | Now |
+|---|---|
+| 1500px centred column | **Full viewport width**, 22px gutters, collapses cleanly under 820px |
+| Per-pair panels — good for context, impossible to filter or prioritise | **One flat sortable table per Part**, every row self-describing (account · pair · SKU · keyword) |
+| One free-text box | **Search + 5 filters + gaps-only toggle**, all live |
+| Static counts | **Live "showing N rows"**, plus per-section `(N of total)` |
+| Fixed order | **Click any column heading to sort**; volume descending by default |
+| Header scrolls away | **Sticky toolbar** — filters stay put while scrolling a 275-row table |
+
+### The filters, and why each one
+| Filter | Why it is there |
+|---|---|
+| **Search** — ASIN / SKU / keyword | the one thing a person always arrives with |
+| **Account** — DCVOLTAGE / LEDSone | the source's §2.10 rule is that the accounts are never merged |
+| **Show** — Part A / B / C | the three Parts are three different jobs (rewrite · add keywords · fix SKU) |
+| **What to do** — backend / bullets / both / nothing | lets her batch identical actions in one pass |
+| **Why flagged** — no sales 6mo / falling 3mo | separates dead listings from declining ones |
+| **Min searches** | prioritise by opportunity; a 4,000-search gap is not a 4-search gap |
+| **Only rows needing action** *(on by default)* | opens on the 204 real gaps, hiding the 71 keywords already in place |
+
+The 4 KPI tiles are also **clickable filters** — click "Keyword gaps" to see only Part B; click again to
+clear. Keyboard: `/` focuses search, `Esc` clears it.
+
+### Verified interactively in-browser
+| Action | Result |
+|---|---|
+| Default view | 229 rows · first row is an action, not a "Nothing to do" |
+| KPI tile → Part B | 275 rows, Parts A and C hidden |
+| + Account = DCVOLTAGE | 70 rows |
+| + What to do = Add to backend | 8 rows |
+| + Min searches = 100 | 7 rows |
+| Search "edison" | 22 rows |
+| Sort by Searches | desc 11,481 · asc 1 · toggles correctly |
+| Choose "Nothing to do" | gaps-only auto-unchecks (would otherwise contradict itself) → 71 rows |
+| Reset | back to 229, gaps-only re-checked |
+
+Still one self-contained HTML file: no network calls, no external assets, all filtering client-side over
+an embedded payload, so it works from a local file or an email attachment.
