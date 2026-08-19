@@ -41,6 +41,11 @@ def main():
     per, rules, qa = p["period"], p["rules"], p["qa"]
     pa, pb, pc = p["part_a"], p["part_b"], p.get("part_c", [])
     cov = p.get("coverage", {})
+    cat = p.get("catalogue", [])
+    rows_g = [{"a": r["asin"], "sk": r["sku"], "bs": r["base_sku"], "ac": r["accounts"],
+               "u": r["units_by_month"], "u3": r["units_3mo"], "u6": r["units_6mo"],
+               "ma": r["months_above"], "b": r["bucket"], "st": r["status"],
+               "ti": r["title"]} for r in cat]
     terms, tm = p["phase1"], p["top_moving"]
 
     pairsB = sorted({(r["brand"], r["top_asin"], r["duplicate_asin"]) for r in pb})
@@ -78,8 +83,8 @@ def main():
                "sku": r["duplicate_sku"], "sk": r["base_sku"], "tw": r["top_watts"],
                "dw": r["duplicate_watts"], "is": r["issue"], "ti": r["title"]} for r in pc]
 
-    data = json.dumps({"t": rows_t, "m": rows_m, "a": rows_a, "b": rows_b, "c": rows_c},
-                      separators=(",", ":"))
+    data = json.dumps({"t": rows_t, "m": rows_m, "a": rows_a, "b": rows_b, "c": rows_c,
+                       "g": rows_g}, separators=(",", ":"))
     qa_line = " · ".join(f'{k.split("_",1)[1].replace("_"," ")} '
                          f'<b class="{"y" if v else "n"}">{"PASS" if v else "FAIL"}</b>'
                          for k, v in qa.items())
@@ -200,6 +205,9 @@ th b{{color:var(--nv2)}}
 .pill.be{{background:#fff3e0;color:var(--warn)}} .pill.bu{{background:#e8f0fe;color:var(--nv2)}}
 .pill.no{{background:#e7f4ea;color:var(--ok)}} .pill.op{{background:#e2f2f8;color:var(--opp)}}
 .pill.lt{{background:#f0e9f8;color:var(--purple)}}
+.pill.bk{{background:#fbe9e7;color:var(--gap)}} .pill.wn{{background:#f0e9f8;color:var(--purple)}}
+.pill.am{{background:#fff3e0;color:var(--warn)}} .pill.ok{{background:#e7f4ea;color:var(--ok)}}
+.pill.tm{{background:#e2f2f8;color:var(--opp)}}
 /* each month shown with a tick or cross, so the Top-Moving rule reads off the row itself */
 .mth{{display:inline-block;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11.5px;
  border-radius:5px;padding:2px 7px;margin-right:5px;white-space:nowrap}}
@@ -232,6 +240,7 @@ kbd{{background:#fff;border:1px solid #c9d3de;border-bottom-width:2px;border-rad
   <div class="tabs">
     <button class="tab on" data-t="1">Phase 1 — Proven keywords<span class="c">{len(terms)}</span></button>
     <button class="tab" data-t="2">Phase 2 — Gaps to fix<span class="c">{len(gaps)}</span></button>
+    <button class="tab" data-t="3">All my bulbs<span class="c">{cov.get('total',0)}</span></button>
   </div>
 </header>
 
@@ -459,6 +468,57 @@ should go — a person adds it. (The source document's automatic push is deliber
 </main>
 </div>
 
+<div id="p3" hidden>
+<div class="note p1"><b>Every bulb in your category</b>, whether this report acts on it or not — with
+its sales over the last 3 months and the last 6, and why it is or is not in the report.</div>
+<div class="kpis">
+  <div class="kpi clk" data-f="gb-"><div class="v">{cov.get('total',0)}</div>
+    <div class="k">All your bulbs<br><span class="s">click a tile to filter</span></div></div>
+  <div class="kpi b clk" data-f="gb-in_report"><div class="v">{cov.get('in_report',0)}</div>
+    <div class="k">In this report<br><span class="s">needs work now</span></div></div>
+  <div class="kpi c clk" data-f="gb-under_no_twin"><div class="v">{cov.get('under_no_twin',0)}</div>
+    <div class="k">Struggling, no twin<br><span class="s">this report cannot help</span></div></div>
+  <div class="kpi a clk" data-f="gb-under_no_gap"><div class="v">{cov.get('under_no_gap',0)}</div>
+    <div class="k">Struggling, words OK<br><span class="s">problem is something else</span></div></div>
+  <div class="kpi o clk" data-f="gb-selling_ok"><div class="v">{cov.get('selling_ok',0)}</div>
+    <div class="k">Selling normally<br><span class="s">nothing to fix</span></div></div>
+  <div class="kpi clk" data-f="gb-top_moving"><div class="v">{cov.get('top_moving',0)}</div>
+    <div class="k">Best sellers<br><span class="s">gave the keywords</span></div></div>
+</div>
+<div class="bar">
+  <input type="search" id="q3" placeholder="Search ASIN, SKU or product name…   (press / )">
+  <label>Account<select id="br3"><option value="">All accounts</option>
+    <option value="dcvoltage_uk">DCVOLTAGE UK</option>
+    <option value="ledsone_uk">LEDSone UK</option></select></label>
+  <label>What is happening<select id="bk3"><option value="">Everything</option>
+    <option value="in_report">In this report — needs work</option>
+    <option value="under_no_twin">Struggling — no twin to copy from</option>
+    <option value="under_no_gap">Struggling — words already there</option>
+    <option value="selling_ok">Selling normally</option>
+    <option value="top_moving">Best seller — gave the keywords</option></select></label>
+  <label>Sales<select id="sl3"><option value="">Any</option>
+    <option value="none6">No sales in 6 months</option>
+    <option value="none3">No sales in the 3 months</option>
+    <option value="drop">Falling every month</option>
+    <option value="some">Sold something</option></select></label>
+  <button class="btn" id="rs3">Reset</button><span class="count" id="ct3"></span>
+</div>
+<main><section><h2>All bulbs <span class="n" id="nG"></span></h2>
+  <p class="sub">One row per bulb. <b>Months above {rules['top_moving_units_gt']}</b> counts how many
+  of the 3 months sold more than {rules['top_moving_units_gt']}. Click any heading to sort.</p>
+  <div class="wrap"><table id="tG"><thead><tr>
+    <th data-k="a"><b>ASIN</b><span class="ar">▾</span></th>
+    <th data-k="sk">Its <b>SKU</b><span class="ar">▾</span></th>
+    <th data-k="ac">Account<span class="ar">▾</span></th>
+    <th class="na">Units each month</th>
+    <th data-k="ma" class="c">Months above {rules['top_moving_units_gt']}<span class="ar">▾</span></th>
+    <th data-k="u3" class="r">3-month sales<span class="ar">▾</span></th>
+    <th data-k="u6" class="r">6-month sales<span class="ar">▾</span></th>
+    <th data-k="st">What is happening<span class="ar">▾</span></th>
+    <th class="na">Product</th></tr></thead><tbody></tbody></table>
+    <div class="empty" hidden>Nothing matches these filters.</div></div></section></main>
+</div>
+
 <footer>
 <b>How each figure is decided.</b> Keywords come from Amazon <b>Search Query Performance</b>, the
 ASIN-level view the source requires, for {E(per['start'])} → {E(per['end'])} — the last {nmonths}
@@ -496,7 +556,8 @@ const pct = x => x==null ? '<span class="s">—</span>' : x.toFixed(2)+'%';
 const rate = x => x==null ? '<span class="s">—</span>'
   : (x>100 ? `<span class="odd" title="Amazon reports more than one click per search for this term - its recorded search volume is very low, so treat this figure with care">${{x.toFixed(0)}}%</span>`
            : x.toFixed(2)+'%');
-const sort = {{T:{{k:'v',d:-1}},M:{{k:'n',d:-1}},A:{{k:'sk',d:1}},B:{{k:'v',d:-1}},C:{{k:'sk',d:1}}}};
+const sort = {{T:{{k:'v',d:-1}},M:{{k:'n',d:-1}},A:{{k:'sk',d:1}},B:{{k:'v',d:-1}},
+  C:{{k:'sk',d:1}},G:{{k:'u6',d:-1}}}};
 const UNITS_GT = {rules['top_moving_units_gt']}, MONTHS = {json.dumps([m[:7] for m in per['months']])};
 const REVIEWED = {{}};        // 2.9 action_state - in-page only, never sent to Amazon
 let tab='1', sec='';
@@ -653,10 +714,47 @@ function draw2(){{
   arrows();
 }}
 
+/* ---------------- ALL BULBS ---------------- */
+const BK={{in_report:'bk',under_no_twin:'wn',under_no_gap:'am',selling_ok:'ok',top_moving:'tm'}};
+function draw3(){{
+  const q=$('#q3').value.trim().toLowerCase(), br=$('#br3').value,
+        bk=$('#bk3').value, sl=$('#sl3').value;
+  const G=order(D.g.filter(r=>{{
+    if(bk && r.b!==bk) return false;
+    if(br && r.ac.indexOf(br)<0) return false;
+    if(sl==='none6' && r.u6!==0) return false;
+    if(sl==='none3' && r.u3!==0) return false;
+    if(sl==='some'  && r.u3===0) return false;
+    if(sl==='drop'){{ const u=r.u; if(!(u[0]>u[1] && u[1]>u[2] && u[0]>0)) return false; }}
+    if(q && (r.a+' '+r.sk+' '+r.bs+' '+r.ti).toLowerCase().indexOf(q)<0) return false;
+    return true;
+  }}),sort.G.k,sort.G.d);
+  $('#tG tbody').innerHTML=G.map(r=>{{
+    const cells=r.u.map((v,i)=>`<span class="mth ${{v>UNITS_GT?'ok':'no'}}" title="${{MONTHS[i]}}: ${{v}}">`
+      +`${{MONTHS[i].slice(5)}} <b>${{v}}</b></span>`).join('');
+    return `<tr><td><span class="asin">${{esc(r.a)}}</span></td><td class="m s">${{esc(r.sk)}}</td>
+      <td class="s">${{esc(r.ac)}}</td><td>${{cells}}</td>
+      <td class="c"><b>${{r.ma}}</b></td>
+      <td class="r">${{r.u3?r.u3.toLocaleString():'<span class="s">0</span>'}}</td>
+      <td class="r">${{r.u6?r.u6.toLocaleString():'<span class="s">0</span>'}}</td>
+      <td><span class="pill ${{BK[r.b]||''}}">${{esc(r.st)}}</span></td>
+      <td class="s clip wide" title="${{esc(r.ti)}}">${{esc(r.ti)}}</td></tr>`;}}).join('');
+  $('#nG').textContent = G.length===D.g.length?`(${{D.g.length}})`:`(${{G.length}} of ${{D.g.length}})`;
+  $('#tG').hidden=G.length===0;
+  $('#tG').closest('.wrap').querySelector('.empty').hidden=G.length!==0;
+  const noSale=G.filter(r=>r.u6===0).length;
+  $('#ct3').innerHTML=`Showing <b>${{G.length}}</b> bulb${{G.length===1?'':'s'}}`
+    +(G.length!==D.g.length?` of ${{D.g.length}}`:'')
+    +` · <b>${{noSale}}</b> with no sales in 6 months`;
+  $$('#p3 .kpi').forEach(k=>k.classList.toggle('on',k.dataset.f==='gb-'+bk));
+  arrows();
+}}
+
 /* ---------------- wiring ---------------- */
-function tabTo(t){{ tab=t; $('#p1').hidden=t!=='1'; $('#p2').hidden=t!=='2';
+function tabTo(t){{ tab=t;
+  $('#p1').hidden=t!=='1'; $('#p2').hidden=t!=='2'; $('#p3').hidden=t!=='3';
   $$('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
-  (t==='1'?draw1:draw2)(); }}
+  (t==='1'?draw1:t==='2'?draw2:draw3)(); }}
 $$('.tab').forEach(b=>b.addEventListener('click',()=>tabTo(b.dataset.t)));
 // The instructions collapse via the browser's own <details> element - no script, no storage, so
 // there is nothing here that can fail or block the tables from drawing.
@@ -666,6 +764,14 @@ $$('.tab').forEach(b=>b.addEventListener('click',()=>tabTo(b.dataset.t)));
 ['q2','br2','tg2','ds2','v2','gap2','vw2'].forEach(id=>{{
   $('#'+id).addEventListener('input',draw2); $('#'+id).addEventListener('change',draw2); }});
 $('#sec2').addEventListener('change',e=>{{ sec=e.target.value; draw2(); }});
+['q3','br3','bk3','sl3'].forEach(id=>{{
+  $('#'+id).addEventListener('input',draw3); $('#'+id).addEventListener('change',draw3); }});
+$$('#p3 .kpi.clk').forEach(k=>k.addEventListener('click',()=>{{
+  const want=k.dataset.f.slice(3);
+  $('#bk3').value = ($('#bk3').value===want?'':want); draw3(); }}));
+$('#rs3').addEventListener('click',()=>{{
+  ['q3','br3','bk3','sl3'].forEach(i=>$('#'+i).value='');
+  sort.G={{k:'u6',d:-1}}; draw3(); }});
 $('#tg2').addEventListener('change',e=>{{ if(e.target.value==='none') $('#gap2').checked=false; draw2(); }});
 $$('#p1 .kpi.clk').forEach(k=>k.addEventListener('click',()=>{{
   const b=$('#'+k.dataset.f); b.checked=!b.checked; draw1(); }}));
@@ -681,10 +787,12 @@ $$('th[data-k]').forEach(th=>th.addEventListener('click',()=>{{
   if(!sort[t]) return;
   if(sort[t].k===k) sort[t].d*=-1;
   else sort[t]={{k:k,d:(k==='v'||k==='n'||k==='pu'||k==='sh'||k==='cr')?-1:1}};
-  (tab==='1'?draw1:draw2)(); }}));
+  (tab==='1'?draw1:tab==='2'?draw2:draw3)(); }}));
 addEventListener('keydown',e=>{{
-  if(e.key==='/' && e.target.tagName!=='INPUT'){{ e.preventDefault(); $(tab==='1'?'#q1':'#q2').focus(); }}
-  if(e.key==='Escape'){{ $(tab==='1'?'#q1':'#q2').value=''; (tab==='1'?draw1:draw2)(); }} }});
+  if(e.key==='/' && e.target.tagName!=='INPUT'){{ e.preventDefault();
+    $(tab==='1'?'#q1':tab==='2'?'#q2':'#q3').focus(); }}
+  if(e.key==='Escape'){{ $(tab==='1'?'#q1':tab==='2'?'#q2':'#q3').value='';
+    (tab==='1'?draw1:tab==='2'?draw2:draw3)(); }} }});
 draw1();
 </script></body></html>"""
 

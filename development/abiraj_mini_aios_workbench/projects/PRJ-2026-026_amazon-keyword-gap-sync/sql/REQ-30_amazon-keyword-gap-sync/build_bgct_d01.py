@@ -569,6 +569,55 @@ def main():
     coverage = {"total": len(ph_asins or in_catalogue), **cov}
     print("coverage of her category:", dict(coverage))
 
+    # --- the full catalogue, one row per ASIN, so she can see EVERY bulb and why -----------------
+    # Requested by Thuwaraga: she wants to look through all her bulbs herself - 3-month and 6-month
+    # sales, which ones have no sales, which are falling - not just the 45 the report acts on.
+    BUCKET = {"top_moving": "Best seller — gave the keywords",
+              "in_report": "In this report — needs work",
+              "selling_ok": "Selling normally",
+              "under_no_gap": "Struggling — but words are already there",
+              "under_no_twin": "Struggling — no best-selling twin to copy from",
+              "not_listed": "Not listed on her two accounts"}
+    title_of, sku_of, acct_of = {}, {}, defaultdict(set)
+    for l in listings:
+        title_of.setdefault(l["asin"], l["title"])
+        sku_of.setdefault(l["asin"], l["sku"])
+        acct_of[l["asin"]].add(RULES["accounts"][l["ss"]])
+
+    catalogue = []
+    for a in sorted(ph_asins or in_catalogue):
+        if a not in in_catalogue:
+            b = "not_listed"
+        elif any((ss_, a) in top_moving for ss_ in RULES["accounts"]):
+            b = "top_moving"
+        elif a in reported_asins:
+            b = "in_report"
+        elif is_under(a) and not (asin_bases.get(a, set()) & tm_bases):
+            b = "under_no_twin"
+        elif is_under(a):
+            b = "under_no_gap"
+        else:
+            b = "selling_ok"
+        # NB: named mth_units, NOT per_month - `per_month` is the Phase 1 dict used further down,
+        # and shadowing it here crashed the payload assembly.
+        mth_units = [sum(monthly.get((ss_, a), {}).get(m, 0) for ss_ in RULES["accounts"])
+                     for m in months]
+        catalogue.append({
+            "asin": a,
+            "sku": sku_of.get(a, ""),
+            "base_sku": sorted(asin_bases.get(a, {""}))[0],
+            "accounts": " + ".join(sorted(acct_of.get(a, []))) or "—",
+            "units_by_month": mth_units,
+            "units_3mo": sum(mth_units),
+            "units_6mo": sum(units6.get((ss_, a), 0) for ss_ in RULES["accounts"]),
+            "months_above": sum(1 for v in mth_units if v > RULES["top_moving_units_gt"]),
+            "bucket": b,
+            "status": BUCKET[b],
+            "in_report": a in reported_asins,
+            "title": (title_of.get(a) or "")[:160],
+        })
+    print(f"catalogue rows for the All-bulbs tab: {len(catalogue)}")
+
     # --- QA assertions (source section 2.10) --------------------------------------------------
     qa = {}
     qa["1_account_separation"] = all(r["brand"] in RULES["accounts"].values() for r in part_a + part_b + part_c)
@@ -597,6 +646,7 @@ def main():
         "rules": {k: (v if not isinstance(v, tuple) else list(v)) for k, v in RULES.items()},
         "qa": qa,
         "coverage": coverage,
+        "catalogue": catalogue,
         "top_moving": [{"brand": RULES["accounts"][ss], "asin": a,
                         "units": [monthly[(ss, a)].get(m, 0) for m in months],
                         "terms": len(sqp.get((ss, a), []))} for ss, a in sorted(top_moving)],
