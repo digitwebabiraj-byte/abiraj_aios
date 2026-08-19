@@ -549,3 +549,70 @@ the rule caption now reads "at least 2 of 3 months".
 
 **Read-only throughout. No Amazon API call of any kind. Still DRAFT — not validated, not published,
 not automated.**
+
+---
+
+## 15. 🔴 SKU NORMALISER BUG — found by the owner in the Listing Management tool (2026-08-19)
+
+The owner opened the two ASINs from the §14 worked example in the listing tool and their SKUs did not
+belong together. **He was right — the pairing was wrong.**
+
+### The bug
+`_TAIL_RE = r"\s*([0-9]+PK)?(\s*-?[A-Za-z]{1,2})?$"` — `[0-9]+PK` is **greedy**. It consumed the product
+code as well as the pack quantity:
+
+| SKU | product | old base | correct base |
+|---|---|---|---|
+| `LDMST64E2786PK` | 8W ST64, 6-pack | `LDMST64E` | **`LDMST64E278`** |
+| `LDMST64E2746PK` | 6W ST84, 6-pack | `LDMST64E` | **`LDMST64E274`** |
+
+Two genuinely different bulbs collapsed to the same base SKU and were paired as one product — a
+Top-Moving 8W ST64 was used as the keyword source for a dead 6W ST84.
+
+**The source document's own example was the test I failed to run.** It states
+`LDMG95E278` = `LDMG95E2782PK` = `LDMG95E2785PK`. My rule returned `LDMG95E` for the pack variants and
+`LDMG95E278` for the single — so under my own rule the spec's example **did not even match itself**.
+Every §12–§14 pairing is suspect as a result.
+
+### The fix
+Pack quantity is a **single digit** glued to `PK`. Verified across the catalogue: every multi-digit
+capture before `PK` is product code + a 1-digit pack (`…2786PK` = product `…278` + `6PK`; last digits
+observed are 2–6, none ending 0 or 1, so no 10PK/12PK forms exist).
+
+The normaliser now strips **repeatedly until stable**, in the right order:
+1. separator-introduced markers — `[\s\-_][A-Za-z]{1,4}[0-9]{0,2}$` (` D`, ` AM`, `-B1`, `-AFR`, `-DC`, `_DCVV`)
+2. pack quantity — `([0-9])PK$`
+
+Verified:
+
+| SKU | base |
+|---|---|
+| `LDMG95E278` / `LDMG95E2782PK` / `LDMG95E2785PK` / `LDMG95E278 M` / `LDMG95E278-DC_DCVV` | **`LDMG95E278`** ✅ all match |
+| `LDMST64E2786PK` / `-B1` / `-AFR` / ` AM` / `amzn.gr.LDMST64E2786PK-B1-60H9yWgQhY6-LN` | **`LDMST64E278`** ✅ |
+| `LDMST64E2746PK` / `LDMST64E2746PK D` | **`LDMST64E274`** ✅ correctly separate |
+| `CRSF100BM+PHHT1PBRBM+LSFT320DG` | unchanged ✅ bundle kept whole |
+
+**Two assertions now run at import time** so this can never silently regress: the source's worked
+example must match itself, and `LDMST64E2786PK` must not equal `LDMST64E2746PK`.
+
+### Effect on the report
+| | §14 (broken rule) | **corrected** |
+|---|---|---|
+| Top-Moving ASINs | 30 | 30 |
+| Part A — rewrites | 6 | **18** |
+| Part B — listings / rows / gaps | 22 / 225 / 216 | **13 / 144 / 115** |
+| `add_target` | b+b 184 · bullet 18 · backend 14 · none 9 | b+b 89 · none 29 · backend 18 · bullet 8 |
+| QA (§2.10) | 6/6 | **6/6** |
+
+The wrong pair `B0BLP1JSRK → B0CNTH491L` is gone. Base SKUs are now real product codes —
+`LDMG95E278`, `LDMG125E278`, `LDMST64E274`, `LDMST64E278`, `LDMG80E274`.
+
+Part A rose from 6 to 18 because tighter matching re-paired listings against their *actual* twins, and
+more of those twins turn out to be empty listings.
+
+### Lesson
+**When the source document contains a worked example, make it an automated assertion before building
+anything on the rule.** The example was quoted verbatim in `SOURCE_MANIFEST.md`, `SYSTEM_REFERENCE.md`
+and the implementation plan — and never executed. It would have failed on the first run.
+Second lesson: a greedy quantifier next to a product code is a silent data-merge, and the QA checklist
+did not catch it because every §2.10 check passed on wrongly-paired rows.
