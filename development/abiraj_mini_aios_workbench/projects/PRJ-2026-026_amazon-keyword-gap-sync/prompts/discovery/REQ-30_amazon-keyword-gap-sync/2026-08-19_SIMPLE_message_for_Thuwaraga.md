@@ -22,9 +22,9 @@ The report finds those missing words and tells you exactly where to put them.
 I looked at **your 776 bulbs** on Amazon UK (DCVOLTAGE and LEDSone).
 
 **I found:**
-- **20 listings that are completely empty** — no bullet points, no keywords. These need writing.
-- **130 missing keywords** on 15 other listings. These just need the words added.
-- **2 listings where the SKU does not match the bulb** (see question 4).
+- **26 listings that are completely empty** — no bullet points, no keywords. These need writing.
+- **195 missing keywords** on 26 other listings. These just need the words added.
+- **1 listing where the SKU does not match the bulb** (see question 4).
 
 ---
 
@@ -69,12 +69,12 @@ Your answer: ______________
 
 ---
 
-## Question 4 — Two listings have the wrong SKU 🔴
+## Question 4 — One listing has the wrong SKU 🔴
 
 This is not about keywords.
 
-Your SKU codes carry the wattage — `LDMG125E27`**8** = 8W, `LDCWB22`**3** = 3W. Two listings have a
-code that does not match the bulb:
+Your SKU codes carry the wattage — `LDMG125E27`**8** = 8W. One listing has a code that does not
+match the bulb:
 
 ### 1. `B0B8P75R4Y` — has an 8W code on a 4W bulb
 
@@ -86,18 +86,10 @@ code that does not match the bulb:
 **It needs a 4W code.** Note: the existing 4W G125 codes (`LDSG125LOE274`, `LDSG125MUE274`) are the
 Music/Love decorative bulbs, so a plain 4W G125 code may not exist yet.
 
-### 2. `B09Z6P8H29` — has a 3W code on a 7W bulb
+I have **not** used this pair in the keyword report, because putting 8W keywords on a 4W bulb
+would be wrong.
 
-- Its SKU is `LDCWB223` — and in that family `LDCWB22`**12** is 12W, so `LDCWB22`**3** means **3W**
-- But this listing says: *"LED A60 B22 Light Bulb, **7W** (70W Equivalent)"*
-- Its twin `B0D5CMBXK6` says *"(6 Pack, **3W**)"* — that one **matches** its code and is correct
-
-**So this is the one to fix, not the twin.**
-
-I have **not** used either pair in the keyword report — they are in a separate list, because putting
-8W keywords on a 4W bulb would be wrong.
-
-**Can you confirm these two, and tell me who fixes the codes?**
+**Can you confirm this, and tell me who fixes the code?**
 
 Your answer: ______________
 

@@ -841,3 +841,60 @@ Both rejections are real, found without relying on the unsound SKU parser — Pa
 ### Note on the LDCWB22 family
 Its titles are internally inconsistent beyond this pair: base `LDCWB2212` carries titles stating 12W,
 15W and 22W. Not pursued here — outside the requester's keyword question, but worth her knowing.
+
+---
+
+## 20. 🔴 `mapped_sku` — the source's "SKU mapping table" — was not being used (2026-08-19)
+
+The owner asked: *"did you consider the mapped sku also, it's mentioned in the requirement document."*
+**It is, and I was not using it.** The source's Phase 2 Step 2 says plainly: *"Where a listing's stored
+SKU doesn't match its real product, correct it against the **SKU mapping table**."*
+
+`listings.amazon_listings.mapped_sku` **is** that table. §5/§17 dismissed it on a carried-over caution
+from the T7 project ("mapped_sku is known dirty") and left it as open item #7 instead of testing it.
+That was wrong — the caution was about a different use, and the document names the requirement directly.
+
+### What it does that a regex cannot
+| stored `sku` | `mapped_sku` |
+|---|---|
+| `G125RDS4WLOVEAMBERE27` | `LDSG125LOE274` |
+| `G125RDS4WMUSICAMBERE27` | `LDSG125MUE274` |
+| `HEARTRDS4WS2200KAMBERE27` | `LDSHEAE274` |
+| `DMLDG125E278 A` | `LDMG125E278` |
+| `DM_LDG95E274_1_DCVV` | `LDMG95E274` |
+| `G95 4W B22` | `LDMG95B224` |
+| `ICG125B2240 A` | `LDMG125B228` |
+
+These are legacy and descriptive SKUs. **No normalisation rule could ever derive `LDSG125LOE274` from
+`G125RDS4WLOVEAMBERE27`** — it needs the lookup. Every such listing was previously stranded as its own
+base SKU and never matched its family, so the report was **silently missing real pairs**.
+
+Coverage in the requester's category: **483 of 937 rows (52%) carry a `mapped_sku`; 441 differ from the
+stored SKU.**
+
+### The fix
+Base SKU is now derived from `COALESCE(NULLIF(mapped_sku,''), sku)`, then the existing pack/marker
+normalisation runs on top — necessary because `mapped_sku` strips account markers but **keeps** the
+pack suffix (`LDMG125E2782PK_SM` → `LDMG125E2782PK`). Falls back to the stored SKU for the 48% with no
+mapping, and the run log states how many rows were mapped.
+
+### Effect — the largest single improvement of the build
+| | §19 | **§20 (mapped_sku)** |
+|---|---|---|
+| Part A — rewrites | 20 | **26** |
+| Part B — listings | 15 | **26** |
+| Part B — rows / gaps | 165 / 130 | **258 / 195** |
+| Part C — rejected | 2 | **1** |
+| QA | 7/7 | **7/7** |
+
+**+50% more real keyword gaps found**, from a column the requirement document had named all along.
+
+Part C dropping from 2 to 1 is a correction, not a loss: `mapped_sku` resolves the `LDCWB223` pair into
+their true families, so that flag was an artefact of matching on the raw SKU. **`B0B8P75R4Y` remains
+flagged** — it has no `mapped_sku`, and the owner confirmed `LDMG125E278` is 8W only.
+
+### Lesson
+**Read the requirement document as a specification of inputs, not just outputs.** It named the mapping
+table in plain English; I treated that as an open question for the requester instead of a column to go
+and find. A caution inherited from another project is a reason to test something carefully, never a
+reason to skip it — especially when the source explicitly asks for it. Open item #7 is now **closed**.

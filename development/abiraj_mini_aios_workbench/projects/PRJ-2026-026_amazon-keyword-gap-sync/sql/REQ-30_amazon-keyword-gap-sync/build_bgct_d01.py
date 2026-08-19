@@ -239,15 +239,30 @@ def main():
 
     # --- catalogue (the anchor - deviation 2) -------------------------------------------------
     cur.execute("""
-        SELECT id, asin, sku, sub_source, COALESCE(title,''), COALESCE(product_description,'')
+        SELECT id, asin, sku, COALESCE(NULLIF(mapped_sku,''), sku) AS effective_sku,
+               sub_source, COALESCE(title,''), COALESCE(product_description,'')
         FROM listings.amazon_listings
         WHERE site='UK' AND sub_source IN %s""", (accts,))
     listings = []
-    for lid, asin, sku, ss, title, desc in cur.fetchall():
+    n_mapped = 0
+    for lid, asin, sku, eff, ss, title, desc in cur.fetchall():
         if ph_asins is not None and asin not in ph_asins:
             continue                                    # outside the requester's PH category
+        if eff and sku and eff != sku:
+            n_mapped += 1
         listings.append({"id": lid, "asin": asin, "sku": sku or "", "ss": ss,
-                         "title": title, "desc": desc, "base_sku": normalise_sku(sku or "")})
+                         "title": title, "desc": desc,
+                         # Source Phase 2 Step 2: "correct it against the SKU mapping table".
+                         # listings.amazon_listings.mapped_sku IS that table. It resolves legacy and
+                         # descriptive SKUs that no regex could ever normalise -
+                         #   G125RDS4WLOVEAMBERE27 -> LDSG125LOE274
+                         #   DMLDG125E278 A        -> LDMG125E278
+                         #   G95 4W B22            -> LDMG95B224
+                         # It strips account markers but KEEPS the pack suffix, so the pack rule below
+                         # still applies on top. Falls back to `sku` where no mapping exists (48%).
+                         "base_sku": normalise_sku(eff or sku or "")})
+    print(f"mapped_sku applied to {n_mapped} of {len(listings)} in-scope rows "
+          f"(source Phase 2 Step 2 - the SKU mapping table)")
     print(f"catalogue in scope: {len(listings)} listing rows / "
           f"{len({l['asin'] for l in listings})} ASINs")
     ids = tuple(l["id"] for l in listings)
