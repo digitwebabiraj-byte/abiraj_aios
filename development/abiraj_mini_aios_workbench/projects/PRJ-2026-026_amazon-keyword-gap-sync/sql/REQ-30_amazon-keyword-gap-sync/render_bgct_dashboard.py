@@ -165,6 +165,9 @@ tbody tr:hover td{{background:#f7fafd}}
 tbody tr.gap td{{background:var(--gapbg)}} tbody tr.gap:hover td{{background:#fbeceb}}
 .c{{text-align:center}} .r{{text-align:right;font-variant-numeric:tabular-nums}}
 .m{{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;white-space:nowrap}}
+.asin{{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;white-space:nowrap;
+ background:#eaf2fb;color:#123a63;border:1px solid #cfe0f2;border-radius:4px;padding:1px 5px}}
+th b{{color:var(--nv2)}}
 .s{{color:var(--mut);font-size:11.5px}} .kw{{font-weight:600}} .warnt{{color:var(--warn)}}
 .tick{{display:inline-block;width:19px;height:19px;line-height:19px;border-radius:50%;font-size:11px;
  color:#fff;text-align:center}} .tick.y{{background:var(--ok)}} .tick.n{{background:var(--gap)}}
@@ -215,6 +218,10 @@ kbd{{background:#fff;border:1px solid #c9d3de;border-bottom-width:2px;border-rad
       searches, but the customer knows what they want, so they buy more often.</li>
     <li>Use <b>Month</b> to see one month at a time, and <b>ASIN</b> to see the words for one product.</li>
     <li>Click <b>Searches / mo</b> at the top of the column to sort biggest first.</li>
+    <li><b>Looking a product up in the Listing tool?</b> The blue boxed codes are
+      <b>ASINs</b> (like <span class="asin">B08G4YZDH5</span>) — paste those into the tool's
+      <b>ASIN</b> box. Plain codes like <span class="m">LDMG125E278_VDS</span> are <b>SKUs</b> — paste
+      those into the <b>SKU</b> box. Putting a SKU in the ASIN box finds nothing.</li>
   </ol>
   <div class="tip">Use this tab when you are <b>writing or improving a listing</b> and need to know
     which words to include. To see which listings are <b>missing</b> these words, go to
@@ -260,14 +267,14 @@ Amazon's own first-party data, not an estimate. They are the input to Phase 2.</
     <th data-k="cr" class="r">Click rate<span class="ar">▾</span></th>
     <th data-k="pu" class="r">Purchases<span class="ar">▾</span></th>
     <th data-k="op" class="c">Pattern<span class="ar">▾</span></th>
-    <th data-k="a">From ASIN<span class="ar">▾</span></th></tr></thead><tbody></tbody></table>
+    <th data-k="a">From <b>ASIN</b><span class="ar">▾</span></th></tr></thead><tbody></tbody></table>
     <div class="empty" hidden>Nothing matches these filters.</div></div></section>
 
   <section><h2>Top-Moving ASINs <span class="n" id="nM"></span></h2>
   <p class="sub">The best sellers these keywords came from. Units month by month, never combined.</p>
   <div class="wrap"><table id="tM"><thead><tr>
     <th data-k="br">Account<span class="ar">▾</span></th>
-    <th data-k="a">ASIN<span class="ar">▾</span></th>
+    <th data-k="a"><b>ASIN</b><span class="ar">▾</span></th>
     <th class="na">Units per month ({E(' · '.join(m[:7] for m in per['months']))})</th>
     <th data-k="n" class="r">Proven keywords<span class="ar">▾</span></th></tr></thead><tbody></tbody></table>
     <div class="empty" hidden>Nothing matches these filters.</div></div></section>
@@ -298,6 +305,10 @@ Amazon's own first-party data, not an estimate. They are the input to Phase 2.</
       top rows are worth the most.</li>
     <li>When you have finished a listing, set <b>View</b> to <b>“By listing”</b> and click its button
       to mark it done.</li>
+    <li><b>Looking a listing up in the Listing tool?</b> The blue boxed codes are <b>ASINs</b>
+      (like <span class="asin">B08G4YZDH5</span>) — paste those into the tool's <b>ASIN</b> box. Plain
+      codes like <span class="m">LDMG125E278_VDS</span> are <b>SKUs</b> — paste those into the
+      <b>SKU</b> box. Putting a SKU in the ASIN box finds nothing.</li>
   </ol>
   <div class="tip"><b>Two things to know.</b> Nothing here touches Amazon — you make the changes
     yourself, so nothing can go wrong by accident. And <b>if a word does not suit the bulb, do not add
@@ -344,13 +355,13 @@ should go — a person adds it. (The source document's automatic push is deliber
   blank page. <b>0 — none</b> means the twin has no proven terms either.</p>
   <div class="wrap"><table id="tA"><thead><tr>
     <th data-k="br">Account<span class="ar">▾</span></th>
-    <th data-k="da">Dead listing<span class="ar">▾</span></th>
-    <th data-k="sku">Its SKU<span class="ar">▾</span></th>
+    <th data-k="da">Dead listing — <b>ASIN</b><span class="ar">▾</span></th>
+    <th data-k="sku">Its <b>SKU</b><span class="ar">▾</span></th>
     <th data-k="sk">Base SKU<span class="ar">▾</span></th>
     <th data-k="ds">Why flagged<span class="ar">▾</span></th>
     <th data-k="is">What is missing<span class="ar">▾</span></th>
     <th data-k="n" class="r">Keywords ready to use<span class="ar">▾</span></th>
-    <th data-k="ta">Good twin<span class="ar">▾</span></th>
+    <th data-k="ta">Good twin — <b>ASIN</b><span class="ar">▾</span></th>
     <th class="na">Title</th></tr></thead><tbody></tbody></table>
     <div class="empty" hidden>Nothing matches these filters.</div></div></section>
 
@@ -359,11 +370,11 @@ should go — a person adds it. (The source document's automatic push is deliber
   fitting differs, so the stored SKU is wrong. No keywords were checked. Fix the SKU first.</p>
   <div class="wrap"><table id="tC"><thead><tr>
     <th data-k="br">Account<span class="ar">▾</span></th>
-    <th data-k="ta">Good seller<span class="ar">▾</span></th>
+    <th data-k="ta">Good seller — <b>ASIN</b><span class="ar">▾</span></th>
     <th data-k="tw" class="c">Its spec<span class="ar">▾</span></th>
-    <th data-k="da">Listing with wrong SKU<span class="ar">▾</span></th>
+    <th data-k="da">Wrong-SKU listing — <b>ASIN</b><span class="ar">▾</span></th>
     <th data-k="dw" class="c">Its spec<span class="ar">▾</span></th>
-    <th data-k="sku">Wrong SKU<span class="ar">▾</span></th>
+    <th data-k="sku">Its wrong <b>SKU</b><span class="ar">▾</span></th>
     <th data-k="sk">Base SKU<span class="ar">▾</span></th>
     <th class="na">Title</th></tr></thead><tbody></tbody></table>
     <div class="empty" hidden>Nothing matches these filters.</div></div></section>
@@ -378,10 +389,10 @@ should go — a person adds it. (The source document's automatic push is deliber
     <th data-k="f" class="c">In text<span class="ar">▾</span></th>
     <th data-k="b" class="c">In backend<span class="ar">▾</span></th>
     <th data-k="t">What to do<span class="ar">▾</span></th>
-    <th data-k="da">Listing to fix<span class="ar">▾</span></th>
+    <th data-k="da">Listing to fix — <b>ASIN</b><span class="ar">▾</span></th>
     <th data-k="ds">Why flagged<span class="ar">▾</span></th>
     <th data-k="sk">Base SKU<span class="ar">▾</span></th>
-    <th data-k="ta">Keyword came from<span class="ar">▾</span></th></tr></thead><tbody></tbody></table>
+    <th data-k="ta">Keyword came from — <b>ASIN</b><span class="ar">▾</span></th></tr></thead><tbody></tbody></table>
     <div class="empty" hidden>Nothing matches these filters.</div></div>
   <div id="pairs" hidden></div></section>
 </main>
@@ -456,9 +467,9 @@ function draw1(){{
     <td class="r">${{num(r.v)}}</td><td class="r">${{pct(r.sh)}}</td><td class="r">${{pct(r.cr)}}</td>
     <td class="r">${{num(r.pu)}}</td>
     <td class="c">${{r.op?'<span class="pill op">Opportunity</span> ':''}}${{r.lt?'<span class="pill lt">Long-tail</span>':''}}${{(!r.op&&!r.lt)?'<span class="s">—</span>':''}}</td>
-    <td class="m s">${{esc(r.a)}}</td></tr>`).join('');
+    <td><span class="asin">${{esc(r.a)}}</span></td></tr>`).join('');
   $('#tM tbody').innerHTML=M.map(r=>`<tr><td><span class="pill acc">${{esc(BR[r.br])}}</span></td>
-    <td class="m">${{esc(r.a)}}</td><td class="m">${{r.u.join('  ·  ')}}</td>
+    <td><span class="asin">${{esc(r.a)}}</span></td><td class="m">${{r.u.join('  ·  ')}}</td>
     <td class="r">${{r.n}}</td></tr>`).join('');
   $('#nT').textContent = T.length===D.t.length?`(${{D.t.length}})`:`(${{T.length}} of ${{D.t.length}})`;
   $('#nM').textContent = M.length===D.m.length?`(${{D.m.length}})`:`(${{M.length}} of ${{D.m.length}})`;
@@ -491,12 +502,15 @@ function draw2(){{
   const C=(sec&&sec!=='C')?[]:order(D.c.filter(r=>keep2(r,f,'C')),sort.C.k,sort.C.d);
 
   $('#tA tbody').innerHTML=A.map(r=>`<tr><td><span class="pill acc">${{esc(BR[r.br])}}</span></td>
-    <td class="m">${{esc(r.da)}}</td><td class="m s">${{esc(r.sku)}}</td><td class="m">${{esc(r.sk)}}</td>
+    <td><span class="asin">${{esc(r.da)}}</span></td><td class="m s">${{esc(r.sku)}}</td>
+    <td class="m">${{esc(r.sk)}}</td>
     <td>${{esc(ST[r.ds]||r.ds)}}</td><td class="warnt">${{esc(r.is)}}</td>
     <td class="r">${{r.n?r.n:'<span class="warnt">0 — none</span>'}}</td>
-    <td class="m">${{esc(r.ta)}}</td><td class="s">${{esc((r.ti||'').slice(0,80))}}</td></tr>`).join('');
+    <td><span class="asin">${{esc(r.ta)}}</span></td>
+    <td class="s">${{esc((r.ti||'').slice(0,80))}}</td></tr>`).join('');
   $('#tC tbody').innerHTML=C.map(r=>`<tr><td><span class="pill acc">${{esc(BR[r.br])}}</span></td>
-    <td class="m">${{esc(r.ta)}}</td><td class="c m">${{esc(r.tw)}}</td><td class="m">${{esc(r.da)}}</td>
+    <td><span class="asin">${{esc(r.ta)}}</span></td><td class="c m">${{esc(r.tw)}}</td>
+    <td><span class="asin">${{esc(r.da)}}</span></td>
     <td class="c m warnt"><b>${{esc(r.dw)}}</b></td><td class="m warnt">${{esc(r.sku)}}</td>
     <td class="m">${{esc(r.sk)}}</td><td class="s">${{esc((r.ti||'').slice(0,80))}}</td></tr>`).join('');
   $('#tB tbody').innerHTML=B.map(r=>`<tr class="${{r.t==='none'?'':'gap'}}">
@@ -505,8 +519,8 @@ function draw2(){{
     <td class="c"><span class="tick ${{r.f?'y':'n'}}">${{r.f?'✓':'✗'}}</span></td>
     <td class="c"><span class="tick ${{r.b?'y':'n'}}">${{r.b?'✓':'✗'}}</span></td>
     <td><span class="pill ${{PILL[r.t]}}">${{esc(TG[r.t])}}</span></td>
-    <td class="m">${{esc(r.da)}}</td><td>${{esc(ST[r.ds]||r.ds)}}</td>
-    <td class="m">${{esc(r.sk)}}</td><td class="m s">${{esc(r.ta)}}</td></tr>`).join('');
+    <td><span class="asin">${{esc(r.da)}}</span></td><td>${{esc(ST[r.ds]||r.ds)}}</td>
+    <td class="m">${{esc(r.sk)}}</td><td><span class="asin">${{esc(r.ta)}}</span></td></tr>`).join('');
 
   /* grouped view - source 2.6 (per-pair status) + 2.7 (the two buttons) */
   const grouped=$('#vw2').value==='pair';
