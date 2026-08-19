@@ -40,6 +40,7 @@ def main():
     p = json.load(open(PAYLOAD, encoding="utf-8"))
     per, rules, qa = p["period"], p["rules"], p["qa"]
     pa, pb, pc = p["part_a"], p["part_b"], p.get("part_c", [])
+    cov = p.get("coverage", {})
     terms, tm = p["phase1"], p["top_moving"]
 
     pairsB = sorted({(r["brand"], r["top_asin"], r["duplicate_asin"]) for r in pb})
@@ -110,6 +111,13 @@ header .meta b{{color:#ffe9b0;font-weight:600}}
 .help>summary::-webkit-details-marker{{display:none}}
 /* the show/hide affordance is a pseudo-element, so it is styled to LOOK like the button it is -
    the whole summary row is the click target, and it highlights on hover of any part of it */
+.covt{{width:100%;border-collapse:collapse;font-size:13px}}
+.covt td{{padding:6px 8px;border-bottom:1px solid var(--line2);vertical-align:top}}
+.covt td.n{{width:64px;text-align:right;font-weight:700;font-size:16px;
+ font-variant-numeric:tabular-nums;color:var(--nv2)}}
+.covt tr.hi td{{background:#f2f8f4}} .covt tr.hi td.n{{color:var(--ok)}}
+.covt tr.warnrow td{{background:#fff8ec}} .covt tr.warnrow td.n{{color:var(--warn)}}
+.help.cov{{border-left-color:var(--opp)}}
 .help>summary::after{{content:"Hide ▴";margin-left:auto;flex:none;
  font-size:12px;font-weight:600;color:var(--nv2);background:#f2f6fb;
  border:1px solid #c9d9ea;border-bottom-width:2px;border-radius:7px;padding:4px 11px;
@@ -346,6 +354,29 @@ Amazon's own first-party data, not an estimate. They are the input to Phase 2.</
 </details>
 <div class="note p2"><b>This report changes nothing on Amazon.</b> It shows where each proven keyword
 should go — a person adds it. (The source document's automatic push is deliberately out of scope.)</div>
+<details class="help cov" open>
+  <summary>Where did all {cov.get('total',0)} of your bulbs go?</summary>
+  <p class="sub" style="padding-left:0;margin:0 0 10px">Every bulb in your “Bulbs” category is listed
+  below, so nothing is silently left out.</p>
+  <table class="covt">
+    <tr><td class="n">{cov.get('top_moving',0)}</td><td><b>Your best sellers</b> — these supplied the
+      proven keywords. Nothing to fix on them.</td></tr>
+    <tr class="hi"><td class="n">{cov.get('in_report',0)}</td><td><b>In this report</b> — a listing
+      below needs work. This is the list you act on.</td></tr>
+    <tr><td class="n">{cov.get('selling_ok',0)}</td><td><b>Selling normally</b> — not a best seller,
+      but not dying either. Nothing to fix.</td></tr>
+    <tr><td class="n">{cov.get('under_no_gap',0)}</td><td><b>Struggling, but already have the words</b>
+      — we checked them and found no missing keyword. Their problem is something else (price, stock,
+      photos, reviews).</td></tr>
+    <tr class="warnrow"><td class="n">{cov.get('under_no_twin',0)}</td><td><b>Struggling, but this
+      report cannot help them</b> — there is no best-selling version of the same product to copy
+      proven words from. <b>This is the biggest group.</b> They need keyword research of their own,
+      not a copy.</td></tr>
+  </table>
+  <div class="tip">So this report acts on <b>{cov.get('in_report',0)}</b> bulbs. The
+  <b>{cov.get('under_no_twin',0)}</b> in the last row are the real gap in coverage — worth discussing
+  as separate work.</div>
+</details>
 <div class="kpis">
   <div class="kpi clk" data-f="secall"><div class="v">{len(pa)+len(pairsB)+len(pc)}</div>
     <div class="k">Underperforming listings<br><span class="s">no sales 6mo, or falling 3mo</span></div></div>
