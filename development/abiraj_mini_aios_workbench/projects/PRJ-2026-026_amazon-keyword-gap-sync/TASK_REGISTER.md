@@ -63,7 +63,7 @@ a separate system. See `CLAUDE.md` §2 and open item #1.
 ## Deliverables (planned)
 - Phase 1 export: `evidence/final_outputs/REQ-30_amazon-keyword-gap-sync/REQ-30-D01_sqp_top_terms.xlsx`
 - Phase 2 Excel: `.../REQ-30-D02_keyword_gap_report.xlsx`
-- Phase 2 dashboard: `.../REQ-30-D02_keyword_gap_dashboard.html`
+- Phase 2 dashboard: `.../REQ-30_bgct_keyword_dashboard.html`
 - Builder: `sql/REQ-30_amazon-keyword-gap-sync/build_bgct_d01.py`
 
 ## Open items (block the build)
