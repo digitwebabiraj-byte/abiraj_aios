@@ -23,7 +23,8 @@ I looked at **your 776 bulbs** on Amazon UK (DCVOLTAGE and LEDSone).
 
 **I found:**
 - **1 listing that is completely empty** — no keywords at all. It needs writing.
-- **387 missing keywords** across 45 listings. These just need the words added.
+- **136 missing keywords** across your listings. These just need the words added.
+  *(Only words at least 10 people search a month are listed. The full set is on the Phase 1 tab.)*
 - **3 listings where the SKU does not match the bulb** (see question 4).
 
 ---

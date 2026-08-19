@@ -70,6 +70,15 @@ RULES = {
     "zero_sales_window_months": 6,            # source Phase 2 Step 1b
     "sales_drop_strictly_falling": True,      # source Phase 2 Step 1a, read as option A
     "terms_per_asin": 50,                     # source Step 5 says "top 30-50"
+    # MINIMUM monthly searches for a keyword to reach the Phase 2 to-do list.
+    # Confirmed by Abiraj 2026-08-19 = 10. The source states no volume floor, so without one the
+    # work list mixed "e27 screw bulb" (6,610 searches/mo) with "outdoor bulb for pendant light"
+    # (1 search) and pasted product titles - 2 of every 3 gaps were words fewer than 10 people had
+    # searched. At 10 the list goes 387 -> 139 real gaps.
+    # Applies to PHASE 2 ONLY. Phase 1 / REQ-30-D01 stays complete, because Step 8 defines that
+    # export and filtering it would change the deliverable; the dashboard's "Min searches" box lets
+    # anyone drop the floor back to 0 and see everything.
+    "min_search_volume_for_gaps": 10,
     "drop_zero_conversion_terms": True,       # source Step 6, explicitly stated
     "long_tail_words": (3, 6),                # source Step 7
     "long_tail_volume": (50, 500),            # source Step 7
@@ -501,6 +510,8 @@ def main():
 
             front, back = norm_text(front_raw), norm_text(k_txt)
             for t in sqp.get((ss, top_asin), []):
+                if t["search_query_volume"] < RULES["min_search_volume_for_gaps"]:
+                    continue                       # too few searches to be worth her time
                 w = kw_words(t["search_term"])
                 inf, inb = contains_all(front, w), contains_all(back, w)
                 if inf and inb:
@@ -613,6 +624,10 @@ def write_excel(p):
                                     "case and punctuation ignored"),
         ("Terms per ASIN", f"top {p['rules']['terms_per_asin']} by search volume PER MONTH, "
                            f"zero-conversion terms dropped (source Step 6)"),
+        ("Minimum searches (Part B)", f"a keyword reaches the Part B to-do list only if at least "
+                                      f"{p['rules']['min_search_volume_for_gaps']} people searched it "
+                                      f"in a month. Confirmed by Abiraj 2026-08-19; the source sets no "
+                                      f"floor. Phase 1 (D01) is unfiltered."),
         ("Months kept separate", "Source Step 4: the last 3 months are checked one month at a time, "
                                  "never combined. Each weekly row is assigned to the month containing "
                                  "its start_date. Phase 2 audits the de-duplicated union of the "

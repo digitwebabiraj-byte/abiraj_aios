@@ -329,7 +329,9 @@ Amazon's own first-party data, not an estimate. They are the input to Phase 2.</
     <li><b>Work in batches.</b> Set <b>What to do</b> to “Add to backend”, do all of those in Seller
       Central in one go, then switch to the next one. Much faster than going listing by listing.</li>
     <li>Start with the <b>biggest numbers</b>. The list is already sorted by monthly searches, so the
-      top rows are worth the most.</li>
+      top rows are worth the most. Words fewer than
+      <b>{rules['min_search_volume_for_gaps']} people</b> searched are left out — they are not worth
+      your time. You can still see every word on the <b>Phase 1</b> tab.</li>
     <li>When you have finished a listing, set <b>View</b> to <b>“By listing”</b> and click its button
       to mark it done.</li>
     <li><b>Looking a listing up in the Listing tool?</b> The blue boxed codes are <b>ASINs</b>
@@ -370,7 +372,8 @@ should go — a person adds it. (The source document's automatic push is deliber
   <label>Why flagged<select id="ds2"><option value="">Any reason</option>
     <option value="zero_sales_6mo">No sales 6 months</option>
     <option value="sales_drop_3mo">Sales falling 3 months</option></select></label>
-  <label>Min searches<input type="number" id="v2" min="0" step="10" placeholder="0"></label>
+  <label>Min searches<input type="number" id="v2" min="0" step="10" placeholder="0"
+    title="The report already excludes keywords under {rules['min_search_volume_for_gaps']} searches a month. Raise this to focus further."></label>
   <label class="chk"><input type="checkbox" id="gap2" checked> Only rows needing action</label>
   <button class="btn" id="rs2">Reset</button><span class="count" id="ct2"></span>
 </div>
@@ -432,6 +435,8 @@ complete months, assembled from Amazon's weekly rows with rates recomputed from 
 denominator, never averaged, and the months kept separate as the source insists ·
 Top-Moving = {tm_rule}, within the requester's own “Bulbs” category ·
 top {rules['terms_per_asin']} keywords per ASIN per month, terms with no purchases dropped ·
+<b>a keyword only reaches the Part B list if at least {rules['min_search_volume_for_gaps']} people
+searched it in a month</b> (Phase 1 is unfiltered, so the full set is still there) ·
 base SKU = pack size, trailing markers and account suffixes stripped, using the SKU mapping table
 (<code>mapped_sku</code>); bundles kept whole ·
 underperforming = no sales in {rules['zero_sales_window_months']} months (counted from the product
