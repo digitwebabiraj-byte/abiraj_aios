@@ -131,6 +131,23 @@ _WATT_RE = re.compile(r"(?<![0-9])([0-9]{1,2})\s*W(?![A-Za-z])", re.I)
 
 MAX_LED_WATTS = 30   # real LED wattages here run 3-25W; 40/50/60/70/100 are incandescent equivalents
 
+# Cap/fitting. E27/E26/E14 are SCREW, B22/B15/BC are BAYONET - physically incompatible, so a screw
+# bulb's keywords must never be recommended onto a bayonet listing. Verified 2026-08-19: two pairs in
+# the requester's category matched on base SKU but are different fittings (B0D7MDP9XP, B0DTHWWCZS).
+_SCREW_RE = re.compile(r"\b(E27|E26|E14|EDISON SCREW|SCREW)\b", re.I)
+_BAYONET_RE = re.compile(r"\b(B22|B15|BC|BAYONET)\b", re.I)
+
+
+def title_fittings(title: str):
+    """The SET of cap fittings the listing states. A set, because some listings genuinely sell both
+    ("B22/E27 Screw Bulb"). Pairs are rejected only when both sides state a fitting and share none."""
+    f = set()
+    if _SCREW_RE.search(title or ""):
+        f.add("screw")
+    if _BAYONET_RE.search(title or ""):
+        f.add("bayonet")
+    return f or None
+
 
 def title_watts(title: str):
     """The SET of wattages the listing itself states. Used ONLY as a safety check on pairing - a
@@ -336,7 +353,9 @@ def main():
         return None
 
     by_base = defaultdict(list)
+    by_asin = defaultdict(list)          # ALL rows of an ASIN, whatever base SKU they normalise to
     for l in listings:
+        by_asin[(l["ss"], l["asin"])].append(l)
         if l["base_sku"]:
             by_base[(l["ss"], l["base_sku"])].append(l)
 
@@ -345,11 +364,14 @@ def main():
         if (l["ss"], l["asin"]) in top_moving and l["base_sku"]:
             tm_by_base[(l["ss"], l["base_sku"])].add(l["asin"])
 
-    watts = {}
+    watts, fittings = {}, {}
     for l in listings:
         w = title_watts(l["title"])
         if w is not None:
-            watts.setdefault((l["ss"], l["asin"]), w)
+            watts.setdefault((l["ss"], l["asin"]), set()).update(w)
+        f = title_fittings(l["title"])
+        if f is not None:
+            fittings.setdefault((l["ss"], l["asin"]), set()).update(f)
 
     part_a, part_b, part_c, seen = [], [], [], set()
     for key, tops in tm_by_base.items():
@@ -367,6 +389,19 @@ def main():
 
             # SAFETY: a wrong SKU must not silently pair two different bulbs. If both listings state
             # a wattage and they disagree, this is NOT the same product - surface it, never guess.
+            ft, fd = fittings.get((ss, top_asin)), fittings.get((ss, cand["asin"]))
+            if ft and fd and not (ft & fd):        # screw vs bayonet - cannot be the same product
+                part_c.append({"brand": RULES["accounts"][ss], "top_asin": top_asin, "base_sku": base,
+                               "duplicate_asin": cand["asin"], "duplicate_sku": cand["sku"],
+                               "duplicate_status": st, "date_checked": ref.isoformat(),
+                               "top_watts": "/".join(sorted(ft)), "duplicate_watts": "/".join(sorted(fd)),
+                               "issue": f"same base SKU but different cap fitting "
+                                        f"({'/'.join(sorted(ft))} vs {'/'.join(sorted(fd))}) - "
+                                        f"these bulbs do not fit the same socket",
+                               "recommended_action": "Check and correct the SKU before using this pair",
+                               "title": cand["title"][:200]})
+                continue
+
             wt, wd = watts.get((ss, top_asin)), watts.get((ss, cand["asin"]))
             if wt and wd and not (wt & wd):        # both stated, and NO shared wattage
                 part_c.append({"brand": RULES["accounts"][ss], "top_asin": top_asin, "base_sku": base,
@@ -381,8 +416,16 @@ def main():
                                "title": cand["title"][:200]})
                 continue
 
-            b_txt, k_txt = bullets.get(cand["id"], ""), backend.get(cand["id"], "")
-            front_raw = " ".join([cand["title"], b_txt, cand["desc"]]).strip()
+            # Content must be gathered across ALL of this ASIN's listing rows, not just one. An ASIN
+            # commonly has several rows (per market/SKU variant) and the bullets or backend keywords
+            # may sit on a different row from the one picked here. Reading a single row put 3
+            # listings into Part A ("no content") that actually had content on a sibling row.
+            rows_for_asin = by_asin[(ss, cand["asin"])]
+            b_txt = " ".join(filter(None, (bullets.get(x["id"], "") for x in rows_for_asin))).strip()
+            k_txt = " ".join(filter(None, (backend.get(x["id"], "") for x in rows_for_asin))).strip()
+            t_txt = " ".join(filter(None, (x["title"] for x in rows_for_asin))).strip()
+            d_txt = " ".join(filter(None, (x["desc"] for x in rows_for_asin))).strip()
+            front_raw = " ".join([t_txt, b_txt, d_txt]).strip()
             row = {"brand": RULES["accounts"][ss], "top_asin": top_asin, "base_sku": base,
                    "duplicate_asin": cand["asin"], "duplicate_sku": cand["sku"],
                    "duplicate_status": st, "date_checked": ref.isoformat()}
@@ -393,7 +436,7 @@ def main():
                 missing.append("backend keyword field empty")
             if not b_txt.strip():
                 missing.append("no bullet points")
-            if not cand["desc"].strip():
+            if not d_txt.strip():
                 missing.append("no description")
             if not k_txt.strip() or not b_txt.strip():
                 part_a.append({**row, "issue": "; ".join(missing),
