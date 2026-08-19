@@ -544,7 +544,11 @@ def main():
     # The requester asked: "I have 776 bulbs - how many are in this, and what happened to the rest?"
     # A report that silently covers 6% of someone's products is misleading even when every row in it
     # is correct, so the full population is accounted for and shown on the dashboard.
-    reported_asins = {r["duplicate_asin"] for r in part_a + part_b + part_c}
+    reported_asins = {r["duplicate_asin"] for r in part_a + part_b}
+    # Part C is NOT a keyword job, so it is no longer on the Phase 2 to-do list. Its ASINs still need
+    # a bucket of their own, otherwise they would silently fall into "selling normally" and the 776
+    # would stop tying to what the report shows.
+    sku_check_asins = {r["duplicate_asin"] for r in part_c} - reported_asins
     tm_bases = {l["base_sku"] for l in listings if (l["ss"], l["asin"]) in top_moving and l["base_sku"]}
     asin_bases = defaultdict(set)
     for l in listings:
@@ -568,6 +572,8 @@ def main():
             cov["not_listed"] += 1
         elif any((ss_, a) in top_moving for ss_ in RULES["accounts"]):
             cov["top_moving"] += 1
+        elif a in sku_check_asins:
+            cov["sku_check"] += 1
         elif a in reported_asins:
             cov["in_report"] += 1
         elif is_under(a) and not (asin_bases.get(a, set()) & tm_bases):
@@ -587,6 +593,7 @@ def main():
               "selling_ok": "Selling normally",
               "under_no_gap": "Struggling — but words are already there",
               "under_no_twin": "Struggling — no best-selling twin to copy from",
+              "sku_check": "SKU code needs checking — not a keyword job",
               "not_listed": "Not listed on her two accounts"}
     title_of, sku_of, acct_of = {}, {}, defaultdict(set)
     for l in listings:
@@ -600,6 +607,8 @@ def main():
             b = "not_listed"
         elif any((ss_, a) in top_moving for ss_ in RULES["accounts"]):
             b = "top_moving"
+        elif a in sku_check_asins:
+            b = "sku_check"
         elif a in reported_asins:
             b = "in_report"
         elif is_under(a) and not (asin_bases.get(a, set()) & tm_bases):

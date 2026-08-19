@@ -7,7 +7,11 @@ Reads bgct_payload.json (written by build_bgct_d01.py) and emits a SINGLE self-c
 full-screen HTML file covering both deliverables as two tabs:
 
   Phase 1 - Proven keywords  (REQ-30-D01)  the SQP top search terms per Top-Moving ASIN
-  Phase 2 - Gaps to fix      (REQ-30-D02)  Part A rewrites / Part B keyword gaps / Part C wrong SKU
+  Phase 2 - Gaps to fix      (REQ-30-D02)  Part A rewrites / Part B keyword gaps
+                                          Part C (wrong SKU) is intentionally NOT rendered - it is a
+                                          SKU-data fix, not a keyword job, and it confused the reader.
+                                          It stays in REQ-30-D02.xlsx and on the decision sheet (Q4),
+                                          and its ASINs get the 'sku_check' bucket on the bulbs tab.
 
 ONE file on purpose: the person receiving this should have one thing to open, not a folder of HTML.
 This renderer also DELETES the two superseded single-phase HTML files, so only one dashboard ever
@@ -81,11 +85,12 @@ def main():
     rows_a = [{"br": r["brand"], "ta": r["top_asin"], "da": r["duplicate_asin"],
                "sku": r["duplicate_sku"], "sk": r["base_sku"], "ds": r["duplicate_status"],
                "is": r["issue"], "n": r["keywords_ready_to_use"], "ti": r["title"]} for r in pa]
-    rows_c = [{"br": r["brand"], "ta": r["top_asin"], "da": r["duplicate_asin"],
+    # part_c is deliberately NOT sent to the page - see the header note. It stays in the Excel.
+    _unused_rows_c = [{"br": r["brand"], "ta": r["top_asin"], "da": r["duplicate_asin"],
                "sku": r["duplicate_sku"], "sk": r["base_sku"], "tw": r["top_watts"],
                "dw": r["duplicate_watts"], "is": r["issue"], "ti": r["title"]} for r in pc]
 
-    data = json.dumps({"t": rows_t, "m": rows_m, "a": rows_a, "b": rows_b, "c": rows_c,
+    data = json.dumps({"t": rows_t, "m": rows_m, "a": rows_a, "b": rows_b,
                        "g": rows_g}, separators=(",", ":"))
     qa_line = " · ".join(f'{k.split("_",1)[1].replace("_"," ")} '
                          f'<b class="{"y" if v else "n"}">{"PASS" if v else "FAIL"}</b>'
@@ -337,14 +342,13 @@ Amazon's own first-party data, not an estimate. They are the input to Phase 2.</
   <ol>
     <li>You sell the <b>same bulb</b> twice. One listing sells; the other sells nothing. Often the dead
       one is simply <b>missing the words</b> customers search for. This tab lists those words.</li>
-    <li>There are <b>three jobs</b>, and they are different:
+    <li>There are <b>two jobs</b>, and they are different:
       <br><b>Part A</b> — the listing is <b>empty</b> (no bullet points, no keywords). It needs
       <b>writing</b>. The column <b>Keywords ready to use</b> tells you how many proven words are
       already waiting from the good twin.
       <br><b>Part B</b> — the listing has text, but <b>specific words are missing</b>. Each row tells
       you the word and exactly <b>where to put it</b>.
-      <br><b>Part C</b> — the <b>SKU code is wrong</b>, so these two are not really the same bulb.
-      Fix the code first; do not add keywords.</li>
+</li>
     <li><b>Only add the words shown in “Words to actually add”</b> — not the whole phrase. If the
       keyword is <i>e27 screw bulb</i> and the listing already has “e27” and “bulb”, the only thing
       missing is <b>screw</b>. The backend keyword box has a size limit, and Amazon says not to repeat
@@ -397,22 +401,20 @@ should go — a person adds it. (The source document's automatic push is deliber
   as separate work.</div>
 </details>
 <div class="kpis">
-  <div class="kpi clk" data-f="secall"><div class="v">{len(pa)+len(pairsB)+len(pc)}</div>
+  <div class="kpi clk" data-f="secall"><div class="v">{len(pa)+len(pairsB)}</div>
     <div class="k">Underperforming listings<br><span class="s">no sales 6mo, or falling 3mo</span></div></div>
   <div class="kpi a clk" data-f="secA"><div class="v">{len(pa)}</div>
     <div class="k">Need a rewrite<br><span class="s">Part A — nothing on the listing</span></div></div>
   <div class="kpi b clk" data-f="secB"><div class="v">{len(gaps)}</div>
     <div class="k">Keyword gaps<br><span class="s">Part B — across {len(pairsB)} listings</span></div></div>
-  <div class="kpi c clk" data-f="secC"><div class="v">{len(pc)}</div>
-    <div class="k">Wrong SKU<br><span class="s">Part C — rejected, not the same bulb</span></div></div>
 </div>
 <div class="bar">
   <input type="search" id="q2" placeholder="Search ASIN, SKU or keyword…   (press / )">
   <label>Account<select id="br2"><option value="">All accounts</option>
     <option value="dcvoltage_uk">DCVOLTAGE UK</option><option value="ledsone_uk">LEDSone UK</option></select></label>
   <label>Show<select id="sec2"><option value="">Everything</option>
-    <option value="A">A — needs rewrite</option><option value="B">B — keyword gaps</option>
-    <option value="C">C — wrong SKU</option></select></label>
+    <option value="A">A — needs rewrite</option>
+    <option value="B">B — keyword gaps</option></select></label>
   <label>View<select id="vw2"><option value="flat">All keywords — one list</option>
     <option value="pair">By listing — with review buttons</option></select></label>
   <label>What to do<select id="tg2"><option value="">Any action</option>
@@ -442,20 +444,6 @@ should go — a person adds it. (The source document's automatic push is deliber
     <th data-k="is">What is missing<span class="ar">▾</span></th>
     <th data-k="n" class="r">Keywords ready to use<span class="ar">▾</span></th>
     <th data-k="ta">Good twin — <b>ASIN</b><span class="ar">▾</span></th>
-    <th class="na">Title</th></tr></thead><tbody></tbody></table>
-    <div class="empty" hidden>Nothing matches these filters.</div></div></section>
-
-  <section class="C" id="secC"><h2>Part C — wrong SKU, pair rejected <span class="n" id="nC"></span></h2>
-  <p class="sub">These share a base SKU but are <b>not the same bulb</b> — the wattage or the cap
-  fitting differs, so the stored SKU is wrong. No keywords were checked. Fix the SKU first.</p>
-  <div class="wrap"><table id="tC"><thead><tr>
-    <th data-k="br">Account<span class="ar">▾</span></th>
-    <th data-k="ta">Good seller — <b>ASIN</b><span class="ar">▾</span></th>
-    <th data-k="tw" class="c">Its spec<span class="ar">▾</span></th>
-    <th data-k="da">Wrong-SKU listing — <b>ASIN</b><span class="ar">▾</span></th>
-    <th data-k="dw" class="c">Its spec<span class="ar">▾</span></th>
-    <th data-k="sku">Its wrong <b>SKU</b><span class="ar">▾</span></th>
-    <th data-k="sk">Base SKU<span class="ar">▾</span></th>
     <th class="na">Title</th></tr></thead><tbody></tbody></table>
     <div class="empty" hidden>Nothing matches these filters.</div></div></section>
 
@@ -506,7 +494,8 @@ its sales over the last 3 months and the last 6, and why it is or is not in the 
     <option value="under_no_twin">Struggling — no twin to copy from</option>
     <option value="under_no_gap">Struggling — words already there</option>
     <option value="selling_ok">Selling normally</option>
-    <option value="top_moving">Best seller — gave the keywords</option></select></label>
+    <option value="top_moving">Best seller — gave the keywords</option>
+    <option value="sku_check">SKU code needs checking</option></select></label>
   <label>Sales<select id="sl3"><option value="">Any</option>
     <option value="none6">No sales in 6 months</option>
     <option value="none3">No sales in the 3 months</option>
@@ -580,7 +569,7 @@ const rate = x => x==null ? '<span class="s">—</span>'
   : (x>100 ? `<span class="odd" title="Amazon reports more than one click per search for this term - its recorded search volume is very low, so treat this figure with care">${{x.toFixed(0)}}%</span>`
            : x.toFixed(2)+'%');
 const sort = {{T:{{k:'v',d:-1}},M:{{k:'n',d:-1}},A:{{k:'sk',d:1}},B:{{k:'v',d:-1}},
-  C:{{k:'sk',d:1}},G:{{k:'u6',d:-1}}}};
+  G:{{k:'u6',d:-1}}}};
 const UNITS_GT = {rules['top_moving_units_gt']}, MONTHS = {json.dumps([m[:7] for m in per['months']])};
 const REVIEWED = {{}};        // 2.9 action_state - in-page only, never sent to Amazon
 let tab='1', sec='';
@@ -662,7 +651,6 @@ function draw2(){{
   const f=F2();
   const A=(sec&&sec!=='A')?[]:order(D.a.filter(r=>keep2(r,f,'A')),sort.A.k,sort.A.d);
   const B=(sec&&sec!=='B')?[]:order(D.b.filter(r=>keep2(r,f,'B')),sort.B.k,sort.B.d);
-  const C=(sec&&sec!=='C')?[]:order(D.c.filter(r=>keep2(r,f,'C')),sort.C.k,sort.C.d);
 
   $('#tA tbody').innerHTML=A.map(r=>`<tr><td><span class="pill acc">${{esc(BR[r.br])}}</span></td>
     <td><span class="asin">${{esc(r.da)}}</span></td><td class="m s">${{esc(r.sku)}}</td>
@@ -671,12 +659,6 @@ function draw2(){{
     <td class="warnt clip" title="${{esc(r.is)}}">${{esc(r.is)}}</td>
     <td class="r">${{r.n?r.n:'<span class="warnt">0 — none</span>'}}</td>
     <td><span class="asin">${{esc(r.ta)}}</span></td>
-    <td class="s clip wide" title="${{esc(r.ti)}}">${{esc(r.ti)}}</td></tr>`).join('');
-  $('#tC tbody').innerHTML=C.map(r=>`<tr><td><span class="pill acc">${{esc(BR[r.br])}}</span></td>
-    <td><span class="asin">${{esc(r.ta)}}</span></td><td class="c m">${{esc(r.tw)}}</td>
-    <td><span class="asin">${{esc(r.da)}}</span></td>
-    <td class="c m warnt"><b>${{esc(r.dw)}}</b></td><td class="m warnt">${{esc(r.sku)}}</td>
-    <td class="m">${{esc(r.sk)}}</td>
     <td class="s clip wide" title="${{esc(r.ti)}}">${{esc(r.ti)}}</td></tr>`).join('');
   $('#tB tbody').innerHTML=B.map(r=>`<tr class="${{r.t==='none'?'':'gap'}}">
     <td><span class="pill acc">${{esc(BR[r.br])}}</span></td><td class="kw">${{esc(r.kw)}}</td>
@@ -726,12 +708,12 @@ function draw2(){{
   }}
 
   const set=(id,n,t)=>{{ $(id).textContent = n===t?`(${{t}})`:`(${{n}} of ${{t}})`; }};
-  set('#nA',A.length,D.a.length); set('#nB',B.length,D.b.length); set('#nC',C.length,D.c.length);
-  ['A','B','C'].forEach(s=>{{ const rows={{A:A,B:B,C:C}}[s];
+  set('#nA',A.length,D.a.length); set('#nB',B.length,D.b.length);
+  ['A','B'].forEach(s=>{{ const rows={{A:A,B:B}}[s];
     $('#sec'+s).hidden = !!(sec&&sec!==s);
     if(s!=='B') $('#t'+s).hidden = rows.length===0;
     $('#sec'+s+' .empty').hidden = rows.length!==0; }});
-  const shown=A.length+B.length+C.length, tot=D.a.length+D.b.length+D.c.length;
+  const shown=A.length+B.length, tot=D.a.length+D.b.length;
   $('#ct2').innerHTML=`Showing <b>${{shown}}</b> row${{shown===1?'':'s'}}`
     +(f.g?` · <b>${{D.b.filter(r=>r.t!=='none').length}}</b> gaps in total`:` of ${{tot}}`);
   $$('#p2 .kpi').forEach(k=>k.classList.toggle('on',
@@ -740,7 +722,8 @@ function draw2(){{
 }}
 
 /* ---------------- ALL BULBS ---------------- */
-const BK={{in_report:'bk',under_no_twin:'wn',under_no_gap:'am',selling_ok:'ok',top_moving:'tm'}};
+const BK={{in_report:'bk',under_no_twin:'wn',under_no_gap:'am',selling_ok:'ok',top_moving:'tm',
+  sku_check:'lt'}};
 function draw3(){{
   const q=$('#q3').value.trim().toLowerCase(), br=$('#br3').value,
         bk=$('#bk3').value, sl=$('#sl3').value;

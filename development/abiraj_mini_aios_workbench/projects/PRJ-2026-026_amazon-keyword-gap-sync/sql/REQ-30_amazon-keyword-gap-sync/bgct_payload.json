@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-19T16:20:33",
+ "generated_at": "2026-08-19T16:40:50",
  "reference_date": "2026-08-19",
  "period": {
   "months": [
@@ -64,11 +64,12 @@
  },
  "coverage": {
   "total": 776,
-  "under_no_twin": 340,
   "selling_ok": 302,
-  "in_report": 45,
+  "under_no_twin": 340,
+  "top_moving": 30,
+  "in_report": 42,
   "under_no_gap": 59,
-  "top_moving": 30
+  "sku_check": 3
  },
  "catalogue": [
   {
@@ -2892,9 +2893,9 @@
    "units_3mo": 0,
    "units_6mo": 0,
    "months_above": 0,
-   "bucket": "in_report",
-   "status": "In this report \u2014 needs work",
-   "in_report": true,
+   "bucket": "sku_check",
+   "status": "SKU code needs checking \u2014 not a keyword job",
+   "in_report": false,
    "title": "LED G125 Vintage Non-Dimmable Edison Christmas Decorative Light Bulb 4W(40 Watts Equivalent), E27 Screw Warm White 2700K Energy-Saving Spiral Marry X-mas Filame"
   },
   {
@@ -8598,9 +8599,9 @@
    "units_3mo": 11,
    "units_6mo": 15,
    "months_above": 1,
-   "bucket": "in_report",
-   "status": "In this report \u2014 needs work",
-   "in_report": true,
+   "bucket": "sku_check",
+   "status": "SKU code needs checking \u2014 not a keyword job",
+   "in_report": false,
    "title": "DC VOLTAGE 10-Pack, LED Bayonet Light Bulb, BC G95 4W(40W Equivalent) Dimmable Warm White 2700K 450 Lumens LED Filament Amber Glass Retro Style Old Fashioned De"
   },
   {
@@ -11244,9 +11245,9 @@
    "units_3mo": 0,
    "units_6mo": 0,
    "months_above": 0,
-   "bucket": "in_report",
-   "status": "In this report \u2014 needs work",
-   "in_report": true,
+   "bucket": "sku_check",
+   "status": "SKU code needs checking \u2014 not a keyword job",
+   "in_report": false,
    "title": "Pack 6 | Vintage LED B22 Bulb,ST64 4W Dimmable 2700K Warm White 2700K Bayonet Base LED Filament Squirrel Cage Lamp Amber Glass 450 Lumens Energy Saving Bulb for"
   },
   {
