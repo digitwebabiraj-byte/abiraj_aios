@@ -163,6 +163,22 @@ tbody tr.gap:hover td{{background:#fbeceb}}
 .pill.acc{{background:var(--chip);color:var(--nv)}}
 .warnt{{color:var(--warn)}}
 .empty{{padding:26px;text-align:center;color:var(--mut);font-size:13px}}
+/* grouped "By listing" view - source sections 2.6 / 2.7 */
+.pair{{background:var(--panel);border:1px solid var(--line);border-radius:9px;margin-bottom:12px;
+ overflow:hidden}}
+.ph{{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:11px 13px;
+ background:#f6f9fc;border-bottom:1px solid var(--line);flex-wrap:wrap}}
+.ph .who{{font-size:13px}} .ph .sk{{color:var(--mut);font-size:11.5px;margin-top:3px}}
+.tag{{background:var(--chip);color:var(--nv);border-radius:4px;padding:2px 7px;font-size:11px;
+ font-weight:600}}
+.tag.dead{{background:#fbe9e7;color:var(--gap)}}
+.arrow{{color:var(--mut);margin:0 5px}}
+.act{{border:0;border-radius:7px;padding:8px 13px;font-size:12.5px;font-weight:600;cursor:pointer;
+ color:#fff;white-space:nowrap}}
+.act.ok{{background:var(--ok)}} .act.add{{background:var(--gap)}}
+.act.done{{background:#78868f;cursor:default}}
+.pair table{{border-radius:0}} .pair .wrap{{border:0;border-radius:0}}
+.state{{font-size:11.5px;color:var(--mut);margin-left:9px}}
 footer{{color:var(--mut);font-size:11.5px;padding:16px 22px 40px;border-top:1px solid var(--line);
  margin-top:26px}}
 b.y{{color:var(--ok)}} b.n{{color:var(--gap)}}
@@ -210,6 +226,10 @@ should go — a person adds it. (The source document's automatic push is deliber
     <option value="zero_sales_6mo">No sales 6 months</option>
     <option value="sales_drop_3mo">Sales falling 3 months</option></select></label>
   <label>Min searches<input type="number" id="fv" min="0" step="10" placeholder="0"></label>
+  <label>View<select id="fview">
+    <option value="flat">All keywords — one list</option>
+    <option value="pair">By listing — with review buttons</option>
+  </select></label>
   <label class="chk"><span>&nbsp;</span><span><input type="checkbox" id="fgap" checked>
     Only rows needing action</span></label>
   <button class="btn" id="reset">Reset</button>
@@ -267,6 +287,7 @@ should go — a person adds it. (The source document's automatic push is deliber
       <th data-k="ta">Keyword came from<span class="ar">▾</span></th>
       </tr></thead><tbody></tbody></table>
       <div class="empty" hidden>Nothing matches these filters.</div></div>
+    <div id="pairs" hidden></div>
   </section>
 </main>
 
@@ -295,6 +316,7 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}}[c]));
 const sort = {{A:{{k:'sk',d:1}}, B:{{k:'v',d:-1}}, C:{{k:'sk',d:1}}}};
 let sec = '';
+const REVIEWED = {{}};      // 2.9 action_state, recorded in-page only; never sent to Amazon
 
 function F(){{ return {{
   q:  $('#q').value.trim().toLowerCase(),
@@ -356,6 +378,47 @@ function draw(){{
     <td class="m">${{esc(r.da)}}</td><td>${{esc(ST[r.ds]||r.ds)}}</td>
     <td class="m">${{esc(r.sk)}}</td><td class="m s">${{esc(r.ta)}}</td></tr>`).join('');
 
+  // ---- grouped "By listing" view: source 2.6 (per-pair keyword status) + 2.7 (two buttons) ----
+  const grouped = $('#fview').value==='pair';
+  $('#tB').closest('.wrap').hidden = grouped || B.length===0;
+  $('#pairs').hidden = !grouped;
+  if(grouped){{
+    const g={{}};
+    B.forEach(r=>{{ const k=r.br+'|'+r.ta+'|'+r.da; (g[k]=g[k]||[]).push(r); }});
+    const keys=Object.keys(g).sort((x,y)=>
+      g[y].filter(r=>r.t!=='none').length - g[x].filter(r=>r.t!=='none').length);
+    $('#pairs').innerHTML = keys.map(k=>{{
+      const rs=g[k], r0=rs[0], nGap=rs.filter(r=>r.t!=='none').length;
+      // Button 1 is shown ONLY when every term ticks BOTH methods (source 2.7)
+      const allPresent = nGap===0 && !F().g;
+      const btn = allPresent
+        ? `<button class="act ok" data-p="${{k}}">All keywords present · Mark reviewed</button>`
+        : `<button class="act add" data-p="${{k}}">Add missing keywords (${{nGap}})</button>`;
+      return `<div class="pair">
+        <div class="ph"><div class="who"><span class="tag">Top-Moving</span>
+          <b class="m">${{esc(r0.ta)}}</b><span class="arrow">→</span>
+          <span class="tag dead">${{esc(ST[r0.ds]||r0.ds)}}</span> <b class="m">${{esc(r0.da)}}</b>
+          <span class="pill acc">${{esc(BR[r0.br])}}</span>
+          <div class="sk">base SKU ${{esc(r0.sk)}} · ${{rs.length}} keyword${{rs.length===1?'':'s'}}
+            shown · action_state <b>${{nGap?'pending_add':'reviewed'}}</b></div></div>
+        <div>${{btn}}<span class="state"></span></div></div>
+        <div class="wrap"><table><thead><tr><th class="na">Keyword</th>
+          <th class="na r">Searches / mo</th><th class="na c">In text</th>
+          <th class="na c">In backend</th><th class="na">What to do</th></tr></thead><tbody>
+        ${{rs.map(r=>`<tr class="${{r.t==='none'?'':'gap'}}"><td class="kw">${{esc(r.kw)}}</td>
+          <td class="r">${{r.v.toLocaleString()}}</td>
+          <td class="c"><span class="tick ${{r.f?'y':'n'}}">${{r.f?'✓':'✗'}}</span></td>
+          <td class="c"><span class="tick ${{r.b?'y':'n'}}">${{r.b?'✓':'✗'}}</span></td>
+          <td><span class="pill ${{PILL[r.t]}}">${{esc(TG[r.t])}}</span></td></tr>`).join('')}}
+        </tbody></table></div></div>`;
+    }}).join('') || '<div class="empty">Nothing matches these filters.</div>';
+    $('#pairs').querySelectorAll('.act').forEach(b=>b.addEventListener('click',()=>{{
+      const done = REVIEWED[b.dataset.p] = b.classList.contains('ok') ? 'reviewed' : 'added';
+      b.className='act done'; b.textContent = done==='reviewed' ? 'Reviewed ✓' : 'Marked as added ✓';
+      b.nextElementSibling.textContent = 'recorded in this page only — nothing was sent to Amazon';
+    }}));
+  }}
+
   const set=(id,n,tot)=>{{ $(id).textContent = n===tot ? `(${{tot}})` : `(${{n}} of ${{tot}})`; }};
   set('#nA',A.length,D.a.length); set('#nB',B.length,D.b.length); set('#nC',C.length,D.c.length);
   ['A','B','C'].forEach(s=>{{
@@ -379,6 +442,7 @@ function draw(){{
 
 ['q','fbr','ftg','fds','fv'].forEach(id=>{{
   $('#'+id).addEventListener('input',draw); $('#'+id).addEventListener('change',draw); }});
+$('#fview').addEventListener('change',draw);
 $('#fsec').addEventListener('change',e=>{{ sec=e.target.value; draw(); }});
 $('#ftg').addEventListener('change',e=>{{                 // asking for 'Nothing to do' un-hides them
   if(e.target.value==='none') $('#fgap').checked=false; draw(); }});
@@ -387,7 +451,7 @@ document.querySelectorAll('.kpi').forEach(k=>k.addEventListener('click',()=>{{
   const f=k.dataset.f==='all'?'':k.dataset.f; sec = (sec===f)?'':f; $('#fsec').value=sec; draw(); }}));
 $('#reset').addEventListener('click',()=>{{
   ['q','fbr','ftg','fds','fv'].forEach(id=>$('#'+id).value='');
-  $('#fgap').checked=true; sec=''; $('#fsec').value=''; draw(); }});
+  $('#fgap').checked=true; sec=''; $('#fsec').value=''; $('#fview').value='flat'; draw(); }});
 document.querySelectorAll('th[data-k]').forEach(th=>th.addEventListener('click',()=>{{
   const t=th.closest('table').id.slice(1), k=th.dataset.k;
   if(sort[t].k===k) sort[t].d*=-1; else sort[t]={{k:k,d:(k==='v'?-1:1)}};
