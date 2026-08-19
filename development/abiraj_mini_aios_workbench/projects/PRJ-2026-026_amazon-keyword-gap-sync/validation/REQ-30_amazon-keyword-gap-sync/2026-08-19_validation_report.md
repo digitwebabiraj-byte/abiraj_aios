@@ -214,3 +214,67 @@ isolate it, or — better here — use the browser's own behaviour instead of wr
 | Reset | ✅ 229 rows |
 
 One self-contained file, 157 KB.
+
+---
+
+# ADDENDUM 4 — 🔴 content was read from ONE account row; Part A was 22, should be 1 (2026-08-19)
+
+The owner opened `B08G4YZDH5` in the Listing Management tool and its **Backend keywords field was
+full**. My report had that listing in **Part A** as *"backend keyword field empty; no bullet points;
+no description"*. He was right and the report was wrong.
+
+## The mechanism
+An ASIN can have several rows in `listings.amazon_listings`, one per account offer, and the content
+often sits on only one of them:
+
+| product_id | SKU | Account | Keywords | Bullets | Description |
+|---|---|---|---|---|---|
+| 879455 | `LDMG125E278_VDS` | 8 LEDSone | **0** | **0** | **0** |
+| 680611 | `LDMG125E278-A` | 9 SRM *(out of scope)* | 1 | 5 | 1,155 |
+
+The builder read only the in-scope account's row, so it reported "empty".
+
+**On Amazon an ASIN has ONE set of title, bullets, description and backend keywords** — the product
+page. Our per-account rows are an internal bookkeeping artefact of the listing tool. Reading one of
+them understates what is actually live, which is exactly what the operator sees when they open the
+listing.
+
+Measured across Part A: **21 of 22 listings had content on a row belonging to a different account.**
+Only 1 was genuinely empty everywhere.
+
+## Why this was worse than a Part A miscount
+The same one-row read fed **`in_frontend` and `in_backend` in Part B**. Those listings were not just
+mislabelled — every keyword check against them was being made against empty text, so **every term came
+back "missing"**. The report was manufacturing gaps.
+
+## The fix
+Content (title, bullets, description, backend keywords) is now gathered from **every UK row of that
+ASIN, whatever account it sits under**. Accounts are still **never merged in the report** — §2.10 is
+about reporting, and each row still belongs to one account. Only the content *read* is widened, because
+content is a property of the ASIN.
+
+## Effect
+| | before | **after** |
+|---|---|---|
+| Part A — needs a rewrite | 22 | **1** |
+| Part B — listings | 26 | **45** |
+| Part B — rows | 275 | **567** |
+| Part B — real gaps | 204 | **387** |
+| Part C | 3 | 3 |
+| QA | 7/7 | **7/7** |
+
+`B08G4YZDH5` now sits in Part B with 26 keywords properly checked — e.g. *"large screw light bulbs"*
+(306/mo) missing from both surfaces, and *"e27 globe bulb"* (91/mo) present in the text but missing
+from the backend. That is a usable instruction. "Rewrite this empty listing" was not.
+
+## Also corrected: my own verification test
+A first check flagged `B0BL82LFD7` as wrongly in Part A. It was not — Part A triggers when the backend
+**or** the bullets are empty, and that listing has 5 bullets and 0 keywords, so flagging only the empty
+backend is right. **The test was miscalibrated, not the builder.** Recorded because a false alarm in a
+validation script is as misleading as a false figure in a report.
+
+## Lesson
+**A per-account row is not the listing.** Before treating a stored row as the state of something
+external, check whether the external thing is really per-row — here one ASIN is one Amazon page, and
+the account split is ours, not Amazon's. The tell was available all along: the operator's own tool
+showed content the report called empty.
