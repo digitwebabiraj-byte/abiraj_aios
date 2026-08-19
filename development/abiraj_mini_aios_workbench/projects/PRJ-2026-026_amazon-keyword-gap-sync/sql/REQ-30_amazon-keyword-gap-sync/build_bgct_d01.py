@@ -78,22 +78,43 @@ RULES = {
     "account_suffixes": ["_AML", "_AMD", "_AMN", "_AMS", "_KP", "_DCVV", "_DCV", "_DC", "_UK", "_AM"],
 }
 
-_SUFFIX_RE = re.compile("(" + "|".join(RULES["account_suffixes"]) + ")$", re.I)
-_TAIL_RE = re.compile(r"\s*([0-9]+PK)?(\s*-?[A-Za-z]{1,2})?$", re.I)
+# A trailing marker is always introduced by a separator: ' D', ' AM', '-B1', '-AFR', '-DC', '_DCVV'.
+_MARKER_RE = re.compile(r"[\s\-_][A-Za-z]{1,4}[0-9]{0,2}$")
+# The pack quantity is a SINGLE digit glued directly to 'PK' - verified across the catalogue: every
+# multi-digit capture before 'PK' is product code plus a 1-digit pack (…2786PK = product …278 + 6PK).
+# The earlier `[0-9]+PK` was greedy and ate the product code: LDMST64E2786PK (8W ST64) and
+# LDMST64E2746PK (6W ST84) both collapsed to LDMST64E and were wrongly paired as one product.
+# The source document's own example is the test: LDMG95E2782PK / LDMG95E2785PK -> LDMG95E278.
+_PACK_RE = re.compile(r"([0-9])PK$", re.I)
 _NONALNUM = re.compile(r"[^a-z0-9]+")
 
 
 def normalise_sku(sku: str) -> str:
-    """Q6. Strip pack size, trailing letters and account suffixes. Bundles (A+B+C) are NOT split -
-    a kit is its own product. Splitting them grouped 1,151 unrelated products under one base SKU."""
+    """Q6. Strip pack size, trailing markers and account suffixes, repeatedly until stable.
+    Bundles (A+B+C) are NOT split - a kit is its own product. Splitting them grouped 1,151
+    unrelated products under one base SKU."""
     if not sku:
         return ""
     s = sku.strip()
     if s.lower().startswith("amzn.gr."):          # Amazon-generated junk SKU
         s = s[8:].split("-")[0]
-    s = _SUFFIX_RE.sub("", s)
-    s = _TAIL_RE.sub("", s)
-    return s.strip().upper()
+    s = s.upper()
+    for _ in range(5):                            # e.g. 'LDMST64E2746PK D' -> ' D' -> '6PK'
+        before = s
+        s = _MARKER_RE.sub("", s)
+        s = _PACK_RE.sub("", s)
+        if s == before:
+            break
+    return s.strip(" -_")
+
+
+# The source document's worked example, asserted at import time so this rule can never silently
+# regress: LDMG95E278 (single) == LDMG95E2782PK (2-pack) == LDMG95E2785PK (5-pack).
+assert normalise_sku("LDMG95E2782PK") == normalise_sku("LDMG95E2785PK") == \
+       normalise_sku("LDMG95E278") == "LDMG95E278", "SKU rule fails the source's own example"
+# …and two products that differ only in the digits before the pack must NOT collapse together.
+assert normalise_sku("LDMST64E2786PK") != normalise_sku("LDMST64E2746PK"), \
+       "SKU rule wrongly merges distinct products"
 
 
 def norm_text(t: str) -> str:
