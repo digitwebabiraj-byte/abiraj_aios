@@ -69,21 +69,35 @@ Your answer: ______________
 
 ---
 
-## Question 4 — Two listings look like they have the wrong SKU
+## Question 4 — Two listings have the wrong SKU 🔴
 
 This is not about keywords.
 
-Two of your bulbs are grouped with the wrong family, because their SKU does not match the bulb:
+Your SKU codes carry the wattage — `LDMG125E27`**8** = 8W, `LDCWB22`**3** = 3W. Two listings have a
+code that does not match the bulb:
 
-| Listing | Its SKU groups it with | But the listing says | The family is |
-|---|---|---|---|
-| **`B0B8P75R4Y`** | `LDMG125E278` | **4W** | **8W** |
-| **`B0D5CMBXK6`** | `LDCWB223` | **3W** | **7W** |
+### 1. `B0B8P75R4Y` — has an 8W code on a 4W bulb
 
-I have **not** used these two in the keyword report — they are in a separate list, because I do not
-know which is wrong: the SKU, or the title.
+- Its SKU is `LDMG125E278`**2PK**
+- You confirmed **`LDMG125E278` is 8W only**
+- But this listing says: *"LED G125 Vintage Non-Dimmable ... **4W**(40 Watts Equivalent)"*
+- The other **14 listings** in that family are all 8W
 
-**Can you check these two and tell me which is correct?**
+**It needs a 4W code.** Note: the existing 4W G125 codes (`LDSG125LOE274`, `LDSG125MUE274`) are the
+Music/Love decorative bulbs, so a plain 4W G125 code may not exist yet.
+
+### 2. `B09Z6P8H29` — has a 3W code on a 7W bulb
+
+- Its SKU is `LDCWB223` — and in that family `LDCWB22`**12** is 12W, so `LDCWB22`**3** means **3W**
+- But this listing says: *"LED A60 B22 Light Bulb, **7W** (70W Equivalent)"*
+- Its twin `B0D5CMBXK6` says *"(6 Pack, **3W**)"* — that one **matches** its code and is correct
+
+**So this is the one to fix, not the twin.**
+
+I have **not** used either pair in the keyword report — they are in a separate list, because putting
+8W keywords on a 4W bulb would be wrong.
+
+**Can you confirm these two, and tell me who fixes the codes?**
 
 Your answer: ______________
 

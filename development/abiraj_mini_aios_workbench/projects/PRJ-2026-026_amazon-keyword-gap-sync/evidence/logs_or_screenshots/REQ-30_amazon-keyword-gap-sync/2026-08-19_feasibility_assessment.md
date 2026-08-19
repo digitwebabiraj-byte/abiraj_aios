@@ -800,3 +800,44 @@ single hand-verified case was solid; generalising it to a percentage required a 
 turned out to be false in at least four distinct ways. A finding about someone's data is a claim about
 their work — it needs the same evidence standard as a number in the report, and this one was one
 question away from being sent.
+
+---
+
+## 19. Owner confirms the SKU grammar — both Part C rows are genuine (2026-08-19)
+
+Owner: *"There are SKUs available for both 8W and 4W. However, LDMG125E278 is available only in 8W."*
+
+That confirms the wattage IS encoded in the SKU **for this family**, and settles both Part C rows.
+It does **not** revive the retracted §18 population claim — the grammar is family-specific and the
+digit position varies (`LDCWB22`**12** is a two-digit 12W), which is exactly why the blanket parser
+failed.
+
+### Row 1 — `B0B8P75R4Y` : 8W code on a 4W bulb ✅ genuine
+`LDMG125E278` holds **15 UK ASINs**. Fourteen state 8W; this one states
+*"LED G125 Vintage Non-Dimmable Edison Christmas Decorative Light Bulb **4W**(40 Watts Equivalent)"*.
+Owner-confirmed the family is 8W only → **the listing's SKU is wrong**.
+
+⚠ Its correct code may not exist yet. The 4W G125 codes in the estate — `LDSG125LOE274`,
+`LDSG125MUE274` — are the Music/Love decorative line (alphabet/text filament), not a plain vintage
+G125. Flagged for the requester rather than guessed.
+
+### Row 2 — `B09Z6P8H29` : 3W code on a 7W bulb ✅ genuine, and the culprit is identifiable
+Within `LDCWB22…`, the digits after the prefix are the wattage: `LDCWB22`**12** carries 12W titles.
+So `LDCWB22`**3** means **3W**. Full titles:
+
+| ASIN | SKU | title states |
+|---|---|---|
+| `B09Z6P8H29` | `LDCWB223 M` | *"LED A60 B22 Light Bulb, **7W** (70W Equivalent)"* |
+| `B0D5CMBXK6` | `LDCWB2236PK` | *"… Non-Dimmable (6 Pack, **3W**)"* |
+
+`B0D5CMBXK6` **matches** its 3W code and is correct. **`B09Z6P8H29` is the mislabelled one** — a 7W
+bulb on a 3W code. The earlier write-up had this the wrong way round; the message to the requester now
+names `B09Z6P8H29`.
+
+### Status of the wattage cross-check
+Both rejections are real, found without relying on the unsound SKU parser — Part C compares the two
+**titles** to each other. Two for two.
+
+### Note on the LDCWB22 family
+Its titles are internally inconsistent beyond this pair: base `LDCWB2212` carries titles stating 12W,
+15W and 22W. Not pursued here — outside the requester's keyword question, but worth her knowing.
