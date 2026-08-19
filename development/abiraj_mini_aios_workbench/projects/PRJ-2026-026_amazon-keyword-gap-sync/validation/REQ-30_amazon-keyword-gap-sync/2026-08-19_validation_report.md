@@ -62,3 +62,67 @@ judge whether a term suits the product. That remains the requester's call and is
 ## Standing
 Read-only throughout. No Amazon API call of any kind. **Validated — not yet published, not automated,
 and awaiting Thuwaraga's business sign-off.**
+
+---
+
+# ADDENDUM — D01 given the same treatment as D02, and three D01 defects found (2026-08-19)
+
+Owner: *"not D02 same all same D01"* — D01 had only an Excel file while D02 had Excel **and** a
+dashboard. Building D01 its matching dashboard surfaced three real defects in the Phase 1 data.
+
+## 🔴 Defect 1 — `click_rate` used the wrong denominator
+The source's Step 8 requires a `click_rate` column. The builder computed
+`total_click_count / total_query_impression_count`. **Amazon's own definition is
+`total_click_count / search_query_volume`**, proved against its stored column on live rows:
+
+| search term | impressions | clicks | Amazon `total_click_rate` | clicks/impressions | clicks/**volume** |
+|---|---|---|---|---|---|
+| ceiling fans with lights | 4,298,113 | 58,873 | **31.55%** | 1.37% ✗ | **31.5524%** ✅ |
+| ceiling fan | 4,251,180 | 54,055 | **30.09%** | 1.27% ✗ | **30.0919%** ✅ |
+| kitchen | 2,011,567 | 3,125 | **3.33%** | 0.16% ✗ | **3.3305%** ✅ |
+| garden lights | 1,771,067 | 13,633 | **18.81%** | 0.77% ✗ | **18.8067%** ✅ |
+
+Every delivered click rate was therefore **~23× too low**. Fixed.
+`asin_impression_share` was already correct (ASIN impressions / total query impressions — confirmed
+against Amazon's column on the same rows).
+
+## 🔴 Defect 2 — the three months were combined, which the source forbids
+Step 4 is explicit: *"Check the last 3 consecutive months **one month at a time, not as a combined
+range**"*, and Step 8's filename `SQP_[ASIN]_[YYYY-MM].csv` confirms a per-month export. The builder
+summed the whole window into one row per ASIN × term.
+
+Fixed: Phase 1 is now **one row per ASIN × month × term** (443 rows), the top-N cut applies **within
+each month**, and the Excel writes **one sheet per account per month** (`SQP LED 2026-05`,
+`SQP DCV 2026-06`, …). Each weekly row is assigned to the month containing its `start_date` — Amazon
+weeks are Sun–Sat and can straddle a boundary, so the choice is stated rather than left implicit.
+
+Phase 2 still audits *"the confirmed top search terms"* — now the **de-duplicated union** across the
+three months (411 distinct terms), keeping each term's highest monthly volume.
+
+## 🔴 Defect 3 — the volume column was mislabelled
+`search_query_volume` is the **market-wide** volume for that term in that week, identical for every ASIN
+in the same week (6,610 for all ASINs in w/c 2026-07-19). Summing it per ASIN across the window made an
+ASIN present in 2 weeks look twice as in-demand as one present in 1 week — that is **week coverage, not
+customer demand**. With months now separate the figure is a genuine monthly volume and the label
+"Searches / mo" is accurate.
+
+## Re-verification
+**372 single-week rows compared directly against Amazon's own stored `total_click_rate` and
+`asin_impression_share` columns — 0 mismatches beyond rounding.** (Single-week months are the only ones
+directly comparable; multi-week months are aggregates by construction.)
+
+## D01 dashboard
+Same design, filters and interaction model as D02: full-screen, sticky toolbar, sortable tables,
+clickable KPI tiles. Filters: search · account · **month** · Top-Moving ASIN · min searches ·
+**Opportunity only** · **Long-tail only**. 443 terms · 141 opportunity · 73 long-tail.
+
+*Opportunity* implements the source's "High Volume + Low ASIN Share" pattern. The document names the
+pattern but gives no cut-off (open item #10), so it is a **median split of this run**, labelled as such
+on screen — no business threshold has been invented.
+
+## Standing after this addendum
+| | |
+|---|---|
+| D01 | Excel (7 month/account sheets) **+ dashboard** — rate columns now match Amazon exactly |
+| D02 | Excel (Parts A/B/C + field reference) **+ dashboard** with the §2.7 review buttons |
+| Independent checks | 10/10 · in-run QA 7/7 · 372 rate rows reconciled |

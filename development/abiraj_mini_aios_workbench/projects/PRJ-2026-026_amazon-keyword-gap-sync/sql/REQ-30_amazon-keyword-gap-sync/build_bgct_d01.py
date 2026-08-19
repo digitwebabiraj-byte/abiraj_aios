@@ -308,38 +308,69 @@ def main():
 
     # --- Phase 1 Steps 2-8: SQP terms ---------------------------------------------------------
     tm_asins = tuple({a for _, a in top_moving}) or ("",)
+    # Source Step 4 is explicit: "check the last 3 consecutive months ONE MONTH AT A TIME, not as a
+    # combined range", and Step 8's filename SQP_[ASIN]_[YYYY-MM].csv confirms a per-month export.
+    # Each weekly row is assigned to the month containing its start_date (Amazon weeks are Sun-Sat and
+    # can straddle a month boundary; start_date is the stable, stated choice).
     cur.execute("""
-        SELECT sub_source, asin, search_query,
+        SELECT sub_source, asin, date_trunc('month', start_date)::date AS mo, search_query,
                SUM(search_query_volume), MAX(search_query_score),
                SUM(total_query_impression_count), SUM(asin_impression_count),
                SUM(total_click_count), SUM(asin_click_count), SUM(total_purchase_count)
         FROM business_reports.amz_search_query_performance
         WHERE market_place=%s AND sub_source IN %s AND asin IN %s
           AND start_date >= %s AND end_date < %s
-        GROUP BY 1,2,3""", (mp, accts, tm_asins, p_start, p_end))
-    sqp = defaultdict(list)
-    for ss, asin, q, vol, score, timp, aimp, tclk, aclk, purch in cur.fetchall():
+        GROUP BY 1,2,3,4""", (mp, accts, tm_asins, p_start, p_end))
+    per_month = defaultdict(list)          # (ss, asin, month) -> term rows, months kept SEPARATE
+    for ss, asin, mo, q, vol, score, timp, aimp, tclk, aclk, purch in cur.fetchall():
         if (ss, asin) not in top_moving:
             continue
-        vol, timp, aimp, purch = int(vol or 0), int(timp or 0), int(aimp or 0), int(purch or 0)
+        vol, timp, aimp = int(vol or 0), int(timp or 0), int(aimp or 0)
+        tclk, aclk, purch = int(tclk or 0), int(aclk or 0), int(purch or 0)
         if RULES["drop_zero_conversion_terms"] and purch == 0:     # source Step 6
             continue
         nwords = len(kw_words(q))
         lo, hi = RULES["long_tail_words"]; vlo, vhi = RULES["long_tail_volume"]
-        sqp[(ss, asin)].append({
-            "search_term": q, "search_query_score": int(score or 0), "search_query_volume": vol,
+        per_month[(ss, asin, mo)].append({
+            "month": mo.isoformat()[:7],
+            "search_term": q, "search_query_score": score or 0, "search_query_volume": vol,
             "total_count": timp, "asin_count": aimp,
-            # shares/rates recomputed from numerator+denominator, NEVER averaged across weeks
+            # Rates are RECOMPUTED from numerator and denominator, never averaged across weeks.
+            # Denominators verified against Amazon's own stored columns on live rows:
+            #   asin_impression_share = asin_impression_count / total_query_impression_count
+            #   total_click_rate      = total_click_count     / SEARCH_QUERY_VOLUME  (not impressions)
+            #   asin_click_share      = asin_click_count      / total_click_count
             "asin_share": round(aimp / timp, 6) if timp else None,
-            "click_rate": round(int(tclk or 0) / timp, 6) if timp else None,
-            "asin_click_share": round(int(aclk or 0) / int(tclk or 0), 6) if tclk else None,
+            "click_rate": round(tclk / vol, 6) if vol else None,
+            "asin_click_share": round(aclk / tclk, 6) if tclk else None,
             "purchases": purch,
             "is_long_tail": lo <= nwords <= hi and vlo <= vol <= vhi,
         })
+    for k in per_month:                    # source Step 5: top N per ASIN, within each month
+        per_month[k].sort(key=lambda r: -r["search_query_volume"])
+        del per_month[k][RULES["terms_per_asin"]:]
+
+    # Phase 2 consumes the CONFIRMED terms for each Top-Moving ASIN = the de-duplicated union across
+    # the months (source: "the confirmed top search terms ... is the input to Phase 2"). Where a term
+    # appears in more than one month its highest monthly volume is kept.
+    sqp = defaultdict(list)
+    for (ss, asin, _mo), rows in per_month.items():
+        best = {}
+        for r in rows:
+            cur_best = best.get(r["search_term"])
+            if cur_best is None or r["search_query_volume"] > cur_best["search_query_volume"]:
+                best[r["search_term"]] = r
+        for t, r in best.items():
+            prev = next((x for x in sqp[(ss, asin)] if x["search_term"] == t), None)
+            if prev is None:
+                sqp[(ss, asin)].append(r)
+            elif r["search_query_volume"] > prev["search_query_volume"]:
+                sqp[(ss, asin)][sqp[(ss, asin)].index(prev)] = r
     for k in sqp:
         sqp[k].sort(key=lambda r: -r["search_query_volume"])
-        del sqp[k][RULES["terms_per_asin"]:]                        # source Step 5
-    print(f"Top-Moving ASINs with SQP terms: {len(sqp)} | total terms: {sum(len(v) for v in sqp.values())}")
+    print(f"Top-Moving ASINs with SQP terms: {len(sqp)} | monthly term rows: "
+          f"{sum(len(v) for v in per_month.values())} | distinct terms for Phase 2: "
+          f"{sum(len(v) for v in sqp.values())}")
 
     # --- Phase 2 Step 1: underperformers, catalogue-anchored (deviation 2) --------------------
     def status_of(ss, asin):
@@ -493,8 +524,12 @@ def main():
         "top_moving": [{"brand": RULES["accounts"][ss], "asin": a,
                         "units": [monthly[(ss, a)].get(m, 0) for m in months],
                         "terms": len(sqp.get((ss, a), []))} for ss, a in sorted(top_moving)],
+        # Step 8 export: one row per ASIN x MONTH x term, months never combined
         "phase1": [{"brand": RULES["accounts"][ss], "top_asin": a, **t}
-                   for (ss, a), rows in sqp.items() for t in rows],
+                   for (ss, a, _m), rows in per_month.items() for t in rows],
+        # what Phase 2 actually audited: the de-duplicated union per ASIN
+        "phase1_confirmed": [{"brand": RULES["accounts"][ss], "top_asin": a, **t}
+                             for (ss, a), rows in sqp.items() for t in rows],
         "part_a": part_a,
         "part_b": part_b,
         "part_c": part_c,
@@ -553,8 +588,17 @@ def write_excel(p):
                                      "sales_drop_3mo = strictly falling across the 3 months"),
         ("Keyword match rule (Q9)", "all words of the term present anywhere in the text, any order, "
                                     "case and punctuation ignored"),
-        ("Terms per ASIN", f"top {p['rules']['terms_per_asin']} by search volume, zero-conversion terms dropped "
-                           f"(source Step 6)"),
+        ("Terms per ASIN", f"top {p['rules']['terms_per_asin']} by search volume PER MONTH, "
+                           f"zero-conversion terms dropped (source Step 6)"),
+        ("Months kept separate", "Source Step 4: the last 3 months are checked one month at a time, "
+                                 "never combined. Each weekly row is assigned to the month containing "
+                                 "its start_date. Phase 2 audits the de-duplicated union of the "
+                                 "confirmed terms across those months."),
+        ("Rate denominators", "Verified against Amazon's own stored columns: asin_share = ASIN "
+                              "impressions / total query impressions · click_rate = total clicks / "
+                              "SEARCH VOLUME (not impressions) · asin_click_share = ASIN clicks / "
+                              "total clicks. Recomputed from summed numerator and denominator, never "
+                              "averaged across weeks."),
         ("SCOPE BOUNDARY", "This system NEVER writes to Amazon. Section 2.7's automatic SP-API push is out of "
                            "workbench scope. add_target is a recommendation; a person applies it."),
         ("Deviation from source", "Zero-sales is anchored on the product catalogue, not the sales report: that "
@@ -568,14 +612,18 @@ def write_excel(p):
     # ---- REQ-30-D01 : Phase 1 -----------------------------------------------------------------
     wb = Workbook(); notes(wb.active, "REQ-30-D01 — Phase 1: SQP Top Search Terms", common)
     wb.active.title = "Notes & Method"
-    cols = ["brand", "top_asin", "search_term", "search_query_score", "search_query_volume",
-            "total_count", "asin_count", "asin_share", "click_rate", "asin_click_share",
-            "purchases", "is_long_tail"]
-    for brand in sorted({r["brand"] for r in p["phase1"]}):
-        sheet(wb.create_sheet(f"SQP {brand}"[:31]), cols,
-              sorted([r for r in p["phase1"] if r["brand"] == brand],
-                     key=lambda r: (r["top_asin"], -r["search_query_volume"])),
-              {"search_term": 46})
+    cols = ["month", "brand", "top_asin", "search_term", "search_query_score",
+            "search_query_volume", "total_count", "asin_count", "asin_share", "click_rate",
+            "asin_click_share", "purchases", "is_long_tail"]
+    # Source Step 8 names the export SQP_[ASIN]_[YYYY-MM] - months are kept in separate sheets so a
+    # month is never silently combined with another (Step 4).
+    for mo in sorted({r["month"] for r in p["phase1"]}):
+        for brand in sorted({r["brand"] for r in p["phase1"] if r["month"] == mo}):
+            short = "DCV" if brand.startswith("dcv") else "LED"
+            sheet(wb.create_sheet(f"SQP {short} {mo}"[:31]), cols,
+                  sorted([r for r in p["phase1"] if r["brand"] == brand and r["month"] == mo],
+                         key=lambda r: (r["top_asin"], -r["search_query_volume"])),
+                  {"search_term": 46})
     sheet(wb.create_sheet("Top-Moving ASINs"), ["brand", "asin", "units", "terms"],
           [{**r, "units": " / ".join(map(str, r["units"]))} for r in p["top_moving"]])
     d01 = os.path.join(OUTDIR, "REQ-30-D01_sqp_top_terms.xlsx"); wb.save(d01)
