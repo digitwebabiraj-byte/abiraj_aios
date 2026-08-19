@@ -513,3 +513,39 @@ that the scope is right. **Requester's decision.**
 `ph_category_products` map every PH to the products they own; check it during onboarding, not after the
 build. A report that silently spans another PH's products is wrong even when every figure in it is
 correct — and here the wrongness was visible in the output ("rawl plugs") a step before anyone asked.
+
+---
+
+## 14. FINAL BUILD — PH-scoped, Top-Moving rule re-chosen (2026-08-19)
+
+After the §13 scope correction the Top-Moving threshold was re-chosen, because "all 3 months" had been
+selected against whole-catalogue numbers and yielded only 11 of the requester's 776 bulbs.
+
+**Rule now: `units_ordered > 5` in AT LEAST 2 of the 3 months.** Still a repeat seller, not a one-month
+spike.
+
+🔴 **Latent bug fixed in the same change.** The Top-Moving test read
+`count == months_required`. At 3-of-3 that was accidentally correct; at 2 it would have selected ASINs
+that sold in *exactly* two months and **excluded every three-month seller**. Changed to `>=`.
+Also fixed: the dashboard's rule caption was a hardcoded string reading "in all 3 months" — it now
+derives from the payload, so the deliverable can never misstate the rule it was built on.
+
+### Final output
+| Measure | all-3 (previous) | **≥2-of-3 (final)** |
+|---|---|---|
+| Top-Moving ASINs | 11 | **30** |
+| …with converting SQP terms | 9 | **24** |
+| Phase 1 terms | 184 | **359** |
+| Part A — rewrites | 3 | **6** |
+| Part B — listings / rows / gaps | 2 / 4 / 4 | **22 / 225 / 216** |
+| QA (§2.10) | 6/6 PASS | **6/6 PASS** |
+
+`add_target`: backend_and_bullet 184 · bullet 18 · backend 14 · none 9.
+`duplicate_status`: zero_sales_6mo 221 · sales_drop_3mo 10.
+Accounts: Part A all LEDSone (6); Part B LEDSone 209 rows, DCVOLTAGE 16.
+
+Verified in-browser: tiles, Part A table, Part B pair panels and the two §2.7 buttons all render, and
+the rule caption now reads "at least 2 of 3 months".
+
+**Read-only throughout. No Amazon API call of any kind. Still DRAFT — not validated, not published,
+not automated.**
